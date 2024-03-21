@@ -10,3 +10,7 @@ Our app’s main focus will be facilitating event organisation and the promotion
 ## Figma
 
 To help in the design of our application, we will be working on Figma to design the UI and the workflow of the screens of our application. Here is our [project template](https://www.figma.com/files/project/212894999/Team-project?fuid=1232371200308240063).
+
+## SonarCloud
+
+We are using SonarCloud to analyze our code and to ensure that it is of high quality. Here is our [SonarCloud project](https://sonarcloud.io/summary/overall?id=SwEnt-Project-G18_SwEntApp).
