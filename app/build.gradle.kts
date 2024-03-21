@@ -6,6 +6,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("com.ncorti.ktfmt.gradle") version "0.16.0"
     id("kotlin-android")
+    id("org.sonarqube") version "4.4.1.3373"
 }
 
 
@@ -167,5 +168,13 @@ tasks.register("jacocoTestReport", JacocoReport::class) {
 tasks.withType<Test> {
     onlyIf {
         !name.toLowerCaseAsciiOnly().contains("release")
+    }
+}
+
+sonar {
+    properties {
+        property("sonar.projectKey", "SwEnt-Project-G18_SwEntApp")
+        property("sonar.organization", "swent-project-g18")
+        property("sonar.host.url", "https://sonarcloud.io")
     }
 }
