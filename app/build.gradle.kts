@@ -7,6 +7,7 @@ plugins {
     id("com.ncorti.ktfmt.gradle") version "0.16.0"
     id("kotlin-android")
     id("org.sonarqube") version "4.4.1.3373"
+    id("com.google.gms.google-services")
 }
 
 
@@ -120,8 +121,11 @@ dependencies {
     testImplementation("org.mockito:mockito-inline:2.13.0")
     testImplementation("org.robolectric:robolectric:4.11.1")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
+    
     implementation("com.firebaseui:firebase-ui-auth:7.2.0")
-
+    implementation("com.google.firebase:firebase-database-ktx:20.3.0")
+    implementation("com.google.firebase:firebase-firestore:24.10.0")
+    implementation("com.google.android.play:core-ktx:1.7.0")
     // Dependency for using Intents in instrumented tests
     androidTestImplementation("androidx.test.espresso:espresso-intents:3.5.1")
 
