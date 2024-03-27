@@ -7,7 +7,6 @@ plugins {
     id("com.ncorti.ktfmt.gradle") version "0.16.0"
     id("kotlin-android")
     id("org.sonarqube") version "4.4.1.3373"
-    id("com.google.gms.google-services")
 }
 
 
