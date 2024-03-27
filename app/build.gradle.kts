@@ -11,11 +11,11 @@ plugins {
 
 
 android {
-    namespace = "com.github.se.bootcamp"
+    namespace = "com.github.se.gomeet"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.github.se.bootcamp"
+        applicationId = "com.github.se.gomeet"
         minSdk = 29
         targetSdk = 34
         versionCode = 1
