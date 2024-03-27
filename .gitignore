@@ -8,3 +8,8 @@
 .externalNativeBuild
 .cxx
 local.properties
+app/build
+app/.env
+app/google-services.json
+local.defaults.properties
+secrets.properties

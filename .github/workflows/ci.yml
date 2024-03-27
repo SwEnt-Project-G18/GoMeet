@@ -12,7 +12,7 @@ on:
 
 jobs:
   ci:
-    name: CI and SonarCloud Analysis
+    name: CI SwEntApp
     runs-on: ubuntu-latest
 
     steps:
@@ -21,6 +21,13 @@ jobs:
         with:
           submodules: recursive
           fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
+
+      - name: API Key Setup
+        shell: bash
+        env:
+          MAPS_API_KEY: ${{ secrets.MAPS_API_KEY }}
+        run: |
+          echo MAPS_API_KEY="$MAPS_API_KEY" >> ./secrets.properties
 
       - name: Enable KVM group perms
         run: |
@@ -34,12 +41,8 @@ jobs:
           distribution: "temurin"
           java-version: "17"
 
-      - name: Cache SonarCloud packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
+      - name: Gradle cache
+        uses: gradle/actions/setup-gradle@v3
 
       - name: Cache Gradle packages
         uses: actions/cache@v4
@@ -48,8 +51,12 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
           restore-keys: ${{ runner.os }}-gradle
 
-      - name: Gradle cache
-        uses: gradle/actions/setup-gradle@v3
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
 
       - name: AVD cache
         uses: actions/cache@v4
@@ -78,14 +85,17 @@ jobs:
       - name: KTFmt Check
         run: ./gradlew ktfmtCheck
 
-      - name: Decode google-services.json
-        run: echo "${{secrets.GOOGLE_SERVICES_JSON}}" | base64 --decode > app/google-services.json
+      #- name: Decode google-services.json
+        #run: echo "${{secrets.GOOGLE_SERVICES_JSON}}" | base64 --decode > app/google-services.json
 
       - name: Assemble
         run: ./gradlew assemble lint --parallel --build-cache
 
+      # Run Unit tests
       - name: Run tests
-        run: ./gradlew check --parallel --build-cache
+        run: |
+          # To run the CI with debug information, add --info
+          ./gradlew check --parallel --build-cache
 
       - name: run tests on the emulator
         uses: reactivecircus/android-emulator-runner@v2
