@@ -40,7 +40,7 @@ fun PreviewBottomNavigationMenu() {
       onTabSelect = {},
       tabList = TOP_LEVEL_DESTINATIONS,
       //        selectedItem = OVERVIEW
-      selectedItem = MAP
+      selectedItem = LOGIN
       //        selectedItem = ""
       )
 }
