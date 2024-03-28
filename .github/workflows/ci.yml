@@ -85,8 +85,8 @@ jobs:
       - name: KTFmt Check
         run: ./gradlew ktfmtCheck
 
-      #- name: Decode google-services.json
-        #run: echo "${{secrets.GOOGLE_SERVICES_JSON}}" | base64 --decode > app/google-services.json
+      - name: Decode google-services.json
+        run: echo "${{secrets.GOOGLE_SERVICES_JSON}}" | base64 --decode > app/google-services.json
 
       - name: Assemble
         run: ./gradlew assemble lint --parallel --build-cache
