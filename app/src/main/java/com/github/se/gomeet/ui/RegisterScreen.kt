@@ -19,13 +19,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun LoginScreen(onLoginClicked: (String, String) -> Unit) {
+fun RegisterScreen(onRegister: (String, String) -> Unit) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+
+    //TODO: Implement the RegisterScreen composable function like in the FIGMA design
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -36,13 +37,8 @@ fun LoginScreen(onLoginClicked: (String, String) -> Unit) {
             .padding(16.dp)
     ) {
         Text(
-            text = "GoMeet",
+            text = "Register",
             style = MaterialTheme.typography.headlineLarge,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-        Text(
-            text = "Login",
-            style = MaterialTheme.typography.headlineSmall,
             modifier = Modifier.padding(bottom = 16.dp)
         )
         TextField(
@@ -59,18 +55,10 @@ fun LoginScreen(onLoginClicked: (String, String) -> Unit) {
             modifier = Modifier.fillMaxWidth()
         )
         Button(
-            onClick = { onLoginClicked(email, password) },
+            onClick = { onRegister(email, password) },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Log in")
+            Text("Sign Up")
         }
-    }
-}
-
-@Preview
-@Composable
-fun PreviewLoginScreen() {
-    LoginScreen { email, password ->
-        println("Email: $email, Password: $password")
     }
 }
