@@ -27,8 +27,6 @@ import com.github.se.gomeet.R
 fun WelcomeScreen() {
 
     Column(
-
-
         modifier = Modifier.border(width = 8.dp, color = Color(0x80747775), shape = RoundedCornerShape(size = 18.dp))
         .padding(8.dp)
         .width(412.dp)

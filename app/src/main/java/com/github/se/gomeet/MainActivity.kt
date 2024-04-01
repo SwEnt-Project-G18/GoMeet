@@ -15,12 +15,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
+import com.github.se.gomeet.ui.navigation.Route
+import com.github.se.gomeet.ui.create.Create
+import com.github.se.gomeet.ui.events.Events
+import com.github.se.gomeet.ui.explore.Explore
+import com.github.se.gomeet.ui.navigation.NavigationActions
+import com.github.se.gomeet.ui.profile.Profile
 import com.github.se.gomeet.ui.theme.GoMeetTheme
+import com.github.se.gomeet.ui.trending.Trending
 
 private val providers =
     arrayListOf(
@@ -32,9 +43,30 @@ class MainActivity : ComponentActivity() {
     super.onCreate(savedInstanceState)
     setContent {
       GoMeetTheme {
-        // A surface container using the 'background' color from the theme
         Surface(modifier = Modifier.fillMaxWidth(), color = MaterialTheme.colorScheme.background) {
-          Greeting()
+            val signedIn = remember { mutableStateOf(false) }
+            if (!signedIn.value) {
+                Greeting()
+            } else {
+                val nav = rememberNavController()
+                NavHost(navController = nav, startDestination = Route.EXPLORE) {
+                    composable(Route.EXPLORE) {
+                        Explore(NavigationActions(nav))
+                    }
+                    composable(Route.EVENTS) {
+                        Events(NavigationActions(nav))
+                    }
+                    composable(Route.TRENDING) {
+                        Trending(NavigationActions(nav))
+                    }
+                    composable(Route.CREATE) {
+                        Create(NavigationActions(nav))
+                    }
+                    composable(Route.PROFILE){
+                        Profile(NavigationActions(nav))
+                    }
+                }
+            }
         }
       }
     }
@@ -66,11 +98,7 @@ fun Greeting() {
         signInLauncher.launch(signInIntent)
       },
   ) {
-    if (!signedIn.value) {
       Text("Hello")
-    } else {
-      Text("Login successful")
-    }
   }
 }
 
