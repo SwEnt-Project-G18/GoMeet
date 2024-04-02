@@ -3,8 +3,6 @@ package com.github.se.gomeet.authentication
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import com.github.se.gomeet.ui.RegisterScreen
 import com.google.firebase.auth.FirebaseAuth
 
 class RegisterActivity : ComponentActivity() {
@@ -13,15 +11,9 @@ class RegisterActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         firebaseAuth = FirebaseAuth.getInstance()
-
-        setContent {
-            RegisterScreen { email, password ->
-                registerWithEmailAndPassword(email, password)
-            }
-        }
     }
 
-    private fun registerWithEmailAndPassword(email: String, password: String) {
+    private fun registerWithEmailAndPassword(email: String, password: String, onNavigateToExplore: () -> Unit) {
         firebaseAuth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
@@ -29,6 +21,7 @@ class RegisterActivity : ComponentActivity() {
                     Toast.makeText(this, "Registration successful", Toast.LENGTH_SHORT).show()
 
                     //TODO: Navigate to the MapActivity with the current user
+                    onNavigateToExplore()
 
                 } else {
                     // Registration failed, display a message to the user

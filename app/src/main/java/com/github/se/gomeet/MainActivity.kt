@@ -15,7 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -24,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
+import com.github.se.gomeet.ui.WelcomeScreen
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.create.Create
 import com.github.se.gomeet.ui.events.Events
@@ -46,7 +46,7 @@ class MainActivity : ComponentActivity() {
         Surface(modifier = Modifier.fillMaxWidth(), color = MaterialTheme.colorScheme.background) {
             val signedIn = remember { mutableStateOf(false) }
             if (!signedIn.value) {
-                Greeting()
+                WelcomeScreen()
             } else {
                 val nav = rememberNavController()
                 NavHost(navController = nav, startDestination = Route.EXPLORE) {
