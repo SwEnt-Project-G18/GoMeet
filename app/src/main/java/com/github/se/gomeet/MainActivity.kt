@@ -57,7 +57,7 @@ class MainActivity : ComponentActivity() {
           Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
             val userIdState = remember { mutableStateOf<String?>(null) }
             if (userIdState.value == null) {
-                WelcomeScreen(onSignInSuccess = { userId -> userIdState.value = userId })
+                WelcomeScreen2(onSignInSuccess = { userId -> userIdState.value = userId })
             } else {
                 val nav = rememberNavController()
                 Log.d("SignIn", "Signed in state changed: ${userIdState.value}")
@@ -84,7 +84,7 @@ class MainActivity : ComponentActivity() {
     }
   }
     @Composable
-    fun WelcomeScreen(onSignInSuccess: (String) -> Unit) {
+    fun WelcomeScreen2(onSignInSuccess: (String) -> Unit) {
         val launcher =
             rememberLauncherForActivityResult(FirebaseAuthUIActivityResultContract()) { res ->
                 if (res.resultCode == RESULT_OK) {
