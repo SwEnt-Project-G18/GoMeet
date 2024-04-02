@@ -16,13 +16,13 @@ fun Create (nav: NavigationActions) {
         bottomBar = {
             BottomNavigationMenu(
                 onTabSelect = { selectedTab ->
-                    nav.navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == selectedTab })
+                    nav
+                        .navigateTo(
+                            TOP_LEVEL_DESTINATIONS.first { it.route == selectedTab })
                 },
                 tabList = TOP_LEVEL_DESTINATIONS,
                 selectedItem = Route.EXPLORE)
-        })
-    { innerPadding ->
-        Text("Create", Modifier.padding(innerPadding))
-
+        }) { innerPadding ->
+        Text("Create", modifier = Modifier.padding(innerPadding))
     }
 }
