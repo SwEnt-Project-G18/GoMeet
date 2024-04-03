@@ -23,42 +23,32 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun RegisterScreen(onRegister: (String, String) -> Unit) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+  var email by remember { mutableStateOf("") }
+  var password by remember { mutableStateOf("") }
 
-    //TODO: Implement the RegisterScreen composable function like in the FIGMA design
+  // TODO: Implement the RegisterScreen composable function like in the FIGMA design
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-            .padding(16.dp)
-    ) {
+  Column(
+      horizontalAlignment = Alignment.CenterHorizontally,
+      verticalArrangement = Arrangement.Center,
+      modifier = Modifier.fillMaxSize().background(Color.White).padding(16.dp)) {
         Text(
             text = "Register",
             style = MaterialTheme.typography.headlineLarge,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
+            modifier = Modifier.padding(bottom = 16.dp))
         TextField(
             value = email,
             onValueChange = { newValue -> email = newValue },
             label = { Text("Email") },
-            modifier = Modifier.fillMaxWidth()
-        )
+            modifier = Modifier.fillMaxWidth())
         TextField(
             value = password,
             onValueChange = { newValue -> password = newValue },
             label = { Text("Password") },
             visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier.fillMaxWidth()
-        )
-        Button(
-            onClick = { onRegister(email, password) },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Sign Up")
+            modifier = Modifier.fillMaxWidth())
+        Button(onClick = { onRegister(email, password) }, modifier = Modifier.fillMaxWidth()) {
+          Text("Sign Up")
         }
-    }
+      }
 }

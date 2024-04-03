@@ -17,17 +17,17 @@ fun BottomNavigationMenu(
     tabList: List<TopLevelDestination>,
     selectedItem: String
 ) {
-    BottomNavigation(
-        modifier = Modifier.fillMaxWidth().height(80.dp),
-        backgroundColor = MaterialTheme.colors.background) {
+  BottomNavigation(
+      modifier = Modifier.fillMaxWidth().height(80.dp),
+      backgroundColor = MaterialTheme.colors.background) {
         tabList.forEach { destination ->
-            BottomNavigationItem(
-                icon = {
-                    Icon(imageVector = destination.icon, contentDescription = destination.textId)
-                },
-                label = { Text(destination.textId) },
-                selected = destination.route == selectedItem,
-                onClick = { onTabSelect(destination.route) })
+          BottomNavigationItem(
+              icon = {
+                Icon(imageVector = destination.icon, contentDescription = destination.textId)
+              },
+              label = { Text(destination.textId) },
+              selected = destination.route == selectedItem,
+              onClick = { onTabSelect(destination.route) })
         }
-    }
+      }
 }

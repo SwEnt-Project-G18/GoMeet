@@ -26,30 +26,24 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun LoginScreen(onLoginClicked: (String, String) -> Unit) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+  var email by remember { mutableStateOf("") }
+  var password by remember { mutableStateOf("") }
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top,
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-            .padding(25.dp)
-    ) {
+  Column(
+      horizontalAlignment = Alignment.CenterHorizontally,
+      verticalArrangement = Arrangement.Top,
+      modifier = Modifier.fillMaxSize().background(Color.White).padding(25.dp)) {
         Text(
             text = "GoMeet",
             style = MaterialTheme.typography.headlineLarge,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
+            modifier = Modifier.padding(bottom = 16.dp))
 
         Spacer(modifier = Modifier.size(30.dp))
 
         Text(
             text = "Login",
             style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
+            modifier = Modifier.padding(bottom = 16.dp))
 
         Spacer(modifier = Modifier.size(170.dp))
 
@@ -57,8 +51,7 @@ fun LoginScreen(onLoginClicked: (String, String) -> Unit) {
             value = email,
             onValueChange = { newValue -> email = newValue },
             label = { Text("Email") },
-            modifier = Modifier.fillMaxWidth()
-        )
+            modifier = Modifier.fillMaxWidth())
 
         Spacer(modifier = Modifier.size(16.dp))
 
@@ -67,24 +60,18 @@ fun LoginScreen(onLoginClicked: (String, String) -> Unit) {
             onValueChange = { newValue -> password = newValue },
             label = { Text("Password") },
             visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier.fillMaxWidth()
-        )
+            modifier = Modifier.fillMaxWidth())
 
         Spacer(modifier = Modifier.size(50.dp))
 
-        Button(
-            onClick = { onLoginClicked(email, password) },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Log in")
+        Button(onClick = { onLoginClicked(email, password) }, modifier = Modifier.fillMaxWidth()) {
+          Text("Log in")
         }
-    }
+      }
 }
 
 @Preview
 @Composable
 fun PreviewLoginScreen() {
-    LoginScreen { email, password ->
-        println("Email: $email, Password: $password")
-    }
+  LoginScreen { email, password -> println("Email: $email, Password: $password") }
 }

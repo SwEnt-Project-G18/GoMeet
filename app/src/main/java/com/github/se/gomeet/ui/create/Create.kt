@@ -11,18 +11,16 @@ import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 
 @Composable
-fun Create (nav: NavigationActions) {
-    Scaffold(
-        bottomBar = {
-            BottomNavigationMenu(
-                onTabSelect = { selectedTab ->
-                    nav
-                        .navigateTo(
-                            TOP_LEVEL_DESTINATIONS.first { it.route == selectedTab })
-                },
-                tabList = TOP_LEVEL_DESTINATIONS,
-                selectedItem = Route.EXPLORE)
-        }) { innerPadding ->
+fun Create(nav: NavigationActions) {
+  Scaffold(
+      bottomBar = {
+        BottomNavigationMenu(
+            onTabSelect = { selectedTab ->
+              nav.navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == selectedTab })
+            },
+            tabList = TOP_LEVEL_DESTINATIONS,
+            selectedItem = Route.EXPLORE)
+      }) { innerPadding ->
         Text("Create", modifier = Modifier.padding(innerPadding))
-    }
+      }
 }
