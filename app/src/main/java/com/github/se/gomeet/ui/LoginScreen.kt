@@ -1,5 +1,6 @@
 package com.github.se.gomeet.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,9 +21,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.github.se.gomeet.R
+import com.github.se.gomeet.ui.theme.DarkCyan
 
 @Composable
 fun LoginScreen(onLoginClicked: (String, String) -> Unit) {
@@ -30,22 +37,28 @@ fun LoginScreen(onLoginClicked: (String, String) -> Unit) {
   var password by remember { mutableStateOf("") }
 
   Column(
-      horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.Top,
+      horizontalAlignment = Alignment.CenterHorizontally,
       modifier = Modifier.fillMaxSize().background(Color.White).padding(25.dp)) {
-        Text(
-            text = "GoMeet",
-            style = MaterialTheme.typography.headlineLarge,
-            modifier = Modifier.padding(bottom = 16.dp))
+        Image(
+            painter = painterResource(id = R.drawable.gomeet_text),
+            contentDescription = "GoMeet",
+            modifier = Modifier.padding(top = 40.dp),
+            alignment = Alignment.Center
+        )
 
-        Spacer(modifier = Modifier.size(30.dp))
+        Spacer(modifier = Modifier.size(40.dp))
 
         Text(
             text = "Login",
-            style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier.padding(bottom = 16.dp))
+            modifier = Modifier.padding(bottom = 16.dp),
+            color = DarkCyan,
+            fontStyle = FontStyle.Normal,
+            fontWeight = FontWeight.SemiBold,
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.headlineLarge)
 
-        Spacer(modifier = Modifier.size(170.dp))
+        Spacer(modifier = Modifier.size(110.dp))
 
         TextField(
             value = email,
