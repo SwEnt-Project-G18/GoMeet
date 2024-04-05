@@ -9,6 +9,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -19,7 +20,8 @@ fun BottomNavigationMenu(
 ) {
   BottomNavigation(
       modifier = Modifier.fillMaxWidth().height(80.dp),
-      backgroundColor = MaterialTheme.colors.background) {
+      backgroundColor = MaterialTheme.colors.background)
+  {
         tabList.forEach { destination ->
           BottomNavigationItem(
               icon = {
@@ -30,4 +32,14 @@ fun BottomNavigationMenu(
               onClick = { onTabSelect(destination.route) })
         }
       }
+    }
+
+@Preview
+@Composable
+fun PreviewBottomNavigationMenu() {
+  BottomNavigationMenu(
+      onTabSelect = {},
+      tabList = TOP_LEVEL_DESTINATIONS,
+              selectedItem = "",
+      )
 }
