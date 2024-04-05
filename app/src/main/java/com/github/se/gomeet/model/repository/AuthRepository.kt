@@ -5,10 +5,20 @@ import android.content.Intent
 import android.util.Log
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.tasks.await
 
 class AuthRepository {
 
     private val firebaseAuth = FirebaseAuth.getInstance()
+    val currentUser = firebaseAuth.currentUser
+
+    fun hasUserSignedIn(): Boolean {
+        return currentUser != null
+    }
+
+    fun getUserId(): String? {
+        return currentUser?.uid
+    }
 
     suspend fun signInWithGoogle(): Intent? {
         return try {
@@ -22,28 +32,30 @@ class AuthRepository {
         }
     }
 
-    suspend fun signInWithEmailPassword(email: String, password: String) {
+    suspend fun signUpWithEmailPassword(email: String, password: String, onComplete: (Boolean) -> Unit) {
         firebaseAuth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    Log.d(TAG, "createUserWithEmail:success")
-                    firebaseAuth.currentUser?.uid
+                    Log.d(TAG, "signUpWithEmail:success")
+                    onComplete.invoke(true)
                 } else {
-                    Log.w(TAG, "createUserWithEmail:failure", task.exception)
+                    Log.w(TAG, "signUpWithEmail:failure", task.exception)
+                    onComplete.invoke(false)
                 }
-            }
+            }.await()
     }
 
-    suspend fun signUpWithEmailPassword(email: String, password: String) {
+    suspend fun signInWithEmailPassword(email: String, password: String, onComplete: (Boolean) -> Unit) {
         firebaseAuth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     Log.d(TAG, "signInWithEmail:success")
-                    firebaseAuth.currentUser?.uid
+                    onComplete.invoke(true)
                 } else {
                     Log.w(TAG, "signInWithEmail:failure", task.exception)
+                    onComplete.invoke(false)
                 }
-            }
+            }.await()
     }
 
     fun signOut() {
