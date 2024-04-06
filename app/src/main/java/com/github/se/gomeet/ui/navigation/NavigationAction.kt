@@ -31,7 +31,7 @@ object Route {
 val TOP_LEVEL_DESTINATIONS =
     listOf(
         TopLevelDestination(
-            route = Route.WELCOME, icon = Icons.Default.AccountCircle, textId = "Login"),
+            route = Route.WELCOME, icon = Icons.Default.AccountCircle, textId = "Welcome"),
         TopLevelDestination(
             route = Route.LOGIN, icon = Icons.Default.AccountCircle, textId = "Login"),
         TopLevelDestination(
