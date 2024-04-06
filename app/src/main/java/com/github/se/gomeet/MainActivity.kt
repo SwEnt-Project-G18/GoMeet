@@ -42,7 +42,10 @@ class MainActivity : ComponentActivity() {
                   onNavToRegister = {
                     NavigationActions(nav).navigateTo(TOP_LEVEL_DESTINATIONS[2])
                   },
-                  onSignInSuccess = { userId -> userIdState.value = userId })
+                  onSignInSuccess = { userId ->
+                    userIdState.value = userId
+                    NavigationActions(nav).navigateTo(TOP_LEVEL_DESTINATIONS[5])
+                  })
             }
             composable(Route.LOGIN) {
               LoginScreen(viewModel) {

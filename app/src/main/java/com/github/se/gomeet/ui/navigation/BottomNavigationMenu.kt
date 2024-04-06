@@ -21,7 +21,7 @@ fun BottomNavigationMenu(
   BottomNavigation(
       modifier = Modifier.fillMaxWidth().height(80.dp),
       backgroundColor = MaterialTheme.colors.background) {
-        for (i in 3..< size(tabList)) {
+        for (i in 3 ..< size(tabList)) {
           val destination = tabList[i]
           BottomNavigationItem(
               icon = {
