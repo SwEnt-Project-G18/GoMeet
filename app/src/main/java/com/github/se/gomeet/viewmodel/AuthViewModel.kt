@@ -64,7 +64,7 @@ class AuthViewModel(): ViewModel() {
                 _signInState.value = _signInState.value.copy(registerError = null)
 
                 authRepository.signUpWithEmailPassword(_signInState.value.emailRegister, _signInState.value.passwordRegister) {
-                    isSuccessful ->
+                        isSuccessful ->
                     if (isSuccessful) {
                         Toast.makeText(context, "Registration successful", Toast.LENGTH_SHORT).show()
                         _signInState.value = _signInState.value.copy(isSignInSuccessful = true)
@@ -92,7 +92,7 @@ class AuthViewModel(): ViewModel() {
                 _signInState.value = _signInState.value.copy(signInError = null)
 
                 authRepository.signInWithEmailPassword(_signInState.value.email, _signInState.value.password) {
-                    isSuccessful ->
+                        isSuccessful ->
                     if (isSuccessful) {
                         Toast.makeText(context, "Sign in successful", Toast.LENGTH_SHORT).show()
                         _signInState.value = _signInState.value.copy(isSignInSuccessful = true)
