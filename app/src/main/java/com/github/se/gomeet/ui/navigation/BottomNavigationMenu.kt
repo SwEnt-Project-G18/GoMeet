@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.google.common.collect.Iterables.size
 
 @Composable
 fun BottomNavigationMenu(
@@ -20,7 +21,8 @@ fun BottomNavigationMenu(
   BottomNavigation(
       modifier = Modifier.fillMaxWidth().height(80.dp),
       backgroundColor = MaterialTheme.colors.background) {
-        tabList.forEach { destination ->
+        for (i in 2..size(tabList)) {
+          val destination = tabList[i]
           BottomNavigationItem(
               icon = {
                 Icon(imageVector = destination.icon, contentDescription = destination.textId)
