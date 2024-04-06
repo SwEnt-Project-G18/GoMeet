@@ -8,7 +8,6 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 
 data class TopLevelDestination(
@@ -28,29 +27,37 @@ object Route {
   const val PROFILE = "Profile"
 }
 
+val LOGIN_ITEMS =
+    listOf(
+        TopLevelDestination(
+            route = Route.WELCOME, icon = Icons.Default.AccountCircle, textId = Route.WELCOME),
+        TopLevelDestination(
+            route = Route.LOGIN, icon = Icons.Default.AccountCircle, textId = Route.LOGIN),
+        TopLevelDestination(
+            route = Route.REGISTER, icon = Icons.Default.AccountCircle, textId = Route.REGISTER),
+    )
+
 val TOP_LEVEL_DESTINATIONS =
     listOf(
         TopLevelDestination(
-            route = Route.WELCOME, icon = Icons.Default.AccountCircle, textId = "Welcome"),
+            route = Route.EVENTS, icon = Icons.Default.DateRange, textId = Route.EVENTS),
         TopLevelDestination(
-            route = Route.LOGIN, icon = Icons.Default.AccountCircle, textId = "Login"),
+            route = Route.TRENDING, icon = Icons.Default.KeyboardArrowUp, textId = Route.TRENDING),
         TopLevelDestination(
-            route = Route.REGISTER, icon = Icons.Default.AccountCircle, textId = "Register"),
+            route = Route.EXPLORE, icon = Icons.Default.Home, textId = Route.EXPLORE),
+        TopLevelDestination(route = Route.CREATE, icon = Icons.Default.Add, textId = Route.CREATE),
         TopLevelDestination(
-            route = Route.EVENTS, icon = Icons.Default.DateRange, textId = "Events"),
-        TopLevelDestination(
-            route = Route.TRENDING, icon = Icons.Default.KeyboardArrowUp, textId = "Trending"),
-        TopLevelDestination(route = Route.EXPLORE, icon = Icons.Default.Home, textId = "Explore"),
-        TopLevelDestination(route = Route.CREATE, icon = Icons.Default.Add, textId = "Create"),
-        TopLevelDestination(route = Route.PROFILE, icon = Icons.Default.Person, textId = "Profile"))
+            route = Route.PROFILE, icon = Icons.Default.Person, textId = Route.PROFILE))
 
 class NavigationActions(private val navController: NavHostController) {
   fun navigateTo(destination: TopLevelDestination) {
-    navController.navigate(destination.route) {
-      popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-      launchSingleTop = true
-      restoreState = true
-    }
+    navController.navigate(destination.route)
+    // TODO: following commented out code doesn't work with goBack() function
+    //    {
+    //      popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+    //      launchSingleTop = true
+    //      restoreState = true
+    //    }
   }
 
   fun goBack() {

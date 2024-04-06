@@ -20,8 +20,7 @@ fun BottomNavigationMenu(
 ) {
   BottomNavigation(
       modifier = Modifier.fillMaxWidth().height(80.dp),
-      backgroundColor = MaterialTheme.colors.background)
-  {
+      backgroundColor = MaterialTheme.colors.background) {
         tabList.forEach { destination ->
           BottomNavigationItem(
               icon = {
@@ -32,7 +31,7 @@ fun BottomNavigationMenu(
               onClick = { onTabSelect(destination.route) })
         }
       }
-    }
+}
 
 @Preview
 @Composable
@@ -40,6 +39,6 @@ fun PreviewBottomNavigationMenu() {
   BottomNavigationMenu(
       onTabSelect = {},
       tabList = TOP_LEVEL_DESTINATIONS,
-              selectedItem = "",
-      )
+      selectedItem = "",
+  )
 }

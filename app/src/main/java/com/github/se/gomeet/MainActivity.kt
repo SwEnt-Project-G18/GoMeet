@@ -18,6 +18,7 @@ import com.github.se.gomeet.ui.WelcomeScreen
 import com.github.se.gomeet.ui.create.Create
 import com.github.se.gomeet.ui.events.Events
 import com.github.se.gomeet.ui.explore.Explore
+import com.github.se.gomeet.ui.navigation.LOGIN_ITEMS
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
@@ -38,23 +39,21 @@ class MainActivity : ComponentActivity() {
           NavHost(navController = nav, startDestination = Route.WELCOME) {
             composable(Route.WELCOME) {
               WelcomeScreen(
-                  onNavToLogin = { NavigationActions(nav).navigateTo(TOP_LEVEL_DESTINATIONS[1]) },
-                  onNavToRegister = {
-                    NavigationActions(nav).navigateTo(TOP_LEVEL_DESTINATIONS[2])
-                  },
+                  onNavToLogin = { NavigationActions(nav).navigateTo(LOGIN_ITEMS[1]) },
+                  onNavToRegister = { NavigationActions(nav).navigateTo(LOGIN_ITEMS[2]) },
                   onSignInSuccess = { userId ->
                     userIdState.value = userId
-                    NavigationActions(nav).navigateTo(TOP_LEVEL_DESTINATIONS[5])
+                    NavigationActions(nav).navigateTo(TOP_LEVEL_DESTINATIONS[1])
                   })
             }
             composable(Route.LOGIN) {
               LoginScreen(viewModel) {
-                NavigationActions(nav).navigateTo(TOP_LEVEL_DESTINATIONS[5])
+                NavigationActions(nav).navigateTo(TOP_LEVEL_DESTINATIONS[1])
               }
             }
             composable(Route.REGISTER) {
               RegisterScreen(viewModel) {
-                NavigationActions(nav).navigateTo(TOP_LEVEL_DESTINATIONS[5])
+                NavigationActions(nav).navigateTo(TOP_LEVEL_DESTINATIONS[1])
               }
             }
             composable(Route.EXPLORE) { Explore(nav = NavigationActions(nav)) }
