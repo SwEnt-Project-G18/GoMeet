@@ -10,17 +10,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -30,11 +29,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.se.gomeet.R
 import com.github.se.gomeet.ui.theme.DarkCyan
+import com.github.se.gomeet.viewmodel.AuthViewModel
 
 @Composable
-fun LoginScreen(onLoginClicked: (String, String) -> Unit) {
-  var email by remember { mutableStateOf("") }
-  var password by remember { mutableStateOf("") }
+fun LoginScreen(authViewModel: AuthViewModel, onNavToExplore: () -> Unit) {
+  val signInState = authViewModel.signInState.collectAsState()
+  val isError = signInState.value.signInError != null
+  val context = LocalContext.current
 
   Column(
       verticalArrangement = Arrangement.Top,
@@ -44,8 +45,7 @@ fun LoginScreen(onLoginClicked: (String, String) -> Unit) {
             painter = painterResource(id = R.drawable.gomeet_text),
             contentDescription = "GoMeet",
             modifier = Modifier.padding(top = 40.dp),
-            alignment = Alignment.Center
-        )
+            alignment = Alignment.Center)
 
         Spacer(modifier = Modifier.size(40.dp))
 
@@ -60,25 +60,45 @@ fun LoginScreen(onLoginClicked: (String, String) -> Unit) {
 
         Spacer(modifier = Modifier.size(110.dp))
 
+        if (isError) {
+          Text(
+              text = signInState.value.signInError!!,
+              modifier = Modifier.padding(bottom = 16.dp),
+              color = Color.Red,
+              textAlign = TextAlign.Center)
+        }
+
         TextField(
-            value = email,
-            onValueChange = { newValue -> email = newValue },
+            value = signInState.value.email,
+            onValueChange = { newValue -> authViewModel.onEmailChange(newValue) },
+            modifier = Modifier.fillMaxWidth(),
             label = { Text("Email") },
-            modifier = Modifier.fillMaxWidth())
+            isError = isError)
 
         Spacer(modifier = Modifier.size(16.dp))
 
         TextField(
-            value = password,
-            onValueChange = { newValue -> password = newValue },
+            value = signInState.value.password,
+            onValueChange = { newValue -> authViewModel.onPasswordChange(newValue) },
+            modifier = Modifier.fillMaxWidth(),
             label = { Text("Password") },
-            visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier.fillMaxWidth())
+            isError = isError,
+            visualTransformation = PasswordVisualTransformation())
 
         Spacer(modifier = Modifier.size(50.dp))
 
-        Button(onClick = { onLoginClicked(email, password) }, modifier = Modifier.fillMaxWidth()) {
-          Text("Log in")
+        Button(
+            onClick = { authViewModel.signInWithEmailPassword(context) },
+            modifier = Modifier.fillMaxWidth()) {
+              Text("Log in")
+            }
+
+        if (signInState.value.isLoading) {
+          CircularProgressIndicator()
+        }
+
+        if (signInState.value.isSignInSuccessful) {
+          onNavToExplore()
         }
       }
 }
@@ -86,5 +106,5 @@ fun LoginScreen(onLoginClicked: (String, String) -> Unit) {
 @Preview
 @Composable
 fun PreviewLoginScreen() {
-  LoginScreen { email, password -> println("Email: $email, Password: $password") }
+  LoginScreen(AuthViewModel()) {}
 }

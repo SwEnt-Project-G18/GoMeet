@@ -6,6 +6,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -46,7 +47,11 @@ import com.github.se.gomeet.ui.theme.DarkCyan
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun WelcomeScreen(onSignInSuccess: (String) -> Unit) {
+fun WelcomeScreen(
+    onNavToLogin: () -> Unit,
+    onNavToRegister: () -> Unit,
+    onSignInSuccess: (String) -> Unit
+) {
   val launcher =
       rememberLauncherForActivityResult(FirebaseAuthUIActivityResultContract()) { res ->
         if (res.resultCode == Activity.RESULT_OK) {
@@ -115,7 +120,7 @@ fun WelcomeScreen(onSignInSuccess: (String) -> Unit) {
         Spacer(modifier = Modifier.size(1.dp))
 
         OutlinedButton(
-            onClick = { /* TODO: email-password logic */},
+            onClick = { onNavToLogin() },
             modifier = Modifier.width(250.dp).height(40.dp),
             shape = RoundedCornerShape(20.dp),
             border = BorderStroke(1.dp, Color.Gray), // Set border here if needed
@@ -142,9 +147,9 @@ fun WelcomeScreen(onSignInSuccess: (String) -> Unit) {
                       letterSpacing = 0.25.sp,
                   ))
 
-          // TODO: Create account should go to RegisterScreen
           Text(
               text = "Create account",
+              modifier = Modifier.clickable { onNavToRegister() },
               style =
                   TextStyle(
                       fontSize = 11.sp,
@@ -163,7 +168,10 @@ fun WelcomeScreen(onSignInSuccess: (String) -> Unit) {
 @Preview
 @Composable
 fun WelcomeScreenPreview() {
-  WelcomeScreen {}
+  WelcomeScreen(
+      onNavToLogin = {},
+      onNavToRegister = {},
+      onSignInSuccess = { _ -> }) // Preview the WelcomeScreen
 }
 
 @Composable

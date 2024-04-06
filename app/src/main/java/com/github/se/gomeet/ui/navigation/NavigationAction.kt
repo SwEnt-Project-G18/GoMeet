@@ -1,6 +1,7 @@
 package com.github.se.gomeet.ui.navigation
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
@@ -17,6 +18,9 @@ data class TopLevelDestination(
 )
 
 object Route {
+  const val WELCOME = "Welcome"
+  const val LOGIN = "Login"
+  const val REGISTER = "Register"
   const val EVENTS = "Events"
   const val TRENDING = "Trending"
   const val EXPLORE = "Explore"
@@ -26,6 +30,12 @@ object Route {
 
 val TOP_LEVEL_DESTINATIONS =
     listOf(
+        TopLevelDestination(
+            route = Route.WELCOME, icon = Icons.Default.AccountCircle, textId = "Welcome"),
+        TopLevelDestination(
+            route = Route.LOGIN, icon = Icons.Default.AccountCircle, textId = "Login"),
+        TopLevelDestination(
+            route = Route.REGISTER, icon = Icons.Default.AccountCircle, textId = "Register"),
         TopLevelDestination(
             route = Route.EVENTS, icon = Icons.Default.DateRange, textId = "Events"),
         TopLevelDestination(
