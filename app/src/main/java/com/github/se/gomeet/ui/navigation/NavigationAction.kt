@@ -46,26 +46,22 @@ val TOP_LEVEL_DESTINATIONS =
             route = Route.TRENDS, icon = Icons.Default.KeyboardArrowUp, textId = Route.TRENDS),
         TopLevelDestination(
             route = Route.EXPLORE, icon = Icons.Default.Home, textId = Route.EXPLORE),
+        TopLevelDestination(route = Route.CREATE, icon = Icons.Default.Add, textId = Route.CREATE),
         TopLevelDestination(
-            route = Route.CREATE, icon = Icons.Default.Add, textId = Route.CREATE),
-        TopLevelDestination(
-            route = Route.PROFILE, icon = Icons.Default.Person, textId = Route.PROFILE)
-    )
+            route = Route.PROFILE, icon = Icons.Default.Person, textId = Route.PROFILE))
 
 class NavigationActions(private val navController: NavHostController) {
   fun navigateTo(destination: TopLevelDestination, clearBackStack: Boolean = false) {
-      navController.navigate(destination.route) {
-          if (clearBackStack) {
-              popUpTo(navController.graph.findStartDestination().id) {
-                  inclusive = true
-              }
-          }
-          launchSingleTop = true
-          restoreState = true
+    navController.navigate(destination.route) {
+      if (clearBackStack) {
+        popUpTo(navController.graph.findStartDestination().id) { inclusive = true }
       }
+      launchSingleTop = true
+      restoreState = true
+    }
   }
 
-    fun goBack() {
-        navController.popBackStack()
-    }
+  fun goBack() {
+    navController.popBackStack()
+  }
 }

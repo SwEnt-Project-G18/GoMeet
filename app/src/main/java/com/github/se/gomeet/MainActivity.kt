@@ -44,7 +44,8 @@ class MainActivity : ComponentActivity() {
                   onNavToRegister = { NavigationActions(nav).navigateTo(LOGIN_ITEMS[2]) },
                   onSignInSuccess = { userId ->
                     userIdState.value = userId
-                    NavigationActions(nav).navigateTo(TOP_LEVEL_DESTINATIONS[1], clearBackStack = true)
+                    NavigationActions(nav)
+                        .navigateTo(TOP_LEVEL_DESTINATIONS[1], clearBackStack = true)
                   })
             }
             composable(Route.LOGIN) {
