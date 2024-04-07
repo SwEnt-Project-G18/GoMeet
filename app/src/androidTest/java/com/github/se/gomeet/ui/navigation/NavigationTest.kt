@@ -11,7 +11,6 @@ import com.github.se.gomeet.ui.events.Events
 import com.github.se.gomeet.ui.explore.Explore
 import com.github.se.gomeet.ui.profile.Profile
 import com.github.se.gomeet.ui.trending.Trends
-import com.github.se.gomeet.ui.trending.Trends
 import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.Test

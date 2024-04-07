@@ -13,7 +13,7 @@ import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 
 @Composable
 fun Explore(nav: NavigationActions) {
-  Log.d("EXplore", "Back in EXplore")
+  Log.d("Explore", "Back in Explore")
   Scaffold(
       bottomBar = {
         BottomNavigationMenu(
