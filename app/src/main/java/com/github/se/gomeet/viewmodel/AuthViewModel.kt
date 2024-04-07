@@ -23,6 +23,7 @@ class AuthViewModel() : ViewModel() {
 
   fun signInWithGoogle() {
     // TODO: What to put here ???
+    // Not needed, signInWithGoogle() is already implemented in AuthRepository
 
   }
 

@@ -10,7 +10,8 @@ import com.github.se.gomeet.ui.create.Create
 import com.github.se.gomeet.ui.events.Events
 import com.github.se.gomeet.ui.explore.Explore
 import com.github.se.gomeet.ui.profile.Profile
-import com.github.se.gomeet.ui.trending.Trending
+import com.github.se.gomeet.ui.trending.Trends
+import com.github.se.gomeet.ui.trending.Trends
 import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.Test
@@ -29,7 +30,7 @@ class NavigationTest {
       NavHost(navController = nav, startDestination = Route.EVENTS) {
         composable(TOP_LEVEL_DESTINATIONS[0].route) { Explore(nav = NavigationActions(nav)) }
         composable(TOP_LEVEL_DESTINATIONS[1].route) { Events(NavigationActions(nav)) }
-        composable(TOP_LEVEL_DESTINATIONS[2].route) { Trending(NavigationActions(nav)) }
+        composable(TOP_LEVEL_DESTINATIONS[2].route) { Trends(NavigationActions(nav)) }
         composable(TOP_LEVEL_DESTINATIONS[3].route) { Create(NavigationActions(nav)) }
         composable(TOP_LEVEL_DESTINATIONS[4].route) { Profile(NavigationActions(nav)) }
         // Add more destinations as needed
@@ -49,23 +50,22 @@ class NavigationTest {
 
     composeTestRule.setContent {
       val nav = rememberNavController()
-      NavHost(navController = nav, startDestination = Route.EVENTS) {
+      NavHost(navController = nav, startDestination = TOP_LEVEL_DESTINATIONS[0].route) {
         composable(TOP_LEVEL_DESTINATIONS[0].route) { Explore(nav = NavigationActions(nav)) }
         composable(TOP_LEVEL_DESTINATIONS[1].route) { Events(NavigationActions(nav)) }
-        composable(TOP_LEVEL_DESTINATIONS[2].route) { Trending(NavigationActions(nav)) }
+        composable(TOP_LEVEL_DESTINATIONS[2].route) { Trends(NavigationActions(nav)) }
         composable(TOP_LEVEL_DESTINATIONS[3].route) { Create(NavigationActions(nav)) }
         composable(TOP_LEVEL_DESTINATIONS[4].route) { Profile(NavigationActions(nav)) }
-        // Add more destinations as needed
       }
 
       val navActions = NavigationActions(nav)
+      val backDest = nav.currentDestination
 
-      runBlocking { navActions.navigateTo(TOP_LEVEL_DESTINATIONS[0]) }
-
-      for (dest in TOP_LEVEL_DESTINATIONS) {
+      // Drop first destination, since navigating to it has no effect and messes up the test
+      for (dest in TOP_LEVEL_DESTINATIONS.drop(1)) {
         runBlocking { navActions.navigateTo(dest) }
         runBlocking { navActions.goBack() }
-        assert(nav.currentDestination?.route == TOP_LEVEL_DESTINATIONS[0].route)
+        assert(nav.currentDestination?.route == backDest?.route)
       }
     }
   }
