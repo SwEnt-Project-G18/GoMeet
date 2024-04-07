@@ -117,6 +117,9 @@ dependencies {
     androidTestImplementation("androidx.test:core:1.4.0")
     androidTestImplementation("androidx.navigation:navigation-testing:2.3.5")
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.08.00"))
+    androidTestImplementation("androidx.test:runner:1.4.0")
+    androidTestImplementation("org.mockito:mockito-android:5.11.0")
+    androidTestImplementation("org.mockito:mockito-core:3.11.2")
     debugImplementation("androidx.compose.ui:ui-tooling:1.4.0")
     debugImplementation("androidx.compose.ui:ui-test-manifest:1.4.0")
 
@@ -130,7 +133,7 @@ dependencies {
 
     implementation("com.squareup.okhttp3:okhttp:3.10.0")
 
-    testImplementation("org.mockito:mockito-core:3.11.2")
+
     testImplementation("org.mockito:mockito-inline:2.13.0")
     testImplementation("org.robolectric:robolectric:4.11.1")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
