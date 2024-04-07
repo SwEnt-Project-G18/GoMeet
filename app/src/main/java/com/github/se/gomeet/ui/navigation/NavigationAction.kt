@@ -8,6 +8,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 
 data class TopLevelDestination(
@@ -21,7 +22,7 @@ object Route {
   const val LOGIN = "Login"
   const val REGISTER = "Register"
   const val EVENTS = "Events"
-  const val TRENDING = "Trending"
+  const val TRENDS = "Trends"
   const val EXPLORE = "Explore"
   const val CREATE = "Create"
   const val PROFILE = "Profile"
@@ -42,25 +43,30 @@ val TOP_LEVEL_DESTINATIONS =
         TopLevelDestination(
             route = Route.EVENTS, icon = Icons.Default.DateRange, textId = Route.EVENTS),
         TopLevelDestination(
-            route = Route.TRENDING, icon = Icons.Default.KeyboardArrowUp, textId = Route.TRENDING),
+            route = Route.TRENDS, icon = Icons.Default.KeyboardArrowUp, textId = Route.TRENDS),
         TopLevelDestination(
             route = Route.EXPLORE, icon = Icons.Default.Home, textId = Route.EXPLORE),
-        TopLevelDestination(route = Route.CREATE, icon = Icons.Default.Add, textId = Route.CREATE),
         TopLevelDestination(
-            route = Route.PROFILE, icon = Icons.Default.Person, textId = Route.PROFILE))
+            route = Route.CREATE, icon = Icons.Default.Add, textId = Route.CREATE),
+        TopLevelDestination(
+            route = Route.PROFILE, icon = Icons.Default.Person, textId = Route.PROFILE)
+    )
 
 class NavigationActions(private val navController: NavHostController) {
-  fun navigateTo(destination: TopLevelDestination) {
-    navController.navigate(destination.route)
-    // TODO: following commented out code doesn't work with goBack() function
-    //    {
-    //      popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-    //      launchSingleTop = true
-    //      restoreState = true
-    //    }
+  fun navigateTo(destination: TopLevelDestination, clearBackStack: Boolean = false) {
+      navController.navigate(destination.route) {
+          if (clearBackStack) {
+              popUpTo(navController.graph.findStartDestination().id) {
+                  inclusive = true
+              }
+          }
+          launchSingleTop = true
+          restoreState = true
+      }
   }
 
-  fun goBack() {
-    navController.popBackStack()
-  }
+    fun goBack() {
+        if (!navController.popBackStack()) {
+        }
+    }
 }

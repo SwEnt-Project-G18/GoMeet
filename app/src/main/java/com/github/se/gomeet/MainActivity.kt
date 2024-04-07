@@ -24,7 +24,7 @@ import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.profile.Profile
 import com.github.se.gomeet.ui.theme.GoMeetTheme
-import com.github.se.gomeet.ui.trending.Trending
+import com.github.se.gomeet.ui.trending.Trends
 import com.github.se.gomeet.viewmodel.AuthViewModel
 
 class MainActivity : ComponentActivity() {
@@ -36,6 +36,7 @@ class MainActivity : ComponentActivity() {
           val userIdState = remember { mutableStateOf<String?>(null) }
           val nav = rememberNavController()
           val viewModel = AuthViewModel()
+          val navAction = NavigationActions(nav)
           NavHost(navController = nav, startDestination = Route.WELCOME) {
             composable(Route.WELCOME) {
               WelcomeScreen(
@@ -43,7 +44,7 @@ class MainActivity : ComponentActivity() {
                   onNavToRegister = { NavigationActions(nav).navigateTo(LOGIN_ITEMS[2]) },
                   onSignInSuccess = { userId ->
                     userIdState.value = userId
-                    NavigationActions(nav).navigateTo(TOP_LEVEL_DESTINATIONS[1])
+                    NavigationActions(nav).navigateTo(TOP_LEVEL_DESTINATIONS[1], clearBackStack = true)
                   })
             }
             composable(Route.LOGIN) {
@@ -56,11 +57,11 @@ class MainActivity : ComponentActivity() {
                 NavigationActions(nav).navigateTo(TOP_LEVEL_DESTINATIONS[1])
               }
             }
-            composable(Route.EXPLORE) { Explore(nav = NavigationActions(nav)) }
-            composable(Route.EVENTS) { Events(NavigationActions(nav)) }
-            composable(Route.TRENDING) { Trending(NavigationActions(nav)) }
-            composable(Route.CREATE) { Create(NavigationActions(nav)) }
-            composable(Route.PROFILE) { Profile(NavigationActions(nav)) }
+            composable(Route.EXPLORE) { Explore(navAction) }
+            composable(Route.EVENTS) { Events(navAction) }
+            composable(Route.TRENDS) { Trends(navAction) }
+            composable(Route.CREATE) { Create(navAction) }
+            composable(Route.PROFILE) { Profile(navAction) }
           }
         }
       }

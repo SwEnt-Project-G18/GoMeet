@@ -11,7 +11,7 @@ import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 
 @Composable
-fun Trending(nav: NavigationActions) {
+fun Trends(nav: NavigationActions) {
   Scaffold(
       bottomBar = {
         BottomNavigationMenu(
@@ -21,6 +21,6 @@ fun Trending(nav: NavigationActions) {
             tabList = TOP_LEVEL_DESTINATIONS,
             selectedItem = Route.EXPLORE)
       }) { innerPadding ->
-        Text("Trending", Modifier.padding(innerPadding))
+        Text("Trends", Modifier.padding(innerPadding))
       }
 }

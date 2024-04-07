@@ -28,7 +28,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -133,7 +132,7 @@ fun WelcomeScreen(
 
         Spacer(modifier = Modifier.size(10.dp))
 
-        Row() {
+        Row {
           Text(
               text = "Don’t have an account?",
               style =
@@ -174,12 +173,6 @@ fun WelcomeScreenPreview() {
 
 @Composable
 fun DividerWithText() {
-  val paint =
-      Paint().apply {
-        color = Color.Black
-        strokeWidth = 5f
-      }
-
   Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
     Canvas(modifier = Modifier.matchParentSize()) {
       val canvasWidth = size.width
