@@ -19,7 +19,7 @@ import com.google.maps.android.compose.rememberCameraPositionState
 @Preview
 @Composable
 fun MapScreen() {
-    Box(Modifier.fillMaxSize().testTag("MapScreen")) { GoogleMapView() }
+  Box(Modifier.fillMaxSize().testTag("MapScreen")) { GoogleMapView() }
 }
 
 @Composable
@@ -30,21 +30,21 @@ fun GoogleMapView(
     content: @Composable () -> Unit = {},
 ) {
 
-    val uiSettings by remember {
-        mutableStateOf(MapUiSettings(compassEnabled = false, zoomControlsEnabled = false))
-    }
-    val mapProperties by remember { mutableStateOf(MapProperties(mapType = MapType.NORMAL)) }
-    val mapVisible by remember { mutableStateOf(true) }
+  val uiSettings by remember {
+    mutableStateOf(MapUiSettings(compassEnabled = false, zoomControlsEnabled = false))
+  }
+  val mapProperties by remember { mutableStateOf(MapProperties(mapType = MapType.NORMAL)) }
+  val mapVisible by remember { mutableStateOf(true) }
 
-    if (mapVisible) {
-        GoogleMap(
-            modifier = modifier,
-            cameraPositionState = cameraPositionState,
-            properties = mapProperties,
-            uiSettings = uiSettings,
-            onMapLoaded = onMapLoaded,
-            onPOIClick = {}) {
-            content()
+  if (mapVisible) {
+    GoogleMap(
+        modifier = modifier,
+        cameraPositionState = cameraPositionState,
+        properties = mapProperties,
+        uiSettings = uiSettings,
+        onMapLoaded = onMapLoaded,
+        onPOIClick = {}) {
+          content()
         }
-    }
+  }
 }
