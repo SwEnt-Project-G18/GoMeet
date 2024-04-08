@@ -22,19 +22,18 @@ import com.google.maps.android.compose.rememberCameraPositionState
 
 @Composable
 fun Explore(nav: NavigationActions) {
-    Log.d("Explore", "Back in Explore")
-    Scaffold(
-        bottomBar = {
-            BottomNavigationMenu(
-                onTabSelect = { selectedTab ->
-                    nav.navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == selectedTab })
-                },
-                tabList = TOP_LEVEL_DESTINATIONS,
-                selectedItem = Route.EXPLORE)
-        }
-    ) {
-        innerPadding -> Box(modifier = Modifier.padding(innerPadding)) { GoogleMapView() }
-    }
+  Log.d("Explore", "Back in Explore")
+  Scaffold(
+      bottomBar = {
+        BottomNavigationMenu(
+            onTabSelect = { selectedTab ->
+              nav.navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == selectedTab })
+            },
+            tabList = TOP_LEVEL_DESTINATIONS,
+            selectedItem = Route.EXPLORE)
+      }) { innerPadding ->
+        Box(modifier = Modifier.padding(innerPadding)) { GoogleMapView() }
+      }
 }
 
 @Composable
@@ -45,21 +44,21 @@ fun GoogleMapView(
     content: @Composable () -> Unit = {},
 ) {
 
-    val uiSettings by remember {
-        mutableStateOf(MapUiSettings(compassEnabled = false, zoomControlsEnabled = false))
-    }
-    val mapProperties by remember { mutableStateOf(MapProperties(mapType = MapType.NORMAL)) }
-    val mapVisible by remember { mutableStateOf(true) }
+  val uiSettings by remember {
+    mutableStateOf(MapUiSettings(compassEnabled = false, zoomControlsEnabled = false))
+  }
+  val mapProperties by remember { mutableStateOf(MapProperties(mapType = MapType.NORMAL)) }
+  val mapVisible by remember { mutableStateOf(true) }
 
-    if (mapVisible) {
-        GoogleMap(
-            modifier = modifier,
-            cameraPositionState = cameraPositionState,
-            properties = mapProperties,
-            uiSettings = uiSettings,
-            onMapLoaded = onMapLoaded,
-            onPOIClick = {}) {
-            content()
+  if (mapVisible) {
+    GoogleMap(
+        modifier = modifier,
+        cameraPositionState = cameraPositionState,
+        properties = mapProperties,
+        uiSettings = uiSettings,
+        onMapLoaded = onMapLoaded,
+        onPOIClick = {}) {
+          content()
         }
-    }
+  }
 }
