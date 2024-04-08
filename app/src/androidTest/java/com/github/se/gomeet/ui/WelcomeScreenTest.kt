@@ -27,7 +27,6 @@ class WelcomeScreenTest {
     Intents.release()
   }
 
-
   @Test
   fun googleSignInButtonShouldLaunchIntent() {
     // No need to set content as MainActivity already sets it
