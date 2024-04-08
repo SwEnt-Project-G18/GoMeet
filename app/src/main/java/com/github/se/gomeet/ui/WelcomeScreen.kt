@@ -62,7 +62,11 @@ fun WelcomeScreen(
 
   val providers = arrayListOf(AuthUI.IdpConfig.GoogleBuilder().build())
   val signInIntent =
-      AuthUI.getInstance().createSignInIntentBuilder().setAvailableProviders(providers).build()
+      AuthUI.getInstance()
+          .createSignInIntentBuilder()
+          .setAvailableProviders(providers)
+          .setIsSmartLockEnabled(false)
+          .build()
 
   Column(
       horizontalAlignment = Alignment.CenterHorizontally,
