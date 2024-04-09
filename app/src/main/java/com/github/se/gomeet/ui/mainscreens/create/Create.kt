@@ -89,7 +89,9 @@ fun Create(nav: NavigationActions) {
                     enabled = true,
                     colors =
                         ButtonDefaults.outlinedButtonColors(containerColor = Color(0xFFECEFF1)),
-                    onClick = { nav.navigateTo(CREATE_ITEMS.first{it.route == Route.PUBLIC_CREATE}) }) {
+                    onClick = {
+                      nav.navigateTo(CREATE_ITEMS.first { it.route == Route.PUBLIC_CREATE })
+                    }) {
                       Text(
                           text = "Public",
                           style =
@@ -112,7 +114,9 @@ fun Create(nav: NavigationActions) {
                     enabled = true,
                     colors =
                         ButtonDefaults.outlinedButtonColors(containerColor = Color(0xFFECEFF1)),
-                    onClick = { nav.navigateTo(CREATE_ITEMS.first{it.route == Route.PRIVATE_CREATE}) }) {
+                    onClick = {
+                      nav.navigateTo(CREATE_ITEMS.first { it.route == Route.PRIVATE_CREATE })
+                    }) {
                       Text(
                           text = "Private",
                           style =

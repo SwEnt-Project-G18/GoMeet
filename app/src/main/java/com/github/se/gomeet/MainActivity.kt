@@ -66,8 +66,12 @@ class MainActivity : ComponentActivity() {
             composable(Route.TRENDS) { Trends(navAction) }
             composable(Route.CREATE) { Create(navAction) }
             composable(Route.PROFILE) { Profile(navAction) }
-            composable(Route.PRIVATE_CREATE) { PrivateCreate(navAction, EventViewModel(userIdState.value)) }
-            composable(Route.PUBLIC_CREATE) { PublicCreate(navAction, EventViewModel(userIdState.value)) }
+            composable(Route.PRIVATE_CREATE) {
+              PrivateCreate(navAction, EventViewModel(userIdState.value))
+            }
+            composable(Route.PUBLIC_CREATE) {
+              PublicCreate(navAction, EventViewModel(userIdState.value))
+            }
           }
         }
       }
