@@ -1,4 +1,4 @@
-package com.github.se.gomeet.ui
+package com.github.se.gomeet.ui.authscreens
 
 import android.app.Activity
 import androidx.activity.compose.rememberLauncherForActivityResult
