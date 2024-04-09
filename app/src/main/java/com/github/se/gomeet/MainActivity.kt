@@ -12,20 +12,23 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.github.se.gomeet.ui.LoginScreen
-import com.github.se.gomeet.ui.RegisterScreen
-import com.github.se.gomeet.ui.WelcomeScreen
-import com.github.se.gomeet.ui.create.Create
-import com.github.se.gomeet.ui.events.Events
-import com.github.se.gomeet.ui.explore.Explore
+import com.github.se.gomeet.ui.authscreens.LoginScreen
+import com.github.se.gomeet.ui.authscreens.RegisterScreen
+import com.github.se.gomeet.ui.authscreens.WelcomeScreen
+import com.github.se.gomeet.ui.mainscreens.Events
+import com.github.se.gomeet.ui.mainscreens.Explore
+import com.github.se.gomeet.ui.mainscreens.Profile
+import com.github.se.gomeet.ui.mainscreens.Trends
+import com.github.se.gomeet.ui.mainscreens.create.Create
+import com.github.se.gomeet.ui.mainscreens.create.PrivateCreate
+import com.github.se.gomeet.ui.mainscreens.create.PublicCreate
 import com.github.se.gomeet.ui.navigation.LOGIN_ITEMS
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
-import com.github.se.gomeet.ui.profile.Profile
 import com.github.se.gomeet.ui.theme.GoMeetTheme
-import com.github.se.gomeet.ui.trending.Trends
 import com.github.se.gomeet.viewmodel.AuthViewModel
+import com.github.se.gomeet.viewmodel.EventViewModel
 
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,10 +62,16 @@ class MainActivity : ComponentActivity() {
               }
             }
             composable(Route.EXPLORE) { Explore(navAction) }
-            composable(Route.EVENTS) { Events(navAction) }
+            composable(Route.EVENTS) { Events(navAction, EventViewModel()) }
             composable(Route.TRENDS) { Trends(navAction) }
             composable(Route.CREATE) { Create(navAction) }
             composable(Route.PROFILE) { Profile(navAction) }
+            composable(Route.PRIVATE_CREATE) {
+              PrivateCreate(navAction, EventViewModel(userIdState.value))
+            }
+            composable(Route.PUBLIC_CREATE) {
+              PublicCreate(navAction, EventViewModel(userIdState.value))
+            }
           }
         }
       }

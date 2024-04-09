@@ -1,6 +1,5 @@
-package com.github.se.gomeet.ui.explore
+package com.github.se.gomeet.ui.mainscreens
 
-import android.util.Log
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -12,8 +11,7 @@ import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 
 @Composable
-fun Explore(nav: NavigationActions) {
-  Log.d("Explore", "Back in Explore")
+fun Profile(nav: NavigationActions) {
   Scaffold(
       bottomBar = {
         BottomNavigationMenu(
@@ -23,6 +21,6 @@ fun Explore(nav: NavigationActions) {
             tabList = TOP_LEVEL_DESTINATIONS,
             selectedItem = Route.EXPLORE)
       }) { innerPadding ->
-        Text("Explore", Modifier.padding(innerPadding))
+        Text("Profile", Modifier.padding(innerPadding))
       }
 }
