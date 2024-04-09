@@ -33,9 +33,13 @@ object Route {
 val CREATE_ITEMS =
     listOf(
         TopLevelDestination(
-            route = Route.PUBLIC_CREATE, icon = Icons.Default.AccountCircle, textId = Route.PUBLIC_CREATE),
+            route = Route.PUBLIC_CREATE,
+            icon = Icons.Default.AccountCircle,
+            textId = Route.PUBLIC_CREATE),
         TopLevelDestination(
-            route = Route.PRIVATE_CREATE, icon = Icons.Default.AccountCircle, textId = Route.PRIVATE_CREATE),
+            route = Route.PRIVATE_CREATE,
+            icon = Icons.Default.AccountCircle,
+            textId = Route.PRIVATE_CREATE),
     )
 
 val LOGIN_ITEMS =
