@@ -77,7 +77,7 @@ fun Create(nav: NavigationActions) {
                   textAlign = TextAlign.Start,
                   style = MaterialTheme.typography.headlineSmall)
 
-              Spacer(modifier = Modifier.height(80.dp))
+              Spacer(modifier = Modifier.height(150.dp))
 
               Row {
                 OutlinedButton(

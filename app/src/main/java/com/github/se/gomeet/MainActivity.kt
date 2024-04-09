@@ -20,8 +20,7 @@ import com.github.se.gomeet.ui.mainscreens.Explore
 import com.github.se.gomeet.ui.mainscreens.Profile
 import com.github.se.gomeet.ui.mainscreens.Trends
 import com.github.se.gomeet.ui.mainscreens.create.Create
-import com.github.se.gomeet.ui.mainscreens.create.PrivateCreate
-import com.github.se.gomeet.ui.mainscreens.create.PublicCreate
+import com.github.se.gomeet.ui.mainscreens.create.CreateEvent
 import com.github.se.gomeet.ui.navigation.LOGIN_ITEMS
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
@@ -67,10 +66,10 @@ class MainActivity : ComponentActivity() {
             composable(Route.CREATE) { Create(navAction) }
             composable(Route.PROFILE) { Profile(navAction) }
             composable(Route.PRIVATE_CREATE) {
-              PrivateCreate(navAction, EventViewModel(userIdState.value))
+              CreateEvent(navAction, EventViewModel(userIdState.value), true)
             }
             composable(Route.PUBLIC_CREATE) {
-              PublicCreate(navAction, EventViewModel(userIdState.value))
+              CreateEvent(navAction, EventViewModel(userIdState.value), false)
             }
           }
         }
