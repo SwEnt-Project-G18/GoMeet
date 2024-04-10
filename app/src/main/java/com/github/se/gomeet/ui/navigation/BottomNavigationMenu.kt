@@ -19,34 +19,31 @@ fun BottomNavigationMenu(
     tabList: List<TopLevelDestination>,
     selectedItem: String
 ) {
-    NavigationBar(
-        modifier = Modifier.height(80.dp),
-        containerColor = MaterialTheme.colorScheme.surfaceVariant
-    ) {
+  NavigationBar(
+      modifier = Modifier.height(80.dp),
+      containerColor = MaterialTheme.colorScheme.surfaceVariant) {
         tabList.forEach { destination ->
-            NavigationBarItem(
-                icon = {
-                    Icon(
-                        imageVector = getIconForRoute(destination.route),
-                        contentDescription = destination.textId,
-                        modifier = Modifier.size(24.dp)
-                    )
-                },
-                label = { Text(destination.textId) },
-                selected = destination.route == selectedItem,
-                onClick = { onTabSelect(destination.route) },
-                colors = NavigationBarItemDefaults.colors()
-            )
+          NavigationBarItem(
+              icon = {
+                Icon(
+                    imageVector = getIconForRoute(destination.route),
+                    contentDescription = destination.textId,
+                    modifier = Modifier.size(24.dp))
+              },
+              label = { Text(destination.textId) },
+              selected = destination.route == selectedItem,
+              onClick = { onTabSelect(destination.route) },
+              colors = NavigationBarItemDefaults.colors())
         }
-    }
+      }
 }
 
 @Preview
 @Composable
 fun PreviewBottomNavigationMenu() {
-    BottomNavigationMenu(
-        onTabSelect = {},
-        tabList = TOP_LEVEL_DESTINATIONS,
-        selectedItem = Route.CREATE,
-    )
+  BottomNavigationMenu(
+      onTabSelect = {},
+      tabList = TOP_LEVEL_DESTINATIONS,
+      selectedItem = Route.CREATE,
+  )
 }

@@ -30,10 +30,8 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.R
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
@@ -49,26 +47,26 @@ import java.time.format.DateTimeParseException
 @Composable
 fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivate: Boolean) {
 
-    val titleState = remember { mutableStateOf("") }
-    val descriptionState = remember { mutableStateOf("") }
-    val locationState = remember { mutableStateOf("") }
-    val textDate = remember { mutableStateOf("") }
-    var dateState by remember { mutableStateOf<LocalDate?>(null) }
-    var dateFormatError by remember { mutableStateOf(false) }
-    var price by remember { mutableDoubleStateOf(0.0) }
-    var priceText by remember { mutableStateOf("") }
-    val url = remember { mutableStateOf("") }
-    val isPrivateEvent = remember { mutableStateOf(false) }
+  val titleState = remember { mutableStateOf("") }
+  val descriptionState = remember { mutableStateOf("") }
+  val locationState = remember { mutableStateOf("") }
+  val textDate = remember { mutableStateOf("") }
+  var dateState by remember { mutableStateOf<LocalDate?>(null) }
+  var dateFormatError by remember { mutableStateOf(false) }
+  var price by remember { mutableDoubleStateOf(0.0) }
+  var priceText by remember { mutableStateOf("") }
+  val url = remember { mutableStateOf("") }
+  val isPrivateEvent = remember { mutableStateOf(false) }
 
-    Scaffold(
-        bottomBar = {
-            BottomNavigationMenu(
-                onTabSelect = { selectedTab ->
-                    nav.navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == selectedTab })
-                },
-                tabList = TOP_LEVEL_DESTINATIONS,
-                selectedItem = Route.EXPLORE)
-        }) { innerPadding ->
+  Scaffold(
+      bottomBar = {
+        BottomNavigationMenu(
+            onTabSelect = { selectedTab ->
+              nav.navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == selectedTab })
+            },
+            tabList = TOP_LEVEL_DESTINATIONS,
+            selectedItem = Route.EXPLORE)
+      }) { innerPadding ->
         Text(
             text = "Create",
             modifier = Modifier.padding(horizontal = 15.dp, vertical = 15.dp),
@@ -77,162 +75,140 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
             fontWeight = FontWeight.SemiBold,
             fontFamily = FontFamily.Default,
             textAlign = TextAlign.Start,
-            style = MaterialTheme.typography.headlineLarge
-        )
+            style = MaterialTheme.typography.headlineLarge)
         if (isPrivate) {
-            isPrivateEvent.value = true
-            Text(
-                text = "Private",
-                modifier = Modifier.padding(horizontal = 18.dp, vertical = 50.dp),
-                color = Grey,
-                fontStyle = FontStyle.Normal,
-                fontWeight = FontWeight.SemiBold,
-                fontFamily = FontFamily.Default,
-                textAlign = TextAlign.Start,
-                style = MaterialTheme.typography.titleSmall
-            )
+          isPrivateEvent.value = true
+          Text(
+              text = "Private",
+              modifier = Modifier.padding(horizontal = 18.dp, vertical = 50.dp),
+              color = Grey,
+              fontStyle = FontStyle.Normal,
+              fontWeight = FontWeight.SemiBold,
+              fontFamily = FontFamily.Default,
+              textAlign = TextAlign.Start,
+              style = MaterialTheme.typography.titleSmall)
         } else {
-            isPrivateEvent.value = false
-            Text(
-                text = "Public",
-                modifier = Modifier.padding(horizontal = 18.dp, vertical = 50.dp),
-                color = Grey,
-                fontStyle = FontStyle.Normal,
-                fontWeight = FontWeight.SemiBold,
-                fontFamily = FontFamily.Default,
-                textAlign = TextAlign.Start,
-                style = MaterialTheme.typography.titleSmall
-            )
+          isPrivateEvent.value = false
+          Text(
+              text = "Public",
+              modifier = Modifier.padding(horizontal = 18.dp, vertical = 50.dp),
+              color = Grey,
+              fontStyle = FontStyle.Normal,
+              fontWeight = FontWeight.SemiBold,
+              fontFamily = FontFamily.Default,
+              textAlign = TextAlign.Start,
+              style = MaterialTheme.typography.titleSmall)
         }
 
+        Column(
+            Modifier.padding(innerPadding),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center) {
+              Spacer(modifier = Modifier.height(100.dp))
 
-            Column(
-                Modifier.padding(innerPadding),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center) {
-                Spacer(modifier = Modifier.height(100.dp))
+              OutlinedTextField(
+                  value = titleState.value,
+                  onValueChange = { newVal -> titleState.value = newVal },
+                  label = { Text("Title") },
+                  placeholder = { Text("Name the event") },
+                  modifier = Modifier.fillMaxWidth().padding(7.dp))
 
-                OutlinedTextField(
-                    value = titleState.value,
-                    onValueChange = { newVal -> titleState.value = newVal },
-                    label = { Text("Title") },
-                    placeholder = { Text("Name the event") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(7.dp))
+              OutlinedTextField(
+                  value = descriptionState.value,
+                  onValueChange = { newVal -> descriptionState.value = newVal },
+                  label = { Text("Description") },
+                  placeholder = { Text("Describe the task") },
+                  modifier = Modifier.fillMaxWidth().padding(7.dp))
 
-                OutlinedTextField(
-                    value = descriptionState.value,
-                    onValueChange = { newVal -> descriptionState.value = newVal },
-                    label = { Text("Description") },
-                    placeholder = { Text("Describe the task") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(7.dp))
+              OutlinedTextField(
+                  value = locationState.value,
+                  onValueChange = { newVal -> locationState.value = newVal },
+                  label = { Text("Location") },
+                  placeholder = { Text("Enter an address") },
+                  modifier = Modifier.fillMaxWidth().padding(7.dp))
 
-                OutlinedTextField(
-                    value = locationState.value,
-                    onValueChange = { newVal -> locationState.value = newVal },
-                    label = { Text("Location") },
-                    placeholder = { Text("Enter an address") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(7.dp))
+              OutlinedTextField(
+                  value = textDate.value,
+                  onValueChange = { newText ->
+                    textDate.value = newText
+                    try {
+                      dateState = LocalDate.parse(newText, DateTimeFormatter.ISO_LOCAL_DATE)
+                      dateFormatError = false
+                    } catch (e: DateTimeParseException) {
+                      dateFormatError = true
+                    }
+                  },
+                  label = { Text("Date") },
+                  placeholder = { Text("Enter a date (yyyy-mm-dd)") },
+                  modifier = Modifier.fillMaxWidth().padding(7.dp))
 
-                OutlinedTextField(
-                    value = textDate.value,
-                    onValueChange = { newText ->
-                        textDate.value = newText
-                        try {
-                            dateState = LocalDate.parse(newText, DateTimeFormatter.ISO_LOCAL_DATE)
-                            dateFormatError = false
-                        } catch (e: DateTimeParseException) {
-                            dateFormatError = true
-                        }
-                    },
-                    label = { Text("Date") },
-                    placeholder = { Text("Enter a date (yyyy-mm-dd)") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(7.dp))
+              OutlinedTextField(
+                  value = priceText, // Bind to the TextField's value
+                  onValueChange = { newVal ->
+                    // Update priceText with the new value
+                    priceText = newVal
+                    // Try to convert the new value to a Double and update price if successful
+                    newVal.toDoubleOrNull()?.let {
+                      price = it // Correctly use .value for mutableStateOf variable
+                    }
+                  },
+                  label = { Text("Price") },
+                  placeholder = { Text("Enter a price") },
+                  modifier = Modifier.fillMaxWidth().padding(7.dp))
 
+              OutlinedTextField(
+                  value = url.value,
+                  onValueChange = { newVal -> url.value = newVal },
+                  label = { Text("Ticket link") },
+                  placeholder = { Text("Enter a ticket link") },
+                  modifier = Modifier.fillMaxWidth().padding(7.dp))
 
-                OutlinedTextField(
-                    value = priceText, // Bind to the TextField's value
-                    onValueChange = { newVal ->
-                        // Update priceText with the new value
-                        priceText = newVal
-                        // Try to convert the new value to a Double and update price if successful
-                        newVal.toDoubleOrNull()?.let {
-                            price = it // Correctly use .value for mutableStateOf variable
-                        }
-                    },
-                    label = { Text("Price") },
-                    placeholder = { Text("Enter a price") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(7.dp)
-                )
+              Spacer(modifier = Modifier.height(16.dp))
 
-                OutlinedTextField(
-                    value = url.value,
-                    onValueChange = { newVal -> url.value = newVal },
-                    label = { Text("Ticket link") },
-                    placeholder = { Text("Enter a ticket link") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(7.dp))
-
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                OutlinedButton(
-                    onClick = {
-                        if (!dateFormatError && dateState != null && titleState.value.isNotEmpty()) {
-                            eventViewModel.location(locationState.value) { location ->
-                                eventViewModel.createEvent(
-                                    titleState.value,
-                                    descriptionState.value,
-                                    location!!,
-                                    dateState!!,
-                                    price,
-                                    url.value,
-                                    listOf(),
-                                    listOf(),
-                                    0,
-                                    !isPrivateEvent.value,
-                                    listOf(),
-                                    listOf())
-                                nav.goBack()
-                            }
-                        }
-                    },
-                    modifier = Modifier
-                        .width(128.dp)
-                        .height(40.dp),
-                    shape = RoundedCornerShape(10.dp),
-                    border = BorderStroke(1.dp, Color.Gray), // Set border here if needed
-                    enabled = true,
-                    colors =
-                    ButtonDefaults.outlinedButtonColors(containerColor = Color(0xFFECEFF1))) {
+              OutlinedButton(
+                  onClick = {
+                    if (!dateFormatError && dateState != null && titleState.value.isNotEmpty()) {
+                      eventViewModel.location(locationState.value) { location ->
+                        eventViewModel.createEvent(
+                            titleState.value,
+                            descriptionState.value,
+                            location!!,
+                            dateState!!,
+                            price,
+                            url.value,
+                            listOf(),
+                            listOf(),
+                            0,
+                            !isPrivateEvent.value,
+                            listOf(),
+                            listOf())
+                        nav.goBack()
+                      }
+                    }
+                  },
+                  modifier = Modifier.width(128.dp).height(40.dp),
+                  shape = RoundedCornerShape(10.dp),
+                  border = BorderStroke(1.dp, Color.Gray), // Set border here if needed
+                  enabled = true,
+                  colors =
+                      ButtonDefaults.outlinedButtonColors(containerColor = Color(0xFFECEFF1))) {
                     Text(
                         text = "Post",
                         style =
-                        TextStyle(
-                            fontSize = 12.sp,
-                            lineHeight = 16.sp,
-                            fontFamily = FontFamily(Font(R.font.roboto)),
-                            fontWeight = FontWeight(1000),
-                            color = Color(0xFF000000),
-                            textAlign = TextAlign.Center,
-                            letterSpacing = 0.5.sp,
-                        ))
-                }
+                            TextStyle(
+                                fontSize = 12.sp,
+                                lineHeight = 16.sp,
+                                fontFamily = FontFamily(Font(R.font.roboto)),
+                                fontWeight = FontWeight(1000),
+                                color = Color(0xFF000000),
+                                textAlign = TextAlign.Center,
+                                letterSpacing = 0.5.sp,
+                            ))
+                  }
 
-                if (dateFormatError) {
-                    Text("Error: Date Format Error", color = Color.Red)
-                }
+              if (dateFormatError) {
+                Text("Error: Date Format Error", color = Color.Red)
+              }
             }
-        }
-    }
-
+      }
+}

@@ -54,8 +54,7 @@ val TOP_LEVEL_DESTINATIONS =
     listOf(
         TopLevelDestination(
             route = Route.EVENTS, icon = Icons.Default.DateRange, textId = Route.EVENTS),
-        TopLevelDestination(
-            route = Route.TRENDS, icon = Icons.Default.Home, textId = Route.TRENDS),
+        TopLevelDestination(route = Route.TRENDS, icon = Icons.Default.Home, textId = Route.TRENDS),
         TopLevelDestination(
             route = Route.EXPLORE, icon = Icons.Default.Home, textId = Route.EXPLORE),
         TopLevelDestination(route = Route.CREATE, icon = Icons.Default.Add, textId = Route.CREATE),
@@ -80,12 +79,12 @@ class NavigationActions(private val navController: NavHostController) {
 
 @Composable
 fun getIconForRoute(route: String): ImageVector {
-    return when (route) {
-        Route.EVENTS -> Icons.Default.DateRange
-        Route.TRENDS -> ImageVector.vectorResource(R.drawable.arrow_trending)
-        Route.EXPLORE -> Icons.Default.Home
-        Route.CREATE -> Icons.Default.Add
-        Route.PROFILE -> Icons.Default.Person
-        else -> Icons.Default.AccountCircle
-    }
+  return when (route) {
+    Route.EVENTS -> Icons.Default.DateRange
+    Route.TRENDS -> ImageVector.vectorResource(R.drawable.arrow_trending)
+    Route.EXPLORE -> Icons.Default.Home
+    Route.CREATE -> Icons.Default.Add
+    Route.PROFILE -> Icons.Default.Person
+    else -> Icons.Default.AccountCircle
+  }
 }
