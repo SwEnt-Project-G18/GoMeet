@@ -41,9 +41,7 @@ class EventFirebaseConnection(private val db: FirebaseFirestore) {
         .addOnSuccessListener { querySnapshot ->
           val eventList = mutableListOf<Event>()
           for (document in querySnapshot.documents) {
-            val event =
-                document.data?.fromMap(
-                    document.id) 
+            val event = document.data?.fromMap(document.id)
             if (event != null) {
               eventList.add(event)
             }
@@ -108,9 +106,7 @@ class EventFirebaseConnection(private val db: FirebaseFirestore) {
         creator = this["creator"] as String,
         title = this["title"] as String,
         description = this["description"] as String,
-        location =
-            (this["location"] as Map<String, Any>)
-                .toLocation(), 
+        location = (this["location"] as Map<String, Any>).toLocation(),
         date = LocalDate.parse(this["date"] as String),
         price = this["price"] as Double,
         url = this["url"] as String,
