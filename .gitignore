@@ -12,3 +12,4 @@ app/build
 app/.env
 app/google-services.json
 secrets.properties
+app/src/google-services.json
