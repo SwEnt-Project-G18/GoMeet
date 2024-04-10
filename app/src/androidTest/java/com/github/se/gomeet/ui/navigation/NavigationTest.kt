@@ -6,11 +6,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.github.se.gomeet.ui.create.Create
-import com.github.se.gomeet.ui.events.Events
-import com.github.se.gomeet.ui.explore.Explore
-import com.github.se.gomeet.ui.profile.Profile
-import com.github.se.gomeet.ui.trending.Trends
+import com.github.se.gomeet.ui.mainscreens.Events
+import com.github.se.gomeet.ui.mainscreens.Explore
+import com.github.se.gomeet.ui.mainscreens.Profile
+import com.github.se.gomeet.ui.mainscreens.Trends
+import com.github.se.gomeet.ui.mainscreens.create.Create
+import com.github.se.gomeet.viewmodel.EventViewModel
 import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.Test
@@ -28,7 +29,9 @@ class NavigationTest {
       val nav = rememberNavController()
       NavHost(navController = nav, startDestination = Route.EVENTS) {
         composable(TOP_LEVEL_DESTINATIONS[0].route) { Explore(nav = NavigationActions(nav)) }
-        composable(TOP_LEVEL_DESTINATIONS[1].route) { Events(NavigationActions(nav)) }
+        composable(TOP_LEVEL_DESTINATIONS[1].route) {
+          Events(NavigationActions(nav), EventViewModel())
+        }
         composable(TOP_LEVEL_DESTINATIONS[2].route) { Trends(NavigationActions(nav)) }
         composable(TOP_LEVEL_DESTINATIONS[3].route) { Create(NavigationActions(nav)) }
         composable(TOP_LEVEL_DESTINATIONS[4].route) { Profile(NavigationActions(nav)) }
@@ -51,7 +54,9 @@ class NavigationTest {
       val nav = rememberNavController()
       NavHost(navController = nav, startDestination = TOP_LEVEL_DESTINATIONS[0].route) {
         composable(TOP_LEVEL_DESTINATIONS[0].route) { Explore(nav = NavigationActions(nav)) }
-        composable(TOP_LEVEL_DESTINATIONS[1].route) { Events(NavigationActions(nav)) }
+        composable(TOP_LEVEL_DESTINATIONS[1].route) {
+          Events(NavigationActions(nav), EventViewModel())
+        }
         composable(TOP_LEVEL_DESTINATIONS[2].route) { Trends(NavigationActions(nav)) }
         composable(TOP_LEVEL_DESTINATIONS[3].route) { Create(NavigationActions(nav)) }
         composable(TOP_LEVEL_DESTINATIONS[4].route) { Profile(NavigationActions(nav)) }

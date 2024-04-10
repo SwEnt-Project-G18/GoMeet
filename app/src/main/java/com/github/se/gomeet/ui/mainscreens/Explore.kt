@@ -1,4 +1,4 @@
-package com.github.se.gomeet.ui.explore
+package com.github.se.gomeet.ui.mainscreens
 
 import android.util.Log
 import androidx.compose.foundation.layout.Box

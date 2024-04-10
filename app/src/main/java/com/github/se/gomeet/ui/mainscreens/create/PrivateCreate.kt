@@ -1,17 +1,20 @@
-package com.github.se.gomeet.ui.events
+package com.github.se.gomeet.ui.mainscreens.create
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
+import com.github.se.gomeet.viewmodel.EventViewModel
 
 @Composable
-fun Events(nav: NavigationActions) {
+fun PrivateCreate(nav: NavigationActions, eventViewModel: EventViewModel) {
   Scaffold(
       bottomBar = {
         BottomNavigationMenu(
@@ -21,6 +24,12 @@ fun Events(nav: NavigationActions) {
             tabList = TOP_LEVEL_DESTINATIONS,
             selectedItem = Route.EXPLORE)
       }) { innerPadding ->
-        Text("Events", Modifier.padding(innerPadding))
+        Text(text = "Private", modifier = Modifier.padding(innerPadding))
       }
+}
+
+@Preview
+@Composable
+fun PrivateCreatePreview() {
+  PrivateCreate(NavigationActions(rememberNavController()), EventViewModel())
 }
