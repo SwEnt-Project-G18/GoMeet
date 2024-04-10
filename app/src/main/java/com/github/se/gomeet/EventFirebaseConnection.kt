@@ -43,7 +43,7 @@ class EventFirebaseConnection(private val db: FirebaseFirestore) {
           for (document in querySnapshot.documents) {
             val event =
                 document.data?.fromMap(
-                    document.id) // Assuming `fromMap` is a method to parse the document data into a
+                    document.id) 
             if (event != null) {
               eventList.add(event)
             }
@@ -86,7 +86,7 @@ class EventFirebaseConnection(private val db: FirebaseFirestore) {
         "creator" to creator,
         "title" to title,
         "description" to description,
-        "location" to location.toMap(), // Assuming Location has a toMap() method
+        "location" to location.toMap(),
         "date" to date.toString(),
         "price" to price,
         "url" to url,
@@ -110,7 +110,7 @@ class EventFirebaseConnection(private val db: FirebaseFirestore) {
         description = this["description"] as String,
         location =
             (this["location"] as Map<String, Any>)
-                .toLocation(), // Ensure Location has a method to deserialize
+                .toLocation(), 
         date = LocalDate.parse(this["date"] as String),
         price = this["price"] as Double,
         url = this["url"] as String,
