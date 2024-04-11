@@ -151,6 +151,11 @@ dependencies {
     androidTestImplementation("io.mockk:mockk-agent:1.13.7")
 
     implementation("com.google.maps.android:maps-compose:4.3.3")
+
+    implementation("com.google.accompanist:accompanist-permissions:0.35.0-alpha")
+    implementation("com.google.firebase:firebase-storage-ktx")
+
+
 }
 
 
