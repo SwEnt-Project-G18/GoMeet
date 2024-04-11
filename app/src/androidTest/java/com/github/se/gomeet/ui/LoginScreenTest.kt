@@ -42,7 +42,7 @@ class LoginScreenTest {
 
       rule.onNodeWithText("Email").assertIsDisplayed()
       rule.onNodeWithText("Password").assertIsDisplayed()
-      rule.onNodeWithText("Log in").assertIsNotEnabled().assertHasClickAction()
+      rule.onNodeWithText("Log in", useUnmergedTree = true).assertIsNotEnabled().assertHasClickAction().assertIsDisplayed()
 
       // Enter email and password
       rule.onNodeWithText("Email").performTextInput("test@example.com")
@@ -55,7 +55,7 @@ class LoginScreenTest {
       if (authViewModel.signInState.value.signInError != null) {
         rule.onNodeWithText(authViewModel.signInState.value.signInError!!).assertIsDisplayed()
       } else {
-        rule.waitForIdle()
+        //rule.waitForIdle()
         assert(nav.currentDestination?.route == Route.EXPLORE)
       }
 
