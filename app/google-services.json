@@ -1,0 +1,124 @@
+{
+  "project_info": {
+    "project_number": "563688516930",
+    "project_id": "test2-61ba1",
+    "storage_bucket": "test2-61ba1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:563688516930:android:5fc18748be6969d7222cdb",
+        "android_client_info": {
+          "package_name": "com.github.se.bootcamp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "563688516930-vbci5m87ssg8alkbc80q3bp4193achec.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.github.se.bootcamp",
+            "certificate_hash": "4d3df03204089b52cb5e5e2011a8bf9ef8934188"
+          }
+        },
+        {
+          "client_id": "563688516930-vc4g24tkgs0rhbmj338megj10osp8rjs.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDq57XWVhwmzRv-H-AntJNbHkt_TYS1_M4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "563688516930-vc4g24tkgs0rhbmj338megj10osp8rjs.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:563688516930:android:62cd0764607255d7222cdb",
+        "android_client_info": {
+          "package_name": "com.github.se.gomeet"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "563688516930-0ia08b09l0j555ij5iidos6gr7apc15f.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.github.se.gomeet",
+            "certificate_hash": "b3ca4bcdc69e5ab3b783e4be101337dc57df92ef"
+          }
+        },
+        {
+          "client_id": "563688516930-71phjghtku78ssbd77qk3bghptk444p1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.github.se.gomeet",
+            "certificate_hash": "cbcea947675d924c9ad8d515fb451108e1d34adb"
+          }
+        },
+        {
+          "client_id": "563688516930-86u1nbkal7msrm4be77c324fbrnr1n8e.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.github.se.gomeet",
+            "certificate_hash": "4d3df03204089b52cb5e5e2011a8bf9ef8934188"
+          }
+        },
+        {
+          "client_id": "563688516930-fa2j5h86gdv5h9qnql8iqb6mli8d4lqa.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.github.se.gomeet",
+            "certificate_hash": "783f62bda8f9e67702acc95361d54dd6e8354727"
+          }
+        },
+        {
+          "client_id": "563688516930-ispm0mt2n2vgprd82af95u3n8q0o18ie.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.github.se.gomeet",
+            "certificate_hash": "58fcc23bfb4496dc160a268f564b28085bab7c5e"
+          }
+        },
+        {
+          "client_id": "563688516930-m28ij7abtj8h8hkhbdc3aj092glafqad.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.github.se.gomeet",
+            "certificate_hash": "acab844333d21463e7b4a3716cbc96b255327033"
+          }
+        },
+        {
+          "client_id": "563688516930-vc4g24tkgs0rhbmj338megj10osp8rjs.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDq57XWVhwmzRv-H-AntJNbHkt_TYS1_M4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "563688516930-vc4g24tkgs0rhbmj338megj10osp8rjs.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
