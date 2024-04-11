@@ -34,24 +34,6 @@ class AuthRepository(fAuth: FirebaseAuth? = null) {
     }
   }
 
-//  suspend fun signUpWithEmailPassword(
-//      email: String,
-//      password: String,
-//      onComplete: (Boolean) -> Unit
-//  ) {
-//    firebaseAuth
-//        .createUserWithEmailAndPassword(email, password)
-//        .addOnCompleteListener { task ->
-//          if (task.isSuccessful) {
-//            Log.d(TAG, "signUpWithEmail:success")
-//            onComplete.invoke(true)
-//          } else {
-//            Log.w(TAG, "signUpWithEmail:failure", task.exception)
-//            onComplete.invoke(false)
-//          }
-//        }
-//        .await()
-//  }
 suspend fun signUpWithEmailPassword(
     email: String,
     password: String,
@@ -67,24 +49,6 @@ suspend fun signUpWithEmailPassword(
     }
 }
 
-//    suspend fun signInWithEmailPassword(
-//      email: String,
-//      password: String,
-//      onComplete: (Boolean) -> Unit
-//  ) {
-//    firebaseAuth
-//        .signInWithEmailAndPassword(email, password)
-//        .addOnCompleteListener { task ->
-//          if (task.isSuccessful) {
-//            Log.d(TAG, "signInWithEmail:success")
-//            onComplete.invoke(true)
-//          } else {
-//            Log.w(TAG, "signInWithEmail:failure", task.exception)
-//            onComplete.invoke(false)
-//          }
-//        }
-//        .await()
-//  }
 suspend fun signInWithEmailPassword(
     email: String,
     password: String,
@@ -104,7 +68,7 @@ suspend fun signInWithEmailPassword(
 }
 
 
-    fun signOut() {
+fun signOut() {
     firebaseAuth.signOut()
   }
 }
