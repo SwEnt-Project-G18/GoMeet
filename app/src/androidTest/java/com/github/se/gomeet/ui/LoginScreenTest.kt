@@ -11,12 +11,7 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.github.se.gomeet.ui.navigation.NavigationActions
-import com.github.se.gomeet.ui.navigation.Route
-import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.viewmodel.AuthViewModel
 import org.junit.Rule
 import org.junit.Test
@@ -31,15 +26,11 @@ class LoginScreenTest {
   @get:Rule val rule = createAndroidComposeRule<ComponentActivity>()
 
   @SuppressLint("StateFlowValueCalledInComposition")
-  @Test fun testLoginScreen() {
+  @Test
+  fun testLoginScreen() {
     val authViewModel = AuthViewModel()
 
-    lateinit var nav: NavHostController
-
-    rule.setContent {
-      nav = rememberNavController()
-      LoginScreen(authViewModel) {}
-    }
+    rule.setContent { LoginScreen(authViewModel) {} }
 
     // Test the UI elements
     rule.onNodeWithContentDescription("GoMeet").assertIsDisplayed()
@@ -47,8 +38,7 @@ class LoginScreenTest {
 
     rule.onNodeWithText("Email").assertIsDisplayed()
     rule.onNodeWithText("Password").assertIsDisplayed()
-    rule.onNodeWithText("Log in")
-      .assertIsNotEnabled().assertHasClickAction().assertIsDisplayed()
+    rule.onNodeWithText("Log in").assertIsNotEnabled().assertHasClickAction().assertIsDisplayed()
 
     // Enter email and password
     rule.onNodeWithText("Email").performTextInput(emailDaniel)
@@ -63,14 +53,5 @@ class LoginScreenTest {
 
     // Sign-in should complete successfully
     assert(authViewModel.signInState.value.signInError == null)
-
-//    if (authViewModel.signInState.value.signInError != null) {
-//      rule.onNodeWithText(authViewModel.signInState.value.signInError!!).assertIsDisplayed()
-//    } else {
-//      rule.waitForIdle()
-//      println("Current destination: ${nav.currentDestination?.route}")
-//      assert(nav.currentDestination?.route == Route.TRENDS)
-//    }
-
   }
 }

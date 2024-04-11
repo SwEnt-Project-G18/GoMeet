@@ -33,60 +33,47 @@ class AuthTests {
 
   @Test
   fun testSignUpSuccess() = runTest {
-
     val successfulTask: Task<AuthResult> = Tasks.forResult(mock())
     whenever(firebaseAuth.createUserWithEmailAndPassword(anyString(), anyString()))
-      .thenReturn(successfulTask)
+        .thenReturn(successfulTask)
 
-    launch{
-      authRepository.signUpWithEmailPassword(email, pwd) { success ->
-      assertTrue(success)
-      }
-    }.join()
-
+    launch { authRepository.signUpWithEmailPassword(email, pwd) { success -> assertTrue(success) } }
+        .join()
   }
 
   @Test
   fun testSignUpFailure() = runTest {
-
     val exception = FirebaseAuthException("auth/error", "Authentication failed")
     val unsuccessfulTask: Task<AuthResult> = Tasks.forException(exception)
     whenever(firebaseAuth.createUserWithEmailAndPassword(anyString(), anyString()))
-      .thenReturn(unsuccessfulTask)
+        .thenReturn(unsuccessfulTask)
 
-    launch{
-      authRepository.signUpWithEmailPassword(email, pwd) { success ->
-        assertFalse(success)
-      }
-    }.join()
+    launch {
+          authRepository.signUpWithEmailPassword(email, pwd) { success -> assertFalse(success) }
+        }
+        .join()
   }
 
-
   @Test
-  fun testSignInSuccess() = runTest{
+  fun testSignInSuccess() = runTest {
     val successfulTask: Task<AuthResult> = Tasks.forResult(mock())
     whenever(firebaseAuth.signInWithEmailAndPassword(anyString(), anyString()))
-      .thenReturn(successfulTask)
+        .thenReturn(successfulTask)
 
-    launch{
-      authRepository.signInWithEmailPassword(email, pwd) { success ->
-        assertTrue(success)
-      }
-    }.join()
+    launch { authRepository.signInWithEmailPassword(email, pwd) { success -> assertTrue(success) } }
+        .join()
   }
 
   @Test
-  fun testSignInFailure() = runTest{
+  fun testSignInFailure() = runTest {
     val exception = FirebaseAuthException("auth/error", "Authentication failed")
     val unsuccessfulTask: Task<AuthResult> = Tasks.forException(exception)
     whenever(firebaseAuth.createUserWithEmailAndPassword(anyString(), anyString()))
-      .thenReturn(unsuccessfulTask)
+        .thenReturn(unsuccessfulTask)
 
-    launch{
-      authRepository.signInWithEmailPassword(email, pwd) { success ->
-        assertTrue(!success)
-      }
-    }.join()
+    launch {
+          authRepository.signInWithEmailPassword(email, pwd) { success -> assertTrue(!success) }
+        }
+        .join()
   }
-
 }

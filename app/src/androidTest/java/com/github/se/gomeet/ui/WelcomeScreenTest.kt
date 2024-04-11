@@ -1,19 +1,21 @@
 package com.github.se.gomeet.ui
 
+import androidx.activity.ComponentActivity
+import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.intent.matcher.IntentMatchers.toPackage
-import com.github.se.gomeet.MainActivity
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
 class WelcomeScreenTest {
-  @get:Rule val composeTestRule = createAndroidComposeRule<MainActivity>()
+  @get:Rule val rule = createAndroidComposeRule<ComponentActivity>()
 
   @Before
   fun setup() {
@@ -29,12 +31,17 @@ class WelcomeScreenTest {
 
   @Test
   fun googleSignInButtonShouldLaunchIntent() {
-    // No need to set content as MainActivity already sets it
+
+    rule.setContent { WelcomeScreen({}, {}, {}) }
+
+    rule.onNodeWithContentDescription("GoMeet Logo").assertExists()
+
+    rule.onNodeWithText("Log in").assertExists().assertIsEnabled()
+
+    rule.onNodeWithText("Create account").assertExists().assertIsEnabled()
+
     // Directly interact with the UI elements
-    composeTestRule
-        .onNodeWithText("Continue with Google", useUnmergedTree = true)
-        .assertExists()
-        .performClick()
+    rule.onNodeWithText("Continue with Google").assertExists().performClick()
 
     // Assert that an Intent to Google Mobile Services has been sent
     intended(toPackage("com.google.android.gms"))

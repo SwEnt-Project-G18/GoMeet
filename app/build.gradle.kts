@@ -146,6 +146,7 @@ dependencies {
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.2")
     testImplementation("org.mockito:mockito-inline:3.11.2")
     testImplementation("org.mockito.kotlin:mockito-kotlin:4.0.0")
+    androidTestImplementation("org.mockito.kotlin:mockito-kotlin:4.0.0")
 
 
     implementation("com.firebaseui:firebase-ui-auth:7.2.0")

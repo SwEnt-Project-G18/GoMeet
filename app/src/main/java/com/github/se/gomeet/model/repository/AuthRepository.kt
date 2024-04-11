@@ -34,41 +34,40 @@ class AuthRepository(fAuth: FirebaseAuth? = null) {
     }
   }
 
-suspend fun signUpWithEmailPassword(
-    email: String,
-    password: String,
-    onComplete: (Boolean) -> Unit
-) {
+  suspend fun signUpWithEmailPassword(
+      email: String,
+      password: String,
+      onComplete: (Boolean) -> Unit
+  ) {
     try {
-        firebaseAuth.createUserWithEmailAndPassword(email, password).await()
-        Log.d(TAG, "signUpWithEmail:success")
-        onComplete(true)
+      firebaseAuth.createUserWithEmailAndPassword(email, password).await()
+      Log.d(TAG, "signUpWithEmail:success")
+      onComplete(true)
     } catch (e: Exception) {
-        Log.w(TAG, "signUpWithEmail:failure", e)
-        onComplete(false)
+      Log.w(TAG, "signUpWithEmail:failure", e)
+      onComplete(false)
     }
-}
+  }
 
-suspend fun signInWithEmailPassword(
-    email: String,
-    password: String,
-    onComplete: (Boolean) -> Unit
-) {
+  suspend fun signInWithEmailPassword(
+      email: String,
+      password: String,
+      onComplete: (Boolean) -> Unit
+  ) {
     try {
-        // Attempt to sign in and wait for the task to complete
-        firebaseAuth.signInWithEmailAndPassword(email, password).await()
-        // If the await() completes without throwing an exception, sign-in was successful
-        Log.d(TAG, "signInWithEmail:success")
-        onComplete(true)
+      // Attempt to sign in and wait for the task to complete
+      firebaseAuth.signInWithEmailAndPassword(email, password).await()
+      // If the await() completes without throwing an exception, sign-in was successful
+      Log.d(TAG, "signInWithEmail:success")
+      onComplete(true)
     } catch (e: Exception) {
-        // If await() throws an exception, sign-in failed
-        Log.w(TAG, "signInWithEmail:failure", e)
-        onComplete(false)
+      // If await() throws an exception, sign-in failed
+      Log.w(TAG, "signInWithEmail:failure", e)
+      onComplete(false)
     }
-}
+  }
 
-
-fun signOut() {
+  fun signOut() {
     firebaseAuth.signOut()
   }
 }
