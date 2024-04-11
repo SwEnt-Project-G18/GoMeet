@@ -13,6 +13,8 @@ val DarkCyan = Color(0xFF2F6673)
 val Cyan = Color(0xFF127581)
 val TranslucentCyan = Color(0x03B3C7C9)
 val DarkerCyan = Color(0xFF073F57)
+val SomewhatWhite = Color(0xFFFEFBFF)
+val DarkModeBackground = Color(0xFF1A1B21)
 
 val NavBarUnselected = Color(216, 223, 225)
 val NavBarSelected = Color(191, 206, 208)
