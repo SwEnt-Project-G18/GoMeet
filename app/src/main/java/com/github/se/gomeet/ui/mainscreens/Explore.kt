@@ -39,7 +39,7 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
   val coroutineScope = rememberCoroutineScope()
 
   var isMapLoaded by remember { mutableStateOf(false) }
-  val eventList = remember { mutableListOf<Event>() }
+  var eventList = remember { mutableListOf<Event>() }
 
   LaunchedEffect(Unit) {
     coroutineScope.launch {
