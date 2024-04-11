@@ -28,7 +28,9 @@ class NavigationTest {
     composeTestRule.setContent {
       val nav = rememberNavController()
       NavHost(navController = nav, startDestination = Route.EVENTS) {
-        composable(TOP_LEVEL_DESTINATIONS[0].route) { Explore(nav = NavigationActions(nav)) }
+        composable(TOP_LEVEL_DESTINATIONS[0].route) {
+          Explore(nav = NavigationActions(nav), EventViewModel())
+        }
         composable(TOP_LEVEL_DESTINATIONS[1].route) {
           Events(NavigationActions(nav), EventViewModel())
         }
@@ -53,7 +55,9 @@ class NavigationTest {
     composeTestRule.setContent {
       val nav = rememberNavController()
       NavHost(navController = nav, startDestination = TOP_LEVEL_DESTINATIONS[0].route) {
-        composable(TOP_LEVEL_DESTINATIONS[0].route) { Explore(nav = NavigationActions(nav)) }
+        composable(TOP_LEVEL_DESTINATIONS[0].route) {
+          Explore(nav = NavigationActions(nav), EventViewModel())
+        }
         composable(TOP_LEVEL_DESTINATIONS[1].route) {
           Events(NavigationActions(nav), EventViewModel())
         }

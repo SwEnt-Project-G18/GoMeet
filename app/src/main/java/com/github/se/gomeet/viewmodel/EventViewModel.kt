@@ -30,6 +30,16 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
     }
   }
 
+  suspend fun getAllEvents(): List<Event>? {
+    return try {
+      val event = CompletableDeferred<List<Event>?>()
+      db.getAllEvents { t -> event.complete(t) }
+      event.await()
+    } catch (e: Exception) {
+      null
+    }
+  }
+
   fun createEvent(
       title: String,
       description: String,
