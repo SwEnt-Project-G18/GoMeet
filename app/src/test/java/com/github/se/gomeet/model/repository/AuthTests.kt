@@ -23,7 +23,7 @@ class AuthTests {
   private lateinit var authRepository: AuthRepository
   private val firebaseAuth: FirebaseAuth = mock()
   private val email = "test@123.com"
-  private val pwd = "pass1234"""
+  private val pwd = "pass1234"
 
   @Before
   fun setUp() {
