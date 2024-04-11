@@ -145,6 +145,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                   label = { Text("Title") },
                   placeholder = { Text("Name the event") },
                   singleLine = true,
+                  shape = RoundedCornerShape(10.dp),
                   textStyle = TextStyle(color = MaterialTheme.colorScheme.onBackground),
                   colors = TextFieldDefaults.outlinedTextFieldColors(
                       focusedBorderColor = MaterialTheme.colorScheme.onBackground,
@@ -159,6 +160,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                   label = { Text("Description") },
                   placeholder = { Text("Describe the task") },
                   singleLine = true,
+                  shape = RoundedCornerShape(10.dp),
                   textStyle = TextStyle(color = MaterialTheme.colorScheme.onBackground),
                   colors = TextFieldDefaults.outlinedTextFieldColors(
                       focusedBorderColor = MaterialTheme.colorScheme.onBackground,
@@ -173,6 +175,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                   label = { Text("Location") },
                   placeholder = { Text("Enter an address") },
                   singleLine = true,
+                  shape = RoundedCornerShape(10.dp),
                   textStyle = TextStyle(color = MaterialTheme.colorScheme.onBackground),
                   colors = TextFieldDefaults.outlinedTextFieldColors(
                       focusedBorderColor = MaterialTheme.colorScheme.onBackground,
@@ -195,6 +198,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                   label = { Text("Date") },
                   placeholder = { Text("Enter a date (yyyy-mm-dd)") },
                   singleLine = true,
+                  shape = RoundedCornerShape(10.dp),
                   textStyle = TextStyle(color = MaterialTheme.colorScheme.onBackground),
                   colors = TextFieldDefaults.outlinedTextFieldColors(
                       focusedBorderColor = MaterialTheme.colorScheme.onBackground,
@@ -214,6 +218,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                   label = { Text("Price") },
                   placeholder = { Text("Enter a price") },
                   singleLine = true,
+                  shape = RoundedCornerShape(10.dp),
                   textStyle = TextStyle(color = MaterialTheme.colorScheme.onBackground),
                   colors = TextFieldDefaults.outlinedTextFieldColors(
                       focusedBorderColor = MaterialTheme.colorScheme.onBackground,
@@ -228,6 +233,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                   label = { Text("Link") },
                   placeholder = { Text("Enter a link") },
                   singleLine = true,
+                  shape = RoundedCornerShape(10.dp),
                   colors = TextFieldDefaults.outlinedTextFieldColors(
                       focusedBorderColor = MaterialTheme.colorScheme.onBackground,
                       unfocusedBorderColor = MaterialTheme.colorScheme.onBackground),
@@ -272,7 +278,6 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
 
             if (showDialog) {
                 Dialog(onDismissRequest = { showDialog = false }) {
-                    // Assuming imageBitmap is the Bitmap representation of your selected image
                     imageBitmap?.let { bitmap ->
                         Image(
                             bitmap = bitmap,
