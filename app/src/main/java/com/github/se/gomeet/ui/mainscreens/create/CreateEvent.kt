@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -26,24 +27,25 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.R
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
+import com.github.se.gomeet.ui.theme.DarkerCyan
+import com.github.se.gomeet.ui.theme.Grey
 import com.github.se.gomeet.viewmodel.EventViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 
 @Composable
-fun PublicCreate(nav: NavigationActions, eventViewModel: EventViewModel) {
+fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivate: Boolean) {
 
   val titleState = remember { mutableStateOf("") }
   val descriptionState = remember { mutableStateOf("") }
@@ -51,8 +53,10 @@ fun PublicCreate(nav: NavigationActions, eventViewModel: EventViewModel) {
   val textDate = remember { mutableStateOf("") }
   var dateState by remember { mutableStateOf<LocalDate?>(null) }
   var dateFormatError by remember { mutableStateOf(false) }
-  val price by remember { mutableDoubleStateOf(0.0) }
+  var price by remember { mutableDoubleStateOf(0.0) }
+  var priceText by remember { mutableStateOf("") }
   val url = remember { mutableStateOf("") }
+  val isPrivateEvent = remember { mutableStateOf(false) }
 
   Scaffold(
       bottomBar = {
@@ -64,18 +68,38 @@ fun PublicCreate(nav: NavigationActions, eventViewModel: EventViewModel) {
             selectedItem = Route.EXPLORE)
       }) { innerPadding ->
         Text(
-            modifier = Modifier.padding(horizontal = 15.dp, vertical = 30.dp),
             text = "Create",
-            style =
-                TextStyle(
-                    fontSize = 24.sp,
-                    lineHeight = 16.sp,
-                    fontFamily = FontFamily(Font(R.font.roboto)),
-                    fontWeight = FontWeight(1000),
-                    color = Color(0xFF073F57),
-                    textAlign = TextAlign.Center,
-                    letterSpacing = 0.5.sp,
-                ))
+            modifier = Modifier.padding(horizontal = 15.dp, vertical = 15.dp),
+            color = DarkerCyan,
+            fontStyle = FontStyle.Normal,
+            fontWeight = FontWeight.SemiBold,
+            fontFamily = FontFamily.Default,
+            textAlign = TextAlign.Start,
+            style = MaterialTheme.typography.headlineLarge)
+        if (isPrivate) {
+          isPrivateEvent.value = true
+          Text(
+              text = "Private",
+              modifier = Modifier.padding(horizontal = 18.dp, vertical = 50.dp),
+              color = Grey,
+              fontStyle = FontStyle.Normal,
+              fontWeight = FontWeight.SemiBold,
+              fontFamily = FontFamily.Default,
+              textAlign = TextAlign.Start,
+              style = MaterialTheme.typography.titleSmall)
+        } else {
+          isPrivateEvent.value = false
+          Text(
+              text = "Public",
+              modifier = Modifier.padding(horizontal = 18.dp, vertical = 50.dp),
+              color = Grey,
+              fontStyle = FontStyle.Normal,
+              fontWeight = FontWeight.SemiBold,
+              fontFamily = FontFamily.Default,
+              textAlign = TextAlign.Start,
+              style = MaterialTheme.typography.titleSmall)
+        }
+
         Column(
             Modifier.padding(innerPadding),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -118,6 +142,27 @@ fun PublicCreate(nav: NavigationActions, eventViewModel: EventViewModel) {
                   placeholder = { Text("Enter a date (yyyy-mm-dd)") },
                   modifier = Modifier.fillMaxWidth().padding(7.dp))
 
+              OutlinedTextField(
+                  value = priceText, // Bind to the TextField's value
+                  onValueChange = { newVal ->
+                    // Update priceText with the new value
+                    priceText = newVal
+                    // Try to convert the new value to a Double and update price if successful
+                    newVal.toDoubleOrNull()?.let {
+                      price = it // Correctly use .value for mutableStateOf variable
+                    }
+                  },
+                  label = { Text("Price") },
+                  placeholder = { Text("Enter a price") },
+                  modifier = Modifier.fillMaxWidth().padding(7.dp))
+
+              OutlinedTextField(
+                  value = url.value,
+                  onValueChange = { newVal -> url.value = newVal },
+                  label = { Text("Ticket link") },
+                  placeholder = { Text("Enter a ticket link") },
+                  modifier = Modifier.fillMaxWidth().padding(7.dp))
+
               Spacer(modifier = Modifier.height(16.dp))
 
               OutlinedButton(
@@ -134,7 +179,7 @@ fun PublicCreate(nav: NavigationActions, eventViewModel: EventViewModel) {
                             listOf(),
                             listOf(),
                             0,
-                            true,
+                            !isPrivateEvent.value,
                             listOf(),
                             listOf())
                         nav.goBack()
@@ -166,10 +211,4 @@ fun PublicCreate(nav: NavigationActions, eventViewModel: EventViewModel) {
               }
             }
       }
-}
-
-@Preview
-@Composable
-fun PublicCreatePreview() {
-  PublicCreate(NavigationActions(rememberNavController()), EventViewModel())
 }
