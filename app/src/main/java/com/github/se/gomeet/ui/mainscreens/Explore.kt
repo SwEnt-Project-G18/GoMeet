@@ -45,7 +45,7 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
     coroutineScope.launch {
       val allEvents = eventViewModel.getAllEvents()
       if (allEvents != null) {
-          eventList.addAll(allEvents)
+        eventList.addAll(allEvents)
       }
       isMapLoaded = true
     }
