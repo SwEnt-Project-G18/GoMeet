@@ -21,8 +21,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.IconButton
 import androidx.compose.material.darkColors
 import androidx.compose.material.icons.Icons
@@ -73,7 +75,8 @@ fun Profile(nav: NavigationActions) { // TODO Add parameters to the function
                 tabList = TOP_LEVEL_DESTINATIONS,
                 selectedItem = Route.EXPLORE
             )
-        }) { innerPadding ->
+        },
+        modifier = Modifier.verticalScroll(rememberScrollState())) { innerPadding ->
         print(innerPadding)
         Text(
             text = "My Profile",
