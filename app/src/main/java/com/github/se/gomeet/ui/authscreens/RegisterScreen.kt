@@ -40,7 +40,7 @@ fun RegisterScreen(authViewModel: AuthViewModel, onNavToExplore: () -> Unit) {
   Column(
       verticalArrangement = Arrangement.Top,
       horizontalAlignment = Alignment.CenterHorizontally,
-      modifier = Modifier.fillMaxSize().background(Color.White).padding(25.dp)) {
+      modifier = Modifier.fillMaxSize().padding(25.dp)) {
         Image(
             painter = painterResource(id = R.drawable.gomeet_text),
             contentDescription = "Go Meet",
@@ -72,6 +72,7 @@ fun RegisterScreen(authViewModel: AuthViewModel, onNavToExplore: () -> Unit) {
             value = signInState.value.emailRegister,
             onValueChange = { newValue -> authViewModel.onEmailRegisterChange(newValue) },
             label = { Text("Email") },
+            singleLine = true,
             modifier = Modifier.fillMaxWidth())
 
         Spacer(modifier = Modifier.size(16.dp))
@@ -80,6 +81,7 @@ fun RegisterScreen(authViewModel: AuthViewModel, onNavToExplore: () -> Unit) {
             value = signInState.value.passwordRegister,
             onValueChange = { newValue -> authViewModel.onPasswordRegisterChange(newValue) },
             label = { Text("Password") },
+            singleLine = true,
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth())
 
@@ -90,6 +92,7 @@ fun RegisterScreen(authViewModel: AuthViewModel, onNavToExplore: () -> Unit) {
             onValueChange = { newValue -> authViewModel.onConfirmPasswordRegisterChange(newValue) },
             label = { Text("Confirm Password") },
             visualTransformation = PasswordVisualTransformation(),
+            singleLine = true,
             modifier = Modifier.fillMaxWidth())
 
         Spacer(modifier = Modifier.size(50.dp))

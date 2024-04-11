@@ -31,6 +31,7 @@ import com.github.se.gomeet.ui.navigation.CREATE_ITEMS
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
+import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.ui.theme.DarkerCyan
 
 @Composable
@@ -47,7 +48,7 @@ fun Create(nav: NavigationActions) {
         Text(
             text = "Create",
             modifier = Modifier.padding(horizontal = 15.dp, vertical = 15.dp),
-            color = DarkerCyan,
+            color = DarkCyan,
             fontStyle = FontStyle.Normal,
             fontWeight = FontWeight.SemiBold,
             fontFamily = FontFamily.Default,
@@ -62,7 +63,6 @@ fun Create(nav: NavigationActions) {
 
               Text(
                   text = "Choose your audience",
-                  color = Color.Black,
                   fontStyle = FontStyle.Normal,
                   fontWeight = FontWeight.Normal,
                   fontFamily = FontFamily.Default,
@@ -85,7 +85,7 @@ fun Create(nav: NavigationActions) {
                           text = "Public",
                           color = Color.Black,
                           fontStyle = FontStyle.Normal,
-                          fontWeight = FontWeight.Light,
+                          fontWeight = FontWeight.Normal,
                           fontFamily = FontFamily.Default,
                           textAlign = TextAlign.Start,
                           style = MaterialTheme.typography.bodyMedium)
@@ -105,7 +105,7 @@ fun Create(nav: NavigationActions) {
                           text = "Private",
                           color = Color.Black,
                           fontStyle = FontStyle.Normal,
-                          fontWeight = FontWeight.Light,
+                          fontWeight = FontWeight.Normal,
                           fontFamily = FontFamily.Default,
                           textAlign = TextAlign.Start,
                           style = MaterialTheme.typography.bodyMedium)
