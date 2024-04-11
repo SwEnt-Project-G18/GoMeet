@@ -7,7 +7,7 @@ import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.tasks.await
 
-class AuthRepository(fAuth : FirebaseAuth? = null) {
+class AuthRepository(fAuth: FirebaseAuth? = null) {
 
   private val firebaseAuth = fAuth ?: FirebaseAuth.getInstance()
   val currentUser = firebaseAuth.currentUser
