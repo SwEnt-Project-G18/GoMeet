@@ -1,6 +1,11 @@
 package com.github.se.gomeet.ui.mainscreens.create
 
+import android.graphics.BitmapFactory
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -10,6 +15,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -24,6 +31,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -32,14 +41,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.github.se.gomeet.R
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
+import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.ui.theme.DarkerCyan
 import com.github.se.gomeet.ui.theme.Grey
 import com.github.se.gomeet.viewmodel.EventViewModel
+import java.io.InputStream
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
@@ -58,6 +70,26 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
   val url = remember { mutableStateOf("") }
   val isPrivateEvent = remember { mutableStateOf(false) }
 
+    var imageUri by remember { mutableStateOf<android.net.Uri?>(null) }
+    var imageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: android.net.Uri? ->
+        imageUri = uri
+        uri?.let { uriNonNull ->
+            val inputStream: InputStream? = try {
+                nav.navController.context.contentResolver.openInputStream(uriNonNull)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+            inputStream?.let {
+                val bitmap = BitmapFactory.decodeStream(it)
+                imageBitmap = bitmap.asImageBitmap()
+            }
+        }
+    }
+
   Scaffold(
       bottomBar = {
         BottomNavigationMenu(
@@ -70,17 +102,18 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
         Text(
             text = "Create",
             modifier = Modifier.padding(horizontal = 15.dp, vertical = 15.dp),
-            color = DarkerCyan,
+            color = DarkCyan,
             fontStyle = FontStyle.Normal,
             fontWeight = FontWeight.SemiBold,
             fontFamily = FontFamily.Default,
             textAlign = TextAlign.Start,
             style = MaterialTheme.typography.headlineLarge)
+
         if (isPrivate) {
           isPrivateEvent.value = true
           Text(
               text = "Private",
-              modifier = Modifier.padding(horizontal = 18.dp, vertical = 50.dp),
+              modifier = Modifier.padding(horizontal = 18.dp, vertical = 55.dp),
               color = Grey,
               fontStyle = FontStyle.Normal,
               fontWeight = FontWeight.SemiBold,
@@ -91,7 +124,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
           isPrivateEvent.value = false
           Text(
               text = "Public",
-              modifier = Modifier.padding(horizontal = 18.dp, vertical = 50.dp),
+              modifier = Modifier.padding(horizontal = 18.dp, vertical = 55.dp),
               color = Grey,
               fontStyle = FontStyle.Normal,
               fontWeight = FontWeight.SemiBold,
@@ -111,21 +144,42 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                   onValueChange = { newVal -> titleState.value = newVal },
                   label = { Text("Title") },
                   placeholder = { Text("Name the event") },
-                  modifier = Modifier.fillMaxWidth().padding(7.dp))
+                  singleLine = true,
+                  textStyle = TextStyle(color = MaterialTheme.colorScheme.onBackground),
+                  colors = TextFieldDefaults.outlinedTextFieldColors(
+                      focusedBorderColor = MaterialTheme.colorScheme.onBackground,
+                      unfocusedBorderColor = MaterialTheme.colorScheme.onBackground),
+                  modifier = Modifier
+                      .fillMaxWidth()
+                      .padding(start = 7.dp, end = 7.dp, top = 4.dp, bottom = 4.dp))
 
               OutlinedTextField(
                   value = descriptionState.value,
                   onValueChange = { newVal -> descriptionState.value = newVal },
                   label = { Text("Description") },
                   placeholder = { Text("Describe the task") },
-                  modifier = Modifier.fillMaxWidth().padding(7.dp))
+                  singleLine = true,
+                  textStyle = TextStyle(color = MaterialTheme.colorScheme.onBackground),
+                  colors = TextFieldDefaults.outlinedTextFieldColors(
+                      focusedBorderColor = MaterialTheme.colorScheme.onBackground,
+                      unfocusedBorderColor = MaterialTheme.colorScheme.onBackground),
+                  modifier = Modifier
+                      .fillMaxWidth()
+                      .padding(start = 7.dp, end = 7.dp, top = 4.dp, bottom = 4.dp))
 
               OutlinedTextField(
                   value = locationState.value,
                   onValueChange = { newVal -> locationState.value = newVal },
                   label = { Text("Location") },
                   placeholder = { Text("Enter an address") },
-                  modifier = Modifier.fillMaxWidth().padding(7.dp))
+                  singleLine = true,
+                  textStyle = TextStyle(color = MaterialTheme.colorScheme.onBackground),
+                  colors = TextFieldDefaults.outlinedTextFieldColors(
+                      focusedBorderColor = MaterialTheme.colorScheme.onBackground,
+                      unfocusedBorderColor = MaterialTheme.colorScheme.onBackground),
+                  modifier = Modifier
+                      .fillMaxWidth()
+                      .padding(start = 7.dp, end = 7.dp, top = 4.dp, bottom = 4.dp))
 
               OutlinedTextField(
                   value = textDate.value,
@@ -140,30 +194,97 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                   },
                   label = { Text("Date") },
                   placeholder = { Text("Enter a date (yyyy-mm-dd)") },
-                  modifier = Modifier.fillMaxWidth().padding(7.dp))
+                  singleLine = true,
+                  textStyle = TextStyle(color = MaterialTheme.colorScheme.onBackground),
+                  colors = TextFieldDefaults.outlinedTextFieldColors(
+                      focusedBorderColor = MaterialTheme.colorScheme.onBackground,
+                      unfocusedBorderColor = MaterialTheme.colorScheme.onBackground),
+                  modifier = Modifier
+                      .fillMaxWidth()
+                      .padding(start = 7.dp, end = 7.dp, top = 4.dp, bottom = 4.dp))
 
               OutlinedTextField(
-                  value = priceText, // Bind to the TextField's value
+                  value = priceText,
                   onValueChange = { newVal ->
-                    // Update priceText with the new value
                     priceText = newVal
-                    // Try to convert the new value to a Double and update price if successful
                     newVal.toDoubleOrNull()?.let {
-                      price = it // Correctly use .value for mutableStateOf variable
+                      price = it
                     }
                   },
                   label = { Text("Price") },
                   placeholder = { Text("Enter a price") },
-                  modifier = Modifier.fillMaxWidth().padding(7.dp))
+                  singleLine = true,
+                  textStyle = TextStyle(color = MaterialTheme.colorScheme.onBackground),
+                  colors = TextFieldDefaults.outlinedTextFieldColors(
+                      focusedBorderColor = MaterialTheme.colorScheme.onBackground,
+                      unfocusedBorderColor = MaterialTheme.colorScheme.onBackground),
+                  modifier = Modifier
+                      .fillMaxWidth()
+                      .padding(start = 7.dp, end = 7.dp, top = 4.dp, bottom = 4.dp))
 
               OutlinedTextField(
                   value = url.value,
                   onValueChange = { newVal -> url.value = newVal },
-                  label = { Text("Ticket link") },
-                  placeholder = { Text("Enter a ticket link") },
-                  modifier = Modifier.fillMaxWidth().padding(7.dp))
+                  label = { Text("Link") },
+                  placeholder = { Text("Enter a link") },
+                  singleLine = true,
+                  colors = TextFieldDefaults.outlinedTextFieldColors(
+                      focusedBorderColor = MaterialTheme.colorScheme.onBackground,
+                      unfocusedBorderColor = MaterialTheme.colorScheme.onBackground),
+                  modifier = Modifier
+                      .fillMaxWidth()
+                      .padding(start = 7.dp, end = 7.dp, top = 4.dp, bottom = 4.dp))
 
-              Spacer(modifier = Modifier.height(16.dp))
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(7.dp),
+                onClick = {
+                    if (imageUri != null) {
+                        imageUri = null
+                    } else {
+                        imagePickerLauncher.launch("image/*")
+                    }
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = Grey),
+                shape = RoundedCornerShape(10.dp)
+            ) {
+                Text(text = if (imageUri != null) "Delete Image" else "Add Image",
+                    color = Color.White)
+            }
+
+
+            var showDialog by remember { mutableStateOf(false) }
+            imageUri?.let {
+                Text(
+                    text = "View Selected Image",
+                    modifier = Modifier.clickable { showDialog = true },
+                    style = TextStyle(fontSize = 12.sp,
+                    lineHeight = 16.sp,
+                    fontFamily = FontFamily(Font(R.font.roboto)),
+                    fontWeight = FontWeight(1000),
+                    color = Color(0xFF000000),
+                    textAlign = TextAlign.Center,
+                    letterSpacing = 0.5.sp,
+                )
+                )
+            }
+
+            if (showDialog) {
+                Dialog(onDismissRequest = { showDialog = false }) {
+                    // Assuming imageBitmap is the Bitmap representation of your selected image
+                    imageBitmap?.let { bitmap ->
+                        Image(
+                            bitmap = bitmap,
+                            contentDescription = "Selected Image",
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+            }
+
+
+            Spacer(modifier = Modifier.height(16.dp))
 
               OutlinedButton(
                   onClick = {
@@ -181,14 +302,17 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                             0,
                             !isPrivateEvent.value,
                             listOf(),
-                            listOf())
+                            listOf(),
+                            imageUri)
                         nav.goBack()
                       }
                     }
                   },
-                  modifier = Modifier.width(128.dp).height(40.dp),
+                  modifier = Modifier
+                      .width(128.dp)
+                      .height(40.dp),
                   shape = RoundedCornerShape(10.dp),
-                  border = BorderStroke(1.dp, Color.Gray), // Set border here if needed
+                  border = BorderStroke(1.dp, Color.Gray),
                   enabled = true,
                   colors =
                       ButtonDefaults.outlinedButtonColors(containerColor = Color(0xFFECEFF1))) {
@@ -196,7 +320,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                         text = "Post",
                         style =
                             TextStyle(
-                                fontSize = 12.sp,
+                                fontSize = 14.sp,
                                 lineHeight = 16.sp,
                                 fontFamily = FontFamily(Font(R.font.roboto)),
                                 fontWeight = FontWeight(1000),
@@ -207,6 +331,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                   }
 
               if (dateFormatError) {
+                  Spacer(modifier = Modifier.height(8.dp))
                 Text("Error: Date Format Error", color = Color.Red)
               }
             }
