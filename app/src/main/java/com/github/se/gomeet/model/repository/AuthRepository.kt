@@ -34,26 +34,40 @@ class AuthRepository(fAuth: FirebaseAuth? = null) {
     }
   }
 
-  suspend fun signUpWithEmailPassword(
-      email: String,
-      password: String,
-      onComplete: (Boolean) -> Unit
-  ) {
-    firebaseAuth
-        .createUserWithEmailAndPassword(email, password)
-        .addOnCompleteListener { task ->
-          if (task.isSuccessful) {
-            Log.d(TAG, "signUpWithEmail:success")
-            onComplete.invoke(true)
-          } else {
-            Log.w(TAG, "signUpWithEmail:failure", task.exception)
-            onComplete.invoke(false)
-          }
-        }
-        .await()
-  }
+//  suspend fun signUpWithEmailPassword(
+//      email: String,
+//      password: String,
+//      onComplete: (Boolean) -> Unit
+//  ) {
+//    firebaseAuth
+//        .createUserWithEmailAndPassword(email, password)
+//        .addOnCompleteListener { task ->
+//          if (task.isSuccessful) {
+//            Log.d(TAG, "signUpWithEmail:success")
+//            onComplete.invoke(true)
+//          } else {
+//            Log.w(TAG, "signUpWithEmail:failure", task.exception)
+//            onComplete.invoke(false)
+//          }
+//        }
+//        .await()
+//  }
+suspend fun signUpWithEmailPassword(
+    email: String,
+    password: String,
+    onComplete: (Boolean) -> Unit
+) {
+    try {
+        firebaseAuth.createUserWithEmailAndPassword(email, password).await()
+        Log.d(TAG, "signUpWithEmail:success")
+        onComplete(true)
+    } catch (e: Exception) {
+        Log.w(TAG, "signUpWithEmail:failure", e)
+        onComplete(false)
+    }
+}
 
-  suspend fun signInWithEmailPassword(
+    suspend fun signInWithEmailPassword(
       email: String,
       password: String,
       onComplete: (Boolean) -> Unit

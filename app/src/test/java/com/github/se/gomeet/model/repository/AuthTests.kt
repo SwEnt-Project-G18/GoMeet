@@ -32,6 +32,8 @@ class AuthTests {
   private val firebaseAuth: FirebaseAuth = mock()
   private val vEmail = "test@123.com"
   private val vPwd = "pass1234"
+  private val invEmail = "invalid.email"
+  private val invPwd = "123"
 
   @Before
   fun setUp() {
@@ -40,69 +42,45 @@ class AuthTests {
   }
 
   @Test
-  fun testSignUpWithEmailPassword_Success() = runBlockingTest {
-    // Mock FirebaseAuth to simulate a successful sign-up
-    val successfulTask: Task<AuthResult> = Tasks.forResult(mock())
-    whenever(firebaseAuth.createUserWithEmailAndPassword(anyString(), anyString()))
-        .thenReturn(successfulTask)
-
-    authRepository.signUpWithEmailPassword("email@example.com", "password123") { success ->
-      println("\n\n SUCCESS: " + success + "\n\n")
-      // Assert that the success callback is invoked with true
-      assertTrue("The onComplete callback should be invoked with true.", !success)
-    }
-  }
-
-
-
-  @Test
   fun testSignUpSuccess() = runTest {
 
     val successfulTask: Task<AuthResult> = Tasks.forResult(mock())
     whenever(firebaseAuth.createUserWithEmailAndPassword(anyString(), anyString()))
       .thenReturn(successfulTask)
 
-    println("Launching testSignUpSuccess")
-
     launch{
       authRepository.signUpWithEmailPassword(vEmail, vPwd) { success ->
-      println("RUNNING2")
       assertTrue(success)
       }
     }.join()
 
-    println("Finished testSignUpSuccess")
   }
 
   @Test
-  fun testSignUpWithEmailPassword_Failure() = runBlockingTest {
-    // Mock FirebaseAuth to simulate a failed sign-up
-    // Create a Task instance that represents a failed operation
-    val exception = FirebaseAuthException("errorCode", "Authentication failed")
-    val failedTask: Task<AuthResult> = Tasks.forException(exception)
+  fun testSignUpFailure() = runTest {
+
+    val exception = FirebaseAuthException("auth/error", "Authentication failed")
+    val unsuccessfulTask: Task<AuthResult> = Tasks.forException(exception)
     whenever(firebaseAuth.createUserWithEmailAndPassword(anyString(), anyString()))
-        .thenReturn(failedTask)
+      .thenReturn(unsuccessfulTask)
 
-    authRepository.signUpWithEmailPassword("email@example.com", "password") { success ->
-      // Assert that the success callback is invoked with false
-      assertFalse("The onComplete callback should be invoked with false.", success)
-    }
-  }
+    launch{
+      authRepository.signUpWithEmailPassword(invEmail, vPwd) { success ->
+        assertFalse(success)
+      }
+    }.join()
 
+    launch{
+      authRepository.signUpWithEmailPassword(vEmail, invPwd) { success ->
+        assertFalse(success)
+      }
+    }.join()
 
-
-
-  private fun mockTask(exception: Exception? = null): Task<AuthResult> {
-    val task: Task<AuthResult> = mock()
-    `when` { task.isComplete }.thenReturn { true }
-    `when` { task.exception }.thenReturn { exception }
-    `when` { task.isCanceled }.thenReturn { false }
-    val res: AuthResult = mock()
-    `when` { res.user }.thenReturn { firebaseAuth.currentUser }
-    `when` { res.credential }.thenReturn { mock() }
-    `when` { res.additionalUserInfo }.thenReturn { mock() }
-    `when` { task.result }.thenReturn { res }
-    return task
+    launch{
+      authRepository.signUpWithEmailPassword(invEmail, invPwd) { success ->
+        assertFalse(success)
+      }
+    }.join()
   }
 
 }
