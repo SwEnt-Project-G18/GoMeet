@@ -43,7 +43,10 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
 
   LaunchedEffect(Unit) {
     coroutineScope.launch {
-      eventList.addAll(eventViewModel.getAllEvents()!!)
+      val allEvents = eventViewModel.getAllEvents()
+      if (allEvents != null) {
+          eventList.addAll(allEvents)
+      }
       isMapLoaded = true
     }
   }
