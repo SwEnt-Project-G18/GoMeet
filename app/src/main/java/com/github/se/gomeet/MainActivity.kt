@@ -64,7 +64,7 @@ class MainActivity : ComponentActivity() {
                 NavigationActions(nav).navigateTo(TOP_LEVEL_DESTINATIONS[1])
               }
             }
-            composable(Route.EXPLORE) { Explore(navAction) }
+            composable(Route.EXPLORE) { Explore(navAction, EventViewModel()) }
             composable(Route.EVENTS) { Events(navAction, EventViewModel()) }
             composable(Route.TRENDS) { Trends(navAction) }
             composable(Route.CREATE) { Create(navAction) }

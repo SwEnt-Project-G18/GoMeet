@@ -36,12 +36,22 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
     }
   }
 
-
     suspend fun uploadImageAndGetUrl(imageUri: Uri): String {
         val imageRef = Firebase.storage.reference.child("images/${imageUri.lastPathSegment}")
         val uploadTaskSnapshot = imageRef.putFile(imageUri).await()
         return uploadTaskSnapshot.metadata?.reference?.downloadUrl?.await().toString()
     }
+    
+  suspend fun getAllEvents(): List<Event>? {
+    return try {
+      val event = CompletableDeferred<List<Event>?>()
+      db.getAllEvents { t -> event.complete(t) }
+      event.await()
+    } catch (e: Exception) {
+      null
+    }
+  }
+
   fun createEvent(
       title: String,
       description: String,
