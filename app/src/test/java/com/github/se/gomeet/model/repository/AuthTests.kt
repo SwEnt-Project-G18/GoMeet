@@ -1,17 +1,11 @@
 package com.github.se.gomeet.model.repository
 
-// Choose either one mock() or the other
-// import org.mockito.Mockito.mock
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
-import com.google.firebase.auth.AdditionalUserInfo
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.runBlockingTest
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -19,21 +13,17 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyString
-import org.mockito.Mockito.`when`
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
 
-// @ExperimentalCoroutinesApi
 @RunWith(RobolectricTestRunner::class)
 class AuthTests {
 
   private lateinit var authRepository: AuthRepository
   private val firebaseAuth: FirebaseAuth = mock()
-  private val vEmail = "test@123.com"
-  private val vPwd = "pass1234"
-  private val invEmail = "invalid.email"
-  private val invPwd = "123"
+  private val email = "test@123.com"
+  private val pwd = "pass1234"""
 
   @Before
   fun setUp() {
@@ -49,7 +39,7 @@ class AuthTests {
       .thenReturn(successfulTask)
 
     launch{
-      authRepository.signUpWithEmailPassword(vEmail, vPwd) { success ->
+      authRepository.signUpWithEmailPassword(email, pwd) { success ->
       assertTrue(success)
       }
     }.join()
@@ -65,20 +55,36 @@ class AuthTests {
       .thenReturn(unsuccessfulTask)
 
     launch{
-      authRepository.signUpWithEmailPassword(invEmail, vPwd) { success ->
+      authRepository.signUpWithEmailPassword(email, pwd) { success ->
         assertFalse(success)
       }
     }.join()
+  }
+
+
+  @Test
+  fun testSignInSuccess() = runTest{
+    val successfulTask: Task<AuthResult> = Tasks.forResult(mock())
+    whenever(firebaseAuth.signInWithEmailAndPassword(anyString(), anyString()))
+      .thenReturn(successfulTask)
 
     launch{
-      authRepository.signUpWithEmailPassword(vEmail, invPwd) { success ->
-        assertFalse(success)
+      authRepository.signInWithEmailPassword(email, pwd) { success ->
+        assertTrue(success)
       }
     }.join()
+  }
+
+  @Test
+  fun testSignInFailure() = runTest{
+    val exception = FirebaseAuthException("auth/error", "Authentication failed")
+    val unsuccessfulTask: Task<AuthResult> = Tasks.forException(exception)
+    whenever(firebaseAuth.createUserWithEmailAndPassword(anyString(), anyString()))
+      .thenReturn(unsuccessfulTask)
 
     launch{
-      authRepository.signUpWithEmailPassword(invEmail, invPwd) { success ->
-        assertFalse(success)
+      authRepository.signInWithEmailPassword(email, pwd) { success ->
+        assertTrue(!success)
       }
     }.join()
   }

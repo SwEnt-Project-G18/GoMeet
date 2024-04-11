@@ -67,26 +67,44 @@ suspend fun signUpWithEmailPassword(
     }
 }
 
-    suspend fun signInWithEmailPassword(
-      email: String,
-      password: String,
-      onComplete: (Boolean) -> Unit
-  ) {
-    firebaseAuth
-        .signInWithEmailAndPassword(email, password)
-        .addOnCompleteListener { task ->
-          if (task.isSuccessful) {
-            Log.d(TAG, "signInWithEmail:success")
-            onComplete.invoke(true)
-          } else {
-            Log.w(TAG, "signInWithEmail:failure", task.exception)
-            onComplete.invoke(false)
-          }
-        }
-        .await()
-  }
+//    suspend fun signInWithEmailPassword(
+//      email: String,
+//      password: String,
+//      onComplete: (Boolean) -> Unit
+//  ) {
+//    firebaseAuth
+//        .signInWithEmailAndPassword(email, password)
+//        .addOnCompleteListener { task ->
+//          if (task.isSuccessful) {
+//            Log.d(TAG, "signInWithEmail:success")
+//            onComplete.invoke(true)
+//          } else {
+//            Log.w(TAG, "signInWithEmail:failure", task.exception)
+//            onComplete.invoke(false)
+//          }
+//        }
+//        .await()
+//  }
+suspend fun signInWithEmailPassword(
+    email: String,
+    password: String,
+    onComplete: (Boolean) -> Unit
+) {
+    try {
+        // Attempt to sign in and wait for the task to complete
+        firebaseAuth.signInWithEmailAndPassword(email, password).await()
+        // If the await() completes without throwing an exception, sign-in was successful
+        Log.d(TAG, "signInWithEmail:success")
+        onComplete(true)
+    } catch (e: Exception) {
+        // If await() throws an exception, sign-in failed
+        Log.w(TAG, "signInWithEmail:failure", e)
+        onComplete(false)
+    }
+}
 
-  fun signOut() {
+
+    fun signOut() {
     firebaseAuth.signOut()
   }
 }
