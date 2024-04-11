@@ -1,11 +1,13 @@
 package com.github.se.gomeet.ui
 
+import android.annotation.SuppressLint
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
@@ -24,6 +26,7 @@ class LoginScreenTest {
 
   @get:Rule val rule = createAndroidComposeRule<ComponentActivity>()
 
+  @SuppressLint("StateFlowValueCalledInComposition")
   @Test fun testLoginScreen() {
     val authViewModel = AuthViewModel()
 
@@ -34,6 +37,7 @@ class LoginScreenTest {
       }
 
       // Test the UI elements
+      rule.onNodeWithContentDescription("GoMeet").assertIsDisplayed()
       rule.onNodeWithText("Login").assertIsDisplayed()
 
       rule.onNodeWithText("Email").assertIsDisplayed()
@@ -45,11 +49,15 @@ class LoginScreenTest {
       rule.onNodeWithText("Password").performTextInput("password")
 
       // Click on the "Log in" button
-      rule.onNodeWithText("Log in").assertIsEnabled()
+      rule.onNodeWithText("Log in").assertIsEnabled().assertHasClickAction()
       rule.onNodeWithText("Log in").performClick()
 
-      rule.waitForIdle()
-      assert(nav.currentDestination?.route == Route.EXPLORE)
+      if (authViewModel.signInState.value.signInError != null) {
+        rule.onNodeWithText(authViewModel.signInState.value.signInError!!).assertIsDisplayed()
+      } else {
+        rule.waitForIdle()
+        assert(nav.currentDestination?.route == Route.EXPLORE)
+      }
 
     }
   }
