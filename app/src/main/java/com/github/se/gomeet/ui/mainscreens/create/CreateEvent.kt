@@ -97,7 +97,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
               nav.navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == selectedTab })
             },
             tabList = TOP_LEVEL_DESTINATIONS,
-            selectedItem = Route.EXPLORE)
+            selectedItem = Route.CREATE)
       }) { innerPadding ->
         Text(
             text = "Create",
