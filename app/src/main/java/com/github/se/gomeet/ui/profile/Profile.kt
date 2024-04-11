@@ -1,6 +1,7 @@
 package com.github.se.gomeet.ui.profile
 
 import android.graphics.Paint
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -58,6 +60,7 @@ import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.ui.theme.Grey
+import com.github.se.gomeet.ui.theme.NavBarUnselected
 
 @Composable
 fun Profile(nav: NavigationActions) { // TODO Add parameters to the function
@@ -311,105 +314,70 @@ fun Profile(nav: NavigationActions) { // TODO Add parameters to the function
                         Button(
                             onClick = {},
                             content = {
-                                Text("Test")
+                                Text("Tag")
                             },
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = DarkCyan
-                            )
+                                containerColor = NavBarUnselected,
+                                contentColor = DarkCyan
+                            ),
+                            border = BorderStroke(1.dp, DarkCyan),
                         )
                     }
                 }
             }
             Spacer(modifier = Modifier.height(10.dp))
-            Column {
-                Row {
-                    Text(
-                        text = "My Events",
-                        style = TextStyle(
-                            fontSize = 16.sp,
-                            lineHeight = 16.sp,
-                            fontFamily = FontFamily(Font(R.font.roboto)),
-                            fontWeight = FontWeight(700),
-                            color = DarkCyan,
-                            textAlign = TextAlign.Center,
-                            letterSpacing = 0.5.sp,
-                        ),
-                        modifier = Modifier
-                            .width(104.dp)
-                            .height(17.dp)
-                    )
-                    Text(text = "View all", color = Grey)
-                }
-                Spacer(modifier = Modifier.height(10.dp))
-                LazyRow(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    contentPadding = PaddingValues(start = 12.dp, end = 8.dp),
-                    modifier = Modifier.heightIn(min = 56.dp)
-
-                ) {
-                    items(3) {
-                        Column{
-                            Image(
-                                painter = painterResource(id = R.drawable.chess_demo),
-                                contentDescription = "Event 1",
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier
-                                    .width(150.dp)
-                                    .height(60.dp)
-                                    .clip(RoundedCornerShape(size = 10.dp))
-                            )
-                            Text(text = "Chess Tournament", color = DarkCyan)
-                            Text(text = "11.04.2024 - 21:00", color = Grey)
-                        }
-
-                    }
-                }
-            }
+            ProfileEventsList("My Events")
             Spacer(modifier = Modifier.height(10.dp))
-            Column {
-                Row {
-                    Text(
-                        text = "History",
-                        style = TextStyle(
-                            fontSize = 16.sp,
-                            lineHeight = 16.sp,
-                            fontFamily = FontFamily(Font(R.font.roboto)),
-                            fontWeight = FontWeight(700),
-                            color = DarkCyan,
-                            textAlign = TextAlign.Center,
-                            letterSpacing = 0.5.sp,
-                        ),
-                        modifier = Modifier
-                            .width(74.dp)
-                            .height(17.dp)
-                    )
-                    Text(text = "View all", color = Grey)
-                }
-                Spacer(modifier = Modifier.height(10.dp))
-                LazyRow(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    contentPadding = PaddingValues(start = 12.dp, end = 8.dp),
-                    modifier = Modifier.heightIn(min = 56.dp)
+            ProfileEventsList("History")
+        }
+    }
+}
 
-                ) {
-                    items(10) {
-                        Column{
-                            Image(
-                                painter = painterResource(id = R.drawable.chess_demo),
-                                contentDescription = "Event 1",
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier
-                                    .width(150.dp)
-                                    .height(60.dp)
-                                    .clip(RoundedCornerShape(size = 10.dp))
-                            )
-                            Text(text = "Chess Tournament", color = DarkCyan)
-                            Text(text = "11.04.2024 - 21:00", color = Grey)
-                        }
-                    }
+@Composable
+fun ProfileEventsList(title: String) {
+    Spacer(modifier = Modifier.height(10.dp))
+    Column {
+        Row {
+            Text(
+                text = title,
+                style = TextStyle(
+                    fontSize = 16.sp,
+                    lineHeight = 16.sp,
+                    fontFamily = FontFamily(Font(R.font.roboto)),
+                    fontWeight = FontWeight(700),
+                    color = DarkCyan,
+                    textAlign = TextAlign.Center,
+                    letterSpacing = 0.5.sp,
+                ),
+                modifier = Modifier
+                    .width(104.dp)
+                    .height(17.dp)
+            )
+            Text(text = "View all", color = Grey)
+        }
+        Spacer(modifier = Modifier.height(10.dp))
+        LazyRow(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            contentPadding = PaddingValues(start = 12.dp, end = 8.dp),
+            modifier = Modifier.heightIn(min = 56.dp)
+
+        ) {
+            items(3) {
+                Column {
+                    Image(
+                        painter = painterResource(id = R.drawable.chess_demo),
+                        contentDescription = "Event 1",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .width(150.dp)
+                            .height(60.dp)
+                            .clip(RoundedCornerShape(size = 10.dp))
+                    )
+                    Text(text = "Chess Tournament", color = DarkCyan)
+                    Text(text = "11.04.2024 - 21:00", color = Grey)
                 }
+
             }
         }
     }
