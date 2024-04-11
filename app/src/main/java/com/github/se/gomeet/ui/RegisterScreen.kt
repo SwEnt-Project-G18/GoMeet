@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -33,14 +34,14 @@ import com.github.se.gomeet.viewmodel.AuthViewModel
 
 @Composable
 fun RegisterScreen(authViewModel: AuthViewModel, onNavToExplore: () -> Unit) {
-  val signInState = authViewModel.signInState.collectAsState()
-  val isError = signInState.value.registerError != null
-  val context = LocalContext.current
+    val signInState = authViewModel.signInState.collectAsState()
+    val isError = signInState.value.registerError != null
+    val context = LocalContext.current
 
-  Column(
-      verticalArrangement = Arrangement.Top,
-      horizontalAlignment = Alignment.CenterHorizontally,
-      modifier = Modifier.fillMaxSize().background(Color.White).padding(25.dp)) {
+    Column(
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxSize().background(Color.White).padding(25.dp)) {
         Image(
             painter = painterResource(id = R.drawable.gomeet_text),
             contentDescription = "Go Meet",
@@ -51,7 +52,8 @@ fun RegisterScreen(authViewModel: AuthViewModel, onNavToExplore: () -> Unit) {
 
         Text(
             text = "Create account",
-            modifier = Modifier.padding(bottom = 16.dp),
+            modifier = Modifier.padding(bottom = 16.dp)
+                .testTag("register_title"),
             color = DarkCyan,
             fontStyle = FontStyle.Normal,
             fontWeight = FontWeight.SemiBold,
@@ -61,11 +63,11 @@ fun RegisterScreen(authViewModel: AuthViewModel, onNavToExplore: () -> Unit) {
         Spacer(modifier = Modifier.size(110.dp))
 
         if (isError) {
-          Text(
-              text = signInState.value.registerError!!,
-              modifier = Modifier.padding(bottom = 16.dp),
-              color = Color.Red,
-              textAlign = TextAlign.Center)
+            Text(
+                text = signInState.value.registerError!!,
+                modifier = Modifier.padding(bottom = 16.dp),
+                color = Color.Red,
+                textAlign = TextAlign.Center)
         }
 
         TextField(
@@ -96,22 +98,26 @@ fun RegisterScreen(authViewModel: AuthViewModel, onNavToExplore: () -> Unit) {
 
         Button(
             onClick = { authViewModel.signUpWithEmailPassword(context) },
-            modifier = Modifier.fillMaxWidth()) {
-              Text("Create account")
-            }
+            modifier = Modifier.fillMaxWidth()
+                .testTag("register_button"),
+            enabled = signInState.value.emailRegister.isNotEmpty() &&
+                    signInState.value.passwordRegister.isNotEmpty() &&
+                    signInState.value.confirmPasswordRegister.isNotEmpty()) {
+            Text("Create account")
+        }
 
         if (signInState.value.isLoading) {
-          CircularProgressIndicator()
+            CircularProgressIndicator()
         }
 
         if (signInState.value.isSignInSuccessful) {
-          onNavToExplore()
+            onNavToExplore()
         }
-      }
+    }
 }
 
 @Preview
 @Composable
 fun RegisterScreenPreview() {
-  RegisterScreen(AuthViewModel()) {}
+    RegisterScreen(AuthViewModel()) {}
 }
