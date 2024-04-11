@@ -10,6 +10,8 @@ val Purple40 = Color(0xFF6650a4)
 val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 val DarkCyan = Color(0xFF2F6673)
+val Cyan = Color(0xFF127581)
+val TranslucentCyan = Color(0x03B3C7C9)
 val DarkerCyan = Color(0xFF073F57)
 
 val NavBarUnselected = Color(216, 223, 225)

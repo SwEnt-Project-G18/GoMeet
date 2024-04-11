@@ -10,8 +10,12 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.github.se.gomeet.ui.theme.Cyan
+import com.github.se.gomeet.ui.theme.DarkCyan
+import com.github.se.gomeet.ui.theme.TranslucentCyan
 
 @Composable
 fun BottomNavigationMenu(
@@ -21,7 +25,9 @@ fun BottomNavigationMenu(
 ) {
   NavigationBar(
       modifier = Modifier.height(80.dp),
-      containerColor = MaterialTheme.colorScheme.surfaceVariant) {
+      containerColor = MaterialTheme.colorScheme.surface, tonalElevation = 1.dp,
+  )
+  {
         tabList.forEach { destination ->
           NavigationBarItem(
               icon = {
@@ -33,7 +39,10 @@ fun BottomNavigationMenu(
               label = { Text(destination.textId) },
               selected = destination.route == selectedItem,
               onClick = { onTabSelect(destination.route) },
-              colors = NavigationBarItemDefaults.colors())
+              colors = NavigationBarItemDefaults.colors(
+                  selectedTextColor = Cyan, // Modify text color when selected
+                  selectedIconColor = Cyan,
+                  indicatorColor = TranslucentCyan )) // Modify icon color when selected / Modify background color when selected)
         }
       }
 }
