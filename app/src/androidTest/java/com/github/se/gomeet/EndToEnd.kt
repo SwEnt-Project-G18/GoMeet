@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.screens.CreateEventScreen
 import com.github.se.gomeet.screens.CreateScreen
