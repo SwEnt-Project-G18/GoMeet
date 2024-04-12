@@ -72,7 +72,7 @@ fun WelcomeScreen(
   Column(
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.Top,
-      modifier = Modifier.fillMaxSize().background(Color.White).padding(25.dp)) {
+      modifier = Modifier.fillMaxSize().background(Color.White)) {
         Spacer(modifier = Modifier.size((LocalConfiguration.current.screenHeightDp / 6).dp))
 
         Image(
@@ -83,7 +83,7 @@ fun WelcomeScreen(
 
         Text(
             text = "See what's happening around you right now.",
-            modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+            modifier = Modifier.fillMaxWidth(),
             color = DarkCyan,
             fontStyle = FontStyle.Normal,
             fontWeight = FontWeight.SemiBold,
@@ -108,11 +108,7 @@ fun WelcomeScreen(
 
               Text(
                   text = "Continue with Google",
-                  color = Color.Black,
-                  modifier =
-                      Modifier.padding(
-                          start = 8.dp,
-                          end = 8.dp) // This will add padding around the text inside the button
+                  color = Color.Black // This will add padding around the text inside the button
                   )
             }
 
@@ -131,7 +127,6 @@ fun WelcomeScreen(
             colors = ButtonDefaults.outlinedButtonColors(containerColor = Color(0xFFECEFF1))) {
               Text(
                   text = "Log in",
-                  modifier = Modifier.padding(start = 8.dp, end = 8.dp),
                   color = Color.Black)
             }
 
