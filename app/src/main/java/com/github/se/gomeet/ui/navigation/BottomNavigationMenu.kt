@@ -27,7 +27,7 @@ fun BottomNavigationMenu(
 ) {
     NavigationBar(
         modifier = Modifier.navigationBarsPadding().height(80.dp),
-        containerColor = Color.Red,
+        containerColor = Color.Transparent,
         tonalElevation = 0.dp,
     )
     {
