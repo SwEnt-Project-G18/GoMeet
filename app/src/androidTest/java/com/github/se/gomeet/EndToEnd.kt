@@ -39,7 +39,7 @@ class EndToEndTest : TestCase() {
         }
         emailField {
           assertIsDisplayed()
-          performTextInput("test@test.com")
+          performTextInput("qwe@asd.com")
         }
         passwordField {
           assertIsDisplayed()

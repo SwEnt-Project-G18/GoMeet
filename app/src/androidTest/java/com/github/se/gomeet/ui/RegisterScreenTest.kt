@@ -28,7 +28,7 @@ class RegisterScreenTest {
   @After
   fun tearDown() {
     // Clean up the test data
-    FirebaseAuth.getInstance().currentUser?.delete()
+    //FirebaseAuth.getInstance().currentUser?.delete()
   }
 
   @Test
