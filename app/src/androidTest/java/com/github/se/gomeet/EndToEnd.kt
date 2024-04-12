@@ -55,7 +55,7 @@ class EndToEndTest : TestCase() {
     // First ensure login and switch to the expected screen
     ComposeScreen.onComposeScreen<LoginScreen>(composeTestRule) {
       step("Log in with email and password") { logInButton { performClick() } }
-      Thread.sleep(10000)
+      Thread.sleep(20000)
     }
 
     ComposeScreen.onComposeScreen<CreateScreen>(composeTestRule) {
