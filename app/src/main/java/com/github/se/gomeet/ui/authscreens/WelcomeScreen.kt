@@ -151,7 +151,7 @@ fun WelcomeScreen(
                   ))
 
           Text(
-              text = " Create account",
+              text = "Create account",
               modifier = Modifier.clickable { onNavToRegister() },
               style =
                   TextStyle(
