@@ -5,7 +5,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -72,7 +71,7 @@ fun WelcomeScreen(
   Column(
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.Top,
-      modifier = Modifier.fillMaxSize().background(Color.White).padding(25.dp)) {
+      modifier = Modifier.fillMaxSize().padding(25.dp)) {
         Spacer(modifier = Modifier.size((LocalConfiguration.current.screenHeightDp / 6).dp))
 
         Image(
@@ -96,7 +95,7 @@ fun WelcomeScreen(
             onClick = { launcher.launch(signInIntent) },
             modifier = Modifier.width(250.dp).height(40.dp),
             shape = RoundedCornerShape(20.dp),
-            border = BorderStroke(1.dp, Color.Gray), // Set border here if needed
+            border = BorderStroke(1.dp, Color.Gray),
             enabled = true,
             colors = ButtonDefaults.outlinedButtonColors(containerColor = Color(0xFFECEFF1))) {
               Image(
