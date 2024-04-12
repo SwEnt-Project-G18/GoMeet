@@ -62,7 +62,7 @@ fun Profile(nav: NavigationActions) { // TODO Add parameters to the function
               nav.navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == selectedTab })
             },
             tabList = TOP_LEVEL_DESTINATIONS,
-            selectedItem = Route.EXPLORE)
+            selectedItem = Route.PROFILE)
       },
       ) { innerPadding ->
         Text(
