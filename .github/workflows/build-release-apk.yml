@@ -21,16 +21,24 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
+      - name: Create directories for google-services.json and Maps API Key
+        run: |
+          mkdir -p ./app/src/release/
+          mkdir -p ./app/src/main/res/values/
+
       - name: Create google-services.json
         env:
           GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
-        run: |
-          echo "$GOOGLE_SERVICES_JSON" > ./app/src/release/google-services.json
+        run: echo "$GOOGLE_SERVICES_JSON" > ./app/src/release/google-services.json
 
-      - name: Set Maps API Key
+      - name: Create Maps API Key XML
         env:
           MAPS_API_KEY: ${{ secrets.MAPS_API_KEY }}
-        run: echo "MAPS_API_KEY=$MAPS_API_KEY" > ./app/src/main/res/values/maps_api.xml
+        run: |
+          echo '<?xml version="1.0" encoding="utf-8"?>' > ./app/src/main/res/values/maps_api.xml
+          echo '<resources>' >> ./app/src/main/res/values/maps_api.xml
+          echo '    <string name="maps_api_key">'$MAPS_API_KEY'</string>' >> ./app/src/main/res/values/maps_api.xml
+          echo '</resources>' >> ./app/src/main/res/values/maps_api.xml
 
       - name: Build APK
         run: ./gradlew assembleRelease
