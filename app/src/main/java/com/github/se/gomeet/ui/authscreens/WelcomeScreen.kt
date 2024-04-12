@@ -96,7 +96,7 @@ fun WelcomeScreen(
             onClick = { launcher.launch(signInIntent) },
             modifier = Modifier.width(250.dp).height(40.dp),
             shape = RoundedCornerShape(20.dp),
-            border = BorderStroke(1.dp, Color.Gray), // Set border here if needed
+            border = BorderStroke(1.dp, Color.Gray),
             enabled = true,
             colors = ButtonDefaults.outlinedButtonColors(containerColor = Color(0xFFECEFF1))) {
               Image(
