@@ -65,7 +65,7 @@ val TOP_LEVEL_DESTINATIONS =
         TopLevelDestination(
             route = Route.PROFILE, icon = Icons.Default.Person, textId = Route.PROFILE))
 
-class NavigationActions(private val navController: NavHostController) {
+class NavigationActions(val navController: NavHostController) {
   fun navigateTo(destination: TopLevelDestination, clearBackStack: Boolean = false) {
     navController.navigate(destination.route) {
       if (clearBackStack) {

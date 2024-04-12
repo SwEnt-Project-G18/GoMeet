@@ -1,5 +1,8 @@
 package com.github.se.gomeet.viewmodel
 
+import android.content.ContentValues.TAG
+import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.se.gomeet.EventFirebaseConnection
@@ -7,11 +10,14 @@ import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.location.Location
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 import java.io.IOException
 import java.time.LocalDate
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -28,6 +34,12 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
     } catch (e: Exception) {
       null
     }
+  }
+
+  suspend fun uploadImageAndGetUrl(imageUri: Uri): String {
+    val imageRef = Firebase.storage.reference.child("images/${imageUri.lastPathSegment}")
+    val uploadTaskSnapshot = imageRef.putFile(imageUri).await()
+    return uploadTaskSnapshot.metadata?.reference?.downloadUrl?.await().toString()
   }
 
   suspend fun getAllEvents(): List<Event>? {
@@ -52,24 +64,34 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
       maxParticipants: Int,
       public: Boolean,
       tags: List<String>,
-      images: List<String>
+      images: List<String>,
+      imageUri: Uri?
   ) {
-    db.addEvent(
-        Event(
-            db.getNewId(),
-            creatorId!!,
-            title,
-            description,
-            location,
-            date,
-            price,
-            url,
-            participants,
-            visibleToIfPrivate,
-            maxParticipants,
-            public,
-            tags,
-            images))
+    CoroutineScope(Dispatchers.IO).launch {
+      try {
+        val imageUrl = imageUri?.let { uploadImageAndGetUrl(it) }
+        val updatedImages = images.toMutableList().apply { imageUrl?.let { add(it) } }
+        val event =
+            Event(
+                db.getNewId(),
+                creatorId!!,
+                title,
+                description,
+                location,
+                date,
+                price,
+                url,
+                participants,
+                visibleToIfPrivate,
+                maxParticipants,
+                public,
+                tags,
+                updatedImages)
+        db.addEvent(event)
+      } catch (e: Exception) {
+        Log.w(TAG, "Error uploading image or adding event", e)
+      }
+    }
   }
 
   fun editEvent(event: Event) {

@@ -10,17 +10,27 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 private val DarkColorScheme =
-    darkColorScheme(primary = Grey, secondary = DarkGrey, tertiary = White)
+    darkColorScheme(
+        primary = Grey,
+        secondary = DarkGrey,
+        tertiary = White,
+        background = Color.Black,
+    )
 
 private val LightColorScheme =
     lightColorScheme(
-        primary = NavBarSelected, secondary = NavBarUnselected, tertiary = DarkGrey
+        primary = NavBarSelected,
+        secondary = NavBarUnselected,
+        tertiary = DarkGrey,
+        background = White,
 
         /* Other default colors to override
         background = Color(0xFFFFFBFE),
@@ -31,7 +41,7 @@ private val LightColorScheme =
         onBackground = Color(0xFF1C1B1F),
         onSurface = Color(0xFF1C1B1F),
         */
-        )
+    )
 
 @Composable
 fun GoMeetTheme(
@@ -59,4 +69,10 @@ fun GoMeetTheme(
   }
 
   MaterialTheme(colorScheme = colorScheme, typography = Typography, content = content)
+}
+
+@Composable
+fun SetStatusBarColor(color: Color) {
+  val systemUiController = rememberSystemUiController()
+  SideEffect { systemUiController.setSystemBarsColor(color) }
 }
