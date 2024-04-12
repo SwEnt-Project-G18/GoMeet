@@ -13,7 +13,6 @@ import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.ui.authscreens.RegisterScreen
 import com.github.se.gomeet.viewmodel.AuthViewModel
-import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Rule
@@ -28,7 +27,7 @@ class RegisterScreenTest {
   @After
   fun tearDown() {
     // Clean up the test data
-    //FirebaseAuth.getInstance().currentUser?.delete()
+    // FirebaseAuth.getInstance().currentUser?.delete()
   }
 
   @Test
