@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -36,6 +37,7 @@ import com.github.se.gomeet.ui.theme.DarkCyan
 @Composable
 fun Create(nav: NavigationActions) {
   Scaffold(
+      modifier = Modifier.testTag("Create"),
       bottomBar = {
         BottomNavigationMenu(
             onTabSelect = { selectedTab ->
@@ -72,7 +74,7 @@ fun Create(nav: NavigationActions) {
 
               Row {
                 OutlinedButton(
-                    modifier = Modifier.width(128.dp).height(40.dp),
+                    modifier = Modifier.width(128.dp).height(40.dp).testTag("CreatePublic"),
                     shape = RoundedCornerShape(10.dp),
                     border = BorderStroke(1.dp, Color.Gray),
                     enabled = true,
