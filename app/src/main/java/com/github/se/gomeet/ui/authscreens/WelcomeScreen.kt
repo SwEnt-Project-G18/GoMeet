@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -125,9 +124,7 @@ fun WelcomeScreen(
             border = BorderStroke(1.dp, Color.Gray), // Set border here if needed
             enabled = true,
             colors = ButtonDefaults.outlinedButtonColors(containerColor = Color(0xFFECEFF1))) {
-              Text(
-                  text = "Log in",
-                  color = Color.Black)
+              Text(text = "Log in", color = Color.Black)
             }
 
         Spacer(modifier = Modifier.size(10.dp))
