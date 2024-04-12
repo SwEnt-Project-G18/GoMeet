@@ -112,7 +112,7 @@ class EventFirebaseConnection(private val db: FirebaseFirestore) {
         url = this["url"] as String,
         participants = this["participants"] as List<String>,
         visibleToIfPrivate = this["visibleToIfPrivate"] as List<String>,
-        maxParticipants = this["maxParticipants"] as Int,
+        maxParticipants = this["maxParticipants"].toString().toInt(),
         public = this["public"] as Boolean,
         tags = this["tags"] as List<String>,
         images = this["images"] as List<String>)
