@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -72,7 +73,7 @@ fun WelcomeScreen(
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.Top,
       modifier = Modifier.fillMaxSize().background(Color.White).padding(25.dp)) {
-        Spacer(modifier = Modifier.size(70.dp))
+        Spacer(modifier = Modifier.size((LocalConfiguration.current.screenHeightDp / 6).dp))
 
         Image(
             painter = painterResource(id = R.drawable.gomeet_logo),
