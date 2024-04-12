@@ -4,7 +4,7 @@ plugins {
     id("com.android.application")
     id("com.google.gms.google-services")
     id("org.jetbrains.kotlin.android")
-    id("com.ncorti.ktfmt.gradle") version "0.16.0"
+    id("com.ncorti.ktfmt.gradle") version "0.17.0"
     id("kotlin-android")
     id("org.sonarqube") version "4.4.1.3373"
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
