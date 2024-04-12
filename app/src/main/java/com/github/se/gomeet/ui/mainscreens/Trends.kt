@@ -5,6 +5,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
@@ -13,6 +14,7 @@ import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 @Composable
 fun Trends(nav: NavigationActions) {
   Scaffold(
+      modifier = Modifier.testTag("TrendsScreen"),
       bottomBar = {
         BottomNavigationMenu(
             onTabSelect = { selectedTab ->

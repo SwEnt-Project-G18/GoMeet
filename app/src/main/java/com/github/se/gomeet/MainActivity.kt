@@ -49,17 +49,17 @@ class MainActivity : ComponentActivity() {
                   onSignInSuccess = { userId ->
                     userIdState.value = userId
                     NavigationActions(nav)
-                        .navigateTo(TOP_LEVEL_DESTINATIONS[1], clearBackStack = true)
+                        .navigateTo(TOP_LEVEL_DESTINATIONS.first{it.route == Route.CREATE}, clearBackStack = true)
                   })
             }
             composable(Route.LOGIN) {
               LoginScreen(viewModel) {
-                NavigationActions(nav).navigateTo(TOP_LEVEL_DESTINATIONS[1])
+                NavigationActions(nav).navigateTo(TOP_LEVEL_DESTINATIONS.first{it.route == Route.CREATE})
               }
             }
             composable(Route.REGISTER) {
               RegisterScreen(viewModel) {
-                NavigationActions(nav).navigateTo(TOP_LEVEL_DESTINATIONS[1])
+                NavigationActions(nav).navigateTo(TOP_LEVEL_DESTINATIONS.first{it.route == Route.CREATE})
               }
             }
             composable(Route.EXPLORE) { Explore(navAction, EventViewModel()) }

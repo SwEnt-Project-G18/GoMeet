@@ -4,8 +4,8 @@ import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
 import io.github.kakaocup.compose.node.element.ComposeScreen
 import io.github.kakaocup.compose.node.element.KNode
 
-class Create(semanticsProvider: SemanticsNodeInteractionsProvider) :
-    ComposeScreen<LoginScreen>(
+class CreateScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
+    ComposeScreen<CreateScreen>(
         semanticsProvider = semanticsProvider, viewBuilderAction = { hasTestTag("Create") }) {
 
   val createPublicEventButton: KNode = child { hasTestTag("CreatePublic") }
