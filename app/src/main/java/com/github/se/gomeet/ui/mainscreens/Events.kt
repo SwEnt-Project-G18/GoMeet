@@ -134,14 +134,14 @@ fun Events(nav: NavigationActions) {
                   ProfilePicture = R.drawable.gomeet_logo,
                   EventPicture = R.drawable.intbee_logo,
                   Verified = true)
-            Spacer(modifier = Modifier.height(10.dp))
-            EventWidget(
-                UserName = "EPFL Chess Club",
-                EventName = "Chess Tournament",
-                EventDate = "WEDNESDAY - 14:00",
-                ProfilePicture = R.drawable.gomeet_logo,
-                EventPicture = R.drawable.intbee_logo,
-                Verified = true)
+              Spacer(modifier = Modifier.height(10.dp))
+              EventWidget(
+                  UserName = "EPFL Chess Club",
+                  EventName = "Chess Tournament",
+                  EventDate = "WEDNESDAY - 14:00",
+                  ProfilePicture = R.drawable.gomeet_logo,
+                  EventPicture = R.drawable.intbee_logo,
+                  Verified = true)
 
               Text(
                   text = "Favourites",
@@ -156,13 +156,13 @@ fun Events(nav: NavigationActions) {
                           letterSpacing = 0.5.sp,
                       ),
                   modifier = Modifier.padding(10.dp).align(Alignment.Start))
-            EventWidget(
-                UserName = "EPFL Chess Club",
-                EventName = "Chess Tournament",
-                EventDate = "WEDNESDAY - 14:00",
-                ProfilePicture = R.drawable.gomeet_logo,
-                EventPicture = R.drawable.intbee_logo,
-                Verified = true)
+              EventWidget(
+                  UserName = "EPFL Chess Club",
+                  EventName = "Chess Tournament",
+                  EventDate = "WEDNESDAY - 14:00",
+                  ProfilePicture = R.drawable.gomeet_logo,
+                  EventPicture = R.drawable.intbee_logo,
+                  Verified = true)
               Text(
                   text = "My Events",
                   style =
@@ -176,13 +176,13 @@ fun Events(nav: NavigationActions) {
                           letterSpacing = 0.5.sp,
                       ),
                   modifier = Modifier.padding(10.dp).align(Alignment.Start))
-            EventWidget(
-                UserName = "EPFL Chess Club",
-                EventName = "Chess Tournament",
-                EventDate = "WEDNESDAY - 14:00",
-                ProfilePicture = R.drawable.gomeet_logo,
-                EventPicture = R.drawable.intbee_logo,
-                Verified = true)
+              EventWidget(
+                  UserName = "EPFL Chess Club",
+                  EventName = "Chess Tournament",
+                  EventDate = "WEDNESDAY - 14:00",
+                  ProfilePicture = R.drawable.gomeet_logo,
+                  EventPicture = R.drawable.intbee_logo,
+                  Verified = true)
             }
       }
 }
