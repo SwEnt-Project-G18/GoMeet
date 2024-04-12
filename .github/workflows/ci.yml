@@ -67,11 +67,20 @@ jobs:
             ~/.android/adb*
           key: avd-34
 
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v2
+
       - name: Create and start AVD
         if: steps.avd-cache.outputs.cache-hit != 'true'
         run: |
           echo "no" | avdmanager create avd --name "Medium_Phone_API_34_2" --package "system-images;android-34;google_apis_playstore;x86_64" --device "medium_phone" --abi "google_apis_playstore/x86_64" --sdcard 512M --force
           $ANDROID_HOME/emulator/emulator -avd Medium_Phone_API_34_2 -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -netdelay none -netspeed full &
+
+      - name: Wait for AVD to be ready
+        run: |
+          adb wait-for-device
+          adb shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done; input keyevent 82'
+      
 
       - name: Wait for AVD to be ready
         run: adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done; input keyevent 82'
