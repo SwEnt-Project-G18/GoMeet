@@ -26,56 +26,31 @@ fun BottomNavigationMenu(
     selectedItem: String
 ) {
     NavigationBar(
-            modifier = Modifier.navigationBarsPadding().height(80.dp),
-            containerColor = Color.Transparent,
-            tonalElevation = 0.dp,
-        )
-        {
-            tabList.forEach { destination ->
-                NavigationBarItem(
-                    icon = {
-                        Icon(
-                            imageVector = getIconForRoute(destination.route),
-                            contentDescription = destination.textId,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    },
-                    label = { Text(destination.textId) },
-                    selected = destination.route == selectedItem,
-                    onClick = { onTabSelect(destination.route) },
-                    colors = NavigationBarItemDefaults.colors(
-                        selectedTextColor = Cyan, // Modify text color when selected
-                        selectedIconColor = Cyan,
-                        indicatorColor = TranslucentCyan
+        modifier = Modifier.navigationBarsPadding().height(80.dp),
+        containerColor = Color.Red,
+        tonalElevation = 0.dp,
+    )
+    {
+        tabList.forEach { destination ->
+            NavigationBarItem(
+                icon = {
+                    Icon(
+                        imageVector = getIconForRoute(destination.route),
+                        contentDescription = destination.textId,
+                        modifier = Modifier.size(24.dp)
                     )
-                ) // Modify icon color when selected / Modify background color when selected)
-            }
+                },
+                label = { Text(destination.textId) },
+                selected = destination.route == selectedItem,
+                onClick = { onTabSelect(destination.route) },
+                colors = NavigationBarItemDefaults.colors(
+                    selectedTextColor = Cyan,
+                    selectedIconColor = Cyan,
+                    indicatorColor = TranslucentCyan
+                )
+            )
         }
-  NavigationBar(
-      modifier = Modifier.navigationBarsPadding().height(80.dp),
-      containerColor = if (isSystemInDarkTheme()) DarkModeBackground else SomewhatWhite,
-      tonalElevation = 0.dp,
-  ) {
-    tabList.forEach { destination ->
-      NavigationBarItem(
-          icon = {
-            Icon(
-                imageVector = getIconForRoute(destination.route),
-                contentDescription = destination.textId,
-                modifier = Modifier.size(24.dp))
-          },
-          label = { Text(destination.textId) },
-          selected = destination.route == selectedItem,
-          onClick = { onTabSelect(destination.route) },
-          colors =
-              NavigationBarItemDefaults.colors(
-                  selectedTextColor = Cyan, // Modify text color when selected
-                  selectedIconColor = Cyan,
-                  indicatorColor =
-                      TranslucentCyan)) // Modify icon color when selected / Modify background color
-      // when selected)
     }
-  }
 }
 
 @Preview
