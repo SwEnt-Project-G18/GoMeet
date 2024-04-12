@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -72,7 +73,8 @@ fun WelcomeScreen(
   Column(
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.Top,
-      modifier = Modifier.fillMaxSize().background(Color.White).padding(25.dp)) {
+      modifier =
+          Modifier.fillMaxSize().background(Color.White).padding(25.dp).testTag("WelcomeScreen")) {
         Spacer(modifier = Modifier.size((LocalConfiguration.current.screenHeightDp / 6).dp))
 
         Image(
@@ -124,7 +126,7 @@ fun WelcomeScreen(
 
         OutlinedButton(
             onClick = { onNavToLogin() },
-            modifier = Modifier.width(250.dp).height(40.dp),
+            modifier = Modifier.width(250.dp).height(40.dp).testTag("LogInButton"),
             shape = RoundedCornerShape(20.dp),
             border = BorderStroke(1.dp, Color.Gray), // Set border here if needed
             enabled = true,
