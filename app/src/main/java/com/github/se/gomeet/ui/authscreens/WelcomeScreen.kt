@@ -5,7 +5,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -71,7 +70,7 @@ fun WelcomeScreen(
   Column(
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.Top,
-      modifier = Modifier.fillMaxSize().background(Color.White).padding(25.dp)) {
+      modifier = Modifier.fillMaxSize().padding(25.dp)) {
         Spacer(modifier = Modifier.size(70.dp))
 
         Image(
@@ -144,20 +143,20 @@ fun WelcomeScreen(
                       fontSize = 11.sp,
                       lineHeight = 17.sp,
                       fontFamily = FontFamily(Font(R.font.roboto)),
-                      fontWeight = FontWeight(500),
-                      color = Color(0xFF3C4043),
+                      fontWeight = FontWeight.Normal,
+                      color = MaterialTheme.colorScheme.onBackground,
                       letterSpacing = 0.25.sp,
                   ))
 
           Text(
-              text = "Create account",
+              text = " Create account",
               modifier = Modifier.clickable { onNavToRegister() },
               style =
                   TextStyle(
                       fontSize = 11.sp,
                       lineHeight = 17.sp,
                       fontFamily = FontFamily(Font(R.font.roboto)),
-                      fontWeight = FontWeight(500),
+                      fontWeight = FontWeight.SemiBold,
                       color = Color(0xFF2F6673),
                       textAlign = TextAlign.Center,
                       letterSpacing = 0.25.sp,

@@ -334,7 +334,6 @@ fun Profile(nav: NavigationActions) { // TODO Add parameters to the function
             ProfileEventsList("History")
         }
     }
-}
 
 @Composable
 fun ProfileEventsList(title: String) {

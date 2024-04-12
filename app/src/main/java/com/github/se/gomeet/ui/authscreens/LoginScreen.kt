@@ -1,7 +1,6 @@
 package com.github.se.gomeet.ui.authscreens
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -40,7 +39,7 @@ fun LoginScreen(authViewModel: AuthViewModel, onNavToExplore: () -> Unit) {
   Column(
       verticalArrangement = Arrangement.Top,
       horizontalAlignment = Alignment.CenterHorizontally,
-      modifier = Modifier.fillMaxSize().background(Color.White).padding(25.dp)) {
+      modifier = Modifier.fillMaxSize().padding(25.dp)) {
         Image(
             painter = painterResource(id = R.drawable.gomeet_text),
             contentDescription = "GoMeet",
@@ -70,6 +69,7 @@ fun LoginScreen(authViewModel: AuthViewModel, onNavToExplore: () -> Unit) {
 
         TextField(
             value = signInState.value.email,
+            singleLine = true,
             onValueChange = { newValue -> authViewModel.onEmailChange(newValue) },
             modifier = Modifier.fillMaxWidth(),
             label = { Text("Email") },
@@ -79,6 +79,7 @@ fun LoginScreen(authViewModel: AuthViewModel, onNavToExplore: () -> Unit) {
 
         TextField(
             value = signInState.value.password,
+            singleLine = true,
             onValueChange = { newValue -> authViewModel.onPasswordChange(newValue) },
             modifier = Modifier.fillMaxWidth(),
             label = { Text("Password") },

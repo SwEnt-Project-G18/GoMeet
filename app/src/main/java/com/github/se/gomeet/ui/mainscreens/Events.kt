@@ -20,7 +20,7 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
               nav.navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == selectedTab })
             },
             tabList = TOP_LEVEL_DESTINATIONS,
-            selectedItem = Route.EXPLORE)
+            selectedItem = Route.EVENTS)
       }) { innerPadding ->
         Text("Events", Modifier.padding(innerPadding))
       }
