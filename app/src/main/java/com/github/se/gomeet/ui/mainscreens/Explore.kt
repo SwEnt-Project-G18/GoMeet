@@ -14,6 +14,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
@@ -62,7 +63,7 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
       }) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
           if (isMapLoaded) {
-            GoogleMapView(events = eventList)
+            GoogleMapView(events = eventList, modifier = Modifier.testTag("Map"))
           }
         }
       }
