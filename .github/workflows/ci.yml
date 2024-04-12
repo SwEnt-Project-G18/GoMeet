@@ -69,6 +69,13 @@ jobs:
           disable-animations: true
           script: ./gradlew connectedCheck --parallel --build-cache --info
 
+      - name: Upload Test Report
+        uses: actions/upload-artifact@v2
+        if: failure() # Only runs if the previous steps fail
+        with:
+          name: Android Test Reports
+          path: app/build/reports/androidTests/connected/
+
       - name: Generate Coverage Report
         run: ./gradlew jacocoTestReport
 
