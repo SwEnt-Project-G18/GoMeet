@@ -23,5 +23,11 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
             selectedItem = Route.EXPLORE)
       }) { innerPadding ->
         Text("Events", Modifier.padding(innerPadding))
+
       }
+}
+
+@Composable
+fun EventWidget() {
+  Text("Event Widget")
 }
