@@ -9,6 +9,7 @@ import androidx.compose.ui.test.performClick
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.intent.matcher.IntentMatchers.toPackage
+import com.github.se.gomeet.ui.authscreens.WelcomeScreen
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule

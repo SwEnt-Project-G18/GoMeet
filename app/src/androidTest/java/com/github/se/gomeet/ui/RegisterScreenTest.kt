@@ -11,6 +11,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.se.gomeet.ui.authscreens.RegisterScreen
 import com.github.se.gomeet.viewmodel.AuthViewModel
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.test.runTest

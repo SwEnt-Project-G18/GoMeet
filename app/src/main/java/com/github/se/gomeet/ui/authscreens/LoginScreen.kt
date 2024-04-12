@@ -1,4 +1,4 @@
-package com.github.se.gomeet.ui
+package com.github.se.gomeet.ui.authscreens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

@@ -1,4 +1,4 @@
-package com.github.se.gomeet.ui.profile
+package com.github.se.gomeet.ui.mainscreens
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold

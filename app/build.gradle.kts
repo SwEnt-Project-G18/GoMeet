@@ -161,6 +161,7 @@ dependencies {
     androidTestImplementation("io.mockk:mockk-android:1.13.7")
     androidTestImplementation("io.mockk:mockk-agent:1.13.7")
 
+    implementation("com.google.maps.android:maps-compose:4.3.3")
 }
 
 
