@@ -1,4 +1,4 @@
-package com.github.se.gomeet.ui.profile
+package com.github.se.gomeet.ui.mainscreens
 
 import android.graphics.Paint
 import androidx.compose.foundation.BorderStroke

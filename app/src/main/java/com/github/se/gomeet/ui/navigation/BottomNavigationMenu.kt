@@ -1,11 +1,12 @@
 package com.github.se.gomeet.ui.navigation
 
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.material.BottomNavigation
-import androidx.compose.material.BottomNavigationItem
-import androidx.compose.material.MaterialTheme
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -18,17 +19,21 @@ fun BottomNavigationMenu(
     tabList: List<TopLevelDestination>,
     selectedItem: String
 ) {
-  BottomNavigation(
-      modifier = Modifier.fillMaxWidth().height(80.dp),
-      backgroundColor = MaterialTheme.colors.background) {
+  NavigationBar(
+      modifier = Modifier.height(80.dp),
+      containerColor = MaterialTheme.colorScheme.surfaceVariant) {
         tabList.forEach { destination ->
-          BottomNavigationItem(
+          NavigationBarItem(
               icon = {
-                Icon(imageVector = destination.icon, contentDescription = destination.textId)
+                Icon(
+                    imageVector = getIconForRoute(destination.route),
+                    contentDescription = destination.textId,
+                    modifier = Modifier.size(24.dp))
               },
               label = { Text(destination.textId) },
               selected = destination.route == selectedItem,
-              onClick = { onTabSelect(destination.route) })
+              onClick = { onTabSelect(destination.route) },
+              colors = NavigationBarItemDefaults.colors())
         }
       }
 }
@@ -39,6 +44,6 @@ fun PreviewBottomNavigationMenu() {
   BottomNavigationMenu(
       onTabSelect = {},
       tabList = TOP_LEVEL_DESTINATIONS,
-      selectedItem = "",
+      selectedItem = Route.CREATE,
   )
 }
