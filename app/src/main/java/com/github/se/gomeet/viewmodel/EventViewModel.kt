@@ -36,12 +36,12 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
     }
   }
 
-    suspend fun uploadImageAndGetUrl(imageUri: Uri): String {
-        val imageRef = Firebase.storage.reference.child("images/${imageUri.lastPathSegment}")
-        val uploadTaskSnapshot = imageRef.putFile(imageUri).await()
-        return uploadTaskSnapshot.metadata?.reference?.downloadUrl?.await().toString()
-    }
-    
+  suspend fun uploadImageAndGetUrl(imageUri: Uri): String {
+    val imageRef = Firebase.storage.reference.child("images/${imageUri.lastPathSegment}")
+    val uploadTaskSnapshot = imageRef.putFile(imageUri).await()
+    return uploadTaskSnapshot.metadata?.reference?.downloadUrl?.await().toString()
+  }
+
   suspend fun getAllEvents(): List<Event>? {
     return try {
       val event = CompletableDeferred<List<Event>?>()
@@ -66,11 +66,13 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
       tags: List<String>,
       images: List<String>,
       imageUri: Uri?
-  ){  CoroutineScope(Dispatchers.IO).launch {
-        try {
-            val imageUrl = imageUri?.let { uploadImageAndGetUrl(it) }
-            val updatedImages = images.toMutableList().apply { imageUrl?.let { add(it) } }
-            val event = Event(
+  ) {
+    CoroutineScope(Dispatchers.IO).launch {
+      try {
+        val imageUrl = imageUri?.let { uploadImageAndGetUrl(it) }
+        val updatedImages = images.toMutableList().apply { imageUrl?.let { add(it) } }
+        val event =
+            Event(
                 db.getNewId(),
                 creatorId!!,
                 title,
@@ -84,14 +86,13 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
                 maxParticipants,
                 public,
                 tags,
-                updatedImages
-            )
-            db.addEvent(event)
-        } catch (e: Exception) {
-            Log.w(TAG, "Error uploading image or adding event", e)
-        }
+                updatedImages)
+        db.addEvent(event)
+      } catch (e: Exception) {
+        Log.w(TAG, "Error uploading image or adding event", e)
+      }
     }
-}
+  }
 
   fun editEvent(event: Event) {
     db.updateEvent(event)

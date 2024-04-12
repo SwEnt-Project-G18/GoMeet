@@ -32,7 +32,6 @@ import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
-import com.github.se.gomeet.ui.theme.DarkerCyan
 
 @Composable
 fun Create(nav: NavigationActions) {
@@ -114,7 +113,6 @@ fun Create(nav: NavigationActions) {
             }
       }
 }
-
 
 @Preview
 @Composable
