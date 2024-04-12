@@ -90,7 +90,9 @@ fun LoginScreen(authViewModel: AuthViewModel, onNavToExplore: () -> Unit) {
 
         Button(
             onClick = { authViewModel.signInWithEmailPassword(context) },
-            modifier = Modifier.fillMaxWidth()) {
+            modifier = Modifier.fillMaxWidth(),
+            enabled =
+                signInState.value.email.isNotEmpty() && signInState.value.password.isNotEmpty()) {
               Text("Log in")
             }
 

@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -50,7 +51,7 @@ fun RegisterScreen(authViewModel: AuthViewModel, onNavToExplore: () -> Unit) {
 
         Text(
             text = "Create account",
-            modifier = Modifier.padding(bottom = 16.dp),
+            modifier = Modifier.padding(bottom = 16.dp).testTag("register_title"),
             color = DarkCyan,
             fontStyle = FontStyle.Normal,
             fontWeight = FontWeight.SemiBold,
@@ -98,7 +99,11 @@ fun RegisterScreen(authViewModel: AuthViewModel, onNavToExplore: () -> Unit) {
 
         Button(
             onClick = { authViewModel.signUpWithEmailPassword(context) },
-            modifier = Modifier.fillMaxWidth()) {
+            modifier = Modifier.fillMaxWidth().testTag("register_button"),
+            enabled =
+                signInState.value.emailRegister.isNotEmpty() &&
+                    signInState.value.passwordRegister.isNotEmpty() &&
+                    signInState.value.confirmPasswordRegister.isNotEmpty()) {
               Text("Create account")
             }
 

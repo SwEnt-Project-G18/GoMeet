@@ -7,9 +7,9 @@ import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.tasks.await
 
-class AuthRepository {
+class AuthRepository(fAuth: FirebaseAuth? = null) {
 
-  private val firebaseAuth = FirebaseAuth.getInstance()
+  private val firebaseAuth = fAuth ?: FirebaseAuth.getInstance()
   val currentUser = firebaseAuth.currentUser
 
   fun hasUserSignedIn(): Boolean {
@@ -39,18 +39,14 @@ class AuthRepository {
       password: String,
       onComplete: (Boolean) -> Unit
   ) {
-    firebaseAuth
-        .createUserWithEmailAndPassword(email, password)
-        .addOnCompleteListener { task ->
-          if (task.isSuccessful) {
-            Log.d(TAG, "signUpWithEmail:success")
-            onComplete.invoke(true)
-          } else {
-            Log.w(TAG, "signUpWithEmail:failure", task.exception)
-            onComplete.invoke(false)
-          }
-        }
-        .await()
+    try {
+      firebaseAuth.createUserWithEmailAndPassword(email, password).await()
+      Log.d(TAG, "signUpWithEmail:success")
+      onComplete(true)
+    } catch (e: Exception) {
+      Log.w(TAG, "signUpWithEmail:failure", e)
+      onComplete(false)
+    }
   }
 
   suspend fun signInWithEmailPassword(
@@ -58,18 +54,17 @@ class AuthRepository {
       password: String,
       onComplete: (Boolean) -> Unit
   ) {
-    firebaseAuth
-        .signInWithEmailAndPassword(email, password)
-        .addOnCompleteListener { task ->
-          if (task.isSuccessful) {
-            Log.d(TAG, "signInWithEmail:success")
-            onComplete.invoke(true)
-          } else {
-            Log.w(TAG, "signInWithEmail:failure", task.exception)
-            onComplete.invoke(false)
-          }
-        }
-        .await()
+    try {
+      // Attempt to sign in and wait for the task to complete
+      firebaseAuth.signInWithEmailAndPassword(email, password).await()
+      // If the await() completes without throwing an exception, sign-in was successful
+      Log.d(TAG, "signInWithEmail:success")
+      onComplete(true)
+    } catch (e: Exception) {
+      // If await() throws an exception, sign-in failed
+      Log.w(TAG, "signInWithEmail:failure", e)
+      onComplete(false)
+    }
   }
 
   fun signOut() {
