@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -91,6 +92,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
       }
 
   Scaffold(
+      modifier = Modifier.testTag("CreateEvent"),
       bottomBar = {
         BottomNavigationMenu(
             onTabSelect = { selectedTab ->
@@ -153,7 +155,8 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                           unfocusedBorderColor = MaterialTheme.colorScheme.onBackground),
                   modifier =
                       Modifier.fillMaxWidth()
-                          .padding(start = 7.dp, end = 7.dp, top = 4.dp, bottom = 4.dp))
+                          .padding(start = 7.dp, end = 7.dp, top = 4.dp, bottom = 4.dp)
+                          .testTag("Title"))
 
               OutlinedTextField(
                   value = descriptionState.value,
@@ -169,7 +172,8 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                           unfocusedBorderColor = MaterialTheme.colorScheme.onBackground),
                   modifier =
                       Modifier.fillMaxWidth()
-                          .padding(start = 7.dp, end = 7.dp, top = 4.dp, bottom = 4.dp))
+                          .padding(start = 7.dp, end = 7.dp, top = 4.dp, bottom = 4.dp)
+                          .testTag("Description"))
 
               OutlinedTextField(
                   value = locationState.value,
@@ -185,7 +189,8 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                           unfocusedBorderColor = MaterialTheme.colorScheme.onBackground),
                   modifier =
                       Modifier.fillMaxWidth()
-                          .padding(start = 7.dp, end = 7.dp, top = 4.dp, bottom = 4.dp))
+                          .padding(start = 7.dp, end = 7.dp, top = 4.dp, bottom = 4.dp)
+                          .testTag("Location"))
 
               OutlinedTextField(
                   value = textDate.value,
@@ -209,7 +214,8 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                           unfocusedBorderColor = MaterialTheme.colorScheme.onBackground),
                   modifier =
                       Modifier.fillMaxWidth()
-                          .padding(start = 7.dp, end = 7.dp, top = 4.dp, bottom = 4.dp))
+                          .padding(start = 7.dp, end = 7.dp, top = 4.dp, bottom = 4.dp)
+                          .testTag("Date"))
 
               OutlinedTextField(
                   value = priceText,
@@ -228,7 +234,8 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                           unfocusedBorderColor = MaterialTheme.colorScheme.onBackground),
                   modifier =
                       Modifier.fillMaxWidth()
-                          .padding(start = 7.dp, end = 7.dp, top = 4.dp, bottom = 4.dp))
+                          .padding(start = 7.dp, end = 7.dp, top = 4.dp, bottom = 4.dp)
+                          .testTag("Price"))
 
               OutlinedTextField(
                   value = url.value,
@@ -243,7 +250,8 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                           unfocusedBorderColor = MaterialTheme.colorScheme.onBackground),
                   modifier =
                       Modifier.fillMaxWidth()
-                          .padding(start = 7.dp, end = 7.dp, top = 4.dp, bottom = 4.dp))
+                          .padding(start = 7.dp, end = 7.dp, top = 4.dp, bottom = 4.dp)
+                          .testTag("Link"))
 
               Button(
                   modifier = Modifier.fillMaxWidth().padding(7.dp),
@@ -313,7 +321,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                       }
                     }
                   },
-                  modifier = Modifier.width(128.dp).height(40.dp),
+                  modifier = Modifier.width(128.dp).height(40.dp).testTag("PostButton"),
                   shape = RoundedCornerShape(10.dp),
                   border = BorderStroke(1.dp, Color.Gray),
                   enabled = true,
