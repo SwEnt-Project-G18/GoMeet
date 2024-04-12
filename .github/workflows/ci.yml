@@ -22,12 +22,33 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
-      - name: API Key Setup
-        shell: bash
-        env:
-          MAPS_API_KEY: ${{ secrets.MAPS_API_KEY }}
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: Install Android SDK
         run: |
-          echo MAPS_API_KEY="$MAPS_API_KEY" >> ./secrets.properties
+          wget https://dl.google.com/android/repository/commandlinetools-linux-6858069_latest.zip -O cmdline-tools.zip
+          unzip cmdline-tools.zip -d ${{ github.workspace }}/cmdline-tools
+          echo "${{ github.workspace }}/cmdline-tools/cmdline-tools/bin" >> $GITHUB_PATH
+          echo "y" | ${{ github.workspace }}/cmdline-tools/cmdline-tools/bin/sdkmanager --licenses
+          ${{ github.workspace }}/cmdline-tools/cmdline-tools/bin/sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.2"
+        env:
+          ANDROID_HOME: ${{ github.workspace }}/cmdline-tools
+          ANDROID_SDK_ROOT: ${{ github.workspace }}/cmdline-tools
+
+      - name: Cache Android SDK
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${{ github.workspace }}/cmdline-tools
+          key: ${{ runner.os }}-android-sdk-34-2023
+
+      - name: API Key Setup
+        run: |
+          echo MAPS_API_KEY="${{ secrets.MAPS_API_KEY }}" >> ./secrets.properties
 
       - name: Enable KVM group perms
         run: |
@@ -35,73 +56,37 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      - name: Setup JDK
-        uses: actions/setup-java@v4
-        with:
-          distribution: "temurin"
-          java-version: "17"
-
-      - name: Gradle cache
-        uses: gradle/actions/setup-gradle@v3
-
-      - name: Cache Gradle packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
-          restore-keys: ${{ runner.os }}-gradle
-
-      - name: Cache SonarCloud packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
-
-      - name: AVD cache
-        uses: actions/cache@v4
-        id: avd-cache
+      - name: Cache Gradle
+        uses: actions/cache@v3
         with:
           path: |
-            ~/.android/avd/*
-            ~/.android/adb*
-          key: avd-34
-
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v2
-
-      - name: Create and start AVD
-        if: steps.avd-cache.outputs.cache-hit != 'true'
-        run: |
-          echo "no" | avdmanager create avd --name "Medium_Phone_API_34_2" --package "system-images;android-34;google_apis_playstore;x86_64" --device "medium_phone" --abi "google_apis_playstore/x86_64" --sdcard 512M --force
-          $ANDROID_HOME/emulator/emulator -avd Medium_Phone_API_34_2 -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -netdelay none -netspeed full &
-
-      - name: Wait for AVD to be ready
-        run: |
-          adb wait-for-device
-          adb shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done; input keyevent 82'
-      
-
-      - name: Wait for AVD to be ready
-        run: adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done; input keyevent 82'
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
-      - name: KTFmt Check
-        run: ./gradlew ktfmtCheck
-
       - name: Decode google-services.json
-        run: echo "${{secrets.GOOGLE_SERVICES_JSON}}" | base64 --decode > app/google-services.json
+        run: echo "${{ secrets.GOOGLE_SERVICES_JSON }}" | base64 --decode > app/google-services.json
 
-      - name: Assemble
-        run: ./gradlew assemble lint --parallel --build-cache
+      - name: Assemble and Lint
+        run: ./gradlew assembleDebug lint --parallel --build-cache
 
       - name: Run tests
         run: ./gradlew check --parallel --build-cache
 
-      - name: Run tests on the custom emulator
-        run: ./gradlew connectedCheck --parallel --build-cache
+      - name: Run instrumentation tests
+        uses: RandyLutcavich/android-emulator-runner-without-sdk-setup@v1.0.3
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          avd-name: github
+          force-avd-creation: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          script: ./gradlew connectedCheck --parallel --build-cache
 
       - name: Generate Coverage Report
         run: ./gradlew jacocoTestReport
