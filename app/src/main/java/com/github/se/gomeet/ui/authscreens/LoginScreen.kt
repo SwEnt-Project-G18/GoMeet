@@ -82,7 +82,7 @@ fun LoginScreen(authViewModel: AuthViewModel, onNavToExplore: () -> Unit) {
             value = signInState.value.password,
             singleLine = true,
             onValueChange = { newValue -> authViewModel.onPasswordChange(newValue) },
-            modifier = Modifier.fillMaxWidth().testTag("PasswordField"),
+            modifier = Modifier.fillMaxWidth().testTag("LogInField"),
             label = { Text("Password") },
             isError = isError,
             visualTransformation = PasswordVisualTransformation())
