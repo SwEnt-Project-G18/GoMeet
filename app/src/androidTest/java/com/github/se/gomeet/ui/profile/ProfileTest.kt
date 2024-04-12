@@ -9,27 +9,21 @@ import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.internal.matchers.Null
 
 class ProfileTest {
 
-    @get:Rule
-    val composeTestRule = createComposeRule()
+  @get:Rule val composeTestRule = createComposeRule()
 
-    @Test
-    fun profileUiTest() {
-        composeTestRule.setContent {
-                Profile(NavigationActions(rememberNavController()))
-            }
+  @Test
+  fun profileUiTest() {
+    composeTestRule.setContent { Profile(NavigationActions(rememberNavController())) }
 
+    composeTestRule.onNodeWithText("My Profile").assertIsDisplayed()
 
-        composeTestRule.onNodeWithText("My Profile").assertIsDisplayed()
+    composeTestRule.onNodeWithContentDescription("image description").assertIsDisplayed()
 
-        composeTestRule.onNodeWithContentDescription("image description").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Edit Profile").performClick()
 
-        composeTestRule.onNodeWithText("Edit Profile").performClick()
-
-        composeTestRule.onNodeWithText("Share Profile").assertIsDisplayed()
-    }
-
+    composeTestRule.onNodeWithText("Share Profile").assertIsDisplayed()
+  }
 }
