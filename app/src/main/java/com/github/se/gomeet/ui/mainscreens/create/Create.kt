@@ -37,7 +37,7 @@ import com.github.se.gomeet.ui.theme.DarkCyan
 @Composable
 fun Create(nav: NavigationActions) {
   Scaffold(
-      modifier = Modifier.testTag("Create"),
+      modifier = Modifier.testTag("CreateUI"),
       bottomBar = {
         BottomNavigationMenu(
             onTabSelect = { selectedTab ->
