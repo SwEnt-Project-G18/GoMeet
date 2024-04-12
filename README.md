@@ -13,7 +13,7 @@ To help in the design of our application, we will be working on Figma to design 
 
 ## Architecture Diagram
 To provide a clear overview of how GoMeet is structured, the architecture diagram is essential.
-The diagram should present these components in a layered fashion, showing how data flows from the User Interface down through the Application Logic, interacting with the Data Storage, and then out to the External Integrations or back to the user through the Notification System.
+The diagram should present these components in a layered fashion, showing how data flows from the User Interface down through the Application Logic, interacting with the Data Storage, and then out to the External Integrations.
 Here is our [architecture diagram](https://excalidraw.com/#room=fc79d4082a6d6539cb0e,0jLLbFsc3Ti3OwWkv5p7Ig)
 
 ## SonarCloud
