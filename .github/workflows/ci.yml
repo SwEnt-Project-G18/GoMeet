@@ -58,23 +58,11 @@ jobs:
       - name: Run tests
         run: ./gradlew check --parallel --build-cache
 
-      - name: Run instrumentation tests
+      - name: Run Connected Tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34
-          target: google_apis
-          arch: x86_64
-          profile: pixel_8_pro
-          emulator-options: -no-window -camera-back virtualscene -camera-front emulated -accel on -gpu auto -no-audio -no-boot-anim
-          disable-animations: true
-          script: ./gradlew connectedCheck --parallel --build-cache --info
-
-      - name: Upload Test Report
-        uses: actions/upload-artifact@v2
-        if: failure() # Only runs if the previous steps fail
-        with:
-          name: Android Test Reports
-          path: app/build/reports/androidTests/connected/
+          script: ./gradlew connectedCheck
 
       - name: Generate Coverage Report
         run: ./gradlew jacocoTestReport
