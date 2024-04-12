@@ -64,8 +64,8 @@ jobs:
           api-level: 34
           target: google_apis
           arch: x86_64
-          profile: medium_phone
-          emulator-options: -no-window -camera-back virtualscene -camera-front emulated -accel on -gpu auto -no-audio -no-boot-anim -memory 2048 -cores 4
+          profile: pixel_8_pro
+          emulator-options: -no-window -camera-back virtualscene -camera-front emulated -accel on -gpu auto -no-audio -no-boot-anim
           disable-animations: true
           script: ./gradlew connectedCheck --parallel --build-cache --info
 
