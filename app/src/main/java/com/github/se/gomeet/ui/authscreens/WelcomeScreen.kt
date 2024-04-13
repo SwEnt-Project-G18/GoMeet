@@ -51,28 +51,28 @@ fun WelcomeScreen(
     onNavToRegister: () -> Unit,
     onSignInSuccess: (String) -> Unit
 ) {
-    val launcher =
-        rememberLauncherForActivityResult(FirebaseAuthUIActivityResultContract()) { res ->
-            if (res.resultCode == Activity.RESULT_OK) {
-                val user = FirebaseAuth.getInstance().currentUser
-                user?.uid?.let { userId -> onSignInSuccess(userId) }
-            } else {
-                // Sign-in error
-            }
+  val launcher =
+      rememberLauncherForActivityResult(FirebaseAuthUIActivityResultContract()) { res ->
+        if (res.resultCode == Activity.RESULT_OK) {
+          val user = FirebaseAuth.getInstance().currentUser
+          user?.uid?.let { userId -> onSignInSuccess(userId) }
+        } else {
+          // Sign-in error
         }
+      }
 
-    val providers = arrayListOf(AuthUI.IdpConfig.GoogleBuilder().build())
-    val signInIntent =
-        AuthUI.getInstance()
-            .createSignInIntentBuilder()
-            .setAvailableProviders(providers)
-            .setIsSmartLockEnabled(false)
-            .build()
+  val providers = arrayListOf(AuthUI.IdpConfig.GoogleBuilder().build())
+  val signInIntent =
+      AuthUI.getInstance()
+          .createSignInIntentBuilder()
+          .setAvailableProviders(providers)
+          .setIsSmartLockEnabled(false)
+          .build()
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top,
-        modifier = Modifier.fillMaxSize().padding(25.dp).testTag("WelcomeScreenCol")) {
+  Column(
+      horizontalAlignment = Alignment.CenterHorizontally,
+      verticalArrangement = Arrangement.Top,
+      modifier = Modifier.fillMaxSize().padding(25.dp).testTag("WelcomeScreenCol")) {
         Spacer(modifier = Modifier.size((LocalConfiguration.current.screenHeightDp / 6).dp))
 
         Image(
@@ -99,22 +99,22 @@ fun WelcomeScreen(
             border = BorderStroke(1.dp, Color.Gray),
             enabled = true,
             colors = ButtonDefaults.outlinedButtonColors(containerColor = Color(0xFFECEFF1))) {
-            Image(
-                painter = painterResource(id = R.drawable.google_logo),
-                contentDescription = "Google logo",
-                modifier = Modifier.width(24.dp).height(24.dp))
+              Image(
+                  painter = painterResource(id = R.drawable.google_logo),
+                  contentDescription = "Google logo",
+                  modifier = Modifier.width(24.dp).height(24.dp))
 
-            Spacer(modifier = Modifier.size(15.dp)) // Adjust the size of the spacer as needed
+              Spacer(modifier = Modifier.size(15.dp)) // Adjust the size of the spacer as needed
 
-            Text(
-                text = "Continue with Google",
-                color = Color.Black,
-                modifier =
-                Modifier.padding(
-                    start = 8.dp,
-                    end = 8.dp) // This will add padding around the text inside the button
-            )
-        }
+              Text(
+                  text = "Continue with Google",
+                  color = Color.Black,
+                  modifier =
+                      Modifier.padding(
+                          start = 8.dp,
+                          end = 8.dp) // This will add padding around the text inside the button
+                  )
+            }
 
         Spacer(modifier = Modifier.size(1.dp))
 
@@ -129,82 +129,82 @@ fun WelcomeScreen(
             border = BorderStroke(1.dp, Color.Gray), // Set border here if needed
             enabled = true,
             colors = ButtonDefaults.outlinedButtonColors(containerColor = Color(0xFFECEFF1))) {
-            Text(
-                text = "Log in",
-                modifier = Modifier.padding(start = 8.dp, end = 8.dp),
-                color = Color.Black)
-        }
+              Text(
+                  text = "Log in",
+                  modifier = Modifier.padding(start = 8.dp, end = 8.dp),
+                  color = Color.Black)
+            }
 
         Spacer(modifier = Modifier.size(10.dp))
 
         Row {
-            Text(
-                text = "Don’t have an account?",
-                style =
-                TextStyle(
-                    fontSize = 11.sp,
-                    lineHeight = 17.sp,
-                    fontFamily = FontFamily(Font(R.font.roboto)),
-                    fontWeight = FontWeight.Normal,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    letterSpacing = 0.25.sp,
-                ))
+          Text(
+              text = "Don’t have an account?",
+              style =
+                  TextStyle(
+                      fontSize = 11.sp,
+                      lineHeight = 17.sp,
+                      fontFamily = FontFamily(Font(R.font.roboto)),
+                      fontWeight = FontWeight.Normal,
+                      color = MaterialTheme.colorScheme.onBackground,
+                      letterSpacing = 0.25.sp,
+                  ))
 
-            Text(
-                text = "Create account",
-                modifier = Modifier.clickable { onNavToRegister() },
-                style =
-                TextStyle(
-                    fontSize = 11.sp,
-                    lineHeight = 17.sp,
-                    fontFamily = FontFamily(Font(R.font.roboto)),
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color(0xFF2F6673),
-                    textAlign = TextAlign.Center,
-                    letterSpacing = 0.25.sp,
-                ))
+          Text(
+              text = "Create account",
+              modifier = Modifier.clickable { onNavToRegister() },
+              style =
+                  TextStyle(
+                      fontSize = 11.sp,
+                      lineHeight = 17.sp,
+                      fontFamily = FontFamily(Font(R.font.roboto)),
+                      fontWeight = FontWeight.SemiBold,
+                      color = Color(0xFF2F6673),
+                      textAlign = TextAlign.Center,
+                      letterSpacing = 0.25.sp,
+                  ))
         }
-    }
+      }
 }
 
 @Preview
 @Composable
 fun WelcomeScreenPreview() {
-    WelcomeScreen(
-        onNavToLogin = {},
-        onNavToRegister = {},
-        onSignInSuccess = { _ -> }) // Preview the WelcomeScreen
+  WelcomeScreen(
+      onNavToLogin = {},
+      onNavToRegister = {},
+      onSignInSuccess = { _ -> }) // Preview the WelcomeScreen
 }
 
 @Composable
 fun DividerWithText() {
-    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
-        Canvas(modifier = Modifier.matchParentSize()) {
-            val canvasWidth = size.width
-            val canvasHalfHeight = size.height / 2
+  Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
+    Canvas(modifier = Modifier.matchParentSize()) {
+      val canvasWidth = size.width
+      val canvasHalfHeight = size.height / 2
 
-            drawLine(
-                color = Color.Black,
-                strokeWidth = 2f,
-                start = Offset(x = 120f, y = canvasHalfHeight),
-                end = Offset(x = (canvasWidth / 2) - 50f, y = canvasHalfHeight),
-            )
-            drawLine(
-                color = Color.Black,
-                strokeWidth = 2f,
-                start = Offset(x = (canvasWidth / 2) + 50f, y = canvasHalfHeight),
-                end = Offset(x = canvasWidth - 120, y = canvasHalfHeight),
-            )
-        }
-        Text(
-            text = "or",
-            modifier = Modifier.align(Alignment.Center),
-            style =
+      drawLine(
+          color = Color.Black,
+          strokeWidth = 2f,
+          start = Offset(x = 120f, y = canvasHalfHeight),
+          end = Offset(x = (canvasWidth / 2) - 50f, y = canvasHalfHeight),
+      )
+      drawLine(
+          color = Color.Black,
+          strokeWidth = 2f,
+          start = Offset(x = (canvasWidth / 2) + 50f, y = canvasHalfHeight),
+          end = Offset(x = canvasWidth - 120, y = canvasHalfHeight),
+      )
+    }
+    Text(
+        text = "or",
+        modifier = Modifier.align(Alignment.Center),
+        style =
             TextStyle(
                 fontSize = 15.sp,
                 fontFamily = FontFamily(Font(R.font.roboto)),
                 fontWeight = FontWeight(700),
                 color = Color.Black,
             ))
-    }
+  }
 }
