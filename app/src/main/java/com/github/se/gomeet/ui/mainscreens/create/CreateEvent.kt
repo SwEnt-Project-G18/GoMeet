@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.TextFieldDefaults
@@ -156,9 +155,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                           focusedBorderColor = MaterialTheme.colorScheme.onBackground,
                           unfocusedBorderColor = MaterialTheme.colorScheme.onBackground),
                   modifier =
-                      Modifier.fillMaxWidth()
-                          .padding(start = 7.dp, end = 7.dp)
-                          .testTag("Title"))
+                      Modifier.fillMaxWidth().padding(start = 7.dp, end = 7.dp).testTag("Title"))
 
               OutlinedTextField(
                   value = descriptionState.value,
@@ -190,9 +187,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                           focusedBorderColor = MaterialTheme.colorScheme.onBackground,
                           unfocusedBorderColor = MaterialTheme.colorScheme.onBackground),
                   modifier =
-                      Modifier.fillMaxWidth()
-                          .padding(start = 7.dp, end = 7.dp)
-                          .testTag("Location"))
+                      Modifier.fillMaxWidth().padding(start = 7.dp, end = 7.dp).testTag("Location"))
 
               OutlinedTextField(
                   value = textDate.value,
@@ -215,9 +210,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                           focusedBorderColor = MaterialTheme.colorScheme.onBackground,
                           unfocusedBorderColor = MaterialTheme.colorScheme.onBackground),
                   modifier =
-                      Modifier.fillMaxWidth()
-                          .padding(start = 7.dp, end = 7.dp)
-                          .testTag("Date"))
+                      Modifier.fillMaxWidth().padding(start = 7.dp, end = 7.dp).testTag("Date"))
 
               OutlinedTextField(
                   value = priceText,
@@ -235,9 +228,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                           focusedBorderColor = MaterialTheme.colorScheme.onBackground,
                           unfocusedBorderColor = MaterialTheme.colorScheme.onBackground),
                   modifier =
-                      Modifier.fillMaxWidth()
-                          .padding(start = 7.dp, end = 7.dp)
-                          .testTag("Price"))
+                      Modifier.fillMaxWidth().padding(start = 7.dp, end = 7.dp).testTag("Price"))
 
               OutlinedTextField(
                   value = url.value,
@@ -251,9 +242,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                           focusedBorderColor = MaterialTheme.colorScheme.onBackground,
                           unfocusedBorderColor = MaterialTheme.colorScheme.onBackground),
                   modifier =
-                      Modifier.fillMaxWidth()
-                          .padding(start = 7.dp, end = 7.dp)
-                          .testTag("Link"))
+                      Modifier.fillMaxWidth().padding(start = 7.dp, end = 7.dp).testTag("Link"))
 
               Button(
                   modifier = Modifier.fillMaxWidth().padding(7.dp),
