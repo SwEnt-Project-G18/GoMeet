@@ -7,8 +7,7 @@ import io.github.kakaocup.compose.node.element.KNode
 class WelcomeScreenScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
     ComposeScreen<WelcomeScreenScreen>(
         semanticsProvider = semanticsProvider,
-        viewBuilderAction = { hasTestTag("WelcomeScreen") }) {
+        viewBuilderAction = { hasTestTag("WelcomeScreenCol") }) {
 
   val logInButton: KNode = child { hasTestTag("LogInButton") }
-  val googleLogInButton: KNode = child { hasTestTag("GoogleLogIn") }
 }
