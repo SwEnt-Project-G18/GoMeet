@@ -52,11 +52,18 @@ jobs:
       - name: Decode google-services.json
         run: echo "${{ secrets.GOOGLE_SERVICES_JSON }}" | base64 --decode > app/google-services.json
 
+      # Remove the "#" if you want to enforce the formatting check when pushing on your repo
+      #- name: KTFmt Check
+      #  run: |
+      #    # To run the CI with debug informations, add --info
+      #    ./gradlew ktfmtCheck
+
       - name: Assemble and Lint
         run: ./gradlew assembleDebug lint --parallel --build-cache
 
       - name: Run tests
         run: ./gradlew check --parallel --build-cache
+
 
       - name: Run Connected Tests
         uses: reactivecircus/android-emulator-runner@v2
@@ -65,7 +72,7 @@ jobs:
           arch: x86_64
           profile: Nexus 6
           cores: 4
-          script: ./gradlew connectedCheck --info
+          script: ./gradlew connectedCheck --info # To run the CI with debug informations, add --info
 
       - name: Generate Coverage Report
         run: ./gradlew jacocoTestReport

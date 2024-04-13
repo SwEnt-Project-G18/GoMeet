@@ -4,8 +4,8 @@ import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
 import io.github.kakaocup.compose.node.element.ComposeScreen
 import io.github.kakaocup.compose.node.element.KNode
 
-class WelcomeScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
-    ComposeScreen<WelcomeScreen>(
+class WelcomeScreenScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
+    ComposeScreen<WelcomeScreenScreen>(
         semanticsProvider = semanticsProvider,
         viewBuilderAction = { hasTestTag("WelcomeScreen") }) {
 

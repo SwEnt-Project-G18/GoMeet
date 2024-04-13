@@ -96,7 +96,7 @@ fun WelcomeScreen(
 
         OutlinedButton(
             onClick = { launcher.launch(signInIntent) },
-            modifier = Modifier.width(250.dp).height(40.dp),
+            modifier = Modifier.width(250.dp).height(40.dp).testTag("LogInButton"),
             shape = RoundedCornerShape(20.dp),
             border = BorderStroke(1.dp, Color.Gray),
             enabled = true,
@@ -126,7 +126,7 @@ fun WelcomeScreen(
 
         OutlinedButton(
             onClick = { onNavToLogin() },
-            modifier = Modifier.width(250.dp).height(40.dp).testTag("LogInButton"),
+            modifier = Modifier.width(250.dp).height(40.dp),
             shape = RoundedCornerShape(20.dp),
             border = BorderStroke(1.dp, Color.Gray), // Set border here if needed
             enabled = true,

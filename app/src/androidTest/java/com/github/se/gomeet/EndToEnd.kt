@@ -7,7 +7,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.screens.CreateEventScreen
 import com.github.se.gomeet.screens.CreateScreen
 import com.github.se.gomeet.screens.LoginScreen
-import com.github.se.gomeet.screens.WelcomeScreen
+import com.github.se.gomeet.screens.WelcomeScreenScreen
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen
 import io.mockk.junit4.MockKRule
@@ -24,7 +24,7 @@ class EndToEndTest : TestCase() {
 
   @Test
   fun test() = run {
-    ComposeScreen.onComposeScreen<WelcomeScreen>(composeTestRule) {
+    ComposeScreen.onComposeScreen<WelcomeScreenScreen>(composeTestRule) {
       step("Click on log in button") {
         logInButton {
           assertIsDisplayed()
