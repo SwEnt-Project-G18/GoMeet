@@ -63,9 +63,9 @@ jobs:
         with:
           api-level: 34
           arch: x86_64
-          profile: Pixel 7
+          profile: Nexus 6
           cores: 4
-          script: ./gradlew connectedCheck
+          script: ./gradlew connectedCheck --info
 
       - name: Generate Coverage Report
         run: ./gradlew jacocoTestReport
