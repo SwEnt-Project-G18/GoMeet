@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -39,7 +40,7 @@ fun LoginScreen(authViewModel: AuthViewModel, onNavToExplore: () -> Unit) {
   Column(
       verticalArrangement = Arrangement.Top,
       horizontalAlignment = Alignment.CenterHorizontally,
-      modifier = Modifier.fillMaxSize().padding(25.dp)) {
+      modifier = Modifier.fillMaxSize().padding(25.dp).testTag("LoginScreen")) {
         Image(
             painter = painterResource(id = R.drawable.gomeet_text),
             contentDescription = "GoMeet",
@@ -71,7 +72,7 @@ fun LoginScreen(authViewModel: AuthViewModel, onNavToExplore: () -> Unit) {
             value = signInState.value.email,
             singleLine = true,
             onValueChange = { newValue -> authViewModel.onEmailChange(newValue) },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().testTag("EmailField"),
             label = { Text("Email") },
             isError = isError)
 
@@ -81,7 +82,7 @@ fun LoginScreen(authViewModel: AuthViewModel, onNavToExplore: () -> Unit) {
             value = signInState.value.password,
             singleLine = true,
             onValueChange = { newValue -> authViewModel.onPasswordChange(newValue) },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().testTag("LogInField"),
             label = { Text("Password") },
             isError = isError,
             visualTransformation = PasswordVisualTransformation())
@@ -90,7 +91,7 @@ fun LoginScreen(authViewModel: AuthViewModel, onNavToExplore: () -> Unit) {
 
         Button(
             onClick = { authViewModel.signInWithEmailPassword(context) },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().testTag("LogInButton"),
             enabled =
                 signInState.value.email.isNotEmpty() && signInState.value.password.isNotEmpty()) {
               Text("Log in")
