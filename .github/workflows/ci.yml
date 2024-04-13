@@ -69,9 +69,12 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34
+          target: google_apis
           arch: x86_64
-          profile: Nexus 6
-          cores: 4
+          avd-name: github
+          force-avd-creation: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
           script: ./gradlew connectedCheck --info # To run the CI with debug informations, add --info
 
       - name: Generate Coverage Report

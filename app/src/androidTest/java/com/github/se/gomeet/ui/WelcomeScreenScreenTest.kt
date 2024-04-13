@@ -23,7 +23,7 @@ class WelcomeScreenScreenTest {
   @Test
   fun googleSignInReturnsValidActivityResult() {
     ComposeScreen.onComposeScreen<WelcomeScreenScreen>(composeTestRule) {
-      logInButton {
+      googleLogInButton {
         assertIsDisplayed()
         performClick()
       }
