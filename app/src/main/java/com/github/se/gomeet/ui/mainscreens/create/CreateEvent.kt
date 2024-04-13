@@ -141,7 +141,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
             Modifier.padding(innerPadding),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center) {
-                Spacer(modifier = Modifier.size((LocalConfiguration.current.screenHeightDp / 6).dp))
+              Spacer(modifier = Modifier.size((LocalConfiguration.current.screenHeightDp / 6).dp))
 
               OutlinedTextField(
                   value = titleState.value,
