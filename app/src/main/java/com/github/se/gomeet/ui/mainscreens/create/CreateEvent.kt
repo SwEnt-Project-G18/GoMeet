@@ -141,7 +141,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
             Modifier.padding(innerPadding),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center) {
-              Spacer(modifier = Modifier.size((LocalConfiguration.current.screenHeightDp / 6).dp))
+              Spacer(modifier = Modifier.size((LocalConfiguration.current.screenHeightDp / 9).dp))
 
               OutlinedTextField(
                   value = titleState.value,
@@ -157,7 +157,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                           unfocusedBorderColor = MaterialTheme.colorScheme.onBackground),
                   modifier =
                       Modifier.fillMaxWidth()
-                          .padding(start = 7.dp, end = 7.dp, top = 4.dp, bottom = 4.dp)
+                          .padding(start = 7.dp, end = 7.dp)
                           .testTag("Title"))
 
               OutlinedTextField(
@@ -174,7 +174,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                           unfocusedBorderColor = MaterialTheme.colorScheme.onBackground),
                   modifier =
                       Modifier.fillMaxWidth()
-                          .padding(start = 7.dp, end = 7.dp, top = 4.dp, bottom = 4.dp)
+                          .padding(start = 7.dp, end = 7.dp)
                           .testTag("Description"))
 
               OutlinedTextField(
@@ -191,7 +191,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                           unfocusedBorderColor = MaterialTheme.colorScheme.onBackground),
                   modifier =
                       Modifier.fillMaxWidth()
-                          .padding(start = 7.dp, end = 7.dp, top = 4.dp, bottom = 4.dp)
+                          .padding(start = 7.dp, end = 7.dp)
                           .testTag("Location"))
 
               OutlinedTextField(
@@ -216,7 +216,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                           unfocusedBorderColor = MaterialTheme.colorScheme.onBackground),
                   modifier =
                       Modifier.fillMaxWidth()
-                          .padding(start = 7.dp, end = 7.dp, top = 4.dp, bottom = 4.dp)
+                          .padding(start = 7.dp, end = 7.dp)
                           .testTag("Date"))
 
               OutlinedTextField(
@@ -236,7 +236,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                           unfocusedBorderColor = MaterialTheme.colorScheme.onBackground),
                   modifier =
                       Modifier.fillMaxWidth()
-                          .padding(start = 7.dp, end = 7.dp, top = 4.dp, bottom = 4.dp)
+                          .padding(start = 7.dp, end = 7.dp)
                           .testTag("Price"))
 
               OutlinedTextField(
@@ -252,7 +252,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                           unfocusedBorderColor = MaterialTheme.colorScheme.onBackground),
                   modifier =
                       Modifier.fillMaxWidth()
-                          .padding(start = 7.dp, end = 7.dp, top = 4.dp, bottom = 4.dp)
+                          .padding(start = 7.dp, end = 7.dp)
                           .testTag("Link"))
 
               Button(
@@ -323,7 +323,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                       }
                     }
                   },
-                  modifier = Modifier.width(128.dp).height(40.dp).testTag("PostButton"),
+                  modifier = Modifier.testTag("PostButton"),
                   shape = RoundedCornerShape(10.dp),
                   border = BorderStroke(1.dp, Color.Gray),
                   enabled = true,
