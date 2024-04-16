@@ -367,7 +367,7 @@ fun EventWidget(
                   modifier =
                       Modifier.weight(
                               3f) // Take 1/3 of the card space because of the total weight of 4 (3
-                                  // for the column and 1 for this image)
+                          // for the column and 1 for this image)
                           .fillMaxHeight() // Fill the height of the Row
                           .aspectRatio(
                               3f / 1.75f) // Maintain an aspect ratio of 3:2, change it as needed
