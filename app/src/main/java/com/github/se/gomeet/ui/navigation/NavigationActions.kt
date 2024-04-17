@@ -30,7 +30,6 @@ object Route {
   const val PROFILE = "Profile"
   const val PUBLIC_CREATE = "Public Create"
   const val PRIVATE_CREATE = "Private Create"
-  const val CROP_IMAGE = "Crop Image"
 }
 
 val CREATE_ITEMS =
