@@ -163,47 +163,41 @@ fun Events(nav: NavigationActions) {
                           ),
                       modifier = Modifier.padding(10.dp).align(Alignment.Start))
                   EventWidget(
-                      UserName = "EPFL Chess Club",
-                      EventName = "Chess Tournament",
-                      EventDate = eventDate,
-                      ProfilePicture = R.drawable.gomeet_logo,
-                      EventPicture = R.drawable.intbee_logo,
-                      Verified = true)
+                      userName = "EPFL Chess Club",
+                      eventName = "Chess Tournament",
+                      eventDate = eventDate,
+                      eventPicture = R.drawable.intbee_logo,
+                      verified = true)
                   EventWidget(
-                      UserName = "EPFL Chess Club",
-                      EventName = "Chess Tournament",
-                      EventDate = eventDate,
-                      ProfilePicture = R.drawable.gomeet_logo,
-                      EventPicture = R.drawable.intbee_logo,
-                      Verified = true)
+                      userName = "EPFL Chess Club",
+                      eventName = "Chess Tournament",
+                      eventDate = eventDate,
+                      eventPicture = R.drawable.intbee_logo,
+                      verified = true)
                   EventWidget(
-                      UserName = "EPFL Chess Club",
-                      EventName = "Chess Tournament",
-                      EventDate = eventDate,
-                      ProfilePicture = R.drawable.gomeet_logo,
-                      EventPicture = R.drawable.intbee_logo,
-                      Verified = true)
+                      userName = "EPFL Chess Club",
+                      eventName = "Chess Tournament",
+                      eventDate = eventDate,
+                      eventPicture = R.drawable.intbee_logo,
+                      verified = true)
                   EventWidget(
-                      UserName = "EPFL Chess Club",
-                      EventName = "Chess Tournament",
-                      EventDate = eventDate,
-                      ProfilePicture = R.drawable.gomeet_logo,
-                      EventPicture = R.drawable.intbee_logo,
-                      Verified = true)
+                      userName = "EPFL Chess Club",
+                      eventName = "Chess Tournament",
+                      eventDate = eventDate,
+                      eventPicture = R.drawable.intbee_logo,
+                      verified = true)
                   EventWidget(
-                      UserName = "EPFL Chess Club",
-                      EventName = "Chess Tournament",
-                      EventDate = eventDate,
-                      ProfilePicture = R.drawable.gomeet_logo,
-                      EventPicture = R.drawable.intbee_logo,
-                      Verified = true)
+                      userName = "EPFL Chess Club",
+                      eventName = "Chess Tournament",
+                      eventDate = eventDate,
+                      eventPicture = R.drawable.intbee_logo,
+                      verified = true)
                   EventWidget(
-                      UserName = "EPFL Chess Club",
-                      EventName = "Chess Tournament",
-                      EventDate = eventDate,
-                      ProfilePicture = R.drawable.gomeet_logo,
-                      EventPicture = R.drawable.intbee_logo,
-                      Verified = true)
+                      userName = "EPFL Chess Club",
+                      eventName = "Chess Tournament",
+                      eventDate = eventDate,
+                      eventPicture = R.drawable.intbee_logo,
+                      verified = true)
                 }
 
                 if (selectedFilter == "All" || selectedFilter == "Favourites") {
@@ -222,12 +216,11 @@ fun Events(nav: NavigationActions) {
                           ),
                       modifier = Modifier.padding(10.dp).align(Alignment.Start))
                   EventWidget(
-                      UserName = "EPFL Chess Club",
-                      EventName = "Chess Tournament",
-                      EventDate = eventDate,
-                      ProfilePicture = R.drawable.gomeet_logo,
-                      EventPicture = R.drawable.intbee_logo,
-                      Verified = true)
+                      userName = "EPFL Chess Club",
+                      eventName = "Chess Tournament",
+                      eventDate = eventDate,
+                      eventPicture = R.drawable.intbee_logo,
+                      verified = true)
                 }
 
                 if (selectedFilter == "All" || selectedFilter == "MyEvents") {
@@ -245,12 +238,11 @@ fun Events(nav: NavigationActions) {
                           ),
                       modifier = Modifier.padding(10.dp).align(Alignment.Start))
                   EventWidget(
-                      UserName = "EPFL Chess Club",
-                      EventName = "Chess Tournament",
-                      EventDate = eventDate,
-                      ProfilePicture = R.drawable.gomeet_logo,
-                      EventPicture = R.drawable.intbee_logo,
-                      Verified = true)
+                      userName = "EPFL Chess Club",
+                      eventName = "Chess Tournament",
+                      eventDate = eventDate,
+                      eventPicture = R.drawable.intbee_logo,
+                      verified = true)
                 }
               }
             }
@@ -259,12 +251,11 @@ fun Events(nav: NavigationActions) {
 
 @Composable
 fun EventWidget(
-    UserName: String,
-    EventName: String,
-    EventDate: Date,
-    ProfilePicture: Int,
-    EventPicture: Int,
-    Verified: Boolean
+    userName: String,
+    eventName: String,
+    eventDate: Date,
+    eventPicture: Int,
+    verified: Boolean
 ) {
 
   val configuration = LocalConfiguration.current
@@ -289,7 +280,7 @@ fun EventWidget(
                   horizontalAlignment = Alignment.Start, // Align text horizontally to center
                   verticalArrangement = Arrangement.Center) {
                     Text(
-                        text = EventName,
+                        text = eventName,
                         style =
                             TextStyle(
                                 fontSize = bigTextSize.sp,
@@ -304,7 +295,7 @@ fun EventWidget(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center) {
                           Text(
-                              UserName,
+                              userName,
                               style =
                                   TextStyle(
                                       fontSize = smallTextSize.sp,
@@ -315,7 +306,7 @@ fun EventWidget(
                                       letterSpacing = 0.15.sp,
                                   ),
                               modifier = Modifier.padding(top = 5.dp))
-                          if (Verified) {
+                          if (verified) {
                             Box(
                                 contentAlignment = Alignment.Center,
                                 modifier = Modifier.padding(5.dp).size(smallTextSize.dp * (1.4f))) {
@@ -333,7 +324,7 @@ fun EventWidget(
                     val endOfWeek = startOfWeek.clone() as Calendar
                     endOfWeek.add(Calendar.DAY_OF_WEEK, 6)
 
-                    val eventCalendar = Calendar.getInstance().apply { time = EventDate }
+                    val eventCalendar = Calendar.getInstance().apply { time = eventDate }
 
                     // Determine if the event date is within this week
                     val isThisWeek = eventCalendar >= startOfWeek && eventCalendar <= endOfWeek
@@ -347,7 +338,7 @@ fun EventWidget(
                         }
 
                     // Convert the Date object to a formatted String
-                    val dateString = dateFormat.format(EventDate)
+                    val dateString = dateFormat.format(eventDate)
 
                     Text(
                         dateString,
@@ -362,7 +353,7 @@ fun EventWidget(
                             ))
                   }
               Image(
-                  painter = painterResource(id = EventPicture),
+                  painter = painterResource(id = eventPicture),
                   contentDescription = "Event Picture",
                   modifier =
                       Modifier.weight(
