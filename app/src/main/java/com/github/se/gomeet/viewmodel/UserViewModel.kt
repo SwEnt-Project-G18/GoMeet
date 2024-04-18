@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.github.se.gomeet.UserFirebaseConnection
 import com.github.se.gomeet.model.user.GoMeetUser
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.CompletableDeferred
@@ -14,14 +15,16 @@ import kotlinx.coroutines.launch
 
 class UserViewModel : ViewModel() {
   private val db = UserFirebaseConnection(Firebase.firestore)
+  val currentUid by lazy { Firebase.auth.currentUser!!.uid }
+  private var currentUser: GoMeetUser? = null
 
-  fun createIfNewUser(uid: String, username: String) {
+  fun createUserIfNew(username: String) {
     CoroutineScope(Dispatchers.IO).launch {
-      if (getUser(uid) == null) {
+      if (getUser(currentUid) == null) {
         try {
           val user =
               GoMeetUser(
-                  uid = uid,
+                  uid = currentUid,
                   username = username,
                   following = emptyList(),
                   followers = emptyList(),
@@ -31,6 +34,7 @@ class UserViewModel : ViewModel() {
           Log.w(ContentValues.TAG, "Error adding user", e)
         }
       }
+      currentUser = getUser(currentUid)
     }
   }
 
@@ -44,11 +48,11 @@ class UserViewModel : ViewModel() {
     }
   }
 
-  fun sendRequest(user: GoMeetUser) {}
+  fun sendRequest(uid: String) {}
 
-  fun remove(user: GoMeetUser) {}
+  fun remove(uid: String) {}
 
-  fun accept(user: GoMeetUser) {}
+  fun accept(uid: String) {}
 
-  fun reject(user: GoMeetUser) {}
+  fun reject(uid: String) {}
 }

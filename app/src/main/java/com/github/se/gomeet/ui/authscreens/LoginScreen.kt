@@ -109,8 +109,7 @@ fun LoginScreen(
         }
 
         if (signInState.value.isSignInSuccessful) {
-          userViewModel.createIfNewUser(
-              Firebase.auth.currentUser!!.uid,
+          userViewModel.createUserIfNew(
               Firebase.auth.currentUser!!.email!!) // TODO: currently username = email
           onNavToExplore()
         }

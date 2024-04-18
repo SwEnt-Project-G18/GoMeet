@@ -52,8 +52,7 @@ class MainActivity : ComponentActivity() {
                   onNavToRegister = { NavigationActions(nav).navigateTo(LOGIN_ITEMS[2]) },
                   onSignInSuccess = { userId ->
                     userIdState.value = userId
-                    userViewModel.createIfNewUser(
-                        userId,
+                    userViewModel.createUserIfNew(
                         Firebase.auth.currentUser!!.email!!) // TODO: currently username = email
                     NavigationActions(nav)
                         .navigateTo(
