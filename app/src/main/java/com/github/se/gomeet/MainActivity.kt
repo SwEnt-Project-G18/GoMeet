@@ -61,7 +61,7 @@ class MainActivity : ComponentActivity() {
                   })
             }
             composable(Route.LOGIN) {
-              LoginScreen(authViewModel, userViewModel) {
+              LoginScreen(authViewModel) {
                 NavigationActions(nav)
                     .navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == Route.CREATE })
               }

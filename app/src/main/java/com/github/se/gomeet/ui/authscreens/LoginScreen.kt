@@ -30,16 +30,9 @@ import androidx.compose.ui.unit.dp
 import com.github.se.gomeet.R
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.viewmodel.AuthViewModel
-import com.github.se.gomeet.viewmodel.UserViewModel
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 
 @Composable
-fun LoginScreen(
-    authViewModel: AuthViewModel,
-    userViewModel: UserViewModel,
-    onNavToExplore: () -> Unit
-) {
+fun LoginScreen(authViewModel: AuthViewModel, onNavToExplore: () -> Unit) {
   val signInState = authViewModel.signInState.collectAsState()
   val isError = signInState.value.signInError != null
   val context = LocalContext.current
@@ -109,8 +102,6 @@ fun LoginScreen(
         }
 
         if (signInState.value.isSignInSuccessful) {
-          userViewModel.createUserIfNew(
-              Firebase.auth.currentUser!!.email!!) // TODO: currently username = email
           onNavToExplore()
         }
       }
@@ -119,5 +110,5 @@ fun LoginScreen(
 @Preview
 @Composable
 fun PreviewLoginScreen() {
-  LoginScreen(AuthViewModel(), UserViewModel()) {}
+  LoginScreen(AuthViewModel()) {}
 }
