@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.github.se.gomeet.UserFirebaseConnection
 import com.github.se.gomeet.model.user.GoMeetUser
+import com.github.se.gomeet.model.user.Request
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -16,7 +17,6 @@ import kotlinx.coroutines.launch
 class UserViewModel : ViewModel() {
   private val db = UserFirebaseConnection(Firebase.firestore)
   val currentUid by lazy { Firebase.auth.currentUser!!.uid }
-  private var currentUser: GoMeetUser? = null
 
   fun createUserIfNew(username: String) {
     CoroutineScope(Dispatchers.IO).launch {
@@ -34,7 +34,6 @@ class UserViewModel : ViewModel() {
           Log.w(ContentValues.TAG, "Error adding user", e)
         }
       }
-      currentUser = getUser(currentUid)
     }
   }
 
@@ -48,11 +47,19 @@ class UserViewModel : ViewModel() {
     }
   }
 
-  fun sendRequest(uid: String) {}
+  fun sendRequest(uid: String) {
+    // TODO
+  }
 
-  fun remove(uid: String) {}
+  fun remove(uid: String) {
+    // TODO
+  }
 
-  fun accept(uid: String) {}
+  fun accept(request: Request) {
+    // TODO
+  }
 
-  fun reject(uid: String) {}
+  fun reject(request: Request) {
+    // TODO
+  }
 }

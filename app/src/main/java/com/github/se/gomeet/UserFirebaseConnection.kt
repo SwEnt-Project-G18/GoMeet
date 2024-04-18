@@ -46,7 +46,11 @@ class UserFirebaseConnection(private val db: FirebaseFirestore) {
   }
 
   fun removeUser(user: GoMeetUser) {
-    // to implement later
+    db.collection(EVENT_COLLECTION)
+        .document(user.uid)
+        .delete()
+        .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully deleted!") }
+        .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }
   }
 
   private fun GoMeetUser.toMap(): Map<String, Any?> {
