@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.github.se.gomeet.UserFirebaseConnection
 import com.github.se.gomeet.model.user.GoMeetUser
-import com.github.se.gomeet.model.user.Request
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -55,11 +54,11 @@ class UserViewModel : ViewModel() {
     // TODO
   }
 
-  fun accept(request: Request) {
+  fun accept(senderUid: String) {
     // TODO
   }
 
-  fun reject(request: Request) {
+  fun reject(senderUid: String) {
     // TODO
   }
 }
