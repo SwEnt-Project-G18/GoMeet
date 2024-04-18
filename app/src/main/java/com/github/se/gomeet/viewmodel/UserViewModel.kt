@@ -14,34 +14,30 @@ import kotlinx.coroutines.launch
 
 class UserViewModel : ViewModel() {
   private val db = UserFirebaseConnection(Firebase.firestore)
-  private var uid: String? = null
 
-  fun init(uid_: String, username: String) {
-    if (uid == null) {
-      CoroutineScope(Dispatchers.IO).launch {
-        if (getUser(uid_) == null) {
-          try {
-            val user =
-                GoMeetUser(
-                    uid = uid_,
-                    username = username,
-                    following = emptyList(),
-                    followers = emptyList(),
-                    pendingRequests = emptyList())
-            db.addUser(user)
-          } catch (e: Exception) {
-            Log.w(ContentValues.TAG, "Error adding user", e)
-          }
+  fun createIfNewUser(uid: String, username: String) {
+    CoroutineScope(Dispatchers.IO).launch {
+      if (getUser(uid) == null) {
+        try {
+          val user =
+              GoMeetUser(
+                  uid = uid,
+                  username = username,
+                  following = emptyList(),
+                  followers = emptyList(),
+                  pendingRequests = emptyList())
+          db.addUser(user)
+        } catch (e: Exception) {
+          Log.w(ContentValues.TAG, "Error adding user", e)
         }
       }
-      uid = uid_
     }
   }
 
-  suspend fun getUser(uidQuery: String): GoMeetUser? {
+  suspend fun getUser(uid: String): GoMeetUser? {
     return try {
       val event = CompletableDeferred<GoMeetUser?>()
-      db.getUser(uidQuery) { t -> event.complete(t) }
+      db.getUser(uid) { t -> event.complete(t) }
       event.await()
     } catch (e: Exception) {
       null

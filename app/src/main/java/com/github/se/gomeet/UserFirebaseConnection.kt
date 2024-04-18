@@ -10,10 +10,6 @@ class UserFirebaseConnection(private val db: FirebaseFirestore) {
     private const val EVENT_COLLECTION = "user"
   }
 
-  fun getNewId(): String {
-    return db.collection(EVENT_COLLECTION).document().id
-  }
-
   fun getUser(uid: String, callback: (GoMeetUser?) -> Unit) {
     db.collection(EVENT_COLLECTION)
         .document(uid)

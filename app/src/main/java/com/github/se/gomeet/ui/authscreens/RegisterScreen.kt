@@ -119,7 +119,7 @@ fun RegisterScreen(
         }
 
         if (signInState.value.isSignInSuccessful) {
-          userViewModel.init(
+          userViewModel.createIfNewUser(
               Firebase.auth.currentUser!!.uid,
               Firebase.auth.currentUser!!.email!!) // TODO: currently username = email
           onNavToExplore()
