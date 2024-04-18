@@ -5,7 +5,7 @@ import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.se.gomeet.EventFirebaseConnection
+import com.github.se.gomeet.model.repository.EventRepository
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.location.Location
 import com.google.firebase.firestore.ktx.firestore
@@ -24,7 +24,7 @@ import okhttp3.Request
 import org.json.JSONArray
 
 class EventViewModel(private val creatorId: String? = null) : ViewModel() {
-  private val db = EventFirebaseConnection(Firebase.firestore)
+  private val db = EventRepository(Firebase.firestore)
 
   suspend fun getEvent(uid: String): Event? {
     return try {
