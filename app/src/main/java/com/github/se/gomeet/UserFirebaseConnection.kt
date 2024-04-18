@@ -7,7 +7,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 class UserFirebaseConnection(private val db: FirebaseFirestore) {
   companion object {
     private const val TAG = "FirebaseConnection"
-    private const val EVENT_COLLECTION = "user"
+    private const val EVENT_COLLECTION = "users"
   }
 
   fun getUser(uid: String, callback: (GoMeetUser?) -> Unit) {
