@@ -26,9 +26,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,23 +49,39 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
 import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.R
+import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.ui.theme.NavBarUnselected
+import com.github.se.gomeet.viewmodel.EventViewModel
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
+import java.time.ZoneId
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
 @Composable
-fun Events(nav: NavigationActions) {
+fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
 
-  var selectedFilter by remember { mutableStateOf("All") }
+    var selectedFilter by remember { mutableStateOf("All") }
+    var eventList = remember { mutableListOf<Event>() }
+    val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
+        coroutineScope.launch {
+            val allEvents = eventViewModel.getAllEvents()
+            if (allEvents != null) {
+                eventList.addAll(allEvents)
+            }
+        }
+    }
 
   // Define a function to handle button clicks
   fun onFilterButtonClick(filterType: String) {
@@ -162,48 +180,17 @@ fun Events(nav: NavigationActions) {
                               letterSpacing = 0.5.sp,
                           ),
                       modifier = Modifier.padding(10.dp).align(Alignment.Start))
-                  EventWidget(
-                      UserName = "EPFL Chess Club",
-                      EventName = "Chess Tournament",
-                      EventDate = eventDate,
-                      ProfilePicture = R.drawable.gomeet_logo,
-                      EventPicture = R.drawable.intbee_logo,
-                      Verified = true)
-                  EventWidget(
-                      UserName = "EPFL Chess Club",
-                      EventName = "Chess Tournament",
-                      EventDate = eventDate,
-                      ProfilePicture = R.drawable.gomeet_logo,
-                      EventPicture = R.drawable.intbee_logo,
-                      Verified = true)
-                  EventWidget(
-                      UserName = "EPFL Chess Club",
-                      EventName = "Chess Tournament",
-                      EventDate = eventDate,
-                      ProfilePicture = R.drawable.gomeet_logo,
-                      EventPicture = R.drawable.intbee_logo,
-                      Verified = true)
-                  EventWidget(
-                      UserName = "EPFL Chess Club",
-                      EventName = "Chess Tournament",
-                      EventDate = eventDate,
-                      ProfilePicture = R.drawable.gomeet_logo,
-                      EventPicture = R.drawable.intbee_logo,
-                      Verified = true)
-                  EventWidget(
-                      UserName = "EPFL Chess Club",
-                      EventName = "Chess Tournament",
-                      EventDate = eventDate,
-                      ProfilePicture = R.drawable.gomeet_logo,
-                      EventPicture = R.drawable.intbee_logo,
-                      Verified = true)
-                  EventWidget(
-                      UserName = "EPFL Chess Club",
-                      EventName = "Chess Tournament",
-                      EventDate = eventDate,
-                      ProfilePicture = R.drawable.gomeet_logo,
-                      EventPicture = R.drawable.intbee_logo,
-                      Verified = true)
+                    eventList.forEach {event ->
+                        EventWidget(
+                            UserName = event.creator,
+                            EventName = event.title,
+                            EventDate = Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant()),
+                            ProfilePicture = R.drawable.gomeet_logo,
+                            EventPicture = R.drawable.intbee_logo,
+                            Verified = true)
+                    }
+
+
                 }
 
                 if (selectedFilter == "All" || selectedFilter == "Favourites") {
@@ -382,7 +369,7 @@ fun EventWidget(
 @Composable
 @Preview
 fun EventPreview() {
-  Events(nav = NavigationActions(rememberNavController()))
+  Events(nav = NavigationActions(rememberNavController()), EventViewModel())
   /*EventWidget(
   "EPFL Chess Club",
   "Chess Tournament",
