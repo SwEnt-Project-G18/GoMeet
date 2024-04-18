@@ -8,7 +8,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -31,7 +30,8 @@ import com.github.se.gomeet.ui.theme.SetStatusBarColor
 import com.github.se.gomeet.viewmodel.AuthViewModel
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
-import kotlinx.coroutines.launch
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,9 +43,8 @@ class MainActivity : ComponentActivity() {
           val userIdState = remember { mutableStateOf<String?>(null) }
           val nav = rememberNavController()
           val authViewModel = AuthViewModel()
-          var userViewModel: UserViewModel
+          val userViewModel = UserViewModel()
           val navAction = NavigationActions(nav)
-          val coroutineScope = rememberCoroutineScope()
           NavHost(navController = nav, startDestination = Route.WELCOME) {
             composable(Route.WELCOME) {
               WelcomeScreen(
@@ -53,12 +52,9 @@ class MainActivity : ComponentActivity() {
                   onNavToRegister = { NavigationActions(nav).navigateTo(LOGIN_ITEMS[2]) },
                   onSignInSuccess = { userId ->
                     userIdState.value = userId
-                    userViewModel = UserViewModel(userId)
-                    coroutineScope.launch {
-                      if (userViewModel.getUser(userId) == null) {
-                        userViewModel.createUser(userId) // TODO: currently username = userId
-                      }
-                    }
+                    userViewModel.init(
+                        userId,
+                        Firebase.auth.currentUser!!.email!!) // TODO: currently username = email
                     NavigationActions(nav)
                         .navigateTo(
                             TOP_LEVEL_DESTINATIONS.first { it.route == Route.CREATE },
@@ -66,13 +62,13 @@ class MainActivity : ComponentActivity() {
                   })
             }
             composable(Route.LOGIN) {
-              LoginScreen(authViewModel) {
+              LoginScreen(authViewModel, userViewModel) {
                 NavigationActions(nav)
                     .navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == Route.CREATE })
               }
             }
             composable(Route.REGISTER) {
-              RegisterScreen(authViewModel) {
+              RegisterScreen(authViewModel, userViewModel) {
                 NavigationActions(nav)
                     .navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == Route.CREATE })
               }
