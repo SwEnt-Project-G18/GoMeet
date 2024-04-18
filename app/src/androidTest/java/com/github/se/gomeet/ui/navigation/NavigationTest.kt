@@ -8,9 +8,9 @@ import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.ui.mainscreens.Events
 import com.github.se.gomeet.ui.mainscreens.Explore
-import com.github.se.gomeet.ui.mainscreens.profile.Profile
 import com.github.se.gomeet.ui.mainscreens.Trends
 import com.github.se.gomeet.ui.mainscreens.create.Create
+import com.github.se.gomeet.ui.mainscreens.create.Profile
 import com.github.se.gomeet.viewmodel.EventViewModel
 import kotlinx.coroutines.runBlocking
 import org.junit.Rule
