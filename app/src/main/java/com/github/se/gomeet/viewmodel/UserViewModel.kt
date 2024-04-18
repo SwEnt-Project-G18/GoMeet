@@ -42,13 +42,11 @@ class UserViewModel(private val uid: String? = null) : ViewModel() {
     }
   }
 
-  fun sendFriendRequest(user: GoMeetUser) {}
+  fun sendRequest(user: GoMeetUser) {}
 
-  fun removeFriend(user: GoMeetUser) {}
+  fun remove(user: GoMeetUser) {}
 
-  // accept a user's friend request
   fun accept(user: GoMeetUser) {}
 
-  // reject a user's friend request
   fun reject(user: GoMeetUser) {}
 }
