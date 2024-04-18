@@ -10,7 +10,7 @@ import com.github.se.gomeet.ui.mainscreens.Events
 import com.github.se.gomeet.ui.mainscreens.Explore
 import com.github.se.gomeet.ui.mainscreens.Trends
 import com.github.se.gomeet.ui.mainscreens.create.Create
-import com.github.se.gomeet.ui.mainscreens.create.Profile
+import com.github.se.gomeet.ui.mainscreens.Profile
 import com.github.se.gomeet.viewmodel.EventViewModel
 import kotlinx.coroutines.runBlocking
 import org.junit.Rule

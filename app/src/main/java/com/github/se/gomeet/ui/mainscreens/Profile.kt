@@ -1,4 +1,4 @@
-package com.github.se.gomeet.ui.mainscreens.create
+package com.github.se.gomeet.ui.mainscreens
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
