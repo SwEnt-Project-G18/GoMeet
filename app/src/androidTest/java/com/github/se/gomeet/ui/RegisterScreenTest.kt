@@ -70,6 +70,7 @@ class RegisterScreenTest {
 
     assert(authViewModel.signInState.value.signInError == null)
 
+    // test that user was successfully created in Firestore
     if (authViewModel.signInState.value.isSignInSuccessful) {
       assert(userViewModel.getUser(Firebase.auth.currentUser!!.uid) != null)
     }
