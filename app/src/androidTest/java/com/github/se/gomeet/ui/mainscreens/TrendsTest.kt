@@ -3,7 +3,7 @@ package com.github.se.gomeet.ui.mainscreens
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -26,6 +26,8 @@ class TrendsTest {
       Trends(NavigationActions(navController))
     }
 
-    rule.onNodeWithText("Trends").assertIsDisplayed()
+    rule.onAllNodesWithText("Trends").apply {
+      fetchSemanticsNodes().forEachIndexed { i, _ -> get(i).assertIsDisplayed() }
+    }
   }
 }
