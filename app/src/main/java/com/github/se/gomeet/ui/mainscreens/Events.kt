@@ -59,28 +59,28 @@ import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.ui.theme.NavBarUnselected
 import com.github.se.gomeet.viewmodel.EventViewModel
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.time.ZoneId
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import kotlinx.coroutines.launch
 
 @Composable
 fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
 
-    var selectedFilter by remember { mutableStateOf("All") }
-    var eventList = remember { mutableListOf<Event>() }
-    val coroutineScope = rememberCoroutineScope()
+  var selectedFilter by remember { mutableStateOf("All") }
+  var eventList = remember { mutableListOf<Event>() }
+  val coroutineScope = rememberCoroutineScope()
 
-    LaunchedEffect(Unit) {
-        coroutineScope.launch {
-            val allEvents = eventViewModel.getAllEvents()
-            if (allEvents != null) {
-                eventList.addAll(allEvents)
-            }
-        }
+  LaunchedEffect(Unit) {
+    coroutineScope.launch {
+      val allEvents = eventViewModel.getAllEvents()
+      if (allEvents != null) {
+        eventList.addAll(allEvents)
+      }
     }
+  }
 
   // Define a function to handle button clicks
   fun onFilterButtonClick(filterType: String) {
@@ -126,9 +126,7 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
               Row(
                   verticalAlignment = Alignment.CenterVertically,
                   horizontalArrangement = Arrangement.SpaceEvenly,
-                  modifier = Modifier
-                      .heightIn(min = 56.dp)
-                      .fillMaxWidth()) {
+                  modifier = Modifier.heightIn(min = 56.dp).fillMaxWidth()) {
                     Button(
                         onClick = { onFilterButtonClick("MyTickets") },
                         content = { Text("My tickets") },
@@ -166,10 +164,7 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
                         border = BorderStroke(1.dp, DarkCyan))
                   }
 
-              Column(modifier = Modifier
-                  .verticalScroll(rememberScrollState())
-                  .fillMaxSize()) {
-
+              Column(modifier = Modifier.verticalScroll(rememberScrollState()).fillMaxSize()) {
                 if (selectedFilter == "All" || selectedFilter == "MyTickets") {
                   Text(
                       text = "My Tickets",
@@ -184,21 +179,15 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
                               letterSpacing = 0.5.sp,
                           ),
                       modifier = Modifier.padding(10.dp).align(Alignment.Start))
-                        eventList.forEach { event ->
-
-                            EventWidget(
-                                userName = event.creator,
-                                eventName = event.title,
-                                eventDate = Date.from(
-                                    event.date.atStartOfDay(ZoneId.systemDefault()).toInstant()
-                                ),
-                                eventPicture = R.drawable.intbee_logo,
-                                verified = true
-                            )
-                        }
-
-
-
+                  eventList.forEach { event ->
+                    EventWidget(
+                        userName = event.creator,
+                        eventName = event.title,
+                        eventDate =
+                            Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant()),
+                        eventPicture = R.drawable.intbee_logo,
+                        verified = true)
+                  }
                 }
 
                 if (selectedFilter == "All" || selectedFilter == "Favourites") {
@@ -216,12 +205,6 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
                               letterSpacing = 0.5.sp,
                           ),
                       modifier = Modifier.padding(10.dp).align(Alignment.Start))
-//                  EventWidget(
-//                      UserName = "EPFL Chess Club",
-//                      EventName = "Chess Tournament",
-//                      EventDate = eventDate,
-//                      EventPicture = R.drawable.intbee_logo,
-//                      Verified = true)
                 }
 
                 if (selectedFilter == "All" || selectedFilter == "MyEvents") {
@@ -238,13 +221,6 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
                               letterSpacing = 0.5.sp,
                           ),
                       modifier = Modifier.padding(10.dp).align(Alignment.Start))
-//                  EventWidget(
-//                      UserName = "EPFL Chess Club",
-//                      EventName = "Chess Tournament",
-//                      EventDate = eventDate,
-//                      ProfilePicture = R.drawable.gomeet_logo,
-//                      EventPicture = R.drawable.intbee_logo,
-//                      Verified = true)
                 }
               }
             }
@@ -270,9 +246,7 @@ fun EventWidget(
 
   Card(
       modifier =
-      Modifier
-          .fillMaxWidth()
-          .padding(start = 10.dp, top = 5.dp, end = 10.dp, bottom = 5.dp),
+          Modifier.fillMaxWidth().padding(start = 10.dp, top = 5.dp, end = 10.dp, bottom = 5.dp),
       colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
       border = BorderStroke(2.dp, DarkCyan)) {
         Row(
@@ -280,9 +254,7 @@ fun EventWidget(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceAround) {
               Column(
-                  modifier = Modifier
-                      .weight(4f)
-                      .padding(15.dp),
+                  modifier = Modifier.weight(4f).padding(15.dp),
                   horizontalAlignment = Alignment.Start, // Align text horizontally to center
                   verticalArrangement = Arrangement.Center) {
                     Text(
@@ -315,9 +287,7 @@ fun EventWidget(
                           if (verified) {
                             Box(
                                 contentAlignment = Alignment.Center,
-                                modifier = Modifier
-                                    .padding(5.dp)
-                                    .size(smallTextSize.dp * (1.4f))) {
+                                modifier = Modifier.padding(5.dp).size(smallTextSize.dp * (1.4f))) {
                                   Image(
                                       painter = painterResource(id = R.drawable.verified),
                                       contentDescription = "Verified",
@@ -364,17 +334,14 @@ fun EventWidget(
                   painter = painterResource(id = eventPicture),
                   contentDescription = "Event Picture",
                   modifier =
-                  Modifier
-                      .weight(
-                          3f
-                      ) // Take 1/3 of the card space because of the total weight of 4 (3
-                      // for the column and 1 for this image)
-                      .fillMaxHeight() // Fill the height of the Row
-                      .aspectRatio(
-                          3f / 1.75f
-                      ) // Maintain an aspect ratio of 3:2, change it as needed
-                      .clipToBounds()
-                      .padding(0.dp), // Clip the image if it overflows its bounds
+                      Modifier.weight(
+                              3f) // Take 1/3 of the card space because of the total weight of 4 (3
+                          // for the column and 1 for this image)
+                          .fillMaxHeight() // Fill the height of the Row
+                          .aspectRatio(
+                              3f / 1.75f) // Maintain an aspect ratio of 3:2, change it as needed
+                          .clipToBounds()
+                          .padding(0.dp), // Clip the image if it overflows its bounds
                   contentScale = ContentScale.Crop // Crop the image to fit the aspect ratio
                   )
             }
