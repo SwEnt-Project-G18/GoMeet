@@ -1,5 +1,6 @@
 package com.github.se.gomeet.ui.mainscreens.profile
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -88,11 +89,11 @@ fun Profile(nav: NavigationActions) { // TODO Add parameters to the function
           IconButton(modifier = Modifier
               .align(Alignment.CenterVertically)
               .padding(end = 15.dp),
-              onClick = { /* Handle settings icon click */ }) {
+              onClick = { Log.d("Button", "Pressed") }) {
               Icon(
                   imageVector = ImageVector.vectorResource(R.drawable.settings_icon),
                   contentDescription = "Settings",
-                  modifier = Modifier.size(40.dp).align(Alignment.CenterVertically),
+                  modifier = Modifier.size(30.dp).align(Alignment.CenterVertically),
                   tint = DarkCyan
               )
 
@@ -360,56 +361,6 @@ fun Profile(nav: NavigationActions) { // TODO Add parameters to the function
   }
 }
 
-@Composable
-fun ProfileEventsList(title: String) {
-  Spacer(modifier = Modifier.height(10.dp))
-  Column (modifier = Modifier.padding(0.dp)){
-    Row (
-        Modifier
-            .padding(start = 15.dp, end = 0.dp, top = 0.dp, bottom = 0.dp)
-            .fillMaxWidth()){
-      Text(
-          text = title,
-          style =
-              TextStyle(
-                  fontSize = 18.sp,
-                  lineHeight = 16.sp,
-                  fontFamily = FontFamily(Font(R.font.roboto)),
-                  fontWeight = FontWeight(1000),
-                  color = DarkCyan,
-                  textAlign = TextAlign.Start,
-                  letterSpacing = 0.5.sp,
-              ),
-          modifier = Modifier
-              .width(104.dp)
-              .height(21.dp)
-              .align(Alignment.Bottom))
-      Text(text = "View all", color = Grey, modifier = Modifier.align(Alignment.Bottom))
-    }
-    Spacer(modifier = Modifier.height(10.dp))
-    LazyRow(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        contentPadding = PaddingValues(start = 15.dp, end = 15.dp),
-        modifier = Modifier.heightIn(min = 56.dp)) {
-          items(10) {
-            Column {
-              Image(
-                  painter = painterResource(id = R.drawable.chess_demo),
-                  contentDescription = "Event 1",
-                  contentScale = ContentScale.Crop,
-                  modifier =
-                  Modifier
-                      .width(150.dp)
-                      .height(60.dp)
-                      .clip(RoundedCornerShape(size = 10.dp)))
-              Text(text = "Chess Tournament", color = DarkCyan)
-              Text(text = "11.04.2024 - 21:00", color = Grey)
-            }
-          }
-        }
-  }
-}
 
 @Preview
 @Composable
