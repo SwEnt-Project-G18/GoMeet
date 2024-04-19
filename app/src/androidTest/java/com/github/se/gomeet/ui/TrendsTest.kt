@@ -16,18 +16,17 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class TrendsTest {
 
-    @get:Rule
-    val rule = createAndroidComposeRule<ComponentActivity>()
+  @get:Rule val rule = createAndroidComposeRule<ComponentActivity>()
 
-    @Test
-    fun uiElementsDisplayed() {
-        lateinit var navController: NavHostController
+  @Test
+  fun uiElementsDisplayed() {
+    lateinit var navController: NavHostController
 
-        rule.setContent {
-            navController = rememberNavController()
-            Trends(NavigationActions(navController))
-        }
-
-        rule.onNodeWithText("Trends").assertIsDisplayed()
+    rule.setContent {
+      navController = rememberNavController()
+      Trends(NavigationActions(navController))
     }
+
+    rule.onNodeWithText("Trends").assertIsDisplayed()
+  }
 }

@@ -61,7 +61,8 @@ fun Events(nav: NavigationActions) {
                     color = DarkCyan,
                     letterSpacing = 0.5.sp,
                 ),
-            modifier = Modifier.padding(horizontal = 15.dp, vertical = 15.dp).testTag("EventsTitle"))
+            modifier =
+                Modifier.padding(horizontal = 15.dp, vertical = 15.dp).testTag("EventsTitle"))
       },
       bottomBar = {
         BottomNavigationMenu(
@@ -97,8 +98,7 @@ fun Events(nav: NavigationActions) {
                             ButtonDefaults.buttonColors(
                                 containerColor = NavBarUnselected, contentColor = DarkCyan),
                         border = BorderStroke(1.dp, DarkCyan),
-                        modifier = Modifier.testTag("FavouritesButton")
-                    )
+                        modifier = Modifier.testTag("FavouritesButton"))
                     Spacer(modifier = Modifier.width(10.dp))
                     Button(
                         onClick = {},
@@ -107,8 +107,7 @@ fun Events(nav: NavigationActions) {
                             ButtonDefaults.buttonColors(
                                 containerColor = NavBarUnselected, contentColor = DarkCyan),
                         border = BorderStroke(1.dp, DarkCyan),
-                        modifier = Modifier.testTag("MyEventsButton")
-                    )
+                        modifier = Modifier.testTag("MyEventsButton"))
                   }
               Text(
                   text = "My Tickets",
@@ -122,7 +121,8 @@ fun Events(nav: NavigationActions) {
                           textAlign = TextAlign.Center,
                           letterSpacing = 0.5.sp,
                       ),
-                  modifier = Modifier.padding(10.dp).align(Alignment.Start).testTag("MyTicketsText"))
+                  modifier =
+                      Modifier.padding(10.dp).align(Alignment.Start).testTag("MyTicketsText"))
               EventWidget(
                   UserName = "EPFL Chess Club",
                   EventName = "Chess Tournament",
@@ -159,7 +159,8 @@ fun Events(nav: NavigationActions) {
                           textAlign = TextAlign.Center,
                           letterSpacing = 0.5.sp,
                       ),
-                  modifier = Modifier.padding(10.dp).align(Alignment.Start).testTag("FavouritesText"))
+                  modifier =
+                      Modifier.padding(10.dp).align(Alignment.Start).testTag("FavouritesText"))
               EventWidget(
                   UserName = "EPFL Chess Club",
                   EventName = "Chess Tournament",
@@ -211,7 +212,8 @@ fun EventWidget(
               Image(
                   painterResource(id = ProfilePicture),
                   "Event Picture",
-                  modifier = Modifier.padding(15.dp).width(40.dp).height(40.dp).testTag("ProfilePicture"))
+                  modifier =
+                      Modifier.padding(15.dp).width(40.dp).height(40.dp).testTag("ProfilePicture"))
               Column {
                 Row {
                   Text(
@@ -261,7 +263,8 @@ fun EventWidget(
               Image(
                   painterResource(id = EventPicture),
                   "Event Picture",
-                  modifier = Modifier.width(80.dp).height(77.dp).padding(10.dp).testTag("EventPicture"),
+                  modifier =
+                      Modifier.width(80.dp).height(77.dp).padding(10.dp).testTag("EventPicture"),
                   contentScale = ContentScale.FillBounds)
             }
       }
