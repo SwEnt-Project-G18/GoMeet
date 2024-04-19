@@ -89,7 +89,7 @@ fun Profile(nav: NavigationActions) { // TODO Add parameters to the function
           IconButton(modifier = Modifier
               .align(Alignment.CenterVertically)
               .padding(end = 15.dp),
-              onClick = { Log.d("Button", "Pressed") }) {
+              onClick = { }) {
               Icon(
                   imageVector = ImageVector.vectorResource(R.drawable.settings_icon),
                   contentDescription = "Settings",
