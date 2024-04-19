@@ -59,4 +59,13 @@ class UserViewModel : ViewModel() {
   fun reject(senderUid: String) {
     // TODO
   }
+
+  fun deleteUser(uid: String) {
+    CoroutineScope(Dispatchers.IO).launch {
+      val user = getUser(uid)
+      if (user != null) {
+        db.removeUser(user)
+      }
+    }
+  }
 }

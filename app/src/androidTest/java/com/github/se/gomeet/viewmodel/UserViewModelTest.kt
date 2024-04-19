@@ -10,9 +10,8 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class UserViewModelTest {
   private val userViewModel = UserViewModel()
-  private val randomNumber = (0..Int.MAX_VALUE).random().toString()
-  private val randomUid = "fakeuser$randomNumber"
-  private val randomUsername = "$randomNumber@test"
+  private val randomUid = "fakeuser"
+  private val randomUsername = "fakeuser"
 
   @Before
   fun createNewUser() {
@@ -20,7 +19,7 @@ class UserViewModelTest {
   }
 
   @Test
-  fun getUserTestExisting() = runTest {
+  fun getExistingUser() = runTest {
     val uid = "QpjFlPXRuoYhvtOWcjgR51JYCXs2"
     val user = userViewModel.getUser(uid)
 
@@ -30,13 +29,20 @@ class UserViewModelTest {
   }
 
   @Test
-  fun getUserTestNew() = runTest {
+  fun getAndDeleteNewUser() = runTest {
     TimeUnit.SECONDS.sleep(1)
 
-    val user = userViewModel.getUser(randomUid)
+    var user = userViewModel.getUser(randomUid)
 
     assert(user != null)
     assert(user!!.uid == randomUid)
     assert(user.username == randomUsername)
+
+    userViewModel.deleteUser(randomUid)
+    TimeUnit.SECONDS.sleep(1)
+
+    user = userViewModel.getUser(randomUid)
+
+    assert(user == null)
   }
 }
