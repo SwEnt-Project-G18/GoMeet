@@ -11,7 +11,7 @@ import org.junit.runner.RunWith
 class UserViewModelTest {
   private val userViewModel = UserViewModel()
   private val randomNumber = (0..Int.MAX_VALUE).random().toString()
-  private val randomUid = "deletethis$randomNumber"
+  private val randomUid = "fakeuser$randomNumber"
   private val randomUsername = "$randomNumber@test.com"
 
   @Before
