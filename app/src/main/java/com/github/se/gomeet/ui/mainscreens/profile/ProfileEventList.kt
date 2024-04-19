@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -30,15 +31,11 @@ import androidx.compose.ui.unit.sp
 import com.github.se.gomeet.R
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.ui.theme.Grey
-
 @Composable
 fun ProfileEventsList(title: String) {
     Spacer(modifier = Modifier.height(10.dp))
-    Column (modifier = Modifier.padding(0.dp)){
-        Row (
-            Modifier
-                .padding(start = 15.dp, end = 0.dp, top = 0.dp, bottom = 0.dp)
-                .fillMaxWidth()){
+    Column {
+        Row(Modifier.padding(start = 15.dp, end = 0.dp, top = 0.dp, bottom = 0.dp).fillMaxWidth()) {
             Text(
                 text = title,
                 style =
@@ -51,10 +48,7 @@ fun ProfileEventsList(title: String) {
                     textAlign = TextAlign.Start,
                     letterSpacing = 0.5.sp,
                 ),
-                modifier = Modifier
-                    .width(104.dp)
-                    .height(21.dp)
-                    .align(Alignment.Bottom))
+                modifier = Modifier.width(104.dp).height(21.dp).align(Alignment.Bottom))
             Text(text = "View all", color = Grey, modifier = Modifier.align(Alignment.Bottom))
         }
         Spacer(modifier = Modifier.height(10.dp))
@@ -64,15 +58,14 @@ fun ProfileEventsList(title: String) {
             contentPadding = PaddingValues(start = 15.dp, end = 15.dp),
             modifier = Modifier.heightIn(min = 56.dp)) {
             items(10) {
-                Column {
+                Column(modifier = Modifier.width(170.dp)) {
                     Image(
                         painter = painterResource(id = R.drawable.chess_demo),
                         contentDescription = "Event 1",
                         contentScale = ContentScale.Crop,
                         modifier =
-                        Modifier
-                            .width(150.dp)
-                            .height(60.dp)
+                        Modifier.fillMaxWidth()
+                            .aspectRatio(3f / 1.75f)
                             .clip(RoundedCornerShape(size = 10.dp)))
                     Text(text = "Chess Tournament", color = DarkCyan)
                     Text(text = "11.04.2024 - 21:00", color = Grey)

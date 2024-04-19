@@ -76,11 +76,21 @@ import com.github.se.gomeet.ui.theme.NavBarUnselected
 @Composable
 fun OthersProfile(nav: NavigationActions) { // TODO Add parameters to the function
     Scaffold(
+
+        bottomBar = {
+            BottomNavigationMenu(
+                onTabSelect = { selectedTab ->
+                    nav.navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == selectedTab })
+                },
+                tabList = TOP_LEVEL_DESTINATIONS,
+                selectedItem = "")
+        },
         topBar = {
             TopAppBar(
                 title = { },
                 backgroundColor = MaterialTheme.colorScheme.background,
                 elevation = 0.dp,
+                modifier = Modifier.height(50.dp),
 
                 actions = {
                     // Settings Icon
