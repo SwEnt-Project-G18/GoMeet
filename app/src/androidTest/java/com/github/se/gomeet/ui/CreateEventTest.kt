@@ -1,6 +1,7 @@
-package com.github.se.gomeet.ui.mainscreens.create
+package com.github.se.gomeet.ui
 
 import androidx.activity.ComponentActivity
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -8,6 +9,7 @@ import androidx.compose.ui.test.performTextInput
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.se.gomeet.ui.mainscreens.create.CreateEvent
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
 import java.time.LocalDate
@@ -46,6 +48,8 @@ class CreateEventTest {
     // Enter a URL
     rule.onNodeWithText("Link").performTextInput("http://example.com")
 
+    rule.onNodeWithText("Add Image").assertIsDisplayed()
+
     rule.onNodeWithText("Post").performClick()
   }
 
@@ -74,6 +78,8 @@ class CreateEventTest {
     rule.onNodeWithText("Price").performTextInput("25.00")
     // Enter a URL
     rule.onNodeWithText("Link").performTextInput("http://example.com")
+
+    rule.onNodeWithText("Add Image").assertIsDisplayed()
 
     rule.onNodeWithText("Post").performClick()
   }

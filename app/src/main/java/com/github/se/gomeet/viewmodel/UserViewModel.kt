@@ -44,6 +44,19 @@ class UserViewModel : ViewModel() {
     }
   }
 
+  fun editUser(user: GoMeetUser) {
+    db.updateUser(user)
+  }
+
+  fun deleteUser(uid: String) {
+    CoroutineScope(Dispatchers.IO).launch {
+      val user = getUser(uid)
+      if (user != null) {
+        db.removeUser(user)
+      }
+    }
+  }
+
   fun sendRequest(uid: String) {
     // TODO
   }
@@ -58,14 +71,5 @@ class UserViewModel : ViewModel() {
 
   fun reject(senderUid: String) {
     // TODO
-  }
-
-  fun deleteUser(uid: String) {
-    CoroutineScope(Dispatchers.IO).launch {
-      val user = getUser(uid)
-      if (user != null) {
-        db.removeUser(user)
-      }
-    }
   }
 }
