@@ -18,7 +18,7 @@ class EventsTest {
 
   @get:Rule val rule = createAndroidComposeRule<ComponentActivity>()
 
-  val maxEventsDisplayedOnScreen = 5
+  private val maxEventsDisplayedOnScreen = 5
 
   @Test
   fun uiElementsDisplayed() {
