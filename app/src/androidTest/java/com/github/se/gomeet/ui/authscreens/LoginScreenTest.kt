@@ -1,4 +1,4 @@
-package com.github.se.gomeet.ui
+package com.github.se.gomeet.ui.authscreens
 
 import android.annotation.SuppressLint
 import androidx.activity.ComponentActivity

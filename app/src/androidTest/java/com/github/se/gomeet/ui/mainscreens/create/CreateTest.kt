@@ -1,4 +1,4 @@
-package com.github.se.gomeet.ui
+package com.github.se.gomeet.ui.mainscreens.create
 
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
