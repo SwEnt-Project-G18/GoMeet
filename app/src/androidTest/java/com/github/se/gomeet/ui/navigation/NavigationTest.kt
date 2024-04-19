@@ -31,7 +31,7 @@ class NavigationTest {
         composable(TOP_LEVEL_DESTINATIONS[0].route) {
           Explore(nav = NavigationActions(nav), EventViewModel())
         }
-        composable(TOP_LEVEL_DESTINATIONS[1].route) { Events(NavigationActions(nav)) }
+        composable(TOP_LEVEL_DESTINATIONS[1].route) { Events(NavigationActions(nav), EventViewModel()) }
         composable(TOP_LEVEL_DESTINATIONS[2].route) { Trends(NavigationActions(nav)) }
         composable(TOP_LEVEL_DESTINATIONS[3].route) { Create(NavigationActions(nav)) }
         composable(TOP_LEVEL_DESTINATIONS[4].route) { Profile(NavigationActions(nav)) }
@@ -56,7 +56,7 @@ class NavigationTest {
         composable(TOP_LEVEL_DESTINATIONS[0].route) {
           Explore(nav = NavigationActions(nav), EventViewModel())
         }
-        composable(TOP_LEVEL_DESTINATIONS[1].route) { Events(NavigationActions(nav)) }
+        composable(TOP_LEVEL_DESTINATIONS[1].route) { Events(NavigationActions(nav), EventViewModel()) }
         composable(TOP_LEVEL_DESTINATIONS[2].route) { Trends(NavigationActions(nav)) }
         composable(TOP_LEVEL_DESTINATIONS[3].route) { Create(NavigationActions(nav)) }
         composable(TOP_LEVEL_DESTINATIONS[4].route) { Profile(NavigationActions(nav)) }

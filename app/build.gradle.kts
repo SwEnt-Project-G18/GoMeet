@@ -145,7 +145,7 @@ dependencies {
     testImplementation("org.mockito:mockito-inline:3.11.2")
     testImplementation("org.mockito.kotlin:mockito-kotlin:4.0.0")
     androidTestImplementation("org.mockito.kotlin:mockito-kotlin:4.0.0")
-
+    implementation("io.coil-kt:coil-compose:2.6.0")
 
     implementation("com.firebaseui:firebase-ui-auth:7.2.0")
     implementation("com.google.android.play:core-ktx:1.7.0")

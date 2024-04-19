@@ -123,7 +123,8 @@ class EventRepository(private val db: FirebaseFirestore) {
             maxParticipants = this["maxParticipants"].toString().toInt(),
             public = this["public"] as Boolean,
             tags = this["tags"] as List<String>,
-            images = this["images"] as List<String>)
+            images = this["images"] as List<String>,
+            verified = this["verified"] as Boolean)
     }
 
     private fun Map<String, Any>.toLocation(): Location {

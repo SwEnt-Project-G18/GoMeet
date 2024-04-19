@@ -36,8 +36,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -49,8 +51,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
 import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
@@ -60,44 +63,33 @@ import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.ui.theme.NavBarUnselected
 import com.github.se.gomeet.viewmodel.EventViewModel
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.time.ZoneId
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import kotlinx.coroutines.launch
 
 @Composable
 fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
 
-    var selectedFilter by remember { mutableStateOf("All") }
-    var eventList = remember { mutableListOf<Event>() }
-    val coroutineScope = rememberCoroutineScope()
+  var selectedFilter by remember { mutableStateOf("All") }
+  val eventList = remember { mutableListOf<Event>() }
+  val coroutineScope = rememberCoroutineScope()
 
-    LaunchedEffect(Unit) {
-        coroutineScope.launch {
-            val allEvents = eventViewModel.getAllEvents()
-            if (allEvents != null) {
-                eventList.addAll(allEvents)
-            }
-        }
+  LaunchedEffect(Unit) {
+    coroutineScope.launch {
+      val allEvents = eventViewModel.getAllEvents()
+      if (allEvents != null) {
+        eventList.addAll(allEvents)
+      }
     }
+  }
 
   // Define a function to handle button clicks
   fun onFilterButtonClick(filterType: String) {
     selectedFilter = if (selectedFilter == filterType) "All" else filterType
   }
-
-  val eventDate =
-      Calendar.getInstance()
-          .apply {
-            set(Calendar.YEAR, 2024)
-            set(Calendar.MONTH, Calendar.APRIL)
-            set(Calendar.DAY_OF_MONTH, 16)
-            set(Calendar.HOUR_OF_DAY, 14)
-            set(Calendar.MINUTE, 0)
-          }
-          .time
 
   Scaffold(
       topBar = {
@@ -180,17 +172,24 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
                               letterSpacing = 0.5.sp,
                           ),
                       modifier = Modifier.padding(10.dp).align(Alignment.Start))
-                    eventList.forEach {event ->
-                        EventWidget(
-                            UserName = event.creator,
-                            EventName = event.title,
-                            EventDate = Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant()),
-                            ProfilePicture = R.drawable.gomeet_logo,
-                            EventPicture = R.drawable.intbee_logo,
-                            Verified = true)
-                    }
 
-
+                  eventList.forEach { event ->
+                    val painter: Painter =
+                        rememberAsyncImagePainter(
+                            ImageRequest.Builder(LocalContext.current).data(data = event.images[0])
+                                .apply(block = fun ImageRequest.Builder.() {
+                                    crossfade(true)
+                                    placeholder(R.drawable.gomeet_logo)
+                                }).build()
+                        )
+                    EventWidget(
+                        UserName = event.creator,
+                        EventName = event.title,
+                        EventDate =
+                            Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant()),
+                        EventPicture = painter,
+                        Verified = event.verified)
+                  }
                 }
 
                 if (selectedFilter == "All" || selectedFilter == "Favourites") {
@@ -208,13 +207,29 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
                               letterSpacing = 0.5.sp,
                           ),
                       modifier = Modifier.padding(10.dp).align(Alignment.Start))
-                  EventWidget(
-                      UserName = "EPFL Chess Club",
-                      EventName = "Chess Tournament",
-                      EventDate = eventDate,
-                      ProfilePicture = R.drawable.gomeet_logo,
-                      EventPicture = R.drawable.intbee_logo,
-                      Verified = true)
+
+
+                    eventList.forEach { event ->
+                        val painter: Painter =
+                            if(event.images[0].isNotBlank()){
+                            rememberAsyncImagePainter(
+                                ImageRequest.Builder(LocalContext.current).data(data = event.images[0])
+                                    .apply(block = fun ImageRequest.Builder.() {
+                                        crossfade(true)
+                                        placeholder(R.drawable.gomeet_logo)
+                                    }).build()
+                            )}
+                        else{
+                                painterResource(id = R.drawable.gomeet_logo)
+                            }
+                        EventWidget(
+                            UserName = event.creator,
+                            EventName = event.title,
+                            EventDate =
+                            Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant()),
+                            EventPicture = painter,
+                            Verified = event.verified)
+                    }
                 }
 
                 if (selectedFilter == "All" || selectedFilter == "MyEvents") {
@@ -231,13 +246,27 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
                               letterSpacing = 0.5.sp,
                           ),
                       modifier = Modifier.padding(10.dp).align(Alignment.Start))
-                  EventWidget(
-                      UserName = "EPFL Chess Club",
-                      EventName = "Chess Tournament",
-                      EventDate = eventDate,
-                      ProfilePicture = R.drawable.gomeet_logo,
-                      EventPicture = R.drawable.intbee_logo,
-                      Verified = true)
+                    eventList.forEach { event ->
+                        val painter: Painter =
+                            if(event.images[0].isNotBlank()){
+                                rememberAsyncImagePainter(
+                                    ImageRequest.Builder(LocalContext.current).data(data = event.images[0])
+                                        .apply(block = fun ImageRequest.Builder.() {
+                                            crossfade(true)
+                                            placeholder(R.drawable.gomeet_logo)
+                                        }).build()
+                                )}
+                            else{
+                                painterResource(id = R.drawable.gomeet_logo)
+                            }
+                        EventWidget(
+                            UserName = event.creator,
+                            EventName = event.title,
+                            EventDate =
+                            Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant()),
+                            EventPicture = painter,
+                            Verified = event.verified)
+                    }
                 }
               }
             }
@@ -249,8 +278,7 @@ fun EventWidget(
     UserName: String,
     EventName: String,
     EventDate: Date,
-    ProfilePicture: Int,
-    EventPicture: Int,
+    EventPicture: Painter,
     Verified: Boolean
 ) {
 
@@ -349,7 +377,7 @@ fun EventWidget(
                             ))
                   }
               Image(
-                  painter = painterResource(id = EventPicture),
+                  painter = EventPicture,
                   contentDescription = "Event Picture",
                   modifier =
                       Modifier.weight(
@@ -370,11 +398,4 @@ fun EventWidget(
 @Preview
 fun EventPreview() {
   Events(nav = NavigationActions(rememberNavController()), EventViewModel())
-  /*EventWidget(
-  "EPFL Chess Club",
-  "Chess Tournament",
-  eventDate,
-  R.drawable.gomeet_logo,
-  R.drawable.intbee_logo,
-  true)*/
 }

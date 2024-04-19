@@ -71,6 +71,7 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
       try {
         val imageUrl = imageUri?.let { uploadImageAndGetUrl(it) }
         val updatedImages = images.toMutableList().apply { imageUrl?.let { add(it) } }
+        val verified = false
         val event =
             Event(
                 db.getNewId(),
@@ -86,7 +87,8 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
                 maxParticipants,
                 public,
                 tags,
-                updatedImages)
+                updatedImages,
+                verified)
         db.addEvent(event)
       } catch (e: Exception) {
         Log.w(TAG, "Error uploading image or adding event", e)
@@ -116,7 +118,7 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
         val req = Request.Builder().url(url).build()
         val res = withContext(Dispatchers.IO) { client.newCall(req).execute() }
         if (!res.isSuccessful) throw IOException("IOException")
-        val resBody = res.body()?.string() ?: throw IOException("No response from nominatim")
+        val resBody = res.body?.string() ?: throw IOException("No response from nominatim")
         val location = locHelper(resBody)
         withContext(Dispatchers.Main) { onResult(location) }
       } catch (e: Exception) {
