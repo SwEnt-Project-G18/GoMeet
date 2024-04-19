@@ -18,7 +18,7 @@ class EventsTest {
 
   @get:Rule val rule = createAndroidComposeRule<ComponentActivity>()
 
-  private val maxEventsDisplayedOnScreen = 3
+  private val maxEventsDisplayedOnScreen = 3 // small number so the test passes on the CI
 
   @Test
   fun uiElementsDisplayed() {
