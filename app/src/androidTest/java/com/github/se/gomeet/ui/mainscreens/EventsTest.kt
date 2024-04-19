@@ -18,7 +18,7 @@ class EventsTest {
 
   @get:Rule val rule = createAndroidComposeRule<ComponentActivity>()
 
-  private val maxEventsDisplayedOnScreen = 5
+  private val maxEventsDisplayedOnScreen = 3
 
   @Test
   fun uiElementsDisplayed() {
@@ -31,8 +31,8 @@ class EventsTest {
 
     rule.onNodeWithTag("EventsTitle").assertIsDisplayed()
     rule.onNodeWithTag("MyTicketsButton").assertIsDisplayed()
-    rule.onNodeWithTag("FavouritesButton").assertExists()
-    rule.onNodeWithTag("MyEventsButton").assertExists()
+    rule.onNodeWithTag("FavouritesButton").assertIsDisplayed()
+    rule.onNodeWithTag("MyEventsButton").assertIsDisplayed()
     rule.onNodeWithTag("MyTicketsText").assertIsDisplayed()
     rule.onNodeWithTag("FavouritesText").assertExists()
     rule.onNodeWithTag("MyEventsText").assertExists()
