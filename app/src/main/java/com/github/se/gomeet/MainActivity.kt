@@ -53,6 +53,7 @@ class MainActivity : ComponentActivity() {
                   onSignInSuccess = { userId ->
                     userIdState.value = userId
                     userViewModel.createUserIfNew(
+                        Firebase.auth.currentUser!!.uid,
                         Firebase.auth.currentUser!!.email!!) // TODO: currently username = email
                     NavigationActions(nav)
                         .navigateTo(

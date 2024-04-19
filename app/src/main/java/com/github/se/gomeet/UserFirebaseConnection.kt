@@ -7,11 +7,11 @@ import com.google.firebase.firestore.FirebaseFirestore
 class UserFirebaseConnection(private val db: FirebaseFirestore) {
   companion object {
     private const val TAG = "FirebaseConnection"
-    private const val EVENT_COLLECTION = "users"
+    private const val USERS_COLLECTION = "users"
   }
 
   fun getUser(uid: String, callback: (GoMeetUser?) -> Unit) {
-    db.collection(EVENT_COLLECTION)
+    db.collection(USERS_COLLECTION)
         .document(uid)
         .get()
         .addOnSuccessListener { document ->
@@ -30,7 +30,7 @@ class UserFirebaseConnection(private val db: FirebaseFirestore) {
   }
 
   fun addUser(user: GoMeetUser) {
-    db.collection(EVENT_COLLECTION)
+    db.collection(USERS_COLLECTION)
         .document(user.uid)
         .set(user.toMap())
         .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully written!") }
@@ -38,7 +38,7 @@ class UserFirebaseConnection(private val db: FirebaseFirestore) {
   }
 
   fun updateUser(user: GoMeetUser) {
-    val documentRef = db.collection(EVENT_COLLECTION).document(user.uid)
+    val documentRef = db.collection(USERS_COLLECTION).document(user.uid)
     documentRef
         .update(user.toMap())
         .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully updated!") }
@@ -46,7 +46,7 @@ class UserFirebaseConnection(private val db: FirebaseFirestore) {
   }
 
   fun removeUser(user: GoMeetUser) {
-    db.collection(EVENT_COLLECTION)
+    db.collection(USERS_COLLECTION)
         .document(user.uid)
         .delete()
         .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully deleted!") }

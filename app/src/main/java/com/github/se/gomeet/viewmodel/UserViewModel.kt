@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.github.se.gomeet.UserFirebaseConnection
 import com.github.se.gomeet.model.user.GoMeetUser
-import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.CompletableDeferred
@@ -15,15 +14,14 @@ import kotlinx.coroutines.launch
 
 class UserViewModel : ViewModel() {
   private val db = UserFirebaseConnection(Firebase.firestore)
-  val currentUid by lazy { Firebase.auth.currentUser!!.uid }
 
-  fun createUserIfNew(username: String) {
+  fun createUserIfNew(uid: String, username: String) {
     CoroutineScope(Dispatchers.IO).launch {
-      if (getUser(currentUid) == null) {
+      if (getUser(uid) == null) {
         try {
           val user =
               GoMeetUser(
-                  uid = currentUid,
+                  uid = uid,
                   username = username,
                   following = emptyList(),
                   followers = emptyList(),

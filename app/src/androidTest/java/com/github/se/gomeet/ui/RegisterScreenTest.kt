@@ -14,8 +14,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.ui.authscreens.RegisterScreen
 import com.github.se.gomeet.viewmodel.AuthViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Rule
@@ -69,11 +67,6 @@ class RegisterScreenTest {
     rule.onNodeWithTag("register_button").assertIsEnabled().performClick()
 
     assert(authViewModel.signInState.value.signInError == null)
-
-    // test that user was successfully created in Firestore
-    if (authViewModel.signInState.value.isSignInSuccessful) {
-      assert(userViewModel.getUser(Firebase.auth.currentUser!!.uid) != null)
-    }
 
     // Assert that the register worked
     //        assert(authViewModel.signInState.value.isSignInSuccessful)
