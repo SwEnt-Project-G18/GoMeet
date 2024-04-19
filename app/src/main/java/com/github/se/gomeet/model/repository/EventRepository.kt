@@ -3,6 +3,7 @@ package com.github.se.gomeet.model.repository
 import android.util.Log
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.location.Location
+import com.github.se.gomeet.model.event.parseEvent
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
 import java.time.LocalDate
@@ -138,6 +139,7 @@ class EventRepository(private val db: FirebaseFirestore) {
 
 
 
+
     private fun startListeningForEvents() {
         db.collection("events")
             .addSnapshotListener { snapshot, e ->
@@ -148,19 +150,23 @@ class EventRepository(private val db: FirebaseFirestore) {
                 }
 
                 for (docChange in snapshot?.documentChanges!!) {
+
+                    val event = parseEvent(docChange.document.data)
+                    if (event == null) {
+                        Log.w("EventRepository", "Event is null")
+                        continue
+                    }
+
                     when (docChange.type) {
                         DocumentChange.Type.ADDED -> {
-                            val event = docChange.document.toObject(Event::class.java)
                             localEventsList.add(event)
                         }
                         DocumentChange.Type.MODIFIED -> {
-                            val event = docChange.document.toObject(Event::class.java)
                             localEventsList.find { it == event }?.let {
                                 localEventsList[localEventsList.indexOf(it)] = event
                             }
                         }
                         DocumentChange.Type.REMOVED -> {
-                            val event = docChange.document.toObject(Event::class.java)
                             localEventsList.removeIf { it == event }
                         }
                     }
