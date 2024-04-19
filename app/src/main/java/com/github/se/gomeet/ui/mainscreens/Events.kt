@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -60,7 +61,7 @@ fun Events(nav: NavigationActions) {
                     color = DarkCyan,
                     letterSpacing = 0.5.sp,
                 ),
-            modifier = Modifier.padding(horizontal = 15.dp, vertical = 15.dp))
+            modifier = Modifier.padding(horizontal = 15.dp, vertical = 15.dp).testTag("EventsTitle"))
       },
       bottomBar = {
         BottomNavigationMenu(
@@ -86,6 +87,7 @@ fun Events(nav: NavigationActions) {
                             ButtonDefaults.buttonColors(
                                 containerColor = NavBarUnselected, contentColor = DarkCyan),
                         border = BorderStroke(1.dp, DarkCyan),
+                        modifier = Modifier.testTag("MyTicketsButton"),
                     )
                     Spacer(modifier = Modifier.width(10.dp))
                     Button(
@@ -95,6 +97,7 @@ fun Events(nav: NavigationActions) {
                             ButtonDefaults.buttonColors(
                                 containerColor = NavBarUnselected, contentColor = DarkCyan),
                         border = BorderStroke(1.dp, DarkCyan),
+                        modifier = Modifier.testTag("FavouritesButton")
                     )
                     Spacer(modifier = Modifier.width(10.dp))
                     Button(
@@ -104,6 +107,7 @@ fun Events(nav: NavigationActions) {
                             ButtonDefaults.buttonColors(
                                 containerColor = NavBarUnselected, contentColor = DarkCyan),
                         border = BorderStroke(1.dp, DarkCyan),
+                        modifier = Modifier.testTag("MyEventsButton")
                     )
                   }
               Text(
@@ -118,7 +122,7 @@ fun Events(nav: NavigationActions) {
                           textAlign = TextAlign.Center,
                           letterSpacing = 0.5.sp,
                       ),
-                  modifier = Modifier.padding(10.dp).align(Alignment.Start))
+                  modifier = Modifier.padding(10.dp).align(Alignment.Start).testTag("MyTicketsText"))
               EventWidget(
                   UserName = "EPFL Chess Club",
                   EventName = "Chess Tournament",
@@ -155,7 +159,7 @@ fun Events(nav: NavigationActions) {
                           textAlign = TextAlign.Center,
                           letterSpacing = 0.5.sp,
                       ),
-                  modifier = Modifier.padding(10.dp).align(Alignment.Start))
+                  modifier = Modifier.padding(10.dp).align(Alignment.Start).testTag("FavouritesText"))
               EventWidget(
                   UserName = "EPFL Chess Club",
                   EventName = "Chess Tournament",
@@ -175,7 +179,7 @@ fun Events(nav: NavigationActions) {
                           textAlign = TextAlign.Center,
                           letterSpacing = 0.5.sp,
                       ),
-                  modifier = Modifier.padding(10.dp).align(Alignment.Start))
+                  modifier = Modifier.padding(10.dp).align(Alignment.Start).testTag("MyEventsText"))
               EventWidget(
                   UserName = "EPFL Chess Club",
                   EventName = "Chess Tournament",
@@ -197,7 +201,7 @@ fun EventWidget(
     Verified: Boolean
 ) {
   Card(
-      modifier = Modifier.width(377.dp).height(77.dp),
+      modifier = Modifier.width(377.dp).height(77.dp).testTag("Card"),
       colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
       border = BorderStroke(1.dp, DarkCyan)) {
         Row(
@@ -207,7 +211,7 @@ fun EventWidget(
               Image(
                   painterResource(id = ProfilePicture),
                   "Event Picture",
-                  modifier = Modifier.padding(15.dp).width(40.dp).height(40.dp))
+                  modifier = Modifier.padding(15.dp).width(40.dp).height(40.dp).testTag("ProfilePicture"))
               Column {
                 Row {
                   Text(
@@ -221,7 +225,7 @@ fun EventWidget(
                               color = Color(0xFF1D1B20),
                               letterSpacing = 0.15.sp,
                           ),
-                      modifier = Modifier.padding(top = 5.dp))
+                      modifier = Modifier.padding(top = 5.dp).testTag("UserName"))
                   if (Verified) {
                     Icon(
                         imageVector = Icons.Default.CheckCircle,
@@ -239,7 +243,8 @@ fun EventWidget(
                             fontWeight = FontWeight(700),
                             color = Color(0xFF1D1B20),
                             letterSpacing = 0.25.sp,
-                        ))
+                        ),
+                    modifier = Modifier.testTag("EventName"))
                 Text(
                     EventDate,
                     style =
@@ -250,12 +255,13 @@ fun EventWidget(
                             fontWeight = FontWeight(700),
                             color = Color(0xFF1D1B20),
                             letterSpacing = 0.25.sp,
-                        ))
+                        ),
+                    modifier = Modifier.testTag("EventDate"))
               }
               Image(
                   painterResource(id = EventPicture),
                   "Event Picture",
-                  modifier = Modifier.width(80.dp).height(77.dp).padding(10.dp),
+                  modifier = Modifier.width(80.dp).height(77.dp).padding(10.dp).testTag("EventPicture"),
                   contentScale = ContentScale.FillBounds)
             }
       }

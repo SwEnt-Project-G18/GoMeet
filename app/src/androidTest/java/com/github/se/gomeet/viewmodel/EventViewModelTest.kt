@@ -65,7 +65,7 @@ class EventViewModelTest {
   }
 
   @Test
-  fun deleteEventTest() =
+  fun removeEventTest() =
       runTest {
         // TODO
       }
