@@ -13,6 +13,9 @@ import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.ui.authscreens.RegisterScreen
 import com.github.se.gomeet.viewmodel.AuthViewModel
+import com.github.se.gomeet.viewmodel.UserViewModel
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Rule
@@ -39,9 +42,10 @@ class RegisterScreenTest {
     //        }))
     //        val authViewModel: AuthViewModel = AuthViewModel(repo)
 
-    val authViewModel: AuthViewModel = AuthViewModel()
+    val authViewModel = AuthViewModel()
+    val userViewModel = UserViewModel()
 
-    rule.setContent { RegisterScreen(authViewModel) {} }
+    rule.setContent { RegisterScreen(authViewModel, userViewModel) {} }
 
     rule.onNodeWithTag("register_title").assertIsDisplayed()
 
@@ -55,7 +59,7 @@ class RegisterScreenTest {
         .assertHasClickAction()
         .assertIsDisplayed()
 
-    rule.onNodeWithText("Email").performTextInput("signup@test.com")
+    rule.onNodeWithText("Email").performTextInput("signup@test1.com")
     rule.onNodeWithText("Password").performTextInput("123456")
     rule.onNodeWithText("Confirm Password").performTextInput("123456")
 
@@ -65,6 +69,10 @@ class RegisterScreenTest {
     rule.onNodeWithTag("register_button").assertIsEnabled().performClick()
 
     assert(authViewModel.signInState.value.signInError == null)
+
+    if (authViewModel.signInState.value.isSignInSuccessful) {
+      assert(userViewModel.getUser(Firebase.auth.currentUser!!.uid) != null)
+    }
 
     // Assert that the register worked
     //        assert(authViewModel.signInState.value.isSignInSuccessful)
