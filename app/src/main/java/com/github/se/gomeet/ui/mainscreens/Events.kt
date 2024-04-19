@@ -49,7 +49,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
 import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
@@ -127,7 +126,9 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
               Row(
                   verticalAlignment = Alignment.CenterVertically,
                   horizontalArrangement = Arrangement.SpaceEvenly,
-                  modifier = Modifier.heightIn(min = 56.dp).fillMaxWidth()) {
+                  modifier = Modifier
+                      .heightIn(min = 56.dp)
+                      .fillMaxWidth()) {
                     Button(
                         onClick = { onFilterButtonClick("MyTickets") },
                         content = { Text("My tickets") },
@@ -165,7 +166,10 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
                         border = BorderStroke(1.dp, DarkCyan))
                   }
 
-              Column(modifier = Modifier.verticalScroll(rememberScrollState()).fillMaxSize()) {
+              Column(modifier = Modifier
+                  .verticalScroll(rememberScrollState())
+                  .fillMaxSize()) {
+
                 if (selectedFilter == "All" || selectedFilter == "MyTickets") {
                   Text(
                       text = "My Tickets",
@@ -180,15 +184,19 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
                               letterSpacing = 0.5.sp,
                           ),
                       modifier = Modifier.padding(10.dp).align(Alignment.Start))
-                    eventList.forEach {event ->
-                        EventWidget(
-                            UserName = event.creator,
-                            EventName = event.title,
-                            EventDate = Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant()),
-                            ProfilePicture = R.drawable.gomeet_logo,
-                            EventPicture = R.drawable.intbee_logo,
-                            Verified = true)
-                    }
+                        eventList.forEach { event ->
+
+                            EventWidget(
+                                userName = event.creator,
+                                eventName = event.title,
+                                eventDate = Date.from(
+                                    event.date.atStartOfDay(ZoneId.systemDefault()).toInstant()
+                                ),
+                                eventPicture = R.drawable.intbee_logo,
+                                verified = true
+                            )
+                        }
+
 
 
                 }
@@ -208,13 +216,12 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
                               letterSpacing = 0.5.sp,
                           ),
                       modifier = Modifier.padding(10.dp).align(Alignment.Start))
-                  EventWidget(
-                      UserName = "EPFL Chess Club",
-                      EventName = "Chess Tournament",
-                      EventDate = eventDate,
-                      ProfilePicture = R.drawable.gomeet_logo,
-                      EventPicture = R.drawable.intbee_logo,
-                      Verified = true)
+//                  EventWidget(
+//                      UserName = "EPFL Chess Club",
+//                      EventName = "Chess Tournament",
+//                      EventDate = eventDate,
+//                      EventPicture = R.drawable.intbee_logo,
+//                      Verified = true)
                 }
 
                 if (selectedFilter == "All" || selectedFilter == "MyEvents") {
@@ -231,13 +238,13 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
                               letterSpacing = 0.5.sp,
                           ),
                       modifier = Modifier.padding(10.dp).align(Alignment.Start))
-                  EventWidget(
-                      UserName = "EPFL Chess Club",
-                      EventName = "Chess Tournament",
-                      EventDate = eventDate,
-                      ProfilePicture = R.drawable.gomeet_logo,
-                      EventPicture = R.drawable.intbee_logo,
-                      Verified = true)
+//                  EventWidget(
+//                      UserName = "EPFL Chess Club",
+//                      EventName = "Chess Tournament",
+//                      EventDate = eventDate,
+//                      ProfilePicture = R.drawable.gomeet_logo,
+//                      EventPicture = R.drawable.intbee_logo,
+//                      Verified = true)
                 }
               }
             }
@@ -246,12 +253,11 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
 
 @Composable
 fun EventWidget(
-    UserName: String,
-    EventName: String,
-    EventDate: Date,
-    ProfilePicture: Int,
-    EventPicture: Int,
-    Verified: Boolean
+    userName: String,
+    eventName: String,
+    eventDate: Date,
+    eventPicture: Int,
+    verified: Boolean
 ) {
 
   val configuration = LocalConfiguration.current
@@ -264,7 +270,9 @@ fun EventWidget(
 
   Card(
       modifier =
-          Modifier.fillMaxWidth().padding(start = 10.dp, top = 5.dp, end = 10.dp, bottom = 5.dp),
+      Modifier
+          .fillMaxWidth()
+          .padding(start = 10.dp, top = 5.dp, end = 10.dp, bottom = 5.dp),
       colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
       border = BorderStroke(2.dp, DarkCyan)) {
         Row(
@@ -272,11 +280,13 @@ fun EventWidget(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceAround) {
               Column(
-                  modifier = Modifier.weight(4f).padding(15.dp),
+                  modifier = Modifier
+                      .weight(4f)
+                      .padding(15.dp),
                   horizontalAlignment = Alignment.Start, // Align text horizontally to center
                   verticalArrangement = Arrangement.Center) {
                     Text(
-                        text = EventName,
+                        text = eventName,
                         style =
                             TextStyle(
                                 fontSize = bigTextSize.sp,
@@ -291,7 +301,7 @@ fun EventWidget(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center) {
                           Text(
-                              UserName,
+                              userName,
                               style =
                                   TextStyle(
                                       fontSize = smallTextSize.sp,
@@ -302,10 +312,12 @@ fun EventWidget(
                                       letterSpacing = 0.15.sp,
                                   ),
                               modifier = Modifier.padding(top = 5.dp))
-                          if (Verified) {
+                          if (verified) {
                             Box(
                                 contentAlignment = Alignment.Center,
-                                modifier = Modifier.padding(5.dp).size(smallTextSize.dp * (1.4f))) {
+                                modifier = Modifier
+                                    .padding(5.dp)
+                                    .size(smallTextSize.dp * (1.4f))) {
                                   Image(
                                       painter = painterResource(id = R.drawable.verified),
                                       contentDescription = "Verified",
@@ -320,7 +332,7 @@ fun EventWidget(
                     val endOfWeek = startOfWeek.clone() as Calendar
                     endOfWeek.add(Calendar.DAY_OF_WEEK, 6)
 
-                    val eventCalendar = Calendar.getInstance().apply { time = EventDate }
+                    val eventCalendar = Calendar.getInstance().apply { time = eventDate }
 
                     // Determine if the event date is within this week
                     val isThisWeek = eventCalendar >= startOfWeek && eventCalendar <= endOfWeek
@@ -334,7 +346,7 @@ fun EventWidget(
                         }
 
                     // Convert the Date object to a formatted String
-                    val dateString = dateFormat.format(EventDate)
+                    val dateString = dateFormat.format(eventDate)
 
                     Text(
                         dateString,
@@ -349,17 +361,20 @@ fun EventWidget(
                             ))
                   }
               Image(
-                  painter = painterResource(id = EventPicture),
+                  painter = painterResource(id = eventPicture),
                   contentDescription = "Event Picture",
                   modifier =
-                      Modifier.weight(
-                              3f) // Take 1/3 of the card space because of the total weight of 4 (3
-                          // for the column and 1 for this image)
-                          .fillMaxHeight() // Fill the height of the Row
-                          .aspectRatio(
-                              3f / 1.75f) // Maintain an aspect ratio of 3:2, change it as needed
-                          .clipToBounds()
-                          .padding(0.dp), // Clip the image if it overflows its bounds
+                  Modifier
+                      .weight(
+                          3f
+                      ) // Take 1/3 of the card space because of the total weight of 4 (3
+                      // for the column and 1 for this image)
+                      .fillMaxHeight() // Fill the height of the Row
+                      .aspectRatio(
+                          3f / 1.75f
+                      ) // Maintain an aspect ratio of 3:2, change it as needed
+                      .clipToBounds()
+                      .padding(0.dp), // Clip the image if it overflows its bounds
                   contentScale = ContentScale.Crop // Crop the image to fit the aspect ratio
                   )
             }
