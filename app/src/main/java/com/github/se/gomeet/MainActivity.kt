@@ -67,7 +67,7 @@ class MainActivity : ComponentActivity() {
               }
             }
             composable(Route.EXPLORE) { Explore(navAction, EventViewModel()) }
-            composable(Route.EVENTS) { Events(navAction, EventViewModel())}
+            composable(Route.EVENTS) { Events(navAction, EventViewModel()) }
             composable(Route.TRENDS) { Trends(navAction) }
             composable(Route.CREATE) { Create(navAction) }
             composable(Route.PROFILE) { Profile(navAction) }
