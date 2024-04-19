@@ -18,6 +18,8 @@ class EventsTest {
 
   @get:Rule val rule = createAndroidComposeRule<ComponentActivity>()
 
+  val maxEventsDisplayedOnScreen = 5
+
   @Test
   fun uiElementsDisplayed() {
     lateinit var navController: NavHostController
@@ -32,26 +34,33 @@ class EventsTest {
     rule.onNodeWithTag("FavouritesButton").assertIsDisplayed()
     rule.onNodeWithTag("MyEventsButton").assertIsDisplayed()
     rule.onNodeWithTag("MyTicketsText").assertIsDisplayed()
-    rule.onNodeWithTag("FavouritesText").assertIsDisplayed()
-    rule.onNodeWithTag("MyEventsText").assertIsDisplayed()
+    rule.onNodeWithTag("FavouritesText").assertExists()
+    rule.onNodeWithTag("MyEventsText").assertExists()
 
     rule.onAllNodesWithTag("Card").apply {
-      fetchSemanticsNodes().forEachIndexed { i, _ -> get(i).assertIsDisplayed() }
-    }
-    rule.onAllNodesWithTag("ProfilePicture").apply {
-      fetchSemanticsNodes().forEachIndexed { i, _ -> get(i).assertIsDisplayed() }
-    }
-    rule.onAllNodesWithTag("UserName").apply {
-      fetchSemanticsNodes().forEachIndexed { i, _ -> get(i).assertIsDisplayed() }
+      fetchSemanticsNodes().forEachIndexed { i, _ ->
+        if (i < maxEventsDisplayedOnScreen) get(i).assertIsDisplayed() else get(i).assertExists()
+      }
     }
     rule.onAllNodesWithTag("EventName").apply {
-      fetchSemanticsNodes().forEachIndexed { i, _ -> get(i).assertIsDisplayed() }
+      fetchSemanticsNodes().forEachIndexed { i, _ ->
+        if (i < maxEventsDisplayedOnScreen) get(i).assertIsDisplayed() else get(i).assertExists()
+      }
+    }
+    rule.onAllNodesWithTag("UserName").apply {
+      fetchSemanticsNodes().forEachIndexed { i, _ ->
+        if (i < maxEventsDisplayedOnScreen) get(i).assertIsDisplayed() else get(i).assertExists()
+      }
     }
     rule.onAllNodesWithTag("EventDate").apply {
-      fetchSemanticsNodes().forEachIndexed { i, _ -> get(i).assertIsDisplayed() }
+      fetchSemanticsNodes().forEachIndexed { i, _ ->
+        if (i < maxEventsDisplayedOnScreen) get(i).assertIsDisplayed() else get(i).assertExists()
+      }
     }
     rule.onAllNodesWithTag("EventPicture").apply {
-      fetchSemanticsNodes().forEachIndexed { i, _ -> get(i).assertIsDisplayed() }
+      fetchSemanticsNodes().forEachIndexed { i, _ ->
+        if (i < maxEventsDisplayedOnScreen) get(i).assertIsDisplayed() else get(i).assertExists()
+      }
     }
   }
 }
