@@ -8,14 +8,14 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class UserViewModelTest {
 
-    @Test
-    fun getUserTest() = runTest {
-        val userViewModel = UserViewModel()
-        val uid = "QpjFlPXRuoYhvtOWcjgR51JYCXs2"
-        val user = userViewModel.getUser(uid)
+  @Test
+  fun getUserTest() = runTest {
+    val userViewModel = UserViewModel()
+    val uid = "QpjFlPXRuoYhvtOWcjgR51JYCXs2"
+    val user = userViewModel.getUser(uid)
 
-        assert(user != null)
-        assert(user!!.uid == uid)
-        assert(user.username == "qwe@asd.com")
-    }
+    assert(user != null)
+    assert(user!!.uid == uid)
+    assert(user.username == "qwe@asd.com")
+  }
 }
