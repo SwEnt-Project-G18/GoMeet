@@ -88,7 +88,7 @@ fun Profile(nav: NavigationActions) { // TODO Add parameters to the function
           Spacer(Modifier.weight(1f))
           IconButton(
               modifier = Modifier.align(Alignment.CenterVertically).padding(end = 15.dp),
-              onClick = { nav.navigateTo(SECOND_LEVEL_DESTINATION.first())/* Handle settings icon click */}) {
+              onClick = {/* Handle settings icon click */}) {
                 Icon(
                     imageVector = ImageVector.vectorResource(R.drawable.settings_icon),
                     contentDescription = "Settings",
