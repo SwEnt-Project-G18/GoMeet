@@ -1,3 +1,3 @@
-package com.github.se.gomeet.ui
+package com.github.se.gomeet
 
 class MainActivityTest {}

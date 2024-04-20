@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -85,7 +86,9 @@ fun Events(nav: NavigationActions) {
       topBar = {
         Text(
             text = "Events",
-            modifier = Modifier.padding(start = 15.dp, top = 15.dp, end = 15.dp, bottom = 0.dp),
+            modifier =
+                Modifier.padding(start = 15.dp, top = 15.dp, end = 15.dp, bottom = 0.dp)
+                    .testTag("EventsTitle"),
             color = DarkCyan,
             fontStyle = FontStyle.Normal,
             fontWeight = FontWeight.SemiBold,
@@ -120,7 +123,8 @@ fun Events(nav: NavigationActions) {
                                     else NavBarUnselected,
                                 contentColor =
                                     if (selectedFilter == "MyTickets") Color.White else DarkCyan),
-                        border = BorderStroke(1.dp, DarkCyan))
+                        border = BorderStroke(1.dp, DarkCyan),
+                        modifier = Modifier.testTag("MyTicketsButton"))
                     Spacer(modifier = Modifier.width(10.dp))
                     Button(
                         onClick = { onFilterButtonClick("Favourites") },
@@ -132,7 +136,8 @@ fun Events(nav: NavigationActions) {
                                     else NavBarUnselected,
                                 contentColor =
                                     if (selectedFilter == "Favourites") Color.White else DarkCyan),
-                        border = BorderStroke(1.dp, DarkCyan))
+                        border = BorderStroke(1.dp, DarkCyan),
+                        modifier = Modifier.testTag("FavouritesButton"))
                     Spacer(modifier = Modifier.width(10.dp))
                     Button(
                         onClick = { onFilterButtonClick("MyEvents") },
@@ -144,7 +149,8 @@ fun Events(nav: NavigationActions) {
                                     else NavBarUnselected,
                                 contentColor =
                                     if (selectedFilter == "MyEvents") Color.White else DarkCyan),
-                        border = BorderStroke(1.dp, DarkCyan))
+                        border = BorderStroke(1.dp, DarkCyan),
+                        modifier = Modifier.testTag("MyEventsButton"))
                   }
 
               Column(modifier = Modifier.verticalScroll(rememberScrollState()).fillMaxSize()) {
@@ -161,7 +167,8 @@ fun Events(nav: NavigationActions) {
                               textAlign = TextAlign.Center,
                               letterSpacing = 0.5.sp,
                           ),
-                      modifier = Modifier.padding(10.dp).align(Alignment.Start))
+                      modifier =
+                          Modifier.padding(10.dp).align(Alignment.Start).testTag("MyTicketsText"))
                   EventWidget(
                       UserName = "EPFL Chess Club",
                       EventName = "Chess Tournament",
@@ -220,7 +227,8 @@ fun Events(nav: NavigationActions) {
                               textAlign = TextAlign.Center,
                               letterSpacing = 0.5.sp,
                           ),
-                      modifier = Modifier.padding(10.dp).align(Alignment.Start))
+                      modifier =
+                          Modifier.padding(10.dp).align(Alignment.Start).testTag("FavouritesText"))
                   EventWidget(
                       UserName = "EPFL Chess Club",
                       EventName = "Chess Tournament",
@@ -243,7 +251,8 @@ fun Events(nav: NavigationActions) {
                               textAlign = TextAlign.Center,
                               letterSpacing = 0.5.sp,
                           ),
-                      modifier = Modifier.padding(10.dp).align(Alignment.Start))
+                      modifier =
+                          Modifier.padding(10.dp).align(Alignment.Start).testTag("MyEventsText"))
                   EventWidget(
                       UserName = "EPFL Chess Club",
                       EventName = "Chess Tournament",
@@ -277,7 +286,9 @@ fun EventWidget(
 
   Card(
       modifier =
-          Modifier.fillMaxWidth().padding(start = 10.dp, top = 5.dp, end = 10.dp, bottom = 5.dp),
+          Modifier.fillMaxWidth()
+              .padding(start = 10.dp, top = 5.dp, end = 10.dp, bottom = 5.dp)
+              .testTag("Card"),
       colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
       border = BorderStroke(2.dp, DarkCyan)) {
         Row(
@@ -298,7 +309,8 @@ fun EventWidget(
                                 fontWeight = FontWeight(700),
                                 color = MaterialTheme.colorScheme.onBackground,
                                 letterSpacing = 0.25.sp,
-                            ))
+                            ),
+                        modifier = Modifier.testTag("EventName"))
 
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -314,7 +326,7 @@ fun EventWidget(
                                       color = MaterialTheme.colorScheme.onBackground,
                                       letterSpacing = 0.15.sp,
                                   ),
-                              modifier = Modifier.padding(top = 5.dp))
+                              modifier = Modifier.padding(top = 5.dp).testTag("UserName"))
                           if (Verified) {
                             Box(
                                 contentAlignment = Alignment.Center,
@@ -359,7 +371,8 @@ fun EventWidget(
                                 fontWeight = FontWeight(700),
                                 color = MaterialTheme.colorScheme.onBackground,
                                 letterSpacing = 0.25.sp,
-                            ))
+                            ),
+                        modifier = Modifier.testTag("EventDate"))
                   }
               Image(
                   painter = painterResource(id = EventPicture),
@@ -372,7 +385,8 @@ fun EventWidget(
                           .aspectRatio(
                               3f / 1.75f) // Maintain an aspect ratio of 3:2, change it as needed
                           .clipToBounds()
-                          .padding(0.dp), // Clip the image if it overflows its bounds
+                          .padding(0.dp) // Clip the image if it overflows its bounds
+                          .testTag("EventPicture"),
                   contentScale = ContentScale.Crop // Crop the image to fit the aspect ratio
                   )
             }
