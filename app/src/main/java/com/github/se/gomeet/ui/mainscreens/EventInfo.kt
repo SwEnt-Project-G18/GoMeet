@@ -41,6 +41,9 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.R
 import com.github.se.gomeet.ui.navigation.NavigationActions
@@ -55,7 +58,7 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 
 @Composable
-fun EventInfo(nav: NavigationActions) {
+fun EventInfo(nav: NavigationActions, title: String = "", date: String = "", time: String ="", organizer: String ="", rating: Double =0.0, image: Painter = painterResource(id = R.drawable.ic_launcher_background), description: String = "", loc: LatLng = LatLng(0.0, 0.0)){
     Scaffold(
         topBar = {
             TopAppBar(
@@ -65,7 +68,7 @@ fun EventInfo(nav: NavigationActions) {
                     // Empty title since we're placing our own components
                 },
                 navigationIcon = {
-                    IconButton(onClick = { /* Handle back action */ }) {
+                    IconButton(onClick = { nav.goBack() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
@@ -107,22 +110,22 @@ fun EventInfo(nav: NavigationActions) {
                 .fillMaxSize()
                 .verticalScroll(state = rememberScrollState())
         ) {
-            EventHeader(title = "Chess Tournament", organizer = "EPFL Chess Club", rating = 4.8, nav = nav)
+            EventHeader(title = title, organizer = organizer, rating = rating, nav = nav, date = date, time = time)
             Spacer(modifier = Modifier.height(20.dp))
             EventButtons()
             Spacer(modifier = Modifier.height(20.dp))
-            EventImage(painter = painterResource(id = R.drawable.chess_demo))
+            EventImage(painter = image)
             Spacer(modifier = Modifier.height(20.dp))
-            EventDescription(text = "Howdy!\n\nAfter months of planning, La Dame Blanche is finally offering you a rapid tournament!\n\nJoin us on Saturday 23rd of March afternoon for 6 rounds of 12+3” games in the chill and cozy vibe of Satellite. Take your chance to have fun and play, and maybe win one of our many prizes\n\nOnly 50 spots available, with free entry!")
+            EventDescription(text = description)
             Spacer(modifier = Modifier.height(20.dp))
-            MapViewComposable(loc = LatLng(46.519962, 6.633597))
+            MapViewComposable(loc = loc)
         }
 
     }
 }
 
 @Composable
-fun EventHeader(title: String, organizer: String, rating: Double, nav: NavigationActions) {
+fun EventHeader(title: String, organizer: String, rating: Double, nav: NavigationActions, date : String , time : String) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -142,7 +145,7 @@ fun EventHeader(title: String, organizer: String, rating: Double, nav: Navigatio
             // Add other details like rating here
         }
         // Icon for settings or more options, assuming using Material Icons
-        EventDateTime(day = "TUE", time = "19:10")
+        EventDateTime(day = date, time = time)
     }
 }
 
@@ -294,10 +297,40 @@ fun SingleLocationGoogleMapView(
 }
 
 
+@Composable
+fun EventInfoScreen(navController: NavHostController) {
+    val backStackEntry = navController.currentBackStackEntryAsState().value
+    val arguments = backStackEntry?.arguments
+
+    val title = arguments?.getString("title") ?: ""
+    val date = arguments?.getString("date") ?: ""
+    val time = arguments?.getString("time") ?: ""
+    val organizer = arguments?.getString("organizer") ?: ""
+    val rating = arguments?.getDouble("rating") ?: 0.0
+    val description = arguments?.getString("description") ?: ""
+    val latitude = arguments?.getDouble("latitude") ?: 0.0
+    val longitude = arguments?.getDouble("longitude") ?: 0.0
+    val loc = LatLng(latitude, longitude)
+
+    EventInfo(
+        nav = NavigationActions(navController),
+        title = title,
+        date = date,
+        time = time,
+        organizer = organizer,
+        rating = rating,
+        image = painterResource(id = R.drawable.ic_launcher_background), // Image handling might need different approach
+        description = description,
+        loc = loc
+    )
+}
+
+
+
 
 
 @Preview(showBackground = true)
 @Composable
 fun EventScreenPreview() {
-    EventInfo(nav = NavigationActions(rememberNavController()))
+    EventInfo(nav = NavigationActions(rememberNavController()), title = "Chess Tournament", organizer = "EPFL Chess Club", date = "TUE", time = "19:10", rating = 4.8, image = painterResource(id = R.drawable.chess_demo), description = "Howdy!\n\nAfter months of planning, La Dame Blanche is finally offering you a rapid tournament!\n\nJoin us on Saturday 23rd of March afternoon for 6 rounds of 12+3” games in the chill and cozy vibe of Satellite. Take your chance to have fun and play, and maybe win one of our many prizes\n\nOnly 50 spots available, with free entry!", loc = LatLng(46.519962, 6.633597))
 }
