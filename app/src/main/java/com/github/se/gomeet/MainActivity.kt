@@ -1,9 +1,7 @@
 package com.github.se.gomeet
 
-import EventInfo
 import EventInfoScreen
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,7 +10,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -52,27 +49,26 @@ class MainActivity : ComponentActivity() {
           NavHost(navController = nav, startDestination = Route.WELCOME) {
             composable(Route.WELCOME) {
               WelcomeScreen(
-                onNavToLogin = { NavigationActions(nav).navigateTo(LOGIN_ITEMS[1]) },
-                onNavToRegister = { NavigationActions(nav).navigateTo(LOGIN_ITEMS[2]) },
-                onSignInSuccess = { userId ->
-                  userIdState.value = userId
-                  NavigationActions(nav)
-                    .navigateTo(
-                      TOP_LEVEL_DESTINATIONS.first { it.route == Route.CREATE },
-                      clearBackStack = true
-                    )
-                })
+                  onNavToLogin = { NavigationActions(nav).navigateTo(LOGIN_ITEMS[1]) },
+                  onNavToRegister = { NavigationActions(nav).navigateTo(LOGIN_ITEMS[2]) },
+                  onSignInSuccess = { userId ->
+                    userIdState.value = userId
+                    NavigationActions(nav)
+                        .navigateTo(
+                            TOP_LEVEL_DESTINATIONS.first { it.route == Route.CREATE },
+                            clearBackStack = true)
+                  })
             }
             composable(Route.LOGIN) {
               LoginScreen(viewModel) {
                 NavigationActions(nav)
-                  .navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == Route.CREATE })
+                    .navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == Route.CREATE })
               }
             }
             composable(Route.REGISTER) {
               RegisterScreen(viewModel) {
                 NavigationActions(nav)
-                  .navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == Route.CREATE })
+                    .navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == Route.CREATE })
               }
             }
             composable(Route.EXPLORE) { Explore(navAction, EventViewModel()) }
@@ -88,37 +84,30 @@ class MainActivity : ComponentActivity() {
               CreateEvent(navAction, EventViewModel(userIdState.value), false)
             }
 
-
             composable(
-              route = Route.EVENT_INFO,
-              arguments = listOf(
-                navArgument("title") { type = NavType.StringType },
-                navArgument("date") { type = NavType.StringType },
-                navArgument("time") { type = NavType.StringType },
-                navArgument("organizer") { type = NavType.StringType },
-                navArgument("rating") { type = NavType.FloatType },
-                navArgument("description") { type = NavType.StringType },
-                navArgument("latitude") { type = NavType.FloatType},
-                navArgument("longitude") { type = NavType.FloatType }
-              )
-            ) { entry ->
-              val title = entry.arguments?.getString("title") ?: ""
-              val date = entry.arguments?.getString("date") ?: ""
-              val time = entry.arguments?.getString("time") ?: ""
-              val organizer = entry.arguments?.getString("organizer") ?: ""
-              val rating = entry.arguments?.getFloat("rating") ?: 0f
-              val description = entry.arguments?.getString("description") ?: ""
-              val latitude = entry.arguments?.getFloat("latitude") ?: 0.0
-              val longitude = entry.arguments?.getFloat("longitude") ?: 0.0
-              val loc = LatLng(latitude.toDouble(), longitude.toDouble())
+                route = Route.EVENT_INFO,
+                arguments =
+                    listOf(
+                        navArgument("title") { type = NavType.StringType },
+                        navArgument("date") { type = NavType.StringType },
+                        navArgument("time") { type = NavType.StringType },
+                        navArgument("organizer") { type = NavType.StringType },
+                        navArgument("rating") { type = NavType.FloatType },
+                        navArgument("description") { type = NavType.StringType },
+                        navArgument("latitude") { type = NavType.FloatType },
+                        navArgument("longitude") { type = NavType.FloatType })) { entry ->
+                  val title = entry.arguments?.getString("title") ?: ""
+                  val date = entry.arguments?.getString("date") ?: ""
+                  val time = entry.arguments?.getString("time") ?: ""
+                  val organizer = entry.arguments?.getString("organizer") ?: ""
+                  val rating = entry.arguments?.getFloat("rating") ?: 0f
+                  val description = entry.arguments?.getString("description") ?: ""
+                  val latitude = entry.arguments?.getFloat("latitude") ?: 0.0
+                  val longitude = entry.arguments?.getFloat("longitude") ?: 0.0
+                  val loc = LatLng(latitude.toDouble(), longitude.toDouble())
 
-
-              EventInfoScreen(
-                nav
-              )
-
-
-            }
+                  EventInfoScreen(nav)
+                }
           }
         }
       }
