@@ -66,233 +66,258 @@ import java.util.Locale
 @Composable
 fun Events(nav: NavigationActions) {
 
-  var selectedFilter by remember { mutableStateOf("All") }
+    var selectedFilter by remember { mutableStateOf("All") }
 
-  // Define a function to handle button clicks
-  fun onFilterButtonClick(filterType: String) {
-    selectedFilter = if (selectedFilter == filterType) "All" else filterType
-  }
+    // Define a function to handle button clicks
+    fun onFilterButtonClick(filterType: String) {
+        selectedFilter = if (selectedFilter == filterType) "All" else filterType
+    }
 
-  val eventDate =
-      Calendar.getInstance()
-          .apply {
-            set(Calendar.YEAR, 2024)
-            set(Calendar.MONTH, Calendar.APRIL)
-            set(Calendar.DAY_OF_MONTH, 16)
-            set(Calendar.HOUR_OF_DAY, 14)
-            set(Calendar.MINUTE, 0)
-          }
-          .time
+    val eventDate =
+        Calendar.getInstance()
+            .apply {
+                set(Calendar.YEAR, 2024)
+                set(Calendar.MONTH, Calendar.APRIL)
+                set(Calendar.DAY_OF_MONTH, 16)
+                set(Calendar.HOUR_OF_DAY, 14)
+                set(Calendar.MINUTE, 0)
+            }
+            .time
 
-  Scaffold(
-      topBar = {
-        Text(
-            text = "Events",
-            modifier =
+    Scaffold(
+        topBar = {
+            Text(
+                text = "Events",
+                modifier =
                 Modifier.padding(start = 15.dp, top = 15.dp, end = 15.dp, bottom = 0.dp)
                     .testTag("EventsTitle"),
-            color = DarkCyan,
-            fontStyle = FontStyle.Normal,
-            fontWeight = FontWeight.SemiBold,
-            fontFamily = FontFamily.Default,
-            textAlign = TextAlign.Start,
-            style = MaterialTheme.typography.headlineLarge)
-      },
-      bottomBar = {
-        BottomNavigationMenu(
-            onTabSelect = { selectedTab ->
-              nav.navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == selectedTab })
-            },
-            tabList = TOP_LEVEL_DESTINATIONS,
-            selectedItem = Route.EVENTS)
-      }) { innerPadding ->
+                color = DarkCyan,
+                fontStyle = FontStyle.Normal,
+                fontWeight = FontWeight.SemiBold,
+                fontFamily = FontFamily.Default,
+                textAlign = TextAlign.Start,
+                style = MaterialTheme.typography.headlineLarge
+            )
+        },
+        bottomBar = {
+            BottomNavigationMenu(
+                onTabSelect = { selectedTab ->
+                    nav.navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == selectedTab })
+                },
+                tabList = TOP_LEVEL_DESTINATIONS,
+                selectedItem = Route.EVENTS
+            )
+        }) { innerPadding ->
         Column(
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(innerPadding)) {
-              Spacer(modifier = Modifier.height(10.dp))
-              Row(
-                  verticalAlignment = Alignment.CenterVertically,
-                  horizontalArrangement = Arrangement.SpaceEvenly,
-                  modifier = Modifier.heightIn(min = 56.dp).fillMaxWidth()) {
-                    Button(
-                        onClick = { onFilterButtonClick("MyTickets") },
-                        content = { Text("My tickets") },
-                        colors =
-                            ButtonDefaults.buttonColors(
-                                containerColor =
-                                    if (selectedFilter == "MyTickets") DarkCyan
-                                    else NavBarUnselected,
-                                contentColor =
-                                    if (selectedFilter == "MyTickets") Color.White else DarkCyan),
-                        border = BorderStroke(1.dp, DarkCyan),
-                        modifier = Modifier.testTag("MyTicketsButton"))
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Button(
-                        onClick = { onFilterButtonClick("Favourites") },
-                        content = { Text("Favourites") },
-                        colors =
-                            ButtonDefaults.buttonColors(
-                                containerColor =
-                                    if (selectedFilter == "Favourites") DarkCyan
-                                    else NavBarUnselected,
-                                contentColor =
-                                    if (selectedFilter == "Favourites") Color.White else DarkCyan),
-                        border = BorderStroke(1.dp, DarkCyan),
-                        modifier = Modifier.testTag("FavouritesButton"))
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Button(
-                        onClick = { onFilterButtonClick("MyEvents") },
-                        content = { Text("My events") },
-                        colors =
-                            ButtonDefaults.buttonColors(
-                                containerColor =
-                                    if (selectedFilter == "MyEvents") DarkCyan
-                                    else NavBarUnselected,
-                                contentColor =
-                                    if (selectedFilter == "MyEvents") Color.White else DarkCyan),
-                        border = BorderStroke(1.dp, DarkCyan),
-                        modifier = Modifier.testTag("MyEventsButton"))
-                  }
+            modifier = Modifier.padding(innerPadding)
+        ) {
+            Spacer(modifier = Modifier.height(10.dp))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                modifier = Modifier.heightIn(min = 56.dp).fillMaxWidth()
+            ) {
+                Button(
+                    onClick = { onFilterButtonClick("MyTickets") },
+                    content = { Text("My tickets") },
+                    colors =
+                    ButtonDefaults.buttonColors(
+                        containerColor =
+                        if (selectedFilter == "MyTickets") DarkCyan
+                        else NavBarUnselected,
+                        contentColor =
+                        if (selectedFilter == "MyTickets") Color.White else DarkCyan
+                    ),
+                    border = BorderStroke(1.dp, DarkCyan),
+                    modifier = Modifier.testTag("MyTicketsButton")
+                )
+                Spacer(modifier = Modifier.width(10.dp))
+                Button(
+                    onClick = { onFilterButtonClick("Favourites") },
+                    content = { Text("Favourites") },
+                    colors =
+                    ButtonDefaults.buttonColors(
+                        containerColor =
+                        if (selectedFilter == "Favourites") DarkCyan
+                        else NavBarUnselected,
+                        contentColor =
+                        if (selectedFilter == "Favourites") Color.White else DarkCyan
+                    ),
+                    border = BorderStroke(1.dp, DarkCyan),
+                    modifier = Modifier.testTag("FavouritesButton")
+                )
+                Spacer(modifier = Modifier.width(10.dp))
+                Button(
+                    onClick = { onFilterButtonClick("MyEvents") },
+                    content = { Text("My events") },
+                    colors =
+                    ButtonDefaults.buttonColors(
+                        containerColor =
+                        if (selectedFilter == "MyEvents") DarkCyan
+                        else NavBarUnselected,
+                        contentColor =
+                        if (selectedFilter == "MyEvents") Color.White else DarkCyan
+                    ),
+                    border = BorderStroke(1.dp, DarkCyan),
+                    modifier = Modifier.testTag("MyEventsButton")
+                )
+            }
 
-              Column(modifier = Modifier.verticalScroll(rememberScrollState()).fillMaxSize()) {
+            Column(modifier = Modifier.verticalScroll(rememberScrollState()).fillMaxSize()) {
                 if (selectedFilter == "All" || selectedFilter == "MyTickets") {
-                  Text(
-                      text = "My Tickets",
-                      style =
-                          TextStyle(
-                              fontSize = 20.sp,
-                              lineHeight = 16.sp,
-                              fontFamily = FontFamily(Font(R.font.roboto)),
-                              fontWeight = FontWeight(1000),
-                              color = DarkCyan,
-                              textAlign = TextAlign.Center,
-                              letterSpacing = 0.5.sp,
-                          ),
-                      modifier =
-                          Modifier.padding(10.dp).align(Alignment.Start).testTag("MyTicketsText"))
-                  EventWidget(
-                      UserName = "EPFL Chess Club",
-                      EventName = "Chess Tournament",
-                      EventDate = eventDate,
-                      ProfilePicture = R.drawable.gomeet_logo,
-                      EventPicture = R.drawable.intbee_logo,
-                      Verified = true,
-                      nav = nav)
-                  EventWidget(
-                      UserName = "EPFL",
-                      EventName = "Chess",
-                      EventDate = eventDate,
-                      ProfilePicture = R.drawable.gomeet_logo,
-                      EventPicture = R.drawable.intbee_logo,
-                      Verified = true,
-                      nav = nav)
-                  EventWidget(
-                      UserName = "EPFL Chess Club",
-                      EventName = "Chess Tournament",
-                      EventDate = eventDate,
-                      ProfilePicture = R.drawable.gomeet_logo,
-                      EventPicture = R.drawable.intbee_logo,
-                      Verified = true,
-                      nav = nav)
-                  EventWidget(
-                      UserName = "EPFL Chess Club",
-                      EventName = "Chess Tournament",
-                      EventDate = eventDate,
-                      ProfilePicture = R.drawable.gomeet_logo,
-                      EventPicture = R.drawable.intbee_logo,
-                      Verified = true,
-                      nav = nav)
-                  EventWidget(
-                      UserName = "EPFL Chess Club",
-                      EventName = "Chess Tournament",
-                      EventDate = eventDate,
-                      ProfilePicture = R.drawable.gomeet_logo,
-                      EventPicture = R.drawable.intbee_logo,
-                      Verified = true,
-                      nav = nav)
-                  EventWidget(
-                      UserName = "EPFL Chess Club",
-                      EventName = "Chess Tournament",
-                      EventDate = eventDate,
-                      ProfilePicture = R.drawable.gomeet_logo,
-                      EventPicture = R.drawable.intbee_logo,
-                      Verified = true,
-                      nav = nav)
+                    Text(
+                        text = "My Tickets",
+                        style =
+                        TextStyle(
+                            fontSize = 20.sp,
+                            lineHeight = 16.sp,
+                            fontFamily = FontFamily(Font(R.font.roboto)),
+                            fontWeight = FontWeight(1000),
+                            color = DarkCyan,
+                            textAlign = TextAlign.Center,
+                            letterSpacing = 0.5.sp,
+                        ),
+                        modifier =
+                        Modifier.padding(10.dp).align(Alignment.Start).testTag("MyTicketsText")
+                    )
+                    EventWidget(
+                        UserName = "EPFL Chess Club",
+                        EventName = "Chess Tournament",
+                        EventDate = eventDate,
+                        ProfilePicture = R.drawable.gomeet_logo,
+                        EventPicture = R.drawable.intbee_logo,
+                        Verified = true,
+                        nav = nav
+                    )
+                    EventWidget(
+                        UserName = "EPFL",
+                        EventName = "Chess",
+                        EventDate = eventDate,
+                        ProfilePicture = R.drawable.gomeet_logo,
+                        EventPicture = R.drawable.intbee_logo,
+                        Verified = true,
+                        nav = nav
+                    )
+                    EventWidget(
+                        UserName = "EPFL Chess Club",
+                        EventName = "Chess Tournament",
+                        EventDate = eventDate,
+                        ProfilePicture = R.drawable.gomeet_logo,
+                        EventPicture = R.drawable.intbee_logo,
+                        Verified = true,
+                        nav = nav
+                    )
+                    EventWidget(
+                        UserName = "EPFL Chess Club",
+                        EventName = "Chess Tournament",
+                        EventDate = eventDate,
+                        ProfilePicture = R.drawable.gomeet_logo,
+                        EventPicture = R.drawable.intbee_logo,
+                        Verified = true,
+                        nav = nav
+                    )
+                    EventWidget(
+                        UserName = "EPFL Chess Club",
+                        EventName = "Chess Tournament",
+                        EventDate = eventDate,
+                        ProfilePicture = R.drawable.gomeet_logo,
+                        EventPicture = R.drawable.intbee_logo,
+                        Verified = true,
+                        nav = nav
+                    )
+                    EventWidget(
+                        UserName = "EPFL Chess Club",
+                        EventName = "Chess Tournament",
+                        EventDate = eventDate,
+                        ProfilePicture = R.drawable.gomeet_logo,
+                        EventPicture = R.drawable.intbee_logo,
+                        Verified = true,
+                        nav = nav
+                    )
                 }
 
                 if (selectedFilter == "All" || selectedFilter == "Favourites") {
 
-                  Text(
-                      text = "Favourites",
-                      style =
-                          TextStyle(
-                              fontSize = 20.sp,
-                              lineHeight = 16.sp,
-                              fontFamily = FontFamily(Font(R.font.roboto)),
-                              fontWeight = FontWeight(1000),
-                              color = DarkCyan,
-                              textAlign = TextAlign.Center,
-                              letterSpacing = 0.5.sp,
-                          ),
-                      modifier =
-                          Modifier.padding(10.dp).align(Alignment.Start).testTag("FavouritesText"))
+                    Text(
+                        text = "Favourites",
+                        style =
+                        TextStyle(
+                            fontSize = 20.sp,
+                            lineHeight = 16.sp,
+                            fontFamily = FontFamily(Font(R.font.roboto)),
+                            fontWeight = FontWeight(1000),
+                            color = DarkCyan,
+                            textAlign = TextAlign.Center,
+                            letterSpacing = 0.5.sp,
+                        ),
+                        modifier =
+                        Modifier.padding(10.dp).align(Alignment.Start).testTag("FavouritesText")
+                    )
 
-                  EventWidget(
-                      UserName = "EPFL Chess Club",
-                      EventName = "Chess Tournament",
-                      EventDate = eventDate,
-                      ProfilePicture = R.drawable.gomeet_logo,
-                      EventPicture = R.drawable.intbee_logo,
-                      Verified = true,
-                      nav = nav)
+                    EventWidget(
+                        UserName = "EPFL Chess Club",
+                        EventName = "Chess Tournament",
+                        EventDate = eventDate,
+                        ProfilePicture = R.drawable.gomeet_logo,
+                        EventPicture = R.drawable.intbee_logo,
+                        Verified = true,
+                        nav = nav
+                    )
 
-                  EventWidget(
-                      UserName = "EPFL Chess Club",
-                      EventName = "Chess Tournament",
-                      EventDate = eventDate,
-                      ProfilePicture = R.drawable.gomeet_logo,
-                      EventPicture = R.drawable.intbee_logo,
-                      Verified = true,
-                      nav = nav)
+                    EventWidget(
+                        UserName = "EPFL Chess Club",
+                        EventName = "Chess Tournament",
+                        EventDate = eventDate,
+                        ProfilePicture = R.drawable.gomeet_logo,
+                        EventPicture = R.drawable.intbee_logo,
+                        Verified = true,
+                        nav = nav
+                    )
+
+                    if (selectedFilter == "All" || selectedFilter == "MyEvents") {
+                        Text(
+                            text = "My Events",
+                            style =
+                            TextStyle(
+                                fontSize = 20.sp,
+                                lineHeight = 16.sp,
+                                fontFamily = FontFamily(Font(R.font.roboto)),
+                                fontWeight = FontWeight(1000),
+                                color = DarkCyan,
+                                textAlign = TextAlign.Center,
+                                letterSpacing = 0.5.sp,
+                            ),
+                            modifier =
+                            Modifier.padding(10.dp).align(Alignment.Start).testTag("MyEventsText")
+                        )
+                        EventWidget(
+                            UserName = "EPFL Chess Club",
+                            EventName = "Chess Tournament",
+                            EventDate = eventDate,
+                            ProfilePicture = R.drawable.gomeet_logo,
+                            EventPicture = R.drawable.intbee_logo,
+                            Verified = true,
+                            nav = nav
+                        )
+
+
+                        EventWidget(
+                            UserName = "EPFL Chess Club",
+                            EventName = "Chess Tournament",
+                            EventDate = eventDate,
+                            ProfilePicture = R.drawable.gomeet_logo,
+                            EventPicture = R.drawable.intbee_logo,
+                            Verified = true,
+                            nav = nav
+                        )
+
+                    }
                 }
-
-                if (selectedFilter == "All" || selectedFilter == "MyEvents") {
-                  Text(
-                      text = "My Events",
-                      style =
-                          TextStyle(
-                              fontSize = 20.sp,
-                              lineHeight = 16.sp,
-                              fontFamily = FontFamily(Font(R.font.roboto)),
-                              fontWeight = FontWeight(1000),
-                              color = DarkCyan,
-                              textAlign = TextAlign.Center,
-                              letterSpacing = 0.5.sp,
-                          ),
-                      modifier =
-                          Modifier.padding(10.dp).align(Alignment.Start).testTag("MyEventsText"))
-                  EventWidget(
-                      UserName = "EPFL Chess Club",
-                      EventName = "Chess Tournament",
-                      EventDate = eventDate,
-                      ProfilePicture = R.drawable.gomeet_logo,
-                      EventPicture = R.drawable.intbee_logo,
-                      Verified = true,
-                      nav = nav)
-
-                  EventWidget(
-                      UserName = "EPFL Chess Club",
-                      EventName = "Chess Tournament",
-                      EventDate = eventDate,
-                      ProfilePicture = R.drawable.gomeet_logo,
-                      EventPicture = R.drawable.intbee_logo,
-                      Verified = true,
-                      nav = nav)
-                }
-              }
             }
-      }
+        }
+    }
 }
 
 @Composable
