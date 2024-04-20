@@ -31,7 +31,7 @@ object Route {
   const val PROFILE = "Profile"
   const val PUBLIC_CREATE = "Public Create"
   const val PRIVATE_CREATE = "Private Create"
-    const val OTHERS_PROFILE = "Others Profile"
+  const val OTHERS_PROFILE = "Others Profile"
 }
 
 val CREATE_ITEMS =
@@ -60,22 +60,23 @@ val TOP_LEVEL_DESTINATIONS =
     listOf(
         TopLevelDestination(
             route = Route.EVENTS, icon = Icons.Default.DateRange, textId = Route.EVENTS),
-        TopLevelDestination(
-            route = Route.TRENDS, icon = Icons.Default.Home, textId = Route.TRENDS),
+        TopLevelDestination(route = Route.TRENDS, icon = Icons.Default.Home, textId = Route.TRENDS),
         TopLevelDestination(
             route = Route.EXPLORE, icon = Icons.Default.Home, textId = Route.EXPLORE),
-        TopLevelDestination(
-            route = Route.CREATE, icon = Icons.Default.Add, textId = Route.CREATE),
+        TopLevelDestination(route = Route.CREATE, icon = Icons.Default.Add, textId = Route.CREATE),
         TopLevelDestination(
             route = Route.PROFILE, icon = Icons.Default.Person, textId = Route.PROFILE))
 
-val SECOND_LEVEL_DESTINATION = listOf(
-    TopLevelDestination(
-        route = Route.OTHERS_PROFILE, icon = Icons.Default.Person, textId = Route.OTHERS_PROFILE))
+val SECOND_LEVEL_DESTINATION =
+    listOf(
+        TopLevelDestination(
+            route = Route.OTHERS_PROFILE,
+            icon = Icons.Default.Person,
+            textId = Route.OTHERS_PROFILE))
 
 class NavigationActions(val navController: NavHostController) {
   fun navigateTo(destination: TopLevelDestination, clearBackStack: Boolean = false) {
-      Log.d("Navigation", "Navigating to ${destination.route}, clear back stack: $clearBackStack")
+    Log.d("Navigation", "Navigating to ${destination.route}, clear back stack: $clearBackStack")
     navController.navigate(destination.route) {
       if (clearBackStack) {
         popUpTo(navController.graph.findStartDestination().id) { inclusive = true }
