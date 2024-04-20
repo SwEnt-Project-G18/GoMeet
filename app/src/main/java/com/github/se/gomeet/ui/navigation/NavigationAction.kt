@@ -33,9 +33,10 @@ object Route {
   const val PROFILE = "Profile"
   const val PUBLIC_CREATE = "Public Create"
   const val PRIVATE_CREATE = "Private Create"
-  const val OTHERS_PROFILE = "Others Profile"
+  const val OTHERS_PROFILE = "Others Profile
   const val EVENT_INFO =
       "eventInfo/{title}/{date}/{time}/{organizer}/{rating}/{description}/{latitude}/{longitude}"
+
 }
 
 val CREATE_ITEMS =
@@ -78,7 +79,9 @@ val SECOND_LEVEL_DESTINATION =
             icon = Icons.Default.Person,
             textId = Route.OTHERS_PROFILE),
         TopLevelDestination(
-            route = Route.EVENT_INFO, icon = Icons.Default.Person, textId = Route.EVENT_INFO))
+            route = Route.EVENT_INFO,
+            icon = Icons.Default.Person,
+            textId = Route.EVENT_INFO))
 
 class NavigationActions(val navController: NavHostController) {
   fun navigateTo(destination: TopLevelDestination, clearBackStack: Boolean = false) {
