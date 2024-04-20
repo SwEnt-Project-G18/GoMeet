@@ -1,5 +1,6 @@
 package com.github.se.gomeet.ui.navigation
 
+import android.util.Log
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
@@ -30,6 +31,7 @@ object Route {
   const val PROFILE = "Profile"
   const val PUBLIC_CREATE = "Public Create"
   const val PRIVATE_CREATE = "Private Create"
+  const val OTHERS_PROFILE = "Others Profile"
 }
 
 val CREATE_ITEMS =
@@ -65,8 +67,16 @@ val TOP_LEVEL_DESTINATIONS =
         TopLevelDestination(
             route = Route.PROFILE, icon = Icons.Default.Person, textId = Route.PROFILE))
 
+val SECOND_LEVEL_DESTINATION =
+    listOf(
+        TopLevelDestination(
+            route = Route.OTHERS_PROFILE,
+            icon = Icons.Default.Person,
+            textId = Route.OTHERS_PROFILE))
+
 class NavigationActions(val navController: NavHostController) {
   fun navigateTo(destination: TopLevelDestination, clearBackStack: Boolean = false) {
+    Log.d("Navigation", "Navigating to ${destination.route}, clear back stack: $clearBackStack")
     navController.navigate(destination.route) {
       if (clearBackStack) {
         popUpTo(navController.graph.findStartDestination().id) { inclusive = true }

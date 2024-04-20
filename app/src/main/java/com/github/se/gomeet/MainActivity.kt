@@ -21,6 +21,7 @@ import com.github.se.gomeet.ui.mainscreens.Profile
 import com.github.se.gomeet.ui.mainscreens.Trends
 import com.github.se.gomeet.ui.mainscreens.create.Create
 import com.github.se.gomeet.ui.mainscreens.create.CreateEvent
+import com.github.se.gomeet.ui.mainscreens.profile.OthersProfile
 import com.github.se.gomeet.ui.navigation.LOGIN_ITEMS
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
@@ -78,6 +79,7 @@ class MainActivity : ComponentActivity() {
             composable(Route.TRENDS) { Trends(navAction) }
             composable(Route.CREATE) { Create(navAction) }
             composable(Route.PROFILE) { Profile(navAction) }
+            composable(Route.OTHERS_PROFILE) { OthersProfile(navAction) }
             composable(Route.PRIVATE_CREATE) {
               CreateEvent(navAction, EventViewModel(userIdState.value), true)
             }
