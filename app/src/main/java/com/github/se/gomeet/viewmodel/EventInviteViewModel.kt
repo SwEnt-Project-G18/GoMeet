@@ -10,6 +10,8 @@ import com.google.firebase.ktx.Firebase
 class EventInviteViewModel(_db: FirebaseFirestore? = null) {
 
     private val db = _db ?: Firebase.firestore
+    // Store invites as list of strings (references to the event documents)
+    private val eventInvites: MutableList<String> = mutableListOf()
 
     // Constructor
     init{
@@ -29,25 +31,20 @@ class EventInviteViewModel(_db: FirebaseFirestore? = null) {
                 return@addSnapshotListener
             }
 
-            // TODO
-//            for (docChange in snapshot?.documentChanges!!) {
-//
-//                val inviteList = null
-//
-//                when (docChange.type) {
-//                    DocumentChange.Type.ADDED -> {
-//                        localEventsList.add(event)
-//                    }
-//                    DocumentChange.Type.MODIFIED -> {
-//                        localEventsList
-//                            .find { it == event }
-//                            ?.let { localEventsList[localEventsList.indexOf(it)] = event }
-//                    }
-//                    DocumentChange.Type.REMOVED -> {
-//                        localEventsList.removeIf { it == event }
-//                    }
-//                }
-//            }
+            for (docChange in snapshot?.documentChanges!!) {
+
+                val invite = docChange.document.data["invite"] as String
+
+                when (docChange.type) {
+                    DocumentChange.Type.ADDED -> {
+                        eventInvites.add(invite)
+                    }
+                    DocumentChange.Type.MODIFIED -> {}
+                    DocumentChange.Type.REMOVED -> {
+                        eventInvites.removeIf { it == invite }
+                    }
+                }
+            }
         }
     }
 }
