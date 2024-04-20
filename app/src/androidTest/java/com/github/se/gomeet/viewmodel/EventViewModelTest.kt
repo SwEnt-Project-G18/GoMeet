@@ -76,8 +76,8 @@ class EventViewModelTest {
     assert(event.title == newTitle)
 
     // test removeEvent
-    eventViewModel.removeEvent(events[0].uid)
-    event = eventViewModel.getEvent(events[0].uid)
+    eventViewModel.removeEvent(uid)
+    event = eventViewModel.getEvent(uid)
 
     assert(event == null)
   }

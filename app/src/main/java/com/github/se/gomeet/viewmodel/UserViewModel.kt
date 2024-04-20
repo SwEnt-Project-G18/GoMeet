@@ -52,19 +52,19 @@ class UserViewModel : ViewModel() {
     db.removeUser(user)
   }
 
-  fun sendRequest() {
-    // TODO
-  }
+  // fun sendRequest() {
+  // TODO
+  // }
 
-  fun remove() {
-    // TODO
-  }
+  // fun remove() {
+  // TODO
+  // }
 
-  fun accept() {
-    // TODO
-  }
+  // fun accept() {
+  // TODO
+  // }
 
-  fun reject() {
-    // TODO
-  }
+  // fun reject() {
+  // TODO
+  // }
 }
