@@ -11,55 +11,44 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class UserViewModelTest {
   private val userViewModel = UserViewModel()
-  private val testUid = "testuser"
-  private val testUsername = "testuser"
+  private val uid = "testuid"
+  private val username = "testuser"
 
   @Before
   fun createNewUser() {
-    userViewModel.createUserIfNew(testUid, testUsername)
+    userViewModel.createUserIfNew(uid, username)
   }
 
   @Test
-  fun getUserTest() = runTest {
-    var uid = "QpjFlPXRuoYhvtOWcjgR51JYCXs2"
+  fun test() = runTest {
+    // wait for user to be created
+    TimeUnit.SECONDS.sleep(2)
+
+    // test getUser and createUser
     var user = userViewModel.getUser(uid)
 
     assert(user != null)
     assert(user!!.uid == uid)
+    assert(user.username == username)
 
-    uid = "this_user_does_not_exist"
-    user = userViewModel.getUser(uid)
+    assert(userViewModel.getUser("this_user_does_not_exist") == null)
 
-    assert(user == null)
-  }
-
-  @Test
-  fun getAndDeleteNewUserTest() = runTest {
-    var user = userViewModel.getUser(testUid)
-
-    assert(user != null)
-    assert(user!!.uid == testUid)
-    assert(user.username == testUsername)
-
-    userViewModel.deleteUser(testUid)
-    TimeUnit.SECONDS.sleep(1)
-    user = userViewModel.getUser(testUid)
-
-    assert(user == null)
-  }
-
-  @Test
-  fun editUserTest() = runTest {
-    val uid = "QpjFlPXRuoYhvtOWcjgR51JYCXs2"
-    var user = userViewModel.getUser(uid)
-    val randomNumber = (0..Int.MAX_VALUE).random().toString()
-    val newUsername = "test_user_dont_delete_$randomNumber"
-    val newUser = GoMeetUser(user!!.uid, newUsername, emptyList(), emptyList(), emptyList())
+    // test editUser
+    val newUsername = "newtestuser"
+    val newUser = GoMeetUser(user.uid, newUsername, emptyList(), emptyList(), emptyList())
 
     userViewModel.editUser(newUser)
     user = userViewModel.getUser(uid)
 
     assert(user != null)
-    assert(user!!.username == newUsername)
+    assert(user!!.uid == uid)
+    assert(user.username == newUsername)
+
+    // test deleteUser
+    userViewModel.deleteUser(uid)
+    TimeUnit.SECONDS.sleep(1)
+    user = userViewModel.getUser(uid)
+
+    assert(user == null)
   }
 }
