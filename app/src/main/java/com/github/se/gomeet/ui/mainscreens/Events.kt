@@ -176,19 +176,22 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
                   eventList.forEach { event ->
                     val painter: Painter =
                         rememberAsyncImagePainter(
-                            ImageRequest.Builder(LocalContext.current).data(data = event.images[0])
-                                .apply(block = fun ImageRequest.Builder.() {
-                                    crossfade(true)
-                                    placeholder(R.drawable.gomeet_logo)
-                                }).build()
-                        )
+                            ImageRequest.Builder(LocalContext.current)
+                                .data(data = event.images[0])
+                                .apply(
+                                    block =
+                                        fun ImageRequest.Builder.() {
+                                          crossfade(true)
+                                          placeholder(R.drawable.gomeet_logo)
+                                        })
+                                .build())
                     EventWidget(
-                        UserName = event.creator,
-                        EventName = event.title,
-                        EventDate =
+                        userName = event.creator,
+                        eventName = event.title,
+                        eventDate =
                             Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant()),
-                        EventPicture = painter,
-                        Verified = event.verified)
+                        eventPicture = painter,
+                        verified = event.verified)
                   }
                 }
 
@@ -208,28 +211,30 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
                           ),
                       modifier = Modifier.padding(10.dp).align(Alignment.Start))
 
-
-                    eventList.forEach { event ->
-                        val painter: Painter =
-                            if(event.images[0].isNotBlank()){
-                            rememberAsyncImagePainter(
-                                ImageRequest.Builder(LocalContext.current).data(data = event.images[0])
-                                    .apply(block = fun ImageRequest.Builder.() {
-                                        crossfade(true)
-                                        placeholder(R.drawable.gomeet_logo)
-                                    }).build()
-                            )}
-                        else{
-                                painterResource(id = R.drawable.gomeet_logo)
-                            }
-                        EventWidget(
-                            UserName = event.creator,
-                            EventName = event.title,
-                            EventDate =
+                  eventList.forEach { event ->
+                    val painter: Painter =
+                        if (event.images[0].isNotBlank()) {
+                          rememberAsyncImagePainter(
+                              ImageRequest.Builder(LocalContext.current)
+                                  .data(data = event.images[0])
+                                  .apply(
+                                      block =
+                                          fun ImageRequest.Builder.() {
+                                            crossfade(true)
+                                            placeholder(R.drawable.gomeet_logo)
+                                          })
+                                  .build())
+                        } else {
+                          painterResource(id = R.drawable.gomeet_logo)
+                        }
+                    EventWidget(
+                        userName = event.creator,
+                        eventName = event.title,
+                        eventDate =
                             Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant()),
-                            EventPicture = painter,
-                            Verified = event.verified)
-                    }
+                        eventPicture = painter,
+                        verified = event.verified)
+                  }
                 }
 
                 if (selectedFilter == "All" || selectedFilter == "MyEvents") {
@@ -246,27 +251,30 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
                               letterSpacing = 0.5.sp,
                           ),
                       modifier = Modifier.padding(10.dp).align(Alignment.Start))
-                    eventList.forEach { event ->
-                        val painter: Painter =
-                            if(event.images[0].isNotBlank()){
-                                rememberAsyncImagePainter(
-                                    ImageRequest.Builder(LocalContext.current).data(data = event.images[0])
-                                        .apply(block = fun ImageRequest.Builder.() {
+                  eventList.forEach { event ->
+                    val painter: Painter =
+                        if (event.images[0].isNotBlank()) {
+                          rememberAsyncImagePainter(
+                              ImageRequest.Builder(LocalContext.current)
+                                  .data(data = event.images[0])
+                                  .apply(
+                                      block =
+                                          fun ImageRequest.Builder.() {
                                             crossfade(true)
                                             placeholder(R.drawable.gomeet_logo)
-                                        }).build()
-                                )}
-                            else{
-                                painterResource(id = R.drawable.gomeet_logo)
-                            }
-                        EventWidget(
-                            UserName = event.creator,
-                            EventName = event.title,
-                            EventDate =
+                                          })
+                                  .build())
+                        } else {
+                          painterResource(id = R.drawable.gomeet_logo)
+                        }
+                    EventWidget(
+                        userName = event.creator,
+                        eventName = event.title,
+                        eventDate =
                             Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant()),
-                            EventPicture = painter,
-                            Verified = event.verified)
-                    }
+                        eventPicture = painter,
+                        verified = event.verified)
+                  }
                 }
               }
             }
@@ -275,11 +283,11 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
 
 @Composable
 fun EventWidget(
-    UserName: String,
-    EventName: String,
-    EventDate: Date,
-    EventPicture: Painter,
-    Verified: Boolean
+    userName: String,
+    eventName: String,
+    eventDate: Date,
+    eventPicture: Painter,
+    verified: Boolean
 ) {
 
   val configuration = LocalConfiguration.current
@@ -377,7 +385,7 @@ fun EventWidget(
                             ))
                   }
               Image(
-                  painter = EventPicture,
+                  painter = eventPicture,
                   contentDescription = "Event Picture",
                   modifier =
                       Modifier.weight(

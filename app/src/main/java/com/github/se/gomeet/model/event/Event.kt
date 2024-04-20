@@ -19,7 +19,7 @@ data class Event(
     val public: Boolean, // True if the event is public, false if it's private
     val tags: List<String>, // Tags of the event
     val images: List<String>,
-    val verified: Boolean// TODO : Is it the right type for images ?
+    val verified: Boolean // TODO : Is it the right type for images ?
 )
 
 fun parseEvent(document: Map<String, Any>): Event? {
@@ -39,6 +39,7 @@ fun parseEvent(document: Map<String, Any>): Event? {
         uid = document["uid"] as? String ?: return null,
         url = document["url"] as? String ?: return null,
         visibleToIfPrivate = document["visibleToIfPrivate"] as? List<String> ?: emptyList(),
+        verified = document["verified"] as? Boolean ?: return null
     )
   } catch (e: Exception) {
     e.printStackTrace()
