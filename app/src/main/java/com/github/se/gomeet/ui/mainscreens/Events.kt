@@ -324,23 +324,26 @@ fun EventWidget(
     // Determine if the event date is within this week
     val isThisWeek = eventCalendar >= startOfWeek && eventCalendar <= endOfWeek
 
-    // Format based on whether the date is in the current week
-    val dateFormat =
-        if (isThisWeek) {
-            SimpleDateFormat("EEEE - HH:mm", Locale.getDefault()) // "Tuesday"
-        } else {
-            SimpleDateFormat("dd/MM/yy - HH:mm", Locale.getDefault()) // "05/12/24"
-        }
+    // Define formats for day and time separately
+    val dayFormat = if (isThisWeek) {
+        SimpleDateFormat("EEEE", Locale.getDefault()) // "Tuesday"
+    } else {
+        SimpleDateFormat("dd/MM/yy", Locale.getDefault()) // "05/12/24"
+    }
 
-    // Convert the Date object to a formatted String
-    val dateString = dateFormat.format(EventDate)
+    val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault()) // "15:30"
+
+    // Convert the Date object to formatted Strings
+    val dayString = dayFormat.format(EventDate)
+    val timeString = timeFormat.format(EventDate)
 
   Card(
       modifier =
           Modifier.fillMaxWidth()
               .padding(start = 10.dp, top = 5.dp, end = 10.dp, bottom = 5.dp)
               .testTag("Card").padding(start = 10.dp, top = 5.dp, end = 10.dp, bottom = 5.dp).clickable {
-             nav.navigateToEventInfo(title = EventName, date =  dateString, time = dateString, description = "TEST", organizer = UserName, loc = LatLng(0.0,0.0), rating = 0.0) },
+             nav.navigateToEventInfo(title = EventName, date =  dayString, time = timeString, description = "TEST", organizer = UserName, loc = LatLng(0.0,0.0), rating = 0.0) },
+
       colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
       border = BorderStroke(2.dp, DarkCyan)) {
         Row(
@@ -394,7 +397,7 @@ fun EventWidget(
 
 
                     Text(
-                        dateString,
+                        dayString + " - " + timeString,
                         style =
                             TextStyle(
                                 fontSize = smallTextSize.sp,
