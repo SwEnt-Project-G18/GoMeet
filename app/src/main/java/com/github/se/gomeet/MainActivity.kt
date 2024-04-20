@@ -34,9 +34,9 @@ import com.github.se.gomeet.ui.theme.SetStatusBarColor
 import com.github.se.gomeet.viewmodel.AuthViewModel
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
+import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.google.android.gms.maps.model.LatLng
 
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -101,8 +101,13 @@ class MainActivity : ComponentActivity() {
                         navArgument("organizer") { type = NavType.StringType },
                         navArgument("rating") { type = NavType.FloatType },
                         navArgument("description") { type = NavType.StringType },
-                        navArgument("latitude") { type = NavType.FloatType },
-                        navArgument("longitude") { type = NavType.FloatType })) { entry ->
+                        navArgument("latitude") {
+                          type = NavType.FloatType
+                        }, // Change to DoubleType
+                        navArgument("longitude") {
+                          type = NavType.FloatType
+                        } // Change to DoubleType
+                        )) { entry ->
                   val title = entry.arguments?.getString("title") ?: ""
                   val date = entry.arguments?.getString("date") ?: ""
                   val time = entry.arguments?.getString("time") ?: ""

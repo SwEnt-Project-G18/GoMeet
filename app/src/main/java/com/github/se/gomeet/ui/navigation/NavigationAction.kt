@@ -1,5 +1,6 @@
 package com.github.se.gomeet.ui.navigation
 
+import android.net.Uri
 import android.util.Log
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -105,12 +106,12 @@ class NavigationActions(val navController: NavHostController) {
       loc: LatLng
   ) {
     val route =
-        Route.EVENT_INFO.replace("{title}", title)
-            .replace("{date}", date)
-            .replace("{time}", time)
-            .replace("{organizer}", organizer)
+        Route.EVENT_INFO.replace("{title}", Uri.encode(title))
+            .replace("{date}", Uri.encode(date))
+            .replace("{time}", Uri.encode(time))
+            .replace("{organizer}", Uri.encode(organizer))
             .replace("{rating}", rating.toString())
-            .replace("{description}", description)
+            .replace("{description}", Uri.encode(description))
             .replace("{latitude}", loc.latitude.toString())
             .replace("{longitude}", loc.longitude.toString())
     navController.navigate(route)

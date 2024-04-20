@@ -247,16 +247,14 @@ fun Events(nav: NavigationActions) {
                       Verified = true,
                       nav = nav)
 
-
-                    EventWidget(
-                        UserName = "EPFL Chess Club",
-                        EventName = "Chess Tournament",
-                        EventDate = eventDate,
-                        ProfilePicture = R.drawable.gomeet_logo,
-                        EventPicture = R.drawable.intbee_logo,
-                        Verified = true,
-                        nav = nav)
-
+                  EventWidget(
+                      UserName = "EPFL Chess Club",
+                      EventName = "Chess Tournament",
+                      EventDate = eventDate,
+                      ProfilePicture = R.drawable.gomeet_logo,
+                      EventPicture = R.drawable.intbee_logo,
+                      Verified = true,
+                      nav = nav)
                 }
 
                 if (selectedFilter == "All" || selectedFilter == "MyEvents") {
@@ -283,14 +281,14 @@ fun Events(nav: NavigationActions) {
                       Verified = true,
                       nav = nav)
 
-                    EventWidget(
-                        UserName = "EPFL Chess Club",
-                        EventName = "Chess Tournament",
-                        EventDate = eventDate,
-                        ProfilePicture = R.drawable.gomeet_logo,
-                        EventPicture = R.drawable.intbee_logo,
-                        Verified = true,
-                        nav = nav)
+                  EventWidget(
+                      UserName = "EPFL Chess Club",
+                      EventName = "Chess Tournament",
+                      EventDate = eventDate,
+                      ProfilePicture = R.drawable.gomeet_logo,
+                      EventPicture = R.drawable.intbee_logo,
+                      Verified = true,
+                      nav = nav)
                 }
               }
             }
@@ -339,18 +337,21 @@ fun EventWidget(
 
   Card(
       modifier =
-
-          Modifier.fillMaxWidth().testTag("Card").padding(start = 10.dp, top = 5.dp, end = 10.dp, bottom = 5.dp).clickable {
-             nav.navigateToEventInfo(
-                 title = EventName,
-                 date =  dayString,
-                 time = timeString,
-                 description = "TEST", //replace with actual description
-                 organizer = UserName,
-                 loc = LatLng(46.539027,6.560908), //replace with actual location
-                 rating = 0.0 //replace with actual rating
-                 // add image
-             ) },
+          Modifier.fillMaxWidth()
+              .testTag("Card")
+              .padding(start = 10.dp, top = 5.dp, end = 10.dp, bottom = 5.dp)
+              .clickable {
+                nav.navigateToEventInfo(
+                    title = EventName,
+                    date = dayString,
+                    time = timeString,
+                    description = "TEST", // replace with actual description
+                    organizer = UserName,
+                    loc = LatLng(46.539027, 6.560908), // replace with actual location
+                    rating = 0.0 // replace with actual rating
+                    // add image
+                    )
+              },
       colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
       border = BorderStroke(2.dp, DarkCyan)) {
         Row(
@@ -425,9 +426,7 @@ fun EventWidget(
                           .padding(0.dp) // Clip the image if it overflows its bounds
                           .testTag("EventPicture"),
                   contentScale = ContentScale.Crop, // Crop the image to fit the aspect ratio
-
-                  )
-
+              )
             }
       }
 }
