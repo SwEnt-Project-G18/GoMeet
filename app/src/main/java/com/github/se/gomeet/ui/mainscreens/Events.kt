@@ -309,7 +309,6 @@ fun EventWidget(
   val screenWidth = configuration.screenWidthDp.dp
   val density = LocalDensity.current
 
-  // Example logic to calculate text size based on screen width
   val smallTextSize = with(density) { screenWidth.toPx() / 85 }
   val bigTextSize = with(density) { screenWidth.toPx() / 60 }
 
@@ -321,29 +320,32 @@ fun EventWidget(
 
     val eventCalendar = Calendar.getInstance().apply { time = EventDate }
 
-    // Determine if the event date is within this week
     val isThisWeek = eventCalendar >= startOfWeek && eventCalendar <= endOfWeek
 
-    // Define formats for day and time separately
     val dayFormat = if (isThisWeek) {
-        SimpleDateFormat("EEEE", Locale.getDefault()) // "Tuesday"
+        SimpleDateFormat("EEEE", Locale.getDefault())
     } else {
-        SimpleDateFormat("dd/MM/yy", Locale.getDefault()) // "05/12/24"
+        SimpleDateFormat("dd/MM/yy", Locale.getDefault())
     }
 
-    val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault()) // "15:30"
+    val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
 
-    // Convert the Date object to formatted Strings
     val dayString = dayFormat.format(EventDate)
     val timeString = timeFormat.format(EventDate)
 
   Card(
       modifier =
-          Modifier.fillMaxWidth()
-              .padding(start = 10.dp, top = 5.dp, end = 10.dp, bottom = 5.dp)
-              .testTag("Card").padding(start = 10.dp, top = 5.dp, end = 10.dp, bottom = 5.dp).clickable {
-             nav.navigateToEventInfo(title = EventName, date =  dayString, time = timeString, description = "TEST", organizer = UserName, loc = LatLng(0.0,0.0), rating = 0.0) },
-
+          Modifier.fillMaxWidth().testTag("Card").padding(start = 10.dp, top = 5.dp, end = 10.dp, bottom = 5.dp).clickable {
+             nav.navigateToEventInfo(
+                 title = EventName,
+                 date =  dayString,
+                 time = timeString,
+                 description = "TEST", //replace with actual description
+                 organizer = UserName,
+                 loc = LatLng(46.539027,6.560908), //replace with actual location
+                 rating = 0.0 //replace with actual rating
+                 // add image
+             ) },
       colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
       border = BorderStroke(2.dp, DarkCyan)) {
         Row(
@@ -414,15 +416,16 @@ fun EventWidget(
                   contentDescription = "Event Picture",
                   modifier =
                       Modifier.weight(
-                              3f) // Take 1/3 of the card space because of the total weight of 4 (3
-                          // for the column and 1 for this image)
-                          .fillMaxHeight() // Fill the height of the Row
+                              3f)
+                          .fillMaxHeight()
                           .aspectRatio(
-                              3f / 1.75f) // Maintain an aspect ratio of 3:2, change it as needed
+                              3f / 1.75f)
                           .clipToBounds()
+
                           .padding(0.dp) // Clip the image if it overflows its bounds
                           .testTag("EventPicture"),
-                  contentScale = ContentScale.Crop // Crop the image to fit the aspect ratio
+                  contentScale = ContentScale.Crop, // Crop the image to fit the aspect ratio
+
                   )
             }
       }
