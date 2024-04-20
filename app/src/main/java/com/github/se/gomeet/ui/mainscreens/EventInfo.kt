@@ -162,7 +162,7 @@ fun EventDateTime(day: String, time: String) {
             Text(
                 text = day,
                 style = TextStyle(
-                    fontSize = 30.sp,
+                    fontSize = 24.sp,
                     color = MaterialTheme.colorScheme.onBackground,
                     fontWeight = FontWeight.SemiBold,
                     textAlign = TextAlign.Center
