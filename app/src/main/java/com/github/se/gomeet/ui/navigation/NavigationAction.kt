@@ -10,9 +10,11 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
+import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import com.github.se.gomeet.R
+import com.google.android.gms.maps.model.LatLng
 
 data class TopLevelDestination(
     val route: String,
@@ -32,6 +34,7 @@ object Route {
   const val PUBLIC_CREATE = "Public Create"
   const val PRIVATE_CREATE = "Private Create"
     const val OTHERS_PROFILE = "Others Profile"
+    const val EVENT_INFO = "eventInfo/{title}/{date}/{time}/{organizer}/{rating}/{description}/{latitude}/{longitude}"
 }
 
 val CREATE_ITEMS =
@@ -71,7 +74,9 @@ val TOP_LEVEL_DESTINATIONS =
 
 val SECOND_LEVEL_DESTINATION = listOf(
     TopLevelDestination(
-        route = Route.OTHERS_PROFILE, icon = Icons.Default.Person, textId = Route.OTHERS_PROFILE))
+        route = Route.OTHERS_PROFILE, icon = Icons.Default.Person, textId = Route.OTHERS_PROFILE),
+    TopLevelDestination(
+        route = Route.EVENT_INFO, icon = Icons.Default.Person, textId = Route.EVENT_INFO))
 
 class NavigationActions(val navController: NavHostController) {
   fun navigateTo(destination: TopLevelDestination, clearBackStack: Boolean = false) {
@@ -84,6 +89,32 @@ class NavigationActions(val navController: NavHostController) {
       restoreState = true
     }
   }
+
+
+    fun navigateToScreen(route: String) {
+        navController.navigate(route)
+    }
+
+    fun navigateToEventInfo(
+        title: String,
+        date: String,
+        time: String,
+        organizer: String,
+        rating: Double,
+        description: String,
+        loc: LatLng
+    ) {
+        val route = Route.EVENT_INFO
+            .replace("{title}", title)
+            .replace("{date}", date)
+            .replace("{time}", time)
+            .replace("{organizer}", organizer)
+            .replace("{rating}", rating.toString())
+            .replace("{description}", description)
+            .replace("{latitude}", loc.latitude.toString())
+            .replace("{longitude}", loc.longitude.toString())
+        navController.navigate(route)
+    }
 
   fun goBack() {
     navController.popBackStack()

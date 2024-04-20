@@ -2,6 +2,7 @@ package com.github.se.gomeet.ui.mainscreens
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -53,9 +54,11 @@ import com.github.se.gomeet.R
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
+import com.github.se.gomeet.ui.navigation.SECOND_LEVEL_DESTINATION
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.ui.theme.NavBarUnselected
+import com.google.android.gms.maps.model.LatLng
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -175,42 +178,48 @@ fun Events(nav: NavigationActions) {
                       EventDate = eventDate,
                       ProfilePicture = R.drawable.gomeet_logo,
                       EventPicture = R.drawable.intbee_logo,
-                      Verified = true)
-                  EventWidget(
-                      UserName = "EPFL Chess Club",
-                      EventName = "Chess Tournament",
-                      EventDate = eventDate,
-                      ProfilePicture = R.drawable.gomeet_logo,
-                      EventPicture = R.drawable.intbee_logo,
-                      Verified = true)
-                  EventWidget(
-                      UserName = "EPFL Chess Club",
-                      EventName = "Chess Tournament",
-                      EventDate = eventDate,
-                      ProfilePicture = R.drawable.gomeet_logo,
-                      EventPicture = R.drawable.intbee_logo,
-                      Verified = true)
-                  EventWidget(
-                      UserName = "EPFL Chess Club",
-                      EventName = "Chess Tournament",
-                      EventDate = eventDate,
-                      ProfilePicture = R.drawable.gomeet_logo,
-                      EventPicture = R.drawable.intbee_logo,
-                      Verified = true)
-                  EventWidget(
-                      UserName = "EPFL Chess Club",
-                      EventName = "Chess Tournament",
-                      EventDate = eventDate,
-                      ProfilePicture = R.drawable.gomeet_logo,
-                      EventPicture = R.drawable.intbee_logo,
-                      Verified = true)
-                  EventWidget(
-                      UserName = "EPFL Chess Club",
-                      EventName = "Chess Tournament",
-                      EventDate = eventDate,
-                      ProfilePicture = R.drawable.gomeet_logo,
-                      EventPicture = R.drawable.intbee_logo,
-                      Verified = true)
+                      Verified = true,
+                      nav = nav)
+                    EventWidget(
+                        UserName = "EPFL",
+                        EventName = "Chess",
+                        EventDate = eventDate,
+                        ProfilePicture = R.drawable.gomeet_logo,
+                        EventPicture = R.drawable.intbee_logo,
+                        Verified = true,
+                        nav = nav)
+                    EventWidget(
+                        UserName = "EPFL Chess Club",
+                        EventName = "Chess Tournament",
+                        EventDate = eventDate,
+                        ProfilePicture = R.drawable.gomeet_logo,
+                        EventPicture = R.drawable.intbee_logo,
+                        Verified = true,
+                        nav = nav)
+                    EventWidget(
+                        UserName = "EPFL Chess Club",
+                        EventName = "Chess Tournament",
+                        EventDate = eventDate,
+                        ProfilePicture = R.drawable.gomeet_logo,
+                        EventPicture = R.drawable.intbee_logo,
+                        Verified = true,
+                        nav = nav)
+                    EventWidget(
+                        UserName = "EPFL Chess Club",
+                        EventName = "Chess Tournament",
+                        EventDate = eventDate,
+                        ProfilePicture = R.drawable.gomeet_logo,
+                        EventPicture = R.drawable.intbee_logo,
+                        Verified = true,
+                        nav = nav)
+                    EventWidget(
+                        UserName = "EPFL Chess Club",
+                        EventName = "Chess Tournament",
+                        EventDate = eventDate,
+                        ProfilePicture = R.drawable.gomeet_logo,
+                        EventPicture = R.drawable.intbee_logo,
+                        Verified = true,
+                        nav = nav)
                 }
 
                 if (selectedFilter == "All" || selectedFilter == "Favourites") {
@@ -235,7 +244,17 @@ fun Events(nav: NavigationActions) {
                       EventDate = eventDate,
                       ProfilePicture = R.drawable.gomeet_logo,
                       EventPicture = R.drawable.intbee_logo,
-                      Verified = true)
+                      Verified = true,
+                      nav = nav)
+
+                    EventWidget(
+                        UserName = "EPFL Chess Club",
+                        EventName = "Chess Tournament",
+                        EventDate = eventDate,
+                        ProfilePicture = R.drawable.gomeet_logo,
+                        EventPicture = R.drawable.intbee_logo,
+                        Verified = true,
+                        nav = nav)
                 }
 
                 if (selectedFilter == "All" || selectedFilter == "MyEvents") {
@@ -259,7 +278,16 @@ fun Events(nav: NavigationActions) {
                       EventDate = eventDate,
                       ProfilePicture = R.drawable.gomeet_logo,
                       EventPicture = R.drawable.intbee_logo,
-                      Verified = true)
+                      Verified = true,
+                      nav = nav)
+                    EventWidget(
+                        UserName = "EPFL Chess Club",
+                        EventName = "Chess Tournament",
+                        EventDate = eventDate,
+                        ProfilePicture = R.drawable.gomeet_logo,
+                        EventPicture = R.drawable.intbee_logo,
+                        Verified = true,
+                        nav = nav)
                 }
               }
             }
@@ -273,7 +301,8 @@ fun EventWidget(
     EventDate: Date,
     ProfilePicture: Int,
     EventPicture: Int,
-    Verified: Boolean
+    Verified: Boolean,
+    nav: NavigationActions
 ) {
 
   val configuration = LocalConfiguration.current
@@ -284,11 +313,34 @@ fun EventWidget(
   val smallTextSize = with(density) { screenWidth.toPx() / 85 }
   val bigTextSize = with(density) { screenWidth.toPx() / 60 }
 
+    val currentDate = Calendar.getInstance()
+    val startOfWeek = currentDate.clone() as Calendar
+    startOfWeek[Calendar.DAY_OF_WEEK] = startOfWeek.firstDayOfWeek
+    val endOfWeek = startOfWeek.clone() as Calendar
+    endOfWeek.add(Calendar.DAY_OF_WEEK, 6)
+
+    val eventCalendar = Calendar.getInstance().apply { time = EventDate }
+
+    // Determine if the event date is within this week
+    val isThisWeek = eventCalendar >= startOfWeek && eventCalendar <= endOfWeek
+
+    // Format based on whether the date is in the current week
+    val dateFormat =
+        if (isThisWeek) {
+            SimpleDateFormat("EEEE - HH:mm", Locale.getDefault()) // "Tuesday"
+        } else {
+            SimpleDateFormat("dd/MM/yy - HH:mm", Locale.getDefault()) // "05/12/24"
+        }
+
+    // Convert the Date object to a formatted String
+    val dateString = dateFormat.format(EventDate)
+
   Card(
       modifier =
           Modifier.fillMaxWidth()
               .padding(start = 10.dp, top = 5.dp, end = 10.dp, bottom = 5.dp)
-              .testTag("Card"),
+              .testTag("Card").padding(start = 10.dp, top = 5.dp, end = 10.dp, bottom = 5.dp).clickable {
+             nav.navigateToEventInfo(title = EventName, date =  dateString, time = dateString, description = "TEST", organizer = UserName, loc = LatLng(0.0,0.0), rating = 0.0) },
       colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
       border = BorderStroke(2.dp, DarkCyan)) {
         Row(
@@ -339,27 +391,7 @@ fun EventWidget(
                           }
                         }
 
-                    val currentDate = Calendar.getInstance()
-                    val startOfWeek = currentDate.clone() as Calendar
-                    startOfWeek[Calendar.DAY_OF_WEEK] = startOfWeek.firstDayOfWeek
-                    val endOfWeek = startOfWeek.clone() as Calendar
-                    endOfWeek.add(Calendar.DAY_OF_WEEK, 6)
 
-                    val eventCalendar = Calendar.getInstance().apply { time = EventDate }
-
-                    // Determine if the event date is within this week
-                    val isThisWeek = eventCalendar >= startOfWeek && eventCalendar <= endOfWeek
-
-                    // Format based on whether the date is in the current week
-                    val dateFormat =
-                        if (isThisWeek) {
-                          SimpleDateFormat("EEEE - HH:mm", Locale.getDefault()) // "Tuesday"
-                        } else {
-                          SimpleDateFormat("dd/MM/yy - HH:mm", Locale.getDefault()) // "05/12/24"
-                        }
-
-                    // Convert the Date object to a formatted String
-                    val dateString = dateFormat.format(EventDate)
 
                     Text(
                         dateString,
