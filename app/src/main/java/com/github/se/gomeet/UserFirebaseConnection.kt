@@ -45,9 +45,9 @@ class UserFirebaseConnection(private val db: FirebaseFirestore) {
         .addOnFailureListener { e -> Log.w(TAG, "Error updating document", e) }
   }
 
-  fun removeUser(user: GoMeetUser) {
+  fun removeUser(uid: String) {
     db.collection(USERS_COLLECTION)
-        .document(user.uid)
+        .document(uid)
         .delete()
         .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully deleted!") }
         .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }

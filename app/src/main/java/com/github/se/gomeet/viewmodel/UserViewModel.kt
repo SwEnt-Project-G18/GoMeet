@@ -48,8 +48,8 @@ class UserViewModel : ViewModel() {
     db.updateUser(user)
   }
 
-  fun deleteUser(user: GoMeetUser) {
-    db.removeUser(user)
+  fun deleteUser(uid: String) {
+    db.removeUser(uid)
   }
 
   // fun sendRequest() {
