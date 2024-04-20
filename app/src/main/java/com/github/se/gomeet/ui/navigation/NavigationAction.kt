@@ -33,7 +33,7 @@ object Route {
   const val PROFILE = "Profile"
   const val PUBLIC_CREATE = "Public Create"
   const val PRIVATE_CREATE = "Private Create"
-  const val OTHERS_PROFILE = "Others Profile
+  const val OTHERS_PROFILE = "Others Profile"
   const val EVENT_INFO =
       "eventInfo/{title}/{date}/{time}/{organizer}/{rating}/{description}/{latitude}/{longitude}"
 
