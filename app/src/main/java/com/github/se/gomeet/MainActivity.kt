@@ -3,6 +3,7 @@ package com.github.se.gomeet
 import EventInfo
 import EventInfoScreen
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -97,7 +98,7 @@ class MainActivity : ComponentActivity() {
                 navArgument("organizer") { type = NavType.StringType },
                 navArgument("rating") { type = NavType.FloatType },
                 navArgument("description") { type = NavType.StringType },
-                navArgument("latitude") { type = NavType.FloatType },
+                navArgument("latitude") { type = NavType.FloatType},
                 navArgument("longitude") { type = NavType.FloatType }
               )
             ) { entry ->
@@ -107,9 +108,10 @@ class MainActivity : ComponentActivity() {
               val organizer = entry.arguments?.getString("organizer") ?: ""
               val rating = entry.arguments?.getFloat("rating") ?: 0f
               val description = entry.arguments?.getString("description") ?: ""
-              val latitude = entry.arguments?.getDouble("latitude") ?: 0.0
-              val longitude = entry.arguments?.getDouble("longitude") ?: 0.0
-              val loc = LatLng(latitude, longitude)
+              val latitude = entry.arguments?.getFloat("latitude") ?: 0.0
+              val longitude = entry.arguments?.getFloat("longitude") ?: 0.0
+              val loc = LatLng(latitude.toDouble(), longitude.toDouble())
+
 
               EventInfoScreen(
                 nav

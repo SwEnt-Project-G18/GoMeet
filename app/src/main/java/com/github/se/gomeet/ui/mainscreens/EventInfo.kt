@@ -1,3 +1,4 @@
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -22,6 +23,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -50,6 +57,7 @@ import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.SECOND_LEVEL_DESTINATION
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.ui.theme.Grey
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
@@ -59,6 +67,7 @@ import com.google.maps.android.compose.rememberMarkerState
 
 @Composable
 fun EventInfo(nav: NavigationActions, title: String = "", date: String = "", time: String ="", organizer: String ="", rating: Double =0.0, image: Painter = painterResource(id = R.drawable.ic_launcher_background), description: String = "", loc: LatLng = LatLng(0.0, 0.0)){
+    Log.d("EventInfo", "Loc is $loc")
     Scaffold(
         topBar = {
             TopAppBar(
@@ -240,13 +249,13 @@ fun MapViewComposable(
     loc: LatLng,
     zoomLevel: Float = 15f // Default zoom level for close-up of location
 ) {
-    // Prepare the states for the camera position and marker
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(loc, zoomLevel)
     }
+
     val markerState = rememberMarkerState(position = loc)
 
-    // Use the GoogleMap composable to render the map
+    // Set up the GoogleMap composable
     GoogleMap(
         modifier = Modifier
             .fillMaxWidth()
@@ -254,45 +263,22 @@ fun MapViewComposable(
             .clip(RoundedCornerShape(20.dp)),
         cameraPositionState = cameraPositionState
     ) {
-        // Add a single marker at the given location
         Marker(
             state = markerState,
             title = "Marker in Location",
             snippet = "This is the selected location"
         )
     }
-}
 
-
-@Composable
-fun SingleLocationGoogleMapView(
-    modifier: Modifier = Modifier,
-    location: LatLng,
-    zoomLevel: Float = 15f, // Default zoom level for close-up of location
-    onMapLoaded: () -> Unit = {},
-    content: @Composable () -> Unit = {}
-) {
-    val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(location, zoomLevel)
+    // Initialize the map position once and avoid resetting on recomposition
+    DisposableEffect(loc) {
+        cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(loc, zoomLevel))
+        onDispose { }
     }
 
-    val markerState = rememberMarkerState(position = location)
-
-    GoogleMap(
-        modifier = modifier,
-        cameraPositionState = cameraPositionState,
-        onMapLoaded = {
-            onMapLoaded()
-            cameraPositionState.position = CameraPosition.fromLatLngZoom(location, zoomLevel)
-        },
-        onPOIClick = {}
-    ) {
-        Marker(
-            state = markerState,
-            title = "Location",
-            snippet = "Zoomed in here"
-        )
-        content()
+    DisposableEffect(loc) {
+        markerState.position = loc
+        onDispose { }
     }
 }
 
@@ -308,9 +294,11 @@ fun EventInfoScreen(navController: NavHostController) {
     val organizer = arguments?.getString("organizer") ?: ""
     val rating = arguments?.getDouble("rating") ?: 0.0
     val description = arguments?.getString("description") ?: ""
-    val latitude = arguments?.getDouble("latitude") ?: 0.0
-    val longitude = arguments?.getDouble("longitude") ?: 0.0
-    val loc = LatLng(latitude, longitude)
+    val latitude = arguments?.getFloat("latitude") ?: 0.0
+    val longitude = arguments?.getFloat("longitude") ?: 0.0
+    val loc = LatLng(latitude.toDouble(), longitude.toDouble())
+
+    Log.d("EventInfoScreen", "Loc is $loc")
 
     EventInfo(
         nav = NavigationActions(navController),
