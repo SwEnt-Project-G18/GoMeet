@@ -1,6 +1,5 @@
 package com.github.se.gomeet.ui.mainscreens
 
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -10,7 +9,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -54,7 +52,6 @@ import com.github.se.gomeet.ui.mainscreens.profile.ProfileEventsList
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
-import com.github.se.gomeet.ui.navigation.SECOND_LEVEL_DESTINATION
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.ui.theme.Grey
@@ -88,7 +85,7 @@ fun Profile(nav: NavigationActions) { // TODO Add parameters to the function
           Spacer(Modifier.weight(1f))
           IconButton(
               modifier = Modifier.align(Alignment.CenterVertically).padding(end = 15.dp),
-              onClick = {/* Handle settings icon click */}) {
+              onClick = { /* Handle settings icon click */}) {
                 Icon(
                     imageVector = ImageVector.vectorResource(R.drawable.settings_icon),
                     contentDescription = "Settings",
@@ -339,7 +336,6 @@ fun Profile(nav: NavigationActions) { // TODO Add parameters to the function
             }
       }
 }
-
 
 @Preview
 @Composable

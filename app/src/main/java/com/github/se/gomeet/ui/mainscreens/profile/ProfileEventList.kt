@@ -31,46 +31,47 @@ import androidx.compose.ui.unit.sp
 import com.github.se.gomeet.R
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.ui.theme.Grey
+
 @Composable
 fun ProfileEventsList(title: String) {
-    Spacer(modifier = Modifier.height(10.dp))
-    Column {
-        Row(Modifier.padding(start = 15.dp, end = 0.dp, top = 0.dp, bottom = 0.dp).fillMaxWidth()) {
-            Text(
-                text = title,
-                style =
-                TextStyle(
-                    fontSize = 18.sp,
-                    lineHeight = 16.sp,
-                    fontFamily = FontFamily(Font(R.font.roboto)),
-                    fontWeight = FontWeight(1000),
-                    color = DarkCyan,
-                    textAlign = TextAlign.Start,
-                    letterSpacing = 0.5.sp,
-                ),
-                modifier = Modifier.width(104.dp).height(21.dp).align(Alignment.Bottom))
-            Text(text = "View all", color = Grey, modifier = Modifier.align(Alignment.Bottom))
-        }
-        Spacer(modifier = Modifier.height(10.dp))
-        LazyRow(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            contentPadding = PaddingValues(start = 15.dp, end = 15.dp),
-            modifier = Modifier.heightIn(min = 56.dp)) {
-            items(10) {
-                Column(modifier = Modifier.width(170.dp)) {
-                    Image(
-                        painter = painterResource(id = R.drawable.chess_demo),
-                        contentDescription = "Event 1",
-                        contentScale = ContentScale.Crop,
-                        modifier =
-                        Modifier.fillMaxWidth()
-                            .aspectRatio(3f / 1.75f)
-                            .clip(RoundedCornerShape(size = 10.dp)))
-                    Text(text = "Chess Tournament", color = DarkCyan)
-                    Text(text = "11.04.2024 - 21:00", color = Grey)
-                }
-            }
-        }
+  Spacer(modifier = Modifier.height(10.dp))
+  Column {
+    Row(Modifier.padding(start = 15.dp, end = 0.dp, top = 0.dp, bottom = 0.dp).fillMaxWidth()) {
+      Text(
+          text = title,
+          style =
+              TextStyle(
+                  fontSize = 18.sp,
+                  lineHeight = 16.sp,
+                  fontFamily = FontFamily(Font(R.font.roboto)),
+                  fontWeight = FontWeight(1000),
+                  color = DarkCyan,
+                  textAlign = TextAlign.Start,
+                  letterSpacing = 0.5.sp,
+              ),
+          modifier = Modifier.width(104.dp).height(21.dp).align(Alignment.Bottom))
+      Text(text = "View all", color = Grey, modifier = Modifier.align(Alignment.Bottom))
     }
+    Spacer(modifier = Modifier.height(10.dp))
+    LazyRow(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        contentPadding = PaddingValues(start = 15.dp, end = 15.dp),
+        modifier = Modifier.heightIn(min = 56.dp)) {
+          items(10) {
+            Column(modifier = Modifier.width(170.dp)) {
+              Image(
+                  painter = painterResource(id = R.drawable.chess_demo),
+                  contentDescription = "Event 1",
+                  contentScale = ContentScale.Crop,
+                  modifier =
+                      Modifier.fillMaxWidth()
+                          .aspectRatio(3f / 1.75f)
+                          .clip(RoundedCornerShape(size = 10.dp)))
+              Text(text = "Chess Tournament", color = DarkCyan)
+              Text(text = "11.04.2024 - 21:00", color = Grey)
+            }
+          }
+        }
+  }
 }
