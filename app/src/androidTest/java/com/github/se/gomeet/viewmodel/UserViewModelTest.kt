@@ -45,8 +45,7 @@ class UserViewModelTest {
     assert(user.username == newUsername)
 
     // test deleteUser
-    userViewModel.deleteUser(uid)
-    TimeUnit.SECONDS.sleep(1)
+    userViewModel.deleteUser(user)
     user = userViewModel.getUser(uid)
 
     assert(user == null)

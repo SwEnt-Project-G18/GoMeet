@@ -48,28 +48,23 @@ class UserViewModel : ViewModel() {
     db.updateUser(user)
   }
 
-  fun deleteUser(uid: String) {
-    CoroutineScope(Dispatchers.IO).launch {
-      val user = getUser(uid)
-      if (user != null) {
-        db.removeUser(user)
-      }
-    }
+  fun deleteUser(user: GoMeetUser) {
+    db.removeUser(user)
   }
 
-  fun sendRequest(uid: String) {
+  fun sendRequest() {
     // TODO
   }
 
-  fun remove(uid: String) {
+  fun remove() {
     // TODO
   }
 
-  fun accept(senderUid: String) {
+  fun accept() {
     // TODO
   }
 
-  fun reject(senderUid: String) {
+  fun reject() {
     // TODO
   }
 }
