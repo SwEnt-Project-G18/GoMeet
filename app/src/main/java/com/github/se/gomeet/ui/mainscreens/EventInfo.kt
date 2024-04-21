@@ -61,7 +61,7 @@ fun EventInfo(
     time: String = "",
     organizer: String = "",
     rating: Double = 0.0,
-    image: Painter = painterResource(id = R.drawable.ic_launcher_background),
+    image: Painter = painterResource(id = R.drawable.chess_demo),
     description: String = "",
     loc: LatLng = LatLng(0.0, 0.0)
 ) {
@@ -286,9 +286,7 @@ fun EventInfoScreen(navController: NavHostController) {
       rating = rating,
       image =
           painterResource(
-              id =
-                  R.drawable
-                      .ic_launcher_background), // Image handling might need different approach
+              id = R.drawable.chess_demo), // Image handling might need different approach
       description = description,
       loc = loc)
 }

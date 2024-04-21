@@ -78,7 +78,7 @@ fun Events(nav: NavigationActions) {
           .apply {
             set(Calendar.YEAR, 2024)
             set(Calendar.MONTH, Calendar.APRIL)
-            set(Calendar.DAY_OF_MONTH, 16)
+            set(Calendar.DAY_OF_MONTH, 22)
             set(Calendar.HOUR_OF_DAY, 14)
             set(Calendar.MINUTE, 0)
           }
@@ -303,7 +303,7 @@ fun EventWidget(
     ProfilePicture: Int,
     EventPicture: Int,
     Verified: Boolean,
-    nav: NavigationActions
+    nav: NavigationActions,
 ) {
 
   val configuration = LocalConfiguration.current
@@ -315,13 +315,16 @@ fun EventWidget(
 
   val currentDate = Calendar.getInstance()
   val startOfWeek = currentDate.clone() as Calendar
-  startOfWeek[Calendar.DAY_OF_WEEK] = startOfWeek.firstDayOfWeek
+  startOfWeek.set(Calendar.DAY_OF_WEEK, startOfWeek.firstDayOfWeek)
   val endOfWeek = startOfWeek.clone() as Calendar
   endOfWeek.add(Calendar.DAY_OF_WEEK, 6)
 
   val eventCalendar = Calendar.getInstance().apply { time = EventDate }
 
-  val isThisWeek = eventCalendar >= startOfWeek && eventCalendar <= endOfWeek
+  val isThisWeek = eventCalendar.after(currentDate) && eventCalendar.before(endOfWeek)
+  val isToday =
+      currentDate.get(Calendar.YEAR) == eventCalendar.get(Calendar.YEAR) &&
+          currentDate.get(Calendar.DAY_OF_YEAR) == eventCalendar.get(Calendar.DAY_OF_YEAR)
 
   val dayFormat =
       if (isThisWeek) {
@@ -332,7 +335,12 @@ fun EventWidget(
 
   val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
 
-  val dayString = dayFormat.format(EventDate)
+  val dayString =
+      if (isToday) {
+        "Today"
+      } else {
+        dayFormat.format(EventDate)
+      }
   val timeString = timeFormat.format(EventDate)
 
   Card(
@@ -345,9 +353,10 @@ fun EventWidget(
                     title = EventName,
                     date = dayString,
                     time = timeString,
-                    description = "TEST", // replace with actual description
+                    description =
+                        "Howdy!\n\nAfter months of planning, La Dame Blanche is finally offering you a rapid tournament!\n\nJoin us on Saturday 23rd of March afternoon for 6 rounds of 12+3” games in the chill and cozy vibe of Satellite. Take your chance to have fun and play, and maybe win one of our many prizes\n\nOnly 50 spots available, with free entry!",
                     organizer = UserName,
-                    loc = LatLng(46.539027, 6.560908), // replace with actual location
+                    loc = LatLng(46.5191, 6.5668), // replace with actual location
                     rating = 0.0 // replace with actual rating
                     // add image
                     )
