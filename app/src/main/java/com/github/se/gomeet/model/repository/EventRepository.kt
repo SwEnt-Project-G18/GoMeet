@@ -145,12 +145,7 @@ class EventRepository(private val db: FirebaseFirestore) {
       for (docChange in snapshot?.documentChanges!!) {
 
         val event = docChange.document.data.toEvent()
-        if (event == null) {
-          Log.w("EventRepository", "Event is null")
-          continue
-        }
-
-        when (docChange.type) {
+          when (docChange.type) {
           DocumentChange.Type.ADDED -> {
             localEventsList.add(event)
           }

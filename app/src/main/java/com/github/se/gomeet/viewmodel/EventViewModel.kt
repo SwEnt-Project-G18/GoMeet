@@ -71,7 +71,6 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
       try {
         val imageUrl = imageUri?.let { uploadImageAndGetUrl(it) }
         val updatedImages = images.toMutableList().apply { imageUrl?.let { add(it) } }
-        val verified = false
         val event =
             Event(
                 db.getNewId(),

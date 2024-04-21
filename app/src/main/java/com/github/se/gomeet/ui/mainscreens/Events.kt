@@ -80,7 +80,7 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
   LaunchedEffect(Unit) {
     coroutineScope.launch {
       val allEvents = eventViewModel.getAllEvents()
-      if (allEvents != null) {
+      if (!allEvents.isNullOrEmpty()) {
         eventList.addAll(allEvents)
       }
     }
@@ -174,21 +174,21 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
                       modifier = Modifier.padding(10.dp).align(Alignment.Start))
 
                   eventList.forEach { event ->
-                      val painter: Painter =
-                          if (event.images.isNotEmpty()) {
-                              rememberAsyncImagePainter(
-                                  ImageRequest.Builder(LocalContext.current)
-                                      .data(data = event.images[0])
-                                      .apply(
-                                          block =
+                    val painter: Painter =
+                        if (event.images.isNotEmpty()) {
+                          rememberAsyncImagePainter(
+                              ImageRequest.Builder(LocalContext.current)
+                                  .data(data = event.images[0])
+                                  .apply(
+                                      block =
                                           fun ImageRequest.Builder.() {
-                                              crossfade(true)
-                                              placeholder(R.drawable.gomeet_logo)
+                                            crossfade(true)
+                                            placeholder(R.drawable.gomeet_logo)
                                           })
-                                      .build())
-                          } else {
-                              painterResource(id = R.drawable.gomeet_logo)
-                          }
+                                  .build())
+                        } else {
+                          painterResource(id = R.drawable.gomeet_logo)
+                        }
 
                     EventWidget(
                         userName = event.creator,
