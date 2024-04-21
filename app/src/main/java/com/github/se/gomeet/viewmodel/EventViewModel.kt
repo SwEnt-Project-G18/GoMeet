@@ -87,8 +87,7 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
                 maxParticipants,
                 public,
                 tags,
-                updatedImages,
-                verified)
+                updatedImages)
         db.addEvent(event)
       } catch (e: Exception) {
         Log.w(TAG, "Error uploading image or adding event", e)

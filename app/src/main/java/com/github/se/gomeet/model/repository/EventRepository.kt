@@ -109,22 +109,22 @@ class EventRepository(private val db: FirebaseFirestore) {
   }
 
   private fun Map<String, Any>.toEvent(id: String? = null): Event {
-    return Event(
-        uid = id ?: this["uid"] as String,
-        creator = this["creator"] as String,
-        title = this["title"] as String,
-        description = this["description"] as String,
-        location = (this["location"] as Map<String, Any>).toLocation(),
-        date = LocalDate.parse(this["date"] as String),
-        price = this["price"] as Double,
-        url = this["url"] as String,
-        participants = this["participants"] as List<String>,
-        visibleToIfPrivate = this["visibleToIfPrivate"] as List<String>,
-        maxParticipants = this["maxParticipants"].toString().toInt(),
-        public = this["public"] as Boolean,
-        tags = this["tags"] as List<String>,
-        images = this["images"] as List<String>,
-        verified = this["verified"] as Boolean)
+      return Event(
+          uid = id ?: this["uid"] as? String ?: "",
+          creator = this["creator"] as? String ?: "",
+          title = this["title"] as? String ?: "",
+          description = this["description"] as? String ?: "",
+          location = (this["location"] as? Map<String, Any>)?.toLocation() ?: Location(.0,.0,""),
+          date = LocalDate.parse(this["date"] as? String ?: ""),
+          price = this["price"] as? Double ?: 0.0,
+          url = this["url"] as? String ?: "",
+          participants = this["participants"] as? List<String> ?: emptyList(),
+          visibleToIfPrivate = this["visibleToIfPrivate"] as? List<String> ?: emptyList(),
+          maxParticipants = (this["maxParticipants"] as? String)?.toIntOrNull() ?: 0,
+          public = this["public"] as? Boolean ?: false,
+          tags = this["tags"] as? List<String> ?: emptyList(),
+          images = this["images"] as? List<String> ?: emptyList()
+      )
   }
 
   private fun Map<String, Any>.toLocation(): Location {

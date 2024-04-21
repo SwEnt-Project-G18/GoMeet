@@ -174,24 +174,29 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
                       modifier = Modifier.padding(10.dp).align(Alignment.Start))
 
                   eventList.forEach { event ->
-                    val painter: Painter =
-                        rememberAsyncImagePainter(
-                            ImageRequest.Builder(LocalContext.current)
-                                .data(data = event.images[0])
-                                .apply(
-                                    block =
-                                        fun ImageRequest.Builder.() {
-                                          crossfade(true)
-                                          placeholder(R.drawable.gomeet_logo)
-                                        })
-                                .build())
+                      val painter: Painter =
+                          if (event.images.isNotEmpty()) {
+                              rememberAsyncImagePainter(
+                                  ImageRequest.Builder(LocalContext.current)
+                                      .data(data = event.images[0])
+                                      .apply(
+                                          block =
+                                          fun ImageRequest.Builder.() {
+                                              crossfade(true)
+                                              placeholder(R.drawable.gomeet_logo)
+                                          })
+                                      .build())
+                          } else {
+                              painterResource(id = R.drawable.gomeet_logo)
+                          }
+
                     EventWidget(
                         userName = event.creator,
                         eventName = event.title,
                         eventDate =
                             Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant()),
                         eventPicture = painter,
-                        verified = event.verified)
+                        verified = false) // verification to be done using user details
                   }
                 }
 
@@ -213,7 +218,7 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
 
                   eventList.forEach { event ->
                     val painter: Painter =
-                        if (event.images[0].isNotBlank()) {
+                        if (event.images.isNotEmpty()) {
                           rememberAsyncImagePainter(
                               ImageRequest.Builder(LocalContext.current)
                                   .data(data = event.images[0])
@@ -233,7 +238,7 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
                         eventDate =
                             Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant()),
                         eventPicture = painter,
-                        verified = event.verified)
+                        verified = false)
                   }
                 }
 
@@ -253,7 +258,7 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
                       modifier = Modifier.padding(10.dp).align(Alignment.Start))
                   eventList.forEach { event ->
                     val painter: Painter =
-                        if (event.images[0].isNotBlank()) {
+                        if (event.images.isNotEmpty()) {
                           rememberAsyncImagePainter(
                               ImageRequest.Builder(LocalContext.current)
                                   .data(data = event.images[0])
@@ -273,7 +278,7 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
                         eventDate =
                             Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant()),
                         eventPicture = painter,
-                        verified = event.verified)
+                        verified = false)
                   }
                 }
               }
