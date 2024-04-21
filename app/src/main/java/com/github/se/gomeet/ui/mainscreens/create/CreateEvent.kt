@@ -13,7 +13,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material3.Button
@@ -48,6 +50,7 @@ import com.github.se.gomeet.R
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
+import com.github.se.gomeet.ui.navigation.SECOND_LEVEL_DESTINATION
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.ui.theme.Grey
@@ -137,7 +140,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
         }
 
         Column(
-            Modifier.padding(innerPadding),
+            Modifier.padding(innerPadding).verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center) {
               Spacer(modifier = Modifier.size((LocalConfiguration.current.screenHeightDp / 9).dp))
@@ -155,7 +158,10 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                           focusedBorderColor = MaterialTheme.colorScheme.onBackground,
                           unfocusedBorderColor = MaterialTheme.colorScheme.onBackground),
                   modifier =
-                      Modifier.fillMaxWidth().padding(start = 7.dp, end = 7.dp).testTag("Title"))
+                  Modifier
+                      .fillMaxWidth()
+                      .padding(start = 7.dp, end = 7.dp)
+                      .testTag("Title"))
 
               OutlinedTextField(
                   value = descriptionState.value,
@@ -170,9 +176,10 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                           focusedBorderColor = MaterialTheme.colorScheme.onBackground,
                           unfocusedBorderColor = MaterialTheme.colorScheme.onBackground),
                   modifier =
-                      Modifier.fillMaxWidth()
-                          .padding(start = 7.dp, end = 7.dp)
-                          .testTag("Description"))
+                  Modifier
+                      .fillMaxWidth()
+                      .padding(start = 7.dp, end = 7.dp)
+                      .testTag("Description"))
 
               OutlinedTextField(
                   value = locationState.value,
@@ -187,7 +194,10 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                           focusedBorderColor = MaterialTheme.colorScheme.onBackground,
                           unfocusedBorderColor = MaterialTheme.colorScheme.onBackground),
                   modifier =
-                      Modifier.fillMaxWidth().padding(start = 7.dp, end = 7.dp).testTag("Location"))
+                  Modifier
+                      .fillMaxWidth()
+                      .padding(start = 7.dp, end = 7.dp)
+                      .testTag("Location"))
 
               OutlinedTextField(
                   value = textDate.value,
@@ -210,7 +220,10 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                           focusedBorderColor = MaterialTheme.colorScheme.onBackground,
                           unfocusedBorderColor = MaterialTheme.colorScheme.onBackground),
                   modifier =
-                      Modifier.fillMaxWidth().padding(start = 7.dp, end = 7.dp).testTag("Date"))
+                  Modifier
+                      .fillMaxWidth()
+                      .padding(start = 7.dp, end = 7.dp)
+                      .testTag("Date"))
 
               OutlinedTextField(
                   value = priceText,
@@ -228,7 +241,10 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                           focusedBorderColor = MaterialTheme.colorScheme.onBackground,
                           unfocusedBorderColor = MaterialTheme.colorScheme.onBackground),
                   modifier =
-                      Modifier.fillMaxWidth().padding(start = 7.dp, end = 7.dp).testTag("Price"))
+                  Modifier
+                      .fillMaxWidth()
+                      .padding(start = 7.dp, end = 7.dp)
+                      .testTag("Price"))
 
               OutlinedTextField(
                   value = url.value,
@@ -242,10 +258,31 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                           focusedBorderColor = MaterialTheme.colorScheme.onBackground,
                           unfocusedBorderColor = MaterialTheme.colorScheme.onBackground),
                   modifier =
-                      Modifier.fillMaxWidth().padding(start = 7.dp, end = 7.dp).testTag("Link"))
+                  Modifier
+                      .fillMaxWidth()
+                      .padding(start = 7.dp, end = 7.dp)
+                      .testTag("Link"))
+
+            if (isPrivate) {
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(7.dp),
+                    onClick = {
+                        nav.navigateTo(SECOND_LEVEL_DESTINATION.first { it.route == Route.ADD_PARTICIPANTS })
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Grey),
+                    shape = RoundedCornerShape(10.dp)) {
+                    Text(
+                        text = "Add Participants",
+                        color = Color.White)
+                }
+            }
 
               Button(
-                  modifier = Modifier.fillMaxWidth().padding(7.dp),
+                  modifier = Modifier
+                      .fillMaxWidth()
+                      .padding(7.dp),
                   onClick = {
                     if (imageUri != null) {
                       imageUri = null
