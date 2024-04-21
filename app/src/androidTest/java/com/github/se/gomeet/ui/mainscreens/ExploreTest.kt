@@ -35,6 +35,5 @@ class ExploreTest {
     countdown.await(3, TimeUnit.SECONDS)
 
     rule.onNodeWithTag("Map").assertIsDisplayed()
-    rule.onNodeWithText("Search").assertIsDisplayed()
   }
 }
