@@ -1,5 +1,6 @@
 package com.github.se.gomeet
 
+import EventInfoScreen
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -9,9 +10,11 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.github.se.gomeet.ui.authscreens.LoginScreen
 import com.github.se.gomeet.ui.authscreens.RegisterScreen
 import com.github.se.gomeet.ui.authscreens.WelcomeScreen
@@ -31,6 +34,7 @@ import com.github.se.gomeet.ui.theme.SetStatusBarColor
 import com.github.se.gomeet.viewmodel.AuthViewModel
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
+import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
@@ -86,6 +90,36 @@ class MainActivity : ComponentActivity() {
             composable(Route.PUBLIC_CREATE) {
               CreateEvent(navAction, EventViewModel(userIdState.value), false)
             }
+
+            composable(
+                route = Route.EVENT_INFO,
+                arguments =
+                    listOf(
+                        navArgument("title") { type = NavType.StringType },
+                        navArgument("date") { type = NavType.StringType },
+                        navArgument("time") { type = NavType.StringType },
+                        navArgument("organizer") { type = NavType.StringType },
+                        navArgument("rating") { type = NavType.FloatType },
+                        navArgument("description") { type = NavType.StringType },
+                        navArgument("latitude") {
+                          type = NavType.FloatType
+                        }, // Change to DoubleType
+                        navArgument("longitude") {
+                          type = NavType.FloatType
+                        } // Change to DoubleType
+                        )) { entry ->
+                  val title = entry.arguments?.getString("title") ?: ""
+                  val date = entry.arguments?.getString("date") ?: ""
+                  val time = entry.arguments?.getString("time") ?: ""
+                  val organizer = entry.arguments?.getString("organizer") ?: ""
+                  val rating = entry.arguments?.getFloat("rating") ?: 0f
+                  val description = entry.arguments?.getString("description") ?: ""
+                  val latitude = entry.arguments?.getFloat("latitude") ?: 0.0
+                  val longitude = entry.arguments?.getFloat("longitude") ?: 0.0
+                  val loc = LatLng(latitude.toDouble(), longitude.toDouble())
+
+                  EventInfoScreen(nav)
+                }
           }
         }
       }

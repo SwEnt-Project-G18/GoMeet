@@ -1,5 +1,6 @@
 package com.github.se.gomeet.ui.navigation
 
+import android.net.Uri
 import android.util.Log
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -13,6 +14,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import com.github.se.gomeet.R
+import com.google.android.gms.maps.model.LatLng
 
 data class TopLevelDestination(
     val route: String,
@@ -32,6 +34,8 @@ object Route {
   const val PUBLIC_CREATE = "Public Create"
   const val PRIVATE_CREATE = "Private Create"
   const val OTHERS_PROFILE = "Others Profile"
+  const val EVENT_INFO =
+      "eventInfo/{title}/{date}/{time}/{organizer}/{rating}/{description}/{latitude}/{longitude}"
 }
 
 val CREATE_ITEMS =
@@ -72,7 +76,9 @@ val SECOND_LEVEL_DESTINATION =
         TopLevelDestination(
             route = Route.OTHERS_PROFILE,
             icon = Icons.Default.Person,
-            textId = Route.OTHERS_PROFILE))
+            textId = Route.OTHERS_PROFILE),
+        TopLevelDestination(
+            route = Route.EVENT_INFO, icon = Icons.Default.Person, textId = Route.EVENT_INFO))
 
 class NavigationActions(val navController: NavHostController) {
   fun navigateTo(destination: TopLevelDestination, clearBackStack: Boolean = false) {
@@ -84,6 +90,31 @@ class NavigationActions(val navController: NavHostController) {
       launchSingleTop = true
       restoreState = true
     }
+  }
+
+  fun navigateToScreen(route: String) {
+    navController.navigate(route)
+  }
+
+  fun navigateToEventInfo(
+      title: String,
+      date: String,
+      time: String,
+      organizer: String,
+      rating: Double,
+      description: String,
+      loc: LatLng
+  ) {
+    val route =
+        Route.EVENT_INFO.replace("{title}", Uri.encode(title))
+            .replace("{date}", Uri.encode(date))
+            .replace("{time}", Uri.encode(time))
+            .replace("{organizer}", Uri.encode(organizer))
+            .replace("{rating}", rating.toString())
+            .replace("{description}", Uri.encode(description))
+            .replace("{latitude}", loc.latitude.toString())
+            .replace("{longitude}", loc.longitude.toString())
+    navController.navigate(route)
   }
 
   fun goBack() {
