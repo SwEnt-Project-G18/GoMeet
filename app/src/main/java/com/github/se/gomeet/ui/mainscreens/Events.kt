@@ -418,9 +418,14 @@ fun SearchBar(query: MutableState<String>, backgroundColor: Color, modifier: Mod
       value = query.value,
       onValueChange = { it: String -> query.value = it },
       modifier = modifier,
-      placeholder = { Text(text = "Search", modifier = Modifier.offset(y = (-3).dp)) },
+      placeholder = {
+        Text(text = "Search", modifier = Modifier.offset(y = (-3).dp), color = Color.Black)
+      },
       leadingIcon = {
-        Icon(ImageVector.vectorResource(R.drawable.gomeet_icon), contentDescription = null)
+        Icon(
+            ImageVector.vectorResource(R.drawable.gomeet_icon),
+            contentDescription = null,
+            tint = Color.Black)
       },
       trailingIcon = {
         Row(
@@ -438,9 +443,12 @@ fun SearchBar(query: MutableState<String>, backgroundColor: Color, modifier: Mod
                           disabledContentColor = Color.Transparent),
                   modifier = Modifier.wrapContentSize(),
               ) {
-                Icon(ImageVector.vectorResource(R.drawable.mic_icon), contentDescription = null)
+                Icon(
+                    ImageVector.vectorResource(R.drawable.mic_icon),
+                    contentDescription = null,
+                    tint = Color.Black)
               }
-              Icon(Icons.Default.Search, contentDescription = null)
+              Icon(Icons.Default.Search, contentDescription = null, tint = Color.Black)
             }
       },
       singleLine = true,
