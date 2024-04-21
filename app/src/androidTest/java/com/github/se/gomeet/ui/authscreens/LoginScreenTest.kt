@@ -1,4 +1,4 @@
-package com.github.se.gomeet.ui
+package com.github.se.gomeet.ui.authscreens
 
 import android.annotation.SuppressLint
 import androidx.activity.ComponentActivity
@@ -12,7 +12,6 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.github.se.gomeet.ui.authscreens.LoginScreen
 import com.github.se.gomeet.viewmodel.AuthViewModel
 import org.junit.Rule
 import org.junit.Test
