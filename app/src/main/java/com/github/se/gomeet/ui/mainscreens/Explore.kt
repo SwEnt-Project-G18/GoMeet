@@ -66,7 +66,6 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
           if (isMapLoaded) {
             GoogleMapView(events = eventList, modifier = Modifier.testTag("Map"), query = query)
           }
-          SearchBar(query, Color.White)
         }
       }
 }

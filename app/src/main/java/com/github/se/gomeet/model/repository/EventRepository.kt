@@ -1,12 +1,20 @@
-package com.github.se.gomeet
+package com.github.se.gomeet.model.repository
 
 import android.util.Log
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.location.Location
+import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
 import java.time.LocalDate
 
-class EventFirebaseConnection(private val db: FirebaseFirestore) {
+class EventRepository(private val db: FirebaseFirestore) {
+
+  private val localEventsList: MutableList<Event> = mutableListOf()
+
+  init {
+    startListeningForEvents()
+  }
+
   companion object {
     private const val TAG = "FirebaseConnection"
     private const val EVENT_COLLECTION = "events"
@@ -22,7 +30,7 @@ class EventFirebaseConnection(private val db: FirebaseFirestore) {
         .get()
         .addOnSuccessListener { document ->
           if (document != null && document.exists()) {
-            val event = document.data!!.fromMap(uid)
+            val event = document.data!!.toEvent(uid)
             callback(event)
           } else {
             Log.d(TAG, "No such document")
@@ -41,7 +49,7 @@ class EventFirebaseConnection(private val db: FirebaseFirestore) {
         .addOnSuccessListener { querySnapshot ->
           val eventList = mutableListOf<Event>()
           for (document in querySnapshot.documents) {
-            val event = document.data?.fromMap(document.id)
+            val event = document.data?.toEvent(document.id)
             if (event != null) {
               eventList.add(event)
             }
@@ -100,22 +108,22 @@ class EventFirebaseConnection(private val db: FirebaseFirestore) {
     return mapOf("latitude" to latitude, "longitude" to longitude, "name" to name)
   }
 
-  private fun Map<String, Any>.fromMap(id: String): Event {
+  private fun Map<String, Any>.toEvent(id: String? = null): Event {
     return Event(
-        uid = id,
-        creator = this["creator"] as String,
-        title = this["title"] as String,
-        description = this["description"] as String,
-        location = (this["location"] as Map<String, Any>).toLocation(),
-        date = LocalDate.parse(this["date"] as String),
-        price = this["price"] as Double,
-        url = this["url"] as String,
-        participants = this["participants"] as List<String>,
-        visibleToIfPrivate = this["visibleToIfPrivate"] as List<String>,
-        maxParticipants = this["maxParticipants"].toString().toInt(),
-        public = this["public"] as Boolean,
-        tags = this["tags"] as List<String>,
-        images = this["images"] as List<String>)
+        uid = id ?: this["uid"] as? String ?: "",
+        creator = this["creator"] as? String ?: "",
+        title = this["title"] as? String ?: "",
+        description = this["description"] as? String ?: "",
+        location = (this["location"] as? Map<String, Any>)?.toLocation() ?: Location(.0, .0, ""),
+        date = LocalDate.parse(this["date"] as? String ?: ""),
+        price = this["price"] as? Double ?: 0.0,
+        url = this["url"] as? String ?: "",
+        participants = this["participants"] as? List<String> ?: emptyList(),
+        visibleToIfPrivate = this["visibleToIfPrivate"] as? List<String> ?: emptyList(),
+        maxParticipants = (this["maxParticipants"] as? String)?.toIntOrNull() ?: 0,
+        public = this["public"] as? Boolean ?: false,
+        tags = this["tags"] as? List<String> ?: emptyList(),
+        images = this["images"] as? List<String> ?: emptyList())
   }
 
   private fun Map<String, Any>.toLocation(): Location {
@@ -123,5 +131,33 @@ class EventFirebaseConnection(private val db: FirebaseFirestore) {
         latitude = this["latitude"] as Double,
         longitude = this["longitude"] as Double,
         name = this["name"] as String)
+  }
+
+  private fun startListeningForEvents() {
+    db.collection("events").addSnapshotListener { snapshot, e ->
+      if (e != null) {
+        // Handle error
+        Log.w("EventRepository", "Listen failed.", e)
+        return@addSnapshotListener
+      }
+
+      for (docChange in snapshot?.documentChanges!!) {
+
+        val event = docChange.document.data.toEvent()
+        when (docChange.type) {
+          DocumentChange.Type.ADDED -> {
+            localEventsList.add(event)
+          }
+          DocumentChange.Type.MODIFIED -> {
+            localEventsList
+                .find { it == event }
+                ?.let { localEventsList[localEventsList.indexOf(it)] = event }
+          }
+          DocumentChange.Type.REMOVED -> {
+            localEventsList.removeIf { it == event }
+          }
+        }
+      }
+    }
   }
 }

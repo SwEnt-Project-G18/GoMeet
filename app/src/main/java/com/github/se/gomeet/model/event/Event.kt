@@ -17,5 +17,5 @@ data class Event(
     val maxParticipants: Int, // Maximum number of Participants of the event
     val public: Boolean, // True if the event is public, false if it's private
     val tags: List<String>, // Tags of the event
-    val images: List<String>, // TODO : Is it the right type for images ?
+    val images: List<String> // Is it the right type?
 )

@@ -2,8 +2,6 @@ package com.github.se.gomeet.ui.mainscreens
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,39 +16,32 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -61,49 +52,50 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.github.se.gomeet.R
+import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.ui.theme.NavBarUnselected
-import com.google.android.gms.maps.model.LatLng
+import com.github.se.gomeet.viewmodel.EventViewModel
 import java.text.SimpleDateFormat
+import java.time.ZoneId
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import kotlinx.coroutines.launch
 
 @Composable
-fun Events(nav: NavigationActions) {
+fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
 
   var selectedFilter by remember { mutableStateOf("All") }
+  val eventList = remember { mutableListOf<Event>() }
+  val coroutineScope = rememberCoroutineScope()
+
+  LaunchedEffect(Unit) {
+    coroutineScope.launch {
+      val allEvents = eventViewModel.getAllEvents()
+      if (!allEvents.isNullOrEmpty()) {
+        eventList.addAll(allEvents)
+      }
+    }
+  }
 
   // Define a function to handle button clicks
   fun onFilterButtonClick(filterType: String) {
     selectedFilter = if (selectedFilter == filterType) "All" else filterType
   }
 
-  val eventDate =
-      Calendar.getInstance()
-          .apply {
-            set(Calendar.YEAR, 2024)
-            set(Calendar.MONTH, Calendar.APRIL)
-            set(Calendar.DAY_OF_MONTH, 22)
-            set(Calendar.HOUR_OF_DAY, 14)
-            set(Calendar.MINUTE, 0)
-          }
-          .time
-
-  val query = remember { mutableStateOf("") }
-
   Scaffold(
       topBar = {
         Text(
             text = "Events",
-            modifier =
-                Modifier.padding(start = 15.dp, top = 15.dp, end = 15.dp, bottom = 0.dp)
-                    .testTag("EventsTitle"),
+            modifier = Modifier.padding(start = 15.dp, top = 15.dp, end = 15.dp, bottom = 0.dp),
             color = DarkCyan,
             fontStyle = FontStyle.Normal,
             fontWeight = FontWeight.SemiBold,
@@ -123,8 +115,7 @@ fun Events(nav: NavigationActions) {
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(innerPadding)) {
-              SearchBar(query, NavBarUnselected)
-              Spacer(modifier = Modifier.height(5.dp))
+              Spacer(modifier = Modifier.height(10.dp))
               Row(
                   verticalAlignment = Alignment.CenterVertically,
                   horizontalArrangement = Arrangement.SpaceEvenly,
@@ -139,8 +130,7 @@ fun Events(nav: NavigationActions) {
                                     else NavBarUnselected,
                                 contentColor =
                                     if (selectedFilter == "MyTickets") Color.White else DarkCyan),
-                        border = BorderStroke(1.dp, DarkCyan),
-                        modifier = Modifier.testTag("MyTicketsButton"))
+                        border = BorderStroke(1.dp, DarkCyan))
                     Spacer(modifier = Modifier.width(10.dp))
                     Button(
                         onClick = { onFilterButtonClick("Favourites") },
@@ -152,8 +142,7 @@ fun Events(nav: NavigationActions) {
                                     else NavBarUnselected,
                                 contentColor =
                                     if (selectedFilter == "Favourites") Color.White else DarkCyan),
-                        border = BorderStroke(1.dp, DarkCyan),
-                        modifier = Modifier.testTag("FavouritesButton"))
+                        border = BorderStroke(1.dp, DarkCyan))
                     Spacer(modifier = Modifier.width(10.dp))
                     Button(
                         onClick = { onFilterButtonClick("MyEvents") },
@@ -165,8 +154,7 @@ fun Events(nav: NavigationActions) {
                                     else NavBarUnselected,
                                 contentColor =
                                     if (selectedFilter == "MyEvents") Color.White else DarkCyan),
-                        border = BorderStroke(1.dp, DarkCyan),
-                        modifier = Modifier.testTag("MyEventsButton"))
+                        border = BorderStroke(1.dp, DarkCyan))
                   }
 
               Column(modifier = Modifier.verticalScroll(rememberScrollState()).fillMaxSize()) {
@@ -183,56 +171,33 @@ fun Events(nav: NavigationActions) {
                               textAlign = TextAlign.Center,
                               letterSpacing = 0.5.sp,
                           ),
-                      modifier =
-                          Modifier.padding(10.dp).align(Alignment.Start).testTag("MyTicketsText"))
-                  EventWidget(
-                      UserName = "EPFL Chess Club",
-                      EventName = "Chess Tournament",
-                      EventDate = eventDate,
-                      ProfilePicture = R.drawable.gomeet_logo,
-                      EventPicture = R.drawable.intbee_logo,
-                      Verified = true,
-                      nav = nav)
-                  EventWidget(
-                      UserName = "EPFL",
-                      EventName = "Chess",
-                      EventDate = eventDate,
-                      ProfilePicture = R.drawable.gomeet_logo,
-                      EventPicture = R.drawable.intbee_logo,
-                      Verified = true,
-                      nav = nav)
-                  EventWidget(
-                      UserName = "EPFL Chess Club",
-                      EventName = "Chess Tournament",
-                      EventDate = eventDate,
-                      ProfilePicture = R.drawable.gomeet_logo,
-                      EventPicture = R.drawable.intbee_logo,
-                      Verified = true,
-                      nav = nav)
-                  EventWidget(
-                      UserName = "EPFL Chess Club",
-                      EventName = "Chess Tournament",
-                      EventDate = eventDate,
-                      ProfilePicture = R.drawable.gomeet_logo,
-                      EventPicture = R.drawable.intbee_logo,
-                      Verified = true,
-                      nav = nav)
-                  EventWidget(
-                      UserName = "EPFL Chess Club",
-                      EventName = "Chess Tournament",
-                      EventDate = eventDate,
-                      ProfilePicture = R.drawable.gomeet_logo,
-                      EventPicture = R.drawable.intbee_logo,
-                      Verified = true,
-                      nav = nav)
-                  EventWidget(
-                      UserName = "EPFL Chess Club",
-                      EventName = "Chess Tournament",
-                      EventDate = eventDate,
-                      ProfilePicture = R.drawable.gomeet_logo,
-                      EventPicture = R.drawable.intbee_logo,
-                      Verified = true,
-                      nav = nav)
+                      modifier = Modifier.padding(10.dp).align(Alignment.Start))
+
+                  eventList.forEach { event ->
+                    val painter: Painter =
+                        if (event.images.isNotEmpty()) {
+                          rememberAsyncImagePainter(
+                              ImageRequest.Builder(LocalContext.current)
+                                  .data(data = event.images[0])
+                                  .apply(
+                                      block =
+                                          fun ImageRequest.Builder.() {
+                                            crossfade(true)
+                                            placeholder(R.drawable.gomeet_logo)
+                                          })
+                                  .build())
+                        } else {
+                          painterResource(id = R.drawable.gomeet_logo)
+                        }
+
+                    EventWidget(
+                        userName = event.creator,
+                        eventName = event.title,
+                        eventDate =
+                            Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant()),
+                        eventPicture = painter,
+                        verified = false) // verification to be done using user details
+                  }
                 }
 
                 if (selectedFilter == "All" || selectedFilter == "Favourites") {
@@ -249,59 +214,71 @@ fun Events(nav: NavigationActions) {
                               textAlign = TextAlign.Center,
                               letterSpacing = 0.5.sp,
                           ),
-                      modifier =
-                          Modifier.padding(10.dp).align(Alignment.Start).testTag("FavouritesText"))
+                      modifier = Modifier.padding(10.dp).align(Alignment.Start))
 
-                  EventWidget(
-                      UserName = "EPFL Chess Club",
-                      EventName = "Chess Tournament",
-                      EventDate = eventDate,
-                      ProfilePicture = R.drawable.gomeet_logo,
-                      EventPicture = R.drawable.intbee_logo,
-                      Verified = true,
-                      nav = nav)
-
-                  EventWidget(
-                      UserName = "EPFL Chess Club",
-                      EventName = "Chess Tournament",
-                      EventDate = eventDate,
-                      ProfilePicture = R.drawable.gomeet_logo,
-                      EventPicture = R.drawable.intbee_logo,
-                      Verified = true,
-                      nav = nav)
-
-                  if (selectedFilter == "All" || selectedFilter == "MyEvents") {
-                    Text(
-                        text = "My Events",
-                        style =
-                            TextStyle(
-                                fontSize = 20.sp,
-                                lineHeight = 16.sp,
-                                fontFamily = FontFamily(Font(R.font.roboto)),
-                                fontWeight = FontWeight(1000),
-                                color = DarkCyan,
-                                textAlign = TextAlign.Center,
-                                letterSpacing = 0.5.sp,
-                            ),
-                        modifier =
-                            Modifier.padding(10.dp).align(Alignment.Start).testTag("MyEventsText"))
+                  eventList.forEach { event ->
+                    val painter: Painter =
+                        if (event.images.isNotEmpty()) {
+                          rememberAsyncImagePainter(
+                              ImageRequest.Builder(LocalContext.current)
+                                  .data(data = event.images[0])
+                                  .apply(
+                                      block =
+                                          fun ImageRequest.Builder.() {
+                                            crossfade(true)
+                                            placeholder(R.drawable.gomeet_logo)
+                                          })
+                                  .build())
+                        } else {
+                          painterResource(id = R.drawable.gomeet_logo)
+                        }
                     EventWidget(
-                        UserName = "EPFL Chess Club",
-                        EventName = "Chess Tournament",
-                        EventDate = eventDate,
-                        ProfilePicture = R.drawable.gomeet_logo,
-                        EventPicture = R.drawable.intbee_logo,
-                        Verified = true,
-                        nav = nav)
+                        userName = event.creator,
+                        eventName = event.title,
+                        eventDate =
+                            Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant()),
+                        eventPicture = painter,
+                        verified = false)
+                  }
+                }
 
+                if (selectedFilter == "All" || selectedFilter == "MyEvents") {
+                  Text(
+                      text = "My Events",
+                      style =
+                          TextStyle(
+                              fontSize = 20.sp,
+                              lineHeight = 16.sp,
+                              fontFamily = FontFamily(Font(R.font.roboto)),
+                              fontWeight = FontWeight(1000),
+                              color = DarkCyan,
+                              textAlign = TextAlign.Center,
+                              letterSpacing = 0.5.sp,
+                          ),
+                      modifier = Modifier.padding(10.dp).align(Alignment.Start))
+                  eventList.forEach { event ->
+                    val painter: Painter =
+                        if (event.images.isNotEmpty()) {
+                          rememberAsyncImagePainter(
+                              ImageRequest.Builder(LocalContext.current)
+                                  .data(data = event.images[0])
+                                  .apply(
+                                      block =
+                                          fun ImageRequest.Builder.() {
+                                            crossfade(true)
+                                            placeholder(R.drawable.gomeet_logo)
+                                          })
+                                  .build())
+                        } else {
+                          painterResource(id = R.drawable.gomeet_logo)
+                        }
                     EventWidget(
-                        UserName = "EPFL Chess Club",
-                        EventName = "Chess Tournament",
-                        EventDate = eventDate,
-                        ProfilePicture = R.drawable.gomeet_logo,
-                        EventPicture = R.drawable.intbee_logo,
-                        Verified = true,
-                        nav = nav)
+                        userName = event.creator,
+                        eventName = event.title,
+                        eventDate =
+                            Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant()),
+                        eventPicture = painter,
+                        verified = false)
                   }
                 }
               }
@@ -311,70 +288,24 @@ fun Events(nav: NavigationActions) {
 
 @Composable
 fun EventWidget(
-    UserName: String,
-    EventName: String,
-    EventDate: Date,
-    ProfilePicture: Int,
-    EventPicture: Int,
-    Verified: Boolean,
-    nav: NavigationActions,
+    userName: String,
+    eventName: String,
+    eventDate: Date,
+    eventPicture: Painter,
+    verified: Boolean
 ) {
 
   val configuration = LocalConfiguration.current
   val screenWidth = configuration.screenWidthDp.dp
   val density = LocalDensity.current
 
+  // Example logic to calculate text size based on screen width
   val smallTextSize = with(density) { screenWidth.toPx() / 85 }
   val bigTextSize = with(density) { screenWidth.toPx() / 60 }
 
-  val currentDate = Calendar.getInstance()
-  val startOfWeek = currentDate.clone() as Calendar
-  startOfWeek.set(Calendar.DAY_OF_WEEK, startOfWeek.firstDayOfWeek)
-  val endOfWeek = startOfWeek.clone() as Calendar
-  endOfWeek.add(Calendar.DAY_OF_WEEK, 6)
-
-  val eventCalendar = Calendar.getInstance().apply { time = EventDate }
-
-  val isThisWeek = eventCalendar.after(currentDate) && eventCalendar.before(endOfWeek)
-  val isToday =
-      currentDate.get(Calendar.YEAR) == eventCalendar.get(Calendar.YEAR) &&
-          currentDate.get(Calendar.DAY_OF_YEAR) == eventCalendar.get(Calendar.DAY_OF_YEAR)
-
-  val dayFormat =
-      if (isThisWeek) {
-        SimpleDateFormat("EEEE", Locale.getDefault())
-      } else {
-        SimpleDateFormat("dd/MM/yy", Locale.getDefault())
-      }
-
-  val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-
-  val dayString =
-      if (isToday) {
-        "Today"
-      } else {
-        dayFormat.format(EventDate)
-      }
-  val timeString = timeFormat.format(EventDate)
-
   Card(
       modifier =
-          Modifier.fillMaxWidth()
-              .testTag("Card")
-              .padding(start = 10.dp, top = 5.dp, end = 10.dp, bottom = 5.dp)
-              .clickable {
-                nav.navigateToEventInfo(
-                    title = EventName,
-                    date = dayString,
-                    time = timeString,
-                    description =
-                        "Howdy!\n\nAfter months of planning, La Dame Blanche is finally offering you a rapid tournament!\n\nJoin us on Saturday 23rd of March afternoon for 6 rounds of 12+3” games in the chill and cozy vibe of Satellite. Take your chance to have fun and play, and maybe win one of our many prizes\n\nOnly 50 spots available, with free entry!",
-                    organizer = UserName,
-                    loc = LatLng(46.5191, 6.5668), // replace with actual location
-                    rating = 0.0 // replace with actual rating
-                    // add image
-                    )
-              },
+          Modifier.fillMaxWidth().padding(start = 10.dp, top = 5.dp, end = 10.dp, bottom = 5.dp),
       colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
       border = BorderStroke(2.dp, DarkCyan)) {
         Row(
@@ -386,7 +317,7 @@ fun EventWidget(
                   horizontalAlignment = Alignment.Start, // Align text horizontally to center
                   verticalArrangement = Arrangement.Center) {
                     Text(
-                        text = EventName,
+                        text = eventName,
                         style =
                             TextStyle(
                                 fontSize = bigTextSize.sp,
@@ -395,14 +326,13 @@ fun EventWidget(
                                 fontWeight = FontWeight(700),
                                 color = MaterialTheme.colorScheme.onBackground,
                                 letterSpacing = 0.25.sp,
-                            ),
-                        modifier = Modifier.testTag("EventName"))
+                            ))
 
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center) {
                           Text(
-                              UserName,
+                              userName,
                               style =
                                   TextStyle(
                                       fontSize = smallTextSize.sp,
@@ -412,8 +342,8 @@ fun EventWidget(
                                       color = MaterialTheme.colorScheme.onBackground,
                                       letterSpacing = 0.15.sp,
                                   ),
-                              modifier = Modifier.padding(top = 5.dp).testTag("UserName"))
-                          if (Verified) {
+                              modifier = Modifier.padding(top = 5.dp))
+                          if (verified) {
                             Box(
                                 contentAlignment = Alignment.Center,
                                 modifier = Modifier.padding(5.dp).size(smallTextSize.dp * (1.4f))) {
@@ -425,8 +355,30 @@ fun EventWidget(
                           }
                         }
 
+                    val currentDate = Calendar.getInstance()
+                    val startOfWeek = currentDate.clone() as Calendar
+                    startOfWeek[Calendar.DAY_OF_WEEK] = startOfWeek.firstDayOfWeek
+                    val endOfWeek = startOfWeek.clone() as Calendar
+                    endOfWeek.add(Calendar.DAY_OF_WEEK, 6)
+
+                    val eventCalendar = Calendar.getInstance().apply { time = eventDate }
+
+                    // Determine if the event date is within this week
+                    val isThisWeek = eventCalendar >= startOfWeek && eventCalendar <= endOfWeek
+
+                    // Format based on whether the date is in the current week
+                    val dateFormat =
+                        if (isThisWeek) {
+                          SimpleDateFormat("EEEE - HH:mm", Locale.getDefault()) // "Tuesday"
+                        } else {
+                          SimpleDateFormat("dd/MM/yy - HH:mm", Locale.getDefault()) // "05/12/24"
+                        }
+
+                    // Convert the Date object to a formatted String
+                    val dateString = dateFormat.format(eventDate)
+
                     Text(
-                        dayString + " - " + timeString,
+                        dateString,
                         style =
                             TextStyle(
                                 fontSize = smallTextSize.sp,
@@ -435,84 +387,28 @@ fun EventWidget(
                                 fontWeight = FontWeight(700),
                                 color = MaterialTheme.colorScheme.onBackground,
                                 letterSpacing = 0.25.sp,
-                            ),
-                        modifier = Modifier.testTag("EventDate"))
+                            ))
                   }
               Image(
-                  painter = painterResource(id = EventPicture),
+                  painter = eventPicture,
                   contentDescription = "Event Picture",
                   modifier =
-                      Modifier.weight(3f)
-                          .fillMaxHeight()
-                          .aspectRatio(3f / 1.75f)
+                      Modifier.weight(
+                              3f) // Take 1/3 of the card space because of the total weight of 4 (3
+                          // for the column and 1 for this image)
+                          .fillMaxHeight() // Fill the height of the Row
+                          .aspectRatio(
+                              3f / 1.75f) // Maintain an aspect ratio of 3:2, change it as needed
                           .clipToBounds()
-                          .padding(0.dp) // Clip the image if it overflows its bounds
-                          .testTag("EventPicture"),
-                  contentScale = ContentScale.Crop, // Crop the image to fit the aspect ratio
-              )
+                          .padding(0.dp), // Clip the image if it overflows its bounds
+                  contentScale = ContentScale.Crop // Crop the image to fit the aspect ratio
+                  )
             }
       }
 }
 
 @Composable
-fun SearchBar(query: MutableState<String>, backgroundColor: Color) {
-  BasicTextField(
-      value = query.value,
-      onValueChange = { query.value = it },
-      modifier =
-          Modifier.fillMaxWidth()
-              .padding(top = 10.dp, start = 5.dp, end = 5.dp)
-              .height(50.dp)
-              .background(backgroundColor, RoundedCornerShape(25.dp)),
-      singleLine = true,
-      decorationBox = {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.padding(start = 15.dp, end = 5.dp).background(Color.Transparent)) {
-              Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    ImageVector.vectorResource(R.drawable.gomeet_icon),
-                    contentDescription = null,
-                    modifier = Modifier.padding(end = 20.dp),
-                    tint = Color.Black)
-                Text(text = if (query.value == "") "Search" else query.value, color = Color.Black)
-              }
-              Row(
-                  verticalAlignment = Alignment.CenterVertically,
-                  modifier = Modifier.padding(end = 10.dp)) {
-                    Button(
-                        onClick = {
-                          // TODO: handle voice search
-                        },
-                        colors =
-                            ButtonColors(
-                                containerColor = Color.Transparent,
-                                contentColor = Color.Black,
-                                disabledContainerColor = Color.Transparent,
-                                disabledContentColor = Color.Transparent),
-                        modifier = Modifier.wrapContentSize(),
-                    ) {
-                      Icon(
-                          ImageVector.vectorResource(R.drawable.mic_icon),
-                          contentDescription = null,
-                          tint = Color.Black)
-                    }
-                    Icon(Icons.Default.Search, contentDescription = null, tint = Color.Black)
-                  }
-            }
-      })
-}
-
-@Composable
 @Preview
 fun EventPreview() {
-  Events(nav = NavigationActions(rememberNavController()))
-  /*EventWidget(
-  "EPFL Chess Club",
-  "Chess Tournament",
-  eventDate,
-  R.drawable.gomeet_logo,
-  R.drawable.intbee_logo,
-  true)*/
+  Events(nav = NavigationActions(rememberNavController()), EventViewModel())
 }

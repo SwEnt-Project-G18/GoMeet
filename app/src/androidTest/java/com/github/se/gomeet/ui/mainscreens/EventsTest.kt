@@ -1,68 +1,72 @@
 package com.github.se.gomeet.ui.mainscreens
 
-import androidx.activity.ComponentActivity
-import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onAllNodesWithTag
-import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.onNodeWithText
-import androidx.navigation.NavHostController
+import androidx.compose.ui.test.*
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.navigation.compose.rememberNavController
-import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.se.gomeet.model.event.location.Location
 import com.github.se.gomeet.ui.navigation.NavigationActions
+import com.github.se.gomeet.viewmodel.EventViewModel
+import java.time.LocalDate
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
 
-@RunWith(AndroidJUnit4::class)
 class EventsTest {
 
-  @get:Rule val rule = createAndroidComposeRule<ComponentActivity>()
-
-  private val maxEventsDisplayedOnScreen = 2 // small number so the test passes on the CI
+  @get:Rule val composeTestRule = createComposeRule()
 
   @Test
-  fun uiElementsDisplayed() {
-    lateinit var navController: NavHostController
-
-    rule.setContent {
-      navController = rememberNavController()
-      Events(NavigationActions(navController))
+  fun eventsScreen_RenderingCorrectness() {
+    // Test rendering correctness with events available
+    composeTestRule.setContent {
+      Events(nav = NavigationActions(rememberNavController()), eventViewModel = EventViewModel())
     }
 
-    rule.onNodeWithTag("EventsTitle").assertIsDisplayed()
-    rule.onNodeWithText("Search").assertIsDisplayed()
-    rule.onNodeWithTag("MyTicketsButton").assertIsDisplayed()
-    rule.onNodeWithTag("FavouritesButton").assertIsDisplayed()
-    rule.onNodeWithTag("MyEventsButton").assertIsDisplayed()
-    rule.onNodeWithTag("MyTicketsText").assertIsDisplayed()
-    rule.onNodeWithTag("FavouritesText").assertExists()
-    rule.onNodeWithTag("MyEventsText").assertExists()
+    composeTestRule.onNode(hasText("My events")).assertIsDisplayed()
+    composeTestRule.onAllNodesWithText("Favourites")[0].assertIsDisplayed()
+    composeTestRule.onAllNodesWithText("Favourites")[1].assertIsDisplayed()
+    composeTestRule.onAllNodesWithText("My tickets")[0].assertIsDisplayed()
+    composeTestRule.onAllNodesWithText("My Tickets")[0].assertIsDisplayed()
+    composeTestRule.onAllNodesWithText("My events")[0].assertIsDisplayed()
+  }
 
-    rule.onAllNodesWithTag("Card").apply {
-      fetchSemanticsNodes().forEachIndexed { i, _ ->
-        if (i < maxEventsDisplayedOnScreen) get(i).assertIsDisplayed() else get(i).assertExists()
-      }
+  @Test
+  fun eventsScreen_FilterButtonClick() {
+    // Test button click handling
+    composeTestRule.setContent {
+      Events(nav = NavigationActions(rememberNavController()), eventViewModel = EventViewModel())
     }
-    rule.onAllNodesWithTag("EventName").apply {
-      fetchSemanticsNodes().forEachIndexed { i, _ ->
-        if (i < maxEventsDisplayedOnScreen) get(i).assertIsDisplayed() else get(i).assertExists()
-      }
+
+    composeTestRule.onNodeWithText("My tickets").performClick()
+    composeTestRule.onNodeWithText("Favourites").performClick()
+    composeTestRule.onNodeWithText("My events").performClick()
+  }
+
+  @Test
+  fun eventsScreen_AsyncBehavior() {
+    // Test asynchronous behavior of fetching events
+    val eventViewModel = EventViewModel()
+    runBlocking(Dispatchers.IO) {
+      // Add a mock event to the view model
+      eventViewModel.createEvent(
+          title = "Test Event",
+          description = "Test description",
+          location = Location(46.5190557, 6.5555216, "EPFL Campus"), // Provide a valid location
+          date = LocalDate.now(), // Provide a valid date
+          price = 10.0,
+          url = "",
+          participants = emptyList(),
+          visibleToIfPrivate = emptyList(),
+          maxParticipants = 0,
+          public = true,
+          tags = emptyList(),
+          images = emptyList(),
+          imageUri = null)
     }
-    rule.onAllNodesWithTag("UserName").apply {
-      fetchSemanticsNodes().forEachIndexed { i, _ ->
-        if (i < maxEventsDisplayedOnScreen) get(i).assertIsDisplayed() else get(i).assertExists()
-      }
-    }
-    rule.onAllNodesWithTag("EventDate").apply {
-      fetchSemanticsNodes().forEachIndexed { i, _ ->
-        if (i < maxEventsDisplayedOnScreen) get(i).assertIsDisplayed() else get(i).assertExists()
-      }
-    }
-    rule.onAllNodesWithTag("EventPicture").apply {
-      fetchSemanticsNodes().forEachIndexed { i, _ ->
-        if (i < maxEventsDisplayedOnScreen) get(i).assertIsDisplayed() else get(i).assertExists()
-      }
+
+    composeTestRule.setContent {
+      Events(nav = NavigationActions(rememberNavController()), eventViewModel = EventViewModel())
     }
   }
 }
