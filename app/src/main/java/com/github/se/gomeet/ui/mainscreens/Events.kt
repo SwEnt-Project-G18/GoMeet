@@ -2,6 +2,7 @@ package com.github.se.gomeet.ui.mainscreens
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -56,6 +57,7 @@ import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.ui.theme.NavBarUnselected
+import com.google.android.gms.maps.model.LatLng
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -76,7 +78,7 @@ fun Events(nav: NavigationActions) {
           .apply {
             set(Calendar.YEAR, 2024)
             set(Calendar.MONTH, Calendar.APRIL)
-            set(Calendar.DAY_OF_MONTH, 16)
+            set(Calendar.DAY_OF_MONTH, 22)
             set(Calendar.HOUR_OF_DAY, 14)
             set(Calendar.MINUTE, 0)
           }
@@ -175,42 +177,48 @@ fun Events(nav: NavigationActions) {
                       EventDate = eventDate,
                       ProfilePicture = R.drawable.gomeet_logo,
                       EventPicture = R.drawable.intbee_logo,
-                      Verified = true)
+                      Verified = true,
+                      nav = nav)
+                  EventWidget(
+                      UserName = "EPFL",
+                      EventName = "Chess",
+                      EventDate = eventDate,
+                      ProfilePicture = R.drawable.gomeet_logo,
+                      EventPicture = R.drawable.intbee_logo,
+                      Verified = true,
+                      nav = nav)
                   EventWidget(
                       UserName = "EPFL Chess Club",
                       EventName = "Chess Tournament",
                       EventDate = eventDate,
                       ProfilePicture = R.drawable.gomeet_logo,
                       EventPicture = R.drawable.intbee_logo,
-                      Verified = true)
+                      Verified = true,
+                      nav = nav)
                   EventWidget(
                       UserName = "EPFL Chess Club",
                       EventName = "Chess Tournament",
                       EventDate = eventDate,
                       ProfilePicture = R.drawable.gomeet_logo,
                       EventPicture = R.drawable.intbee_logo,
-                      Verified = true)
+                      Verified = true,
+                      nav = nav)
                   EventWidget(
                       UserName = "EPFL Chess Club",
                       EventName = "Chess Tournament",
                       EventDate = eventDate,
                       ProfilePicture = R.drawable.gomeet_logo,
                       EventPicture = R.drawable.intbee_logo,
-                      Verified = true)
+                      Verified = true,
+                      nav = nav)
                   EventWidget(
                       UserName = "EPFL Chess Club",
                       EventName = "Chess Tournament",
                       EventDate = eventDate,
                       ProfilePicture = R.drawable.gomeet_logo,
                       EventPicture = R.drawable.intbee_logo,
-                      Verified = true)
-                  EventWidget(
-                      UserName = "EPFL Chess Club",
-                      EventName = "Chess Tournament",
-                      EventDate = eventDate,
-                      ProfilePicture = R.drawable.gomeet_logo,
-                      EventPicture = R.drawable.intbee_logo,
-                      Verified = true)
+                      Verified = true,
+                      nav = nav)
                 }
 
                 if (selectedFilter == "All" || selectedFilter == "Favourites") {
@@ -229,37 +237,58 @@ fun Events(nav: NavigationActions) {
                           ),
                       modifier =
                           Modifier.padding(10.dp).align(Alignment.Start).testTag("FavouritesText"))
-                  EventWidget(
-                      UserName = "EPFL Chess Club",
-                      EventName = "Chess Tournament",
-                      EventDate = eventDate,
-                      ProfilePicture = R.drawable.gomeet_logo,
-                      EventPicture = R.drawable.intbee_logo,
-                      Verified = true)
-                }
 
-                if (selectedFilter == "All" || selectedFilter == "MyEvents") {
-                  Text(
-                      text = "My Events",
-                      style =
-                          TextStyle(
-                              fontSize = 20.sp,
-                              lineHeight = 16.sp,
-                              fontFamily = FontFamily(Font(R.font.roboto)),
-                              fontWeight = FontWeight(1000),
-                              color = DarkCyan,
-                              textAlign = TextAlign.Center,
-                              letterSpacing = 0.5.sp,
-                          ),
-                      modifier =
-                          Modifier.padding(10.dp).align(Alignment.Start).testTag("MyEventsText"))
                   EventWidget(
                       UserName = "EPFL Chess Club",
                       EventName = "Chess Tournament",
                       EventDate = eventDate,
                       ProfilePicture = R.drawable.gomeet_logo,
                       EventPicture = R.drawable.intbee_logo,
-                      Verified = true)
+                      Verified = true,
+                      nav = nav)
+
+                  EventWidget(
+                      UserName = "EPFL Chess Club",
+                      EventName = "Chess Tournament",
+                      EventDate = eventDate,
+                      ProfilePicture = R.drawable.gomeet_logo,
+                      EventPicture = R.drawable.intbee_logo,
+                      Verified = true,
+                      nav = nav)
+
+                  if (selectedFilter == "All" || selectedFilter == "MyEvents") {
+                    Text(
+                        text = "My Events",
+                        style =
+                            TextStyle(
+                                fontSize = 20.sp,
+                                lineHeight = 16.sp,
+                                fontFamily = FontFamily(Font(R.font.roboto)),
+                                fontWeight = FontWeight(1000),
+                                color = DarkCyan,
+                                textAlign = TextAlign.Center,
+                                letterSpacing = 0.5.sp,
+                            ),
+                        modifier =
+                            Modifier.padding(10.dp).align(Alignment.Start).testTag("MyEventsText"))
+                    EventWidget(
+                        UserName = "EPFL Chess Club",
+                        EventName = "Chess Tournament",
+                        EventDate = eventDate,
+                        ProfilePicture = R.drawable.gomeet_logo,
+                        EventPicture = R.drawable.intbee_logo,
+                        Verified = true,
+                        nav = nav)
+
+                    EventWidget(
+                        UserName = "EPFL Chess Club",
+                        EventName = "Chess Tournament",
+                        EventDate = eventDate,
+                        ProfilePicture = R.drawable.gomeet_logo,
+                        EventPicture = R.drawable.intbee_logo,
+                        Verified = true,
+                        nav = nav)
+                  }
                 }
               }
             }
@@ -273,22 +302,65 @@ fun EventWidget(
     EventDate: Date,
     ProfilePicture: Int,
     EventPicture: Int,
-    Verified: Boolean
+    Verified: Boolean,
+    nav: NavigationActions,
 ) {
 
   val configuration = LocalConfiguration.current
   val screenWidth = configuration.screenWidthDp.dp
   val density = LocalDensity.current
 
-  // Example logic to calculate text size based on screen width
   val smallTextSize = with(density) { screenWidth.toPx() / 85 }
   val bigTextSize = with(density) { screenWidth.toPx() / 60 }
+
+  val currentDate = Calendar.getInstance()
+  val startOfWeek = currentDate.clone() as Calendar
+  startOfWeek.set(Calendar.DAY_OF_WEEK, startOfWeek.firstDayOfWeek)
+  val endOfWeek = startOfWeek.clone() as Calendar
+  endOfWeek.add(Calendar.DAY_OF_WEEK, 6)
+
+  val eventCalendar = Calendar.getInstance().apply { time = EventDate }
+
+  val isThisWeek = eventCalendar.after(currentDate) && eventCalendar.before(endOfWeek)
+  val isToday =
+      currentDate.get(Calendar.YEAR) == eventCalendar.get(Calendar.YEAR) &&
+          currentDate.get(Calendar.DAY_OF_YEAR) == eventCalendar.get(Calendar.DAY_OF_YEAR)
+
+  val dayFormat =
+      if (isThisWeek) {
+        SimpleDateFormat("EEEE", Locale.getDefault())
+      } else {
+        SimpleDateFormat("dd/MM/yy", Locale.getDefault())
+      }
+
+  val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+
+  val dayString =
+      if (isToday) {
+        "Today"
+      } else {
+        dayFormat.format(EventDate)
+      }
+  val timeString = timeFormat.format(EventDate)
 
   Card(
       modifier =
           Modifier.fillMaxWidth()
+              .testTag("Card")
               .padding(start = 10.dp, top = 5.dp, end = 10.dp, bottom = 5.dp)
-              .testTag("Card"),
+              .clickable {
+                nav.navigateToEventInfo(
+                    title = EventName,
+                    date = dayString,
+                    time = timeString,
+                    description =
+                        "Howdy!\n\nAfter months of planning, La Dame Blanche is finally offering you a rapid tournament!\n\nJoin us on Saturday 23rd of March afternoon for 6 rounds of 12+3” games in the chill and cozy vibe of Satellite. Take your chance to have fun and play, and maybe win one of our many prizes\n\nOnly 50 spots available, with free entry!",
+                    organizer = UserName,
+                    loc = LatLng(46.5191, 6.5668), // replace with actual location
+                    rating = 0.0 // replace with actual rating
+                    // add image
+                    )
+              },
       colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
       border = BorderStroke(2.dp, DarkCyan)) {
         Row(
@@ -339,30 +411,8 @@ fun EventWidget(
                           }
                         }
 
-                    val currentDate = Calendar.getInstance()
-                    val startOfWeek = currentDate.clone() as Calendar
-                    startOfWeek[Calendar.DAY_OF_WEEK] = startOfWeek.firstDayOfWeek
-                    val endOfWeek = startOfWeek.clone() as Calendar
-                    endOfWeek.add(Calendar.DAY_OF_WEEK, 6)
-
-                    val eventCalendar = Calendar.getInstance().apply { time = EventDate }
-
-                    // Determine if the event date is within this week
-                    val isThisWeek = eventCalendar >= startOfWeek && eventCalendar <= endOfWeek
-
-                    // Format based on whether the date is in the current week
-                    val dateFormat =
-                        if (isThisWeek) {
-                          SimpleDateFormat("EEEE - HH:mm", Locale.getDefault()) // "Tuesday"
-                        } else {
-                          SimpleDateFormat("dd/MM/yy - HH:mm", Locale.getDefault()) // "05/12/24"
-                        }
-
-                    // Convert the Date object to a formatted String
-                    val dateString = dateFormat.format(EventDate)
-
                     Text(
-                        dateString,
+                        dayString + " - " + timeString,
                         style =
                             TextStyle(
                                 fontSize = smallTextSize.sp,
@@ -378,17 +428,14 @@ fun EventWidget(
                   painter = painterResource(id = EventPicture),
                   contentDescription = "Event Picture",
                   modifier =
-                      Modifier.weight(
-                              3f) // Take 1/3 of the card space because of the total weight of 4 (3
-                          // for the column and 1 for this image)
-                          .fillMaxHeight() // Fill the height of the Row
-                          .aspectRatio(
-                              3f / 1.75f) // Maintain an aspect ratio of 3:2, change it as needed
+                      Modifier.weight(3f)
+                          .fillMaxHeight()
+                          .aspectRatio(3f / 1.75f)
                           .clipToBounds()
                           .padding(0.dp) // Clip the image if it overflows its bounds
                           .testTag("EventPicture"),
-                  contentScale = ContentScale.Crop // Crop the image to fit the aspect ratio
-                  )
+                  contentScale = ContentScale.Crop, // Crop the image to fit the aspect ratio
+              )
             }
       }
 }
