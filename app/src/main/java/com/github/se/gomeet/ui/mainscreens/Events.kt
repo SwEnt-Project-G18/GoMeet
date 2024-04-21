@@ -13,19 +13,29 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,11 +44,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -82,6 +94,8 @@ fun Events(nav: NavigationActions) {
           }
           .time
 
+  val query = remember { mutableStateOf("") }
+
   Scaffold(
       topBar = {
         Text(
@@ -108,6 +122,8 @@ fun Events(nav: NavigationActions) {
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(innerPadding)) {
+              Spacer(modifier = Modifier.height(10.dp))
+              EventSearchBar(query = query)
               Spacer(modifier = Modifier.height(10.dp))
               Row(
                   verticalAlignment = Alignment.CenterVertically,
@@ -391,6 +407,50 @@ fun EventWidget(
                   )
             }
       }
+}
+
+@Composable
+fun EventSearchBar(query: MutableState<String>) {
+  TextField(
+      value = query.value,
+      onValueChange = { it: String -> query.value = it },
+      modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp).height(50.dp),
+      placeholder = { Text(text = "Search", modifier = Modifier.offset(y = (-3).dp)) },
+      leadingIcon = {
+        Icon(ImageVector.vectorResource(R.drawable.gomeet_icon), contentDescription = null)
+      },
+      trailingIcon = {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(end = 10.dp)) {
+              Button(
+                  onClick = {
+                    // TODO: handle voice search
+                  },
+                  colors =
+                      ButtonColors(
+                          containerColor = Color.Transparent,
+                          contentColor = Color.Black,
+                          disabledContainerColor = Color.Transparent,
+                          disabledContentColor = Color.Transparent),
+                  modifier = Modifier.wrapContentSize(),
+              ) {
+                Icon(ImageVector.vectorResource(R.drawable.mic_icon), contentDescription = null)
+              }
+              Icon(Icons.Default.Search, contentDescription = null)
+            }
+      },
+      singleLine = true,
+      shape = RoundedCornerShape(25.dp),
+      colors =
+          TextFieldDefaults.colors(
+              focusedTextColor = Color.Black,
+              focusedContainerColor = NavBarUnselected,
+              unfocusedContainerColor = NavBarUnselected,
+              focusedIndicatorColor = Color.Transparent,
+              unfocusedIndicatorColor = Color.Transparent,
+              disabledIndicatorColor = Color.Transparent,
+          ))
 }
 
 @Composable
