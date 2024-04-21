@@ -114,7 +114,15 @@ fun GoogleMapView(
                     BitmapDescriptorFactory.defaultMarker(
                         BitmapDescriptorFactory.HUE_RED), // TODO: change this
                 onClick = markerClick,
-                visible = events[i].title.contains(query.value, ignoreCase = true)) {
+                visible =
+                    events[i]
+                        .title
+                        .contains(
+                            query.value,
+                            ignoreCase =
+                                true) // maybe it would also make sense to be able to search
+                                      // for creators or tags ?
+                ) {
                   Text(it.title!!, color = Color.Black)
                 }
           }
