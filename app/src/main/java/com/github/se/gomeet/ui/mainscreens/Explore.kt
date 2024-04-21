@@ -122,7 +122,7 @@ fun GoogleMapView(
                             query.value,
                             ignoreCase =
                                 true) // maybe it would also make sense to be able to search
-                                      // for creators or tags ?
+                // for creators or tags ?
                 ) {
                   Text(it.title!!, color = Color.Black)
                 }

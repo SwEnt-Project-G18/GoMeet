@@ -124,7 +124,9 @@ fun Events(nav: NavigationActions) {
             modifier = Modifier.padding(innerPadding)) {
               Spacer(modifier = Modifier.height(10.dp))
               SearchBar(
-                  query, NavBarUnselected, Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp).height(50.dp))
+                  query,
+                  NavBarUnselected,
+                  Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp).height(50.dp))
               Spacer(modifier = Modifier.height(10.dp))
               Row(
                   verticalAlignment = Alignment.CenterVertically,
