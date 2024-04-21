@@ -2,6 +2,7 @@ package com.github.se.gomeet.ui.mainscreens
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,13 +14,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
@@ -32,8 +33,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
@@ -122,11 +121,7 @@ fun Events(nav: NavigationActions) {
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(innerPadding)) {
-              Spacer(modifier = Modifier.height(10.dp))
-              SearchBar(
-                  query,
-                  NavBarUnselected,
-                  Modifier.fillMaxWidth().padding(start = 5.dp, end = 5.dp).height(50.dp))
+              SearchBar(query, NavBarUnselected)
               Spacer(modifier = Modifier.height(5.dp))
               Row(
                   verticalAlignment = Alignment.CenterVertically,
@@ -413,55 +408,53 @@ fun EventWidget(
 }
 
 @Composable
-fun SearchBar(query: MutableState<String>, backgroundColor: Color, modifier: Modifier) {
-  TextField(
+fun SearchBar(query: MutableState<String>, backgroundColor: Color) {
+  BasicTextField(
       value = query.value,
-      onValueChange = { it: String -> query.value = it },
-      modifier = modifier,
-      placeholder = {
-        Text(text = "Search", modifier = Modifier.offset(y = (-3).dp), color = Color.Black)
-      },
-      leadingIcon = {
-        Icon(
-            ImageVector.vectorResource(R.drawable.gomeet_icon),
-            contentDescription = null,
-            tint = Color.Black)
-      },
-      trailingIcon = {
+      onValueChange = { query.value = it },
+      modifier =
+          Modifier.fillMaxWidth()
+              .padding(top = 10.dp, start = 5.dp, end = 5.dp)
+              .height(50.dp)
+              .background(backgroundColor, RoundedCornerShape(25.dp)),
+      singleLine = true,
+      decorationBox = {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(end = 10.dp)) {
-              Button(
-                  onClick = {
-                    // TODO: handle voice search
-                  },
-                  colors =
-                      ButtonColors(
-                          containerColor = Color.Transparent,
-                          contentColor = Color.Black,
-                          disabledContainerColor = Color.Transparent,
-                          disabledContentColor = Color.Transparent),
-                  modifier = Modifier.wrapContentSize(),
-              ) {
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.padding(start = 15.dp, end = 5.dp).background(Color.Transparent)) {
+              Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
-                    ImageVector.vectorResource(R.drawable.mic_icon),
+                    ImageVector.vectorResource(R.drawable.gomeet_icon),
                     contentDescription = null,
+                    modifier = Modifier.padding(end = 20.dp),
                     tint = Color.Black)
+                Text(text = if (query.value == "") "Search" else query.value, color = Color.Black)
               }
-              Icon(Icons.Default.Search, contentDescription = null, tint = Color.Black)
+              Row(
+                  verticalAlignment = Alignment.CenterVertically,
+                  modifier = Modifier.padding(end = 10.dp)) {
+                    Button(
+                        onClick = {
+                          // TODO: handle voice search
+                        },
+                        colors =
+                            ButtonColors(
+                                containerColor = Color.Transparent,
+                                contentColor = Color.Black,
+                                disabledContainerColor = Color.Transparent,
+                                disabledContentColor = Color.Transparent),
+                        modifier = Modifier.wrapContentSize(),
+                    ) {
+                      Icon(
+                          ImageVector.vectorResource(R.drawable.mic_icon),
+                          contentDescription = null,
+                          tint = Color.Black)
+                    }
+                    Icon(Icons.Default.Search, contentDescription = null, tint = Color.Black)
+                  }
             }
-      },
-      singleLine = true,
-      shape = RoundedCornerShape(25.dp),
-      colors =
-          TextFieldDefaults.colors(
-              focusedTextColor = Color.Black,
-              focusedContainerColor = backgroundColor,
-              unfocusedContainerColor = backgroundColor,
-              focusedIndicatorColor = Color.Transparent,
-              unfocusedIndicatorColor = Color.Transparent,
-              disabledIndicatorColor = Color.Transparent,
-          ))
+      })
 }
 
 @Composable
