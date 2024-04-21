@@ -147,15 +147,23 @@ fun EventHeader(
         Column {
           Text(
               text = title,
-              style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.Bold, color = DarkCyan,
-               letterSpacing = 0.5.sp))
+              style =
+                  TextStyle(
+                      fontSize = 24.sp,
+                      fontWeight = FontWeight.Bold,
+                      color = DarkCyan,
+                      letterSpacing = 0.5.sp))
           Spacer(modifier = Modifier.height(5.dp))
           Text(
               modifier = Modifier.clickable { nav.navigateTo(SECOND_LEVEL_DESTINATION.get(0)) },
               text = organizer,
-              style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.ExtraBold, color = Color.Gray, fontFamily = FontFamily(
-                  Font(R.font.roboto)
-              ), letterSpacing = 0.5.sp)    )
+              style =
+                  TextStyle(
+                      fontSize = 16.sp,
+                      fontWeight = FontWeight.ExtraBold,
+                      color = Color.Gray,
+                      fontFamily = FontFamily(Font(R.font.roboto)),
+                      letterSpacing = 0.5.sp))
           // Add other details like rating here
         }
         // Icon for settings or more options, assuming using Material Icons
@@ -207,10 +215,13 @@ fun EventImage(painter: Painter) {
 fun EventDescription(text: String) {
   Text(
       text = text,
-      style = TextStyle(fontSize = 13.sp, color = MaterialTheme.colorScheme.onBackground, fontFamily = FontFamily(
-          Font(R.font.roboto)
-      ), fontWeight = FontWeight.SemiBold, letterSpacing = 0.5.sp
-      ))
+      style =
+          TextStyle(
+              fontSize = 13.sp,
+              color = MaterialTheme.colorScheme.onBackground,
+              fontFamily = FontFamily(Font(R.font.roboto)),
+              fontWeight = FontWeight.SemiBold,
+              letterSpacing = 0.5.sp))
 }
 
 @Composable
