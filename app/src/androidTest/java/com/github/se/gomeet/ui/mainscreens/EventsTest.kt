@@ -4,7 +4,6 @@ import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
-import androidx.compose.ui.test.onNodeWithTag
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -29,7 +28,6 @@ class EventsTest {
       navController = rememberNavController()
       Events(NavigationActions(navController), eventViewModel = EventViewModel())
     }
-
 
     rule.onAllNodesWithTag("Card").apply {
       fetchSemanticsNodes().forEachIndexed { i, _ ->
