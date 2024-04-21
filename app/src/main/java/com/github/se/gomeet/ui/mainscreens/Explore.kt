@@ -25,7 +25,6 @@ import com.github.se.gomeet.viewmodel.EventViewModel
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
-import com.google.android.material.search.SearchBar
 import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
