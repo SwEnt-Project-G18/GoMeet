@@ -123,7 +123,8 @@ fun Events(nav: NavigationActions) {
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(innerPadding)) {
               Spacer(modifier = Modifier.height(10.dp))
-              EventSearchBar(query = query)
+              EventSearchBar(
+                  query, Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp).height(50.dp))
               Spacer(modifier = Modifier.height(10.dp))
               Row(
                   verticalAlignment = Alignment.CenterVertically,
@@ -410,11 +411,11 @@ fun EventWidget(
 }
 
 @Composable
-fun EventSearchBar(query: MutableState<String>) {
+fun EventSearchBar(query: MutableState<String>, modifier: Modifier) {
   TextField(
       value = query.value,
       onValueChange = { it: String -> query.value = it },
-      modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp).height(50.dp),
+      modifier = modifier,
       placeholder = { Text(text = "Search", modifier = Modifier.offset(y = (-3).dp)) },
       leadingIcon = {
         Icon(ImageVector.vectorResource(R.drawable.gomeet_icon), contentDescription = null)
