@@ -123,8 +123,8 @@ fun Events(nav: NavigationActions) {
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(innerPadding)) {
               Spacer(modifier = Modifier.height(10.dp))
-              EventSearchBar(
-                  query, Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp).height(50.dp))
+              SearchBar(
+                  query, NavBarUnselected, Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp).height(50.dp))
               Spacer(modifier = Modifier.height(10.dp))
               Row(
                   verticalAlignment = Alignment.CenterVertically,
@@ -411,7 +411,7 @@ fun EventWidget(
 }
 
 @Composable
-fun EventSearchBar(query: MutableState<String>, modifier: Modifier) {
+fun SearchBar(query: MutableState<String>, backgroundColor: Color, modifier: Modifier) {
   TextField(
       value = query.value,
       onValueChange = { it: String -> query.value = it },
@@ -446,8 +446,8 @@ fun EventSearchBar(query: MutableState<String>, modifier: Modifier) {
       colors =
           TextFieldDefaults.colors(
               focusedTextColor = Color.Black,
-              focusedContainerColor = NavBarUnselected,
-              unfocusedContainerColor = NavBarUnselected,
+              focusedContainerColor = backgroundColor,
+              unfocusedContainerColor = backgroundColor,
               focusedIndicatorColor = Color.Transparent,
               unfocusedIndicatorColor = Color.Transparent,
               disabledIndicatorColor = Color.Transparent,

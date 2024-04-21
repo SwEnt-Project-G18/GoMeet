@@ -69,8 +69,9 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
           if (isMapLoaded) {
             GoogleMapView(events = eventList, modifier = Modifier.testTag("Map"), query = query)
           }
-          EventSearchBar(
+          SearchBar(
               query,
+              Color.White,
               Modifier.fillMaxWidth()
                   .padding(start = 10.dp, end = 10.dp, top = 10.dp)
                   .height(50.dp))
