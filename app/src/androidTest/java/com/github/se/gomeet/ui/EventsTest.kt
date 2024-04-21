@@ -65,7 +65,7 @@ class EventsTest {
     }
 
     composeTestRule.setContent {
-      Events(nav = NavigationActions(rememberNavController()), eventViewModel = eventViewModel)
+      Events(nav = NavigationActions(rememberNavController()), eventViewModel = EventViewModel())
     }
   }
 }
