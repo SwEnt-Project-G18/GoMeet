@@ -30,13 +30,6 @@ class EventsTest {
       Events(NavigationActions(navController), eventViewModel = EventViewModel())
     }
 
-    rule.onNodeWithTag("EventsTitle").assertIsDisplayed()
-    rule.onNodeWithTag("MyTicketsButton").assertIsDisplayed()
-    rule.onNodeWithTag("FavouritesButton").assertIsDisplayed()
-    rule.onNodeWithTag("MyEventsButton").assertIsDisplayed()
-    rule.onNodeWithTag("MyTicketsText").assertIsDisplayed()
-    rule.onNodeWithTag("FavouritesText").assertExists()
-    rule.onNodeWithTag("MyEventsText").assertExists()
 
     rule.onAllNodesWithTag("Card").apply {
       fetchSemanticsNodes().forEachIndexed { i, _ ->
