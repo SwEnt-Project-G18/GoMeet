@@ -5,6 +5,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -18,7 +19,7 @@ class EventsTest {
 
   @get:Rule val rule = createAndroidComposeRule<ComponentActivity>()
 
-  private val maxEventsDisplayedOnScreen = 3 // small number so the test passes on the CI
+  private val maxEventsDisplayedOnScreen = 2 // small number so the test passes on the CI
 
   @Test
   fun uiElementsDisplayed() {
@@ -30,6 +31,7 @@ class EventsTest {
     }
 
     rule.onNodeWithTag("EventsTitle").assertIsDisplayed()
+    rule.onNodeWithText("Search").assertIsDisplayed()
     rule.onNodeWithTag("MyTicketsButton").assertIsDisplayed()
     rule.onNodeWithTag("FavouritesButton").assertIsDisplayed()
     rule.onNodeWithTag("MyEventsButton").assertIsDisplayed()

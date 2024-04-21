@@ -4,6 +4,7 @@ import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -34,5 +35,6 @@ class ExploreTest {
     countdown.await(3, TimeUnit.SECONDS)
 
     rule.onNodeWithTag("Map").assertIsDisplayed()
+    rule.onNodeWithText("Search").assertIsDisplayed()
   }
 }
