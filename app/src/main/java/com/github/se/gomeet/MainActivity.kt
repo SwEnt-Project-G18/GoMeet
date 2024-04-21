@@ -21,6 +21,7 @@ import com.github.se.gomeet.ui.mainscreens.Profile
 import com.github.se.gomeet.ui.mainscreens.Trends
 import com.github.se.gomeet.ui.mainscreens.create.Create
 import com.github.se.gomeet.ui.mainscreens.create.CreateEvent
+import com.github.se.gomeet.ui.mainscreens.profile.OthersProfile
 import com.github.se.gomeet.ui.navigation.LOGIN_ITEMS
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
@@ -29,6 +30,9 @@ import com.github.se.gomeet.ui.theme.GoMeetTheme
 import com.github.se.gomeet.ui.theme.SetStatusBarColor
 import com.github.se.gomeet.viewmodel.AuthViewModel
 import com.github.se.gomeet.viewmodel.EventViewModel
+import com.github.se.gomeet.viewmodel.UserViewModel
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,7 +43,8 @@ class MainActivity : ComponentActivity() {
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
           val userIdState = remember { mutableStateOf<String?>(null) }
           val nav = rememberNavController()
-          val viewModel = AuthViewModel()
+          val authViewModel = AuthViewModel()
+          val userViewModel = UserViewModel()
           val navAction = NavigationActions(nav)
           NavHost(navController = nav, startDestination = Route.WELCOME) {
             composable(Route.WELCOME) {
@@ -48,6 +53,9 @@ class MainActivity : ComponentActivity() {
                   onNavToRegister = { NavigationActions(nav).navigateTo(LOGIN_ITEMS[2]) },
                   onSignInSuccess = { userId ->
                     userIdState.value = userId
+                    userViewModel.createUserIfNew(
+                        Firebase.auth.currentUser!!.uid,
+                        Firebase.auth.currentUser!!.email!!) // TODO: currently username = email
                     NavigationActions(nav)
                         .navigateTo(
                             TOP_LEVEL_DESTINATIONS.first { it.route == Route.CREATE },
@@ -55,13 +63,13 @@ class MainActivity : ComponentActivity() {
                   })
             }
             composable(Route.LOGIN) {
-              LoginScreen(viewModel) {
+              LoginScreen(authViewModel) {
                 NavigationActions(nav)
                     .navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == Route.CREATE })
               }
             }
             composable(Route.REGISTER) {
-              RegisterScreen(viewModel) {
+              RegisterScreen(authViewModel, userViewModel) {
                 NavigationActions(nav)
                     .navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == Route.CREATE })
               }
@@ -71,6 +79,7 @@ class MainActivity : ComponentActivity() {
             composable(Route.TRENDS) { Trends(navAction) }
             composable(Route.CREATE) { Create(navAction) }
             composable(Route.PROFILE) { Profile(navAction) }
+            composable(Route.OTHERS_PROFILE) { OthersProfile(navAction) }
             composable(Route.PRIVATE_CREATE) {
               CreateEvent(navAction, EventViewModel(userIdState.value), true)
             }

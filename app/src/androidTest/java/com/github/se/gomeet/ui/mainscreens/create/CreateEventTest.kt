@@ -1,6 +1,7 @@
 package com.github.se.gomeet.ui.mainscreens.create
 
 import androidx.activity.ComponentActivity
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -46,6 +47,8 @@ class CreateEventTest {
     // Enter a URL
     rule.onNodeWithText("Link").performTextInput("http://example.com")
 
+    rule.onNodeWithText("Add Image").assertIsDisplayed()
+
     rule.onNodeWithText("Post").performClick()
   }
 
@@ -74,6 +77,8 @@ class CreateEventTest {
     rule.onNodeWithText("Price").performTextInput("25.00")
     // Enter a URL
     rule.onNodeWithText("Link").performTextInput("http://example.com")
+
+    rule.onNodeWithText("Add Image").assertIsDisplayed()
 
     rule.onNodeWithText("Post").performClick()
   }

@@ -1,4 +1,4 @@
-package com.github.se.gomeet.ui.mainscreens
+package com.github.se.gomeet.ui.mainscreens.profile
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -48,11 +48,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.R
-import com.github.se.gomeet.ui.mainscreens.profile.ProfileEventsList
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
-import com.github.se.gomeet.ui.navigation.SECOND_LEVEL_DESTINATION
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.ui.theme.Grey
@@ -86,14 +84,12 @@ fun Profile(nav: NavigationActions) { // TODO Add parameters to the function
           Spacer(Modifier.weight(1f))
           IconButton(
               modifier = Modifier.align(Alignment.CenterVertically).padding(end = 15.dp),
-              onClick = {
-                nav.navigateTo(SECOND_LEVEL_DESTINATION.first()) /* Handle settings icon click */
-              }) {
+              onClick = {}) {
                 Icon(
                     imageVector = ImageVector.vectorResource(R.drawable.settings_icon),
                     contentDescription = "Settings",
                     modifier = Modifier.size(30.dp).align(Alignment.CenterVertically),
-                    tint = Grey)
+                    tint = DarkCyan)
               }
         }
       }) { innerPadding ->
@@ -161,7 +157,7 @@ fun Profile(nav: NavigationActions) { // TODO Add parameters to the function
                     // Edit Profile button
                     Button(
                         onClick = { /*TODO*/},
-                        modifier = Modifier.height(40.dp).width(135.dp),
+                        modifier = Modifier.height(40.dp).width(130.dp),
                         shape = RoundedCornerShape(10.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFECEFF1))) {
                           Text(text = "Edit Profile", color = Color.Black)
@@ -171,7 +167,7 @@ fun Profile(nav: NavigationActions) { // TODO Add parameters to the function
 
                     Button(
                         onClick = { /*TODO*/},
-                        modifier = Modifier.height(40.dp).width(135.dp),
+                        modifier = Modifier.height(40.dp).width(130.dp),
                         shape = RoundedCornerShape(10.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFECEFF1))) {
                           Text(text = "Share Profile", color = Color.Black)
@@ -188,7 +184,7 @@ fun Profile(nav: NavigationActions) { // TODO Add parameters to the function
                           Icon(
                               imageVector = ImageVector.vectorResource(R.drawable.add_friend),
                               contentDescription = "Settings",
-                              modifier = Modifier.size(15.dp),
+                              modifier = Modifier.size(20.dp),
                               tint = Grey)
                         }
                   }

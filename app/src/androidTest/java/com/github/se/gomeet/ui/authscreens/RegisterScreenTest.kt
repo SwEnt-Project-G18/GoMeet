@@ -1,4 +1,4 @@
-package com.github.se.gomeet.ui
+package com.github.se.gomeet.ui.authscreens
 
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertHasClickAction
@@ -11,8 +11,8 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.github.se.gomeet.ui.authscreens.RegisterScreen
 import com.github.se.gomeet.viewmodel.AuthViewModel
+import com.github.se.gomeet.viewmodel.UserViewModel
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Rule
@@ -39,9 +39,10 @@ class RegisterScreenTest {
     //        }))
     //        val authViewModel: AuthViewModel = AuthViewModel(repo)
 
-    val authViewModel: AuthViewModel = AuthViewModel()
+    val authViewModel = AuthViewModel()
+    val userViewModel = UserViewModel()
 
-    rule.setContent { RegisterScreen(authViewModel) {} }
+    rule.setContent { RegisterScreen(authViewModel, userViewModel) {} }
 
     rule.onNodeWithTag("register_title").assertIsDisplayed()
 
@@ -55,7 +56,7 @@ class RegisterScreenTest {
         .assertHasClickAction()
         .assertIsDisplayed()
 
-    rule.onNodeWithText("Email").performTextInput("signup@test.com")
+    rule.onNodeWithText("Email").performTextInput("signup@test1.com")
     rule.onNodeWithText("Password").performTextInput("123456")
     rule.onNodeWithText("Confirm Password").performTextInput("123456")
 
