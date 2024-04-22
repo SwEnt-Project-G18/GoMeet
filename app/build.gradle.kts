@@ -15,7 +15,6 @@ jacoco {
     toolVersion = "0.8.12"
 }
 
-
 secrets {
     // Optionally specify a different file name containing your secrets.
     // The plugin defaults to "local.properties"
@@ -136,7 +135,7 @@ dependencies {
 
     implementation("androidx.fragment:fragment:1.5.5")
 
-    implementation("com.squareup.okhttp3:okhttp:3.10.0")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
 
     testImplementation("org.mockito:mockito-inline:2.13.0")
@@ -146,7 +145,7 @@ dependencies {
     testImplementation("org.mockito:mockito-inline:3.11.2")
     testImplementation("org.mockito.kotlin:mockito-kotlin:4.0.0")
     androidTestImplementation("org.mockito.kotlin:mockito-kotlin:4.0.0")
-
+    implementation("io.coil-kt:coil-compose:2.6.0")
 
     implementation("com.firebaseui:firebase-ui-auth:7.2.0")
     implementation("com.google.android.play:core-ktx:1.7.0")

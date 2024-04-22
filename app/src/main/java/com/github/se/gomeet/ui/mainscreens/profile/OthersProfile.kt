@@ -1,4 +1,4 @@
-package com.github.se.gomeet.ui.mainscreens
+package com.github.se.gomeet.ui.mainscreens.profile
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -20,27 +20,36 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.TopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -48,18 +57,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.R
-import com.github.se.gomeet.ui.mainscreens.profile.ProfileEventsList
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
-import com.github.se.gomeet.ui.navigation.Route
-import com.github.se.gomeet.ui.navigation.SECOND_LEVEL_DESTINATION
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
-import com.github.se.gomeet.ui.theme.Grey
 import com.github.se.gomeet.ui.theme.NavBarUnselected
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Profile(nav: NavigationActions) { // TODO Add parameters to the function
+fun OthersProfile(nav: NavigationActions) { // TODO Add parameters to the function
   Scaffold(
       bottomBar = {
         BottomNavigationMenu(
@@ -67,45 +73,26 @@ fun Profile(nav: NavigationActions) { // TODO Add parameters to the function
               nav.navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == selectedTab })
             },
             tabList = TOP_LEVEL_DESTINATIONS,
-            selectedItem = Route.PROFILE)
+            selectedItem = "")
       },
       topBar = {
-        Row {
-          Text(
-              text = "My Profile",
-              modifier = Modifier.padding(horizontal = 15.dp, vertical = 15.dp),
-              color = DarkCyan,
-              fontStyle = FontStyle.Normal,
-              fontWeight = FontWeight.SemiBold,
-              fontFamily = FontFamily.Default,
-              textAlign = TextAlign.Start,
-              style = MaterialTheme.typography.headlineLarge)
-
-            IconButton(
-                modifier = Modifier.align(Alignment.CenterVertically).padding(end = 15.dp),
-                onClick = { /* Handles notification icon click */}) {
+        TopAppBar(
+            title = {},
+            backgroundColor = MaterialTheme.colorScheme.background,
+            elevation = 0.dp,
+            modifier = Modifier.height(50.dp),
+            actions = {
+              // Settings Icon
+              IconButton(onClick = { /* Handle settings icon click */}) {
                 Icon(
-                    ImageVector.vectorResource(R.drawable.notifications_icon),
+                    imageVector = Icons.Filled.Notifications,
                     contentDescription = "Notifications",
-                    modifier = Modifier.size(40.dp).align(Alignment.CenterVertically),
-                    tint = Grey)
-            }
-
-          // settings icon
-          // This will push the icon to the right
-          Spacer(Modifier.weight(1f))
-          IconButton(
-              modifier = Modifier.align(Alignment.CenterVertically).padding(end = 15.dp),
-              onClick = {
-                nav.navigateTo(SECOND_LEVEL_DESTINATION.first()) /* Handle settings icon click */
-              }) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.settings_icon),
-                    contentDescription = "Settings",
-                    modifier = Modifier.size(30.dp).align(Alignment.CenterVertically),
-                    tint = Grey)
+                    modifier = Modifier.size(24.dp),
+                    tint = DarkCyan)
               }
-        }
+
+              MoreActionsButton()
+            })
       }) { innerPadding ->
         Column(
             verticalArrangement = Arrangement.SpaceEvenly,
@@ -171,36 +158,23 @@ fun Profile(nav: NavigationActions) { // TODO Add parameters to the function
                     // Edit Profile button
                     Button(
                         onClick = { /*TODO*/},
-                        modifier = Modifier.height(40.dp).width(135.dp),
+                        modifier = Modifier.height(40.dp).width(180.dp),
                         shape = RoundedCornerShape(10.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFECEFF1))) {
-                          Text(text = "Edit Profile", color = Color.Black)
+                          Text(text = "Follow", color = Color.Black)
                         }
 
                     Spacer(Modifier.width(5.dp))
 
                     Button(
                         onClick = { /*TODO*/},
-                        modifier = Modifier.height(40.dp).width(135.dp),
+                        modifier = Modifier.height(40.dp).width(180.dp),
                         shape = RoundedCornerShape(10.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFECEFF1))) {
-                          Text(text = "Share Profile", color = Color.Black)
+                          Text(text = "Message", color = Color.Black)
                         }
 
                     Spacer(Modifier.width(5.dp))
-
-                    // Settings (Add) button
-                    Button(
-                        onClick = { /*TODO*/},
-                        modifier = Modifier.height(40.dp),
-                        shape = RoundedCornerShape(10.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFECEFF1))) {
-                          Icon(
-                              imageVector = ImageVector.vectorResource(R.drawable.add_friend),
-                              contentDescription = "Settings",
-                              modifier = Modifier.size(15.dp),
-                              tint = Grey)
-                        }
                   }
 
               Spacer(modifier = Modifier.height(30.dp))
@@ -320,7 +294,7 @@ fun Profile(nav: NavigationActions) { // TODO Add parameters to the function
                       ),
                   modifier =
                       Modifier.width(74.dp)
-                          .height(20.dp)
+                          .height(21.dp)
                           .align(Alignment.Start)
                           .padding(start = 15.dp))
               Column(modifier = Modifier.padding(start = 0.dp, end = 0.dp).fillMaxWidth()) {
@@ -350,8 +324,36 @@ fun Profile(nav: NavigationActions) { // TODO Add parameters to the function
       }
 }
 
+@Composable
+fun MoreActionsButton() {
+  var showMenu by remember { mutableStateOf(false) }
+
+  IconButton(onClick = { showMenu = true }) {
+    Icon(
+        imageVector = Icons.Default.MoreVert,
+        contentDescription = "More",
+        modifier = Modifier.size(24.dp).rotate(90f), // Rotates the icon by 90 degrees
+        tint = DarkCyan)
+  }
+
+  DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }, modifier = Modifier) {
+    DropdownMenuItem(
+        text = { Text("Share Profile") },
+        onClick = {
+          // Handle Share Profile logic here
+          showMenu = false
+        })
+    DropdownMenuItem(
+        text = { Text("Block") },
+        onClick = {
+          // Handle Block logic here
+          showMenu = false
+        })
+  }
+}
+
 @Preview
 @Composable
-fun ProfilePreview() {
-  Profile(nav = NavigationActions(rememberNavController()))
+fun OthersProfilePreview() {
+  OthersProfile(nav = NavigationActions(rememberNavController()))
 }

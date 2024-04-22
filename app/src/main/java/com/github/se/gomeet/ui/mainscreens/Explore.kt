@@ -7,6 +7,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,9 +39,9 @@ import kotlinx.coroutines.launch
 fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
   Log.d("Explore", "Back in Explore")
   val coroutineScope = rememberCoroutineScope()
-
   var isMapLoaded by remember { mutableStateOf(false) }
   var eventList = remember { mutableListOf<Event>() }
+  val query = remember { mutableStateOf("") }
 
   LaunchedEffect(Unit) {
     coroutineScope.launch {
@@ -63,7 +64,7 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
       }) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
           if (isMapLoaded) {
-            GoogleMapView(events = eventList, modifier = Modifier.testTag("Map"))
+            GoogleMapView(events = eventList, modifier = Modifier.testTag("Map"), query = query)
           }
         }
       }
@@ -75,12 +76,12 @@ fun GoogleMapView(
     cameraPositionState: CameraPositionState = rememberCameraPositionState(),
     onMapLoaded: () -> Unit = {},
     content: @Composable () -> Unit = {},
-    events: List<Event>
+    events: List<Event>,
+    query: MutableState<String>
 ) {
 
   val locations = events.map { event -> LatLng(event.location.latitude, event.location.longitude) }
   val states = locations.map { location -> rememberMarkerState(position = location) }
-
   val uiSettings by remember {
     mutableStateOf(MapUiSettings(compassEnabled = false, zoomControlsEnabled = false))
   }
@@ -101,11 +102,21 @@ fun GoogleMapView(
             MarkerInfoWindowContent(
                 state = states[i],
                 title = events[i].title,
-                icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED),
+                icon =
+                    BitmapDescriptorFactory.defaultMarker(
+                        BitmapDescriptorFactory.HUE_RED), // TODO: change this
                 onClick = markerClick,
-            ) {
-              Text(it.title!!, color = Color.Black)
-            }
+                visible =
+                    events[i]
+                        .title
+                        .contains(
+                            query.value,
+                            ignoreCase =
+                                true) // maybe it would also make sense to be able to search for
+                // creators or tags ?
+                ) {
+                  Text(it.title!!, color = Color.Black)
+                }
           }
           content()
         }
