@@ -94,7 +94,6 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
       }
 
   Scaffold(
-      modifier = Modifier.testTag("CreateEvent"),
       topBar = {
         Column {
           Text(
@@ -141,7 +140,9 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
             selectedItem = Route.CREATE)
       }) { innerPadding ->
         Column(
-            Modifier.padding(innerPadding).verticalScroll(rememberScrollState()),
+            Modifier.padding(innerPadding)
+                .verticalScroll(rememberScrollState())
+                .testTag("CreateEvent"),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center) {
               // Spacer(modifier = Modifier.size((LocalConfiguration.current.screenHeightDp /
@@ -249,9 +250,11 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                   modifier =
                       Modifier.fillMaxWidth().padding(start = 7.dp, end = 7.dp).testTag("Link"))
 
+              Spacer(modifier = Modifier.height(16.dp))
+
               if (isPrivate) {
                 Button(
-                    modifier = Modifier.fillMaxWidth().padding(7.dp),
+                    modifier = Modifier.fillMaxWidth().padding(start = 7.dp, end = 7.dp),
                     onClick = {
                       nav.navigateTo(
                           SECOND_LEVEL_DESTINATION.first { it.route == Route.ADD_PARTICIPANTS })
@@ -263,7 +266,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
               }
 
               Button(
-                  modifier = Modifier.fillMaxWidth().padding(7.dp),
+                  modifier = Modifier.fillMaxWidth().padding(start = 7.dp, end = 7.dp),
                   onClick = {
                     if (imageUri != null) {
                       imageUri = null
