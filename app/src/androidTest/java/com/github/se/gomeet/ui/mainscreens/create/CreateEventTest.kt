@@ -47,6 +47,8 @@ class CreateEventTest {
     // Enter a URL
     rule.onNodeWithText("Link").performTextInput("http://example.com")
 
+    rule.onNodeWithText("Add Participants").assertIsDisplayed()
+
     rule.onNodeWithText("Add Image").assertIsDisplayed()
 
     rule.onNodeWithText("Post").performClick()
