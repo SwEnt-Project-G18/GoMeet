@@ -87,9 +87,7 @@ class MainActivity : ComponentActivity() {
             composable(Route.PUBLIC_CREATE) {
               CreateEvent(navAction, EventViewModel(userIdState.value), false)
             }
-            composable(Route.ADD_PARTICIPANTS) {
-                AddParticipants(navAction)
-            }
+            composable(Route.ADD_PARTICIPANTS) { AddParticipants(navAction) }
           }
         }
       }

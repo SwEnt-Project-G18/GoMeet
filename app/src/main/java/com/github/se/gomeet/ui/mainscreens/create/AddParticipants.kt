@@ -13,19 +13,19 @@ import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 
 @Composable
 fun AddParticipants(nav: NavigationActions) {
-    /* TODO: Code the UI of the AddParticipants screen when the logic of
-    the invites will be done and the UI of this screen discussed with the team */
+  /* TODO: Code the UI of the AddParticipants screen when the logic of
+  the invites will be done and the UI of this screen discussed with the team */
 
-    Scaffold(
-        modifier = Modifier.testTag("AddParticipantsScreen"),
-        bottomBar = {
-            BottomNavigationMenu(
-                onTabSelect = { selectedTab ->
-                    nav.navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == selectedTab })
-                },
-                tabList = TOP_LEVEL_DESTINATIONS,
-                selectedItem = Route.CREATE)
-        }) { innerPadding ->
+  Scaffold(
+      modifier = Modifier.testTag("AddParticipantsScreen"),
+      bottomBar = {
+        BottomNavigationMenu(
+            onTabSelect = { selectedTab ->
+              nav.navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == selectedTab })
+            },
+            tabList = TOP_LEVEL_DESTINATIONS,
+            selectedItem = Route.CREATE)
+      }) { innerPadding ->
         Text("Add Participants", Modifier.padding(innerPadding))
-    }
+      }
 }
