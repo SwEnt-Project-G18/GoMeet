@@ -149,7 +149,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center) {
-              Spacer(modifier = Modifier.size((LocalConfiguration.current.screenHeightDp / 9).dp))
+              //Spacer(modifier = Modifier.size((LocalConfiguration.current.screenHeightDp / 9).dp))
 
               OutlinedTextField(
                   value = titleState.value,
