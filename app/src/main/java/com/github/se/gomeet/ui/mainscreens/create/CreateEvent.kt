@@ -97,6 +97,43 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
 
   Scaffold(
       modifier = Modifier.testTag("CreateEvent"),
+      topBar = {
+          Column {
+              Text(
+                  text = "Create",
+                  modifier = Modifier.padding(horizontal = 15.dp, vertical = 15.dp),
+                  color = DarkCyan,
+                  fontStyle = FontStyle.Normal,
+                  fontWeight = FontWeight.SemiBold,
+                  fontFamily = FontFamily.Default,
+                  textAlign = TextAlign.Start,
+                  style = MaterialTheme.typography.headlineLarge)
+
+              if (isPrivate) {
+                  isPrivateEvent.value = true
+                  Text(
+                      text = "Private",
+                      modifier = Modifier.padding(horizontal = 18.dp),
+                      color = Grey,
+                      fontStyle = FontStyle.Normal,
+                      fontWeight = FontWeight.SemiBold,
+                      fontFamily = FontFamily.Default,
+                      textAlign = TextAlign.Start,
+                      style = MaterialTheme.typography.titleSmall)
+              } else {
+                  isPrivateEvent.value = false
+                  Text(
+                      text = "Public",
+                      modifier = Modifier.padding(horizontal = 18.dp),
+                      color = Grey,
+                      fontStyle = FontStyle.Normal,
+                      fontWeight = FontWeight.SemiBold,
+                      fontFamily = FontFamily.Default,
+                      textAlign = TextAlign.Start,
+                      style = MaterialTheme.typography.titleSmall)
+              }
+          }
+      },
       bottomBar = {
         BottomNavigationMenu(
             onTabSelect = { selectedTab ->
@@ -105,42 +142,11 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
             tabList = TOP_LEVEL_DESTINATIONS,
             selectedItem = Route.CREATE)
       }) { innerPadding ->
-        Text(
-            text = "Create",
-            modifier = Modifier.padding(horizontal = 15.dp, vertical = 15.dp),
-            color = DarkCyan,
-            fontStyle = FontStyle.Normal,
-            fontWeight = FontWeight.SemiBold,
-            fontFamily = FontFamily.Default,
-            textAlign = TextAlign.Start,
-            style = MaterialTheme.typography.headlineLarge)
-
-        if (isPrivate) {
-          isPrivateEvent.value = true
-          Text(
-              text = "Private",
-              modifier = Modifier.padding(horizontal = 18.dp, vertical = 55.dp),
-              color = Grey,
-              fontStyle = FontStyle.Normal,
-              fontWeight = FontWeight.SemiBold,
-              fontFamily = FontFamily.Default,
-              textAlign = TextAlign.Start,
-              style = MaterialTheme.typography.titleSmall)
-        } else {
-          isPrivateEvent.value = false
-          Text(
-              text = "Public",
-              modifier = Modifier.padding(horizontal = 18.dp, vertical = 55.dp),
-              color = Grey,
-              fontStyle = FontStyle.Normal,
-              fontWeight = FontWeight.SemiBold,
-              fontFamily = FontFamily.Default,
-              textAlign = TextAlign.Start,
-              style = MaterialTheme.typography.titleSmall)
-        }
 
         Column(
-            Modifier.padding(innerPadding).verticalScroll(rememberScrollState()),
+            Modifier
+                .padding(innerPadding)
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center) {
               Spacer(modifier = Modifier.size((LocalConfiguration.current.screenHeightDp / 9).dp))
@@ -263,21 +269,20 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                       .padding(start = 7.dp, end = 7.dp)
                       .testTag("Link"))
 
-            if (isPrivate) {
+              if (isPrivate) {
                 Button(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(7.dp),
                     onClick = {
-                        nav.navigateTo(SECOND_LEVEL_DESTINATION.first { it.route == Route.ADD_PARTICIPANTS })
+                      nav.navigateTo(
+                          SECOND_LEVEL_DESTINATION.first { it.route == Route.ADD_PARTICIPANTS })
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Grey),
                     shape = RoundedCornerShape(10.dp)) {
-                    Text(
-                        text = "Add Participants",
-                        color = Color.White)
-                }
-            }
+                      Text(text = "Add Participants", color = Color.White)
+                    }
+              }
 
               Button(
                   modifier = Modifier
