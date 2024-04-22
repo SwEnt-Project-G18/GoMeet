@@ -44,22 +44,23 @@ import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapType
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.MarkerInfoWindowContent
-import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
-private var currentPosition: LatLng = LatLng(0.0, 0.0)
+private val defaultPosition = LatLng(46.51821074855688, 6.627076937989363)
+private val deafaultZoom = 16f
 
 @Composable
 fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
   val coroutineScope = rememberCoroutineScope()
-  var isMapLoaded by remember { mutableStateOf(false) }
   var eventList = remember { mutableListOf<Event>() }
   val query = remember { mutableStateOf("") }
   val context = LocalContext.current
 
-  var locationPermitted by remember { mutableStateOf(false) }
+  val locationPermitted: MutableState<Boolean?> = remember { mutableStateOf(null) }
   val locationPermissionsAlreadyGranted =
       ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) ==
           PackageManager.PERMISSION_GRANTED
@@ -69,15 +70,18 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
       rememberLauncherForActivityResult(
           contract = ActivityResultContracts.RequestMultiplePermissions(),
           onResult = { permissions ->
-            locationPermitted =
+            locationPermitted.value =
                 permissions.values.reduce { acc, isPermissionGranted -> acc && isPermissionGranted }
           })
   val locationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
+  var currentPosition by remember { mutableStateOf(defaultPosition) }
+
+  var isMapLoaded by remember { mutableStateOf(false) }
 
   LaunchedEffect(Unit) {
     coroutineScope.launch {
       if (locationPermissionsAlreadyGranted) {
-        locationPermitted = true
+        locationPermitted.value = true
       } else {
         locationPermissionLauncher.launch(locationPermissions)
       }
@@ -87,7 +91,11 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
         eventList.addAll(allEvents)
       }
 
-      if (locationPermitted) {
+      while (locationPermitted.value == null) {
+        delay(100)
+      }
+
+      if (locationPermitted.value == true) {
         val priority = PRIORITY_BALANCED_POWER_ACCURACY
         val result =
             locationClient
@@ -98,9 +106,11 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
                 .await()
         result?.let { fetchedLocation ->
           currentPosition = LatLng(fetchedLocation.latitude, fetchedLocation.longitude)
+          isMapLoaded = true
         }
+      } else if (locationPermitted.value == false) {
+        isMapLoaded = true
       }
-      isMapLoaded = true
     }
   }
 
@@ -108,7 +118,9 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
       bottomBar = {
         BottomNavigationMenu(
             onTabSelect = { selectedTab ->
-              nav.navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == selectedTab })
+              if (selectedTab != "Explore") {
+                nav.navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == selectedTab })
+              }
             },
             tabList = TOP_LEVEL_DESTINATIONS,
             selectedItem = Route.EXPLORE)
@@ -116,10 +128,11 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
         if (isMapLoaded) {
           Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
             GoogleMapView(
+                currentPosition = currentPosition,
                 events = eventList,
                 modifier = Modifier.testTag("Map"),
                 query = query,
-                locationPermitted = locationPermitted)
+                locationPermitted = locationPermitted.value!!)
           }
         } else {
           Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -134,9 +147,7 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
 @Composable
 fun GoogleMapView(
     modifier: Modifier = Modifier,
-    cameraPositionState: CameraPositionState = rememberCameraPositionState {
-      position = CameraPosition.fromLatLngZoom(currentPosition, 16f)
-    },
+    currentPosition: LatLng,
     onMapLoaded: () -> Unit = {},
     content: @Composable () -> Unit = {},
     events: List<Event>,
@@ -156,7 +167,9 @@ fun GoogleMapView(
   if (mapVisible) {
     GoogleMap(
         modifier = modifier,
-        cameraPositionState = cameraPositionState,
+        cameraPositionState =
+            CameraPositionState(
+                position = CameraPosition.fromLatLngZoom(currentPosition, deafaultZoom)),
         properties = mapProperties,
         uiSettings = uiSettings,
         onMapLoaded = onMapLoaded,
