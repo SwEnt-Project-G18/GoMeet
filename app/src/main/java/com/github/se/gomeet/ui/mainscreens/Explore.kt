@@ -69,16 +69,27 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
 
   val locationPermitted: MutableState<Boolean?> = remember { mutableStateOf(null) }
   val locationPermissionsAlreadyGranted =
-      ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) ==
-          PackageManager.PERMISSION_GRANTED
+      (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) ==
+          PackageManager.PERMISSION_GRANTED) ||
+          (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) ==
+              PackageManager.PERMISSION_GRANTED)
   val locationPermissions =
       arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
   val locationPermissionLauncher =
       rememberLauncherForActivityResult(
           contract = ActivityResultContracts.RequestMultiplePermissions(),
           onResult = { permissions ->
-            locationPermitted.value =
-                permissions.values.reduce { acc, isPermissionGranted -> acc && isPermissionGranted }
+            when {
+              permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) -> {
+                locationPermitted.value = true
+              }
+              permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
+                locationPermitted.value = true
+              }
+              else -> {
+                locationPermitted.value = false
+              }
+            }
           })
   val locationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
 
@@ -224,15 +235,7 @@ fun GoogleMapView(
                       BitmapDescriptorFactory.defaultMarker(
                           BitmapDescriptorFactory.HUE_RED), // TODO: change this
                   onClick = markerClick,
-                  visible =
-                      events[i]
-                          .title
-                          .contains(
-                              query.value,
-                              ignoreCase =
-                                  true) // maybe it would also make sense to be able to search for
-                  // creators or tags ?
-                  ) {
+                  visible = events[i].title.contains(query.value, ignoreCase = true)) {
                     Text(it.title!!, color = Color.Black)
                   }
             }
