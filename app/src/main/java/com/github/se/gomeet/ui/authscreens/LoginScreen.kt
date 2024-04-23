@@ -39,6 +39,15 @@ fun LoginScreen(authViewModel: AuthViewModel, onNavToExplore: () -> Unit) {
   val signInState = authViewModel.signInState.collectAsState()
   val isError = signInState.value.signInError != null
   val context = LocalContext.current
+  val textFieldColors =
+      TextFieldDefaults.colors(
+          focusedTextColor = DarkCyan,
+          unfocusedTextColor = DarkCyan,
+          unfocusedContainerColor = Color.Transparent,
+          focusedContainerColor = Color.Transparent,
+          cursorColor = DarkCyan,
+          focusedLabelColor = MaterialTheme.colorScheme.tertiary,
+          focusedIndicatorColor = MaterialTheme.colorScheme.tertiary)
 
   Column(
       verticalArrangement = Arrangement.Top,
@@ -79,15 +88,7 @@ fun LoginScreen(authViewModel: AuthViewModel, onNavToExplore: () -> Unit) {
             modifier = Modifier.fillMaxWidth().testTag("EmailField"),
             label = { Text("Email") },
             isError = isError,
-            colors =
-                TextFieldDefaults.colors(
-                    focusedTextColor = DarkCyan,
-                    unfocusedTextColor = DarkCyan,
-                    unfocusedContainerColor = Color.Transparent,
-                    focusedContainerColor = Color.Transparent,
-                    cursorColor = DarkCyan,
-                    focusedLabelColor = MaterialTheme.colorScheme.tertiary,
-                    focusedIndicatorColor = MaterialTheme.colorScheme.tertiary))
+            colors = textFieldColors)
 
         Spacer(modifier = Modifier.size(16.dp))
 
@@ -98,15 +99,7 @@ fun LoginScreen(authViewModel: AuthViewModel, onNavToExplore: () -> Unit) {
             modifier = Modifier.fillMaxWidth().testTag("LogInField"),
             label = { Text("Password") },
             isError = isError,
-            colors =
-                TextFieldDefaults.colors(
-                    focusedTextColor = DarkCyan,
-                    unfocusedTextColor = DarkCyan,
-                    unfocusedContainerColor = Color.Transparent,
-                    focusedContainerColor = Color.Transparent,
-                    cursorColor = DarkCyan,
-                    focusedLabelColor = MaterialTheme.colorScheme.tertiary,
-                    focusedIndicatorColor = MaterialTheme.colorScheme.tertiary),
+            colors = textFieldColors,
             visualTransformation = PasswordVisualTransformation())
 
         Spacer(modifier = Modifier.size(50.dp))

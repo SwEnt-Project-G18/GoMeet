@@ -46,6 +46,15 @@ fun RegisterScreen(
   val signInState = authViewModel.signInState.collectAsState()
   val isError = signInState.value.registerError != null
   val context = LocalContext.current
+  val textFieldColors =
+      TextFieldDefaults.colors(
+          focusedTextColor = DarkCyan,
+          unfocusedTextColor = DarkCyan,
+          unfocusedContainerColor = Color.Transparent,
+          focusedContainerColor = Color.Transparent,
+          cursorColor = DarkCyan,
+          focusedLabelColor = MaterialTheme.colorScheme.tertiary,
+          focusedIndicatorColor = MaterialTheme.colorScheme.tertiary)
 
   Column(
       verticalArrangement = Arrangement.Top,
@@ -85,15 +94,7 @@ fun RegisterScreen(
             label = { Text("Email") },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
-            colors =
-                TextFieldDefaults.colors(
-                    focusedTextColor = DarkCyan,
-                    unfocusedTextColor = DarkCyan,
-                    unfocusedContainerColor = Color.Transparent,
-                    focusedContainerColor = Color.Transparent,
-                    cursorColor = DarkCyan,
-                    focusedLabelColor = MaterialTheme.colorScheme.tertiary,
-                    focusedIndicatorColor = MaterialTheme.colorScheme.tertiary))
+            colors = textFieldColors)
 
         Spacer(modifier = Modifier.size(16.dp))
 
@@ -104,15 +105,7 @@ fun RegisterScreen(
             singleLine = true,
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth(),
-            colors =
-                TextFieldDefaults.colors(
-                    focusedTextColor = DarkCyan,
-                    unfocusedTextColor = DarkCyan,
-                    unfocusedContainerColor = Color.Transparent,
-                    focusedContainerColor = Color.Transparent,
-                    cursorColor = DarkCyan,
-                    focusedLabelColor = MaterialTheme.colorScheme.tertiary,
-                    focusedIndicatorColor = MaterialTheme.colorScheme.tertiary))
+            colors = textFieldColors)
 
         Spacer(modifier = Modifier.size(16.dp))
 
@@ -123,15 +116,7 @@ fun RegisterScreen(
             visualTransformation = PasswordVisualTransformation(),
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
-            colors =
-                TextFieldDefaults.colors(
-                    focusedTextColor = DarkCyan,
-                    unfocusedTextColor = DarkCyan,
-                    unfocusedContainerColor = Color.Transparent,
-                    focusedContainerColor = Color.Transparent,
-                    cursorColor = DarkCyan,
-                    focusedLabelColor = MaterialTheme.colorScheme.tertiary,
-                    focusedIndicatorColor = MaterialTheme.colorScheme.tertiary))
+            colors = textFieldColors)
 
         Spacer(modifier = Modifier.size(50.dp))
 
