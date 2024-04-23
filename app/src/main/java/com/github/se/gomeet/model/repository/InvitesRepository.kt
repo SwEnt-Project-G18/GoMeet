@@ -59,7 +59,9 @@ class InvitesRepository(private val db : FirebaseFirestore) {
             }
     }
 
-    private fun updateEventInvites(eventID: String, userID: String, status: InviteStatus) {
+
+    /* Calls back success with true if success, false otherwise */
+    private fun updateEventInvites(eventID: String, userID: String, status: InviteStatus, success: (Boolean) -> Unit) {
         val eventInviteRef = db.collection(EVENT_INVITES_COLLECTION).document(eventID)
         db.runTransaction { transaction ->
             val snapshot = transaction.get(eventInviteRef)
@@ -72,13 +74,15 @@ class InvitesRepository(private val db : FirebaseFirestore) {
             transaction.set(eventInviteRef, EventInviteUsers(eventID, currentUsers))
         }.addOnSuccessListener {
             Log.d(TAG, "Event invite updated successfully")
+            success(true)
         }.addOnFailureListener { e ->
             Log.d(TAG, "Error updating event invite", e)
+            success(false)
         }
     }
 
-
-    private fun updateUserInvites(userID: String, eventID: String, status: InviteStatus) {
+    /* Calls back success with true if success, false otherwise */
+    private fun updateUserInvites(userID: String, eventID: String, status: InviteStatus, success: (Boolean) -> Unit) {
         val userInviteRef = db.collection(USER_INVITES_COLLECTION).document(userID)
         db.runTransaction { transaction ->
             val snapshot = transaction.get(userInviteRef)
@@ -91,15 +95,27 @@ class InvitesRepository(private val db : FirebaseFirestore) {
             transaction.set(userInviteRef, UserInvitedToEvents(userID, currentEvents))
         }.addOnSuccessListener {
             Log.d(TAG, "User invite updated successfully")
+            success(true)
         }.addOnFailureListener { e ->
             Log.d(TAG, "Error updating user invite", e)
+            success(false)
         }
     }
 
 
-    fun sendInvite(eventID: String, toUserID: String) {
-        updateEventInvites(eventID, toUserID, InviteStatus.PENDING)
-        updateUserInvites(toUserID, eventID, InviteStatus.PENDING)
+    /* Return True if success, false otherwise */
+    fun sendInvite(eventID: String, toUserID: String): Boolean {
+        var a = false
+        updateEventInvites(eventID, toUserID, InviteStatus.PENDING){a = it}
+        updateUserInvites(toUserID, eventID, InviteStatus.PENDING){a = a && it}
+        return a
+    }
+
+    fun udpateInvite(eventID: String, toUserID: String, status: InviteStatus): Boolean {
+        var a = false
+        updateEventInvites(eventID, toUserID, status){a = it}
+        updateUserInvites(toUserID, eventID, status){a = a && it}
+        return a
     }
 
 
