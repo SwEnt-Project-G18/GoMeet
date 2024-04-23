@@ -140,7 +140,7 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
           isMapLoaded = true
         }
       }
-      delay(5000) // map is updated every 5s (events and current location)
+      delay(5000) // map is updated every 5s
     }
   }
 
