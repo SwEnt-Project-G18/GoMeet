@@ -9,6 +9,7 @@ import android.net.Uri
 import android.util.Log
 import android.widget.ImageView
 import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.se.gomeet.model.event.Event
@@ -33,35 +34,50 @@ import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONArray
+import androidx.compose.runtime.State
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 class EventViewModel(private val creatorId: String? = null) : ViewModel() {
   private val db = EventRepository(Firebase.firestore)
     private val _bitmapDescriptors = mutableStateMapOf<String, BitmapDescriptor>()
-    val bitmapDescriptors: Map<String, BitmapDescriptor> = _bitmapDescriptors
+    val bitmapDescriptors: MutableMap<String, BitmapDescriptor> = _bitmapDescriptors
 
+    private val _loading = mutableStateOf(true) // Default to true
+    val loading: State<Boolean> = _loading
 
-    fun loadCustomPins(context: Context, events: List<Event>) {
-        events.forEach { event ->
-            // Assume you store or can derive the Firebase Storage path or URL for each event's pin
-            val imagePath = "event_icons/${event.uid}.png" // Example path in Firebase Storage
-
-            // Fetch the URL from Firebase Storage
-            val storageRef = FirebaseStorage.getInstance().reference.child(imagePath)
-            storageRef.downloadUrl.addOnSuccessListener { uri ->
-                // Convert URI to BitmapDescriptor
-                loadBitmapFromUri(context, uri) { bitmapDescriptor ->
+    fun loadCustomPins(context: Context, events: List<Event>) = viewModelScope.launch {
+        _loading.value = true
+        val loadJobs = events.map { event ->
+            async {
+                val imagePath = "event_icons/${event.uid}.png"
+                val storageRef = FirebaseStorage.getInstance().reference.child(imagePath)
+                val uri = storageRef.downloadUrl.await()  // Await the download URL
+                try {
+                    val bitmapDescriptor = loadBitmapFromUri(context, uri)  // Load the bitmap as a BitmapDescriptor
                     _bitmapDescriptors[event.uid] = bitmapDescriptor
+                } catch (e: Exception) {
+                    Log.e("ViewModel", "Error loading bitmap descriptor: ${e.message}")
+                    _bitmapDescriptors[event.uid] = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)
                 }
-            }.addOnFailureListener {
-                // Handle possible failures, e.g., log an error or use a default icon
-                Log.e("ViewModel", "Failed to fetch image for event ${event.uid}: ${it.message}")
-                _bitmapDescriptors[event.uid] = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED) // Use default or error icon
             }
+        }
+
+        try {
+            loadJobs.awaitAll()  // Await all loading jobs
+        } finally {
+            Log.d("ViewModel", "Finished loading custom pins")
+            _loading.value = false
         }
     }
 
-    private fun loadBitmapFromUri(context: Context, uri: Uri, callback: (BitmapDescriptor) -> Unit) {
-        // Temporary ImageView
+
+    suspend fun loadBitmapFromUri(context: Context, uri: Uri): BitmapDescriptor = suspendCancellableCoroutine { continuation ->
+        // Create a temporary ImageView to load the image.
         val imageView = ImageView(context)
         imageView.layout(0, 0, 1, 1)  // Minimal size
 
@@ -69,16 +85,23 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
             override fun onSuccess() {
                 imageView.drawable?.let { drawable ->
                     val bitmap = (drawable as BitmapDrawable).bitmap
-                    callback(BitmapDescriptorFactory.fromBitmap(bitmap))
+                    continuation.resume(BitmapDescriptorFactory.fromBitmap(bitmap))
                 } ?: run {
-                    callback(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+                    Log.e("ViewModel", "Drawable is null after loading image.")
+                    continuation.resumeWithException(RuntimeException("Drawable is null after loading image"))
                 }
             }
 
             override fun onError(e: Exception?) {
-                callback(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+                Log.e("ViewModel", "Error loading image from Picasso: ${e?.message}")
+                continuation.resumeWithException(e ?: RuntimeException("Unknown error in Picasso"))
             }
         })
+
+        // Handle cancellation of the coroutine.
+        continuation.invokeOnCancellation {
+            imageView.setImageDrawable(null) // Clear resources
+        }
     }
 
   suspend fun getEvent(uid: String): Event? {

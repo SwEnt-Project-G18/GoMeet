@@ -167,7 +167,10 @@ dependencies {
 
     implementation("com.google.accompanist:accompanist-permissions:0.25.0")
 
-    implementation ("com.squareup.picasso:picasso:2.71828")
+    implementation("com.squareup.picasso:picasso:2.71828")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.3.0")
+
+
 
 }
 

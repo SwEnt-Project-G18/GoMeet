@@ -2,6 +2,7 @@ package com.github.se.gomeet.ui.mainscreens
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
@@ -202,89 +203,99 @@ fun GoogleMapView(
     locationPermitted: Boolean,
     eventViewModel: EventViewModel
 ) {
-    val context = LocalContext.current
-  val coroutineScope = rememberCoroutineScope()
+    val coroutineScope = rememberCoroutineScope()
 
-  val eventLocations =
-      events.value.map { event -> LatLng(event.location.latitude, event.location.longitude) }
-  val eventStates = eventLocations.map { location -> rememberMarkerState(position = location) }
+    val eventLocations =
+        events.value.map { event -> LatLng(event.location.latitude, event.location.longitude) }
+    val eventStates = eventLocations.map { location -> rememberMarkerState(position = location) }
 
-  val uiSettings by remember {
-    mutableStateOf(
-        MapUiSettings(
-            compassEnabled = false, zoomControlsEnabled = false, myLocationButtonEnabled = false))
-  }
-  val mapProperties by remember {
-    mutableStateOf(MapProperties(mapType = MapType.NORMAL, isMyLocationEnabled = locationPermitted))
-  }
-  val mapVisible by remember { mutableStateOf(true) }
-  val cameraPositionState = rememberCameraPositionState()
-
-  LaunchedEffect(moveToCurrentLocation.value, Unit) {
-    if (moveToCurrentLocation.value == CameraAction.MOVE) {
-      coroutineScope.launch {
-        cameraPositionState.move(
-            update =
-                CameraUpdateFactory.newCameraPosition(
-                    CameraPosition.fromLatLngZoom(currentPosition.value, defaultZoom)))
-        moveToCurrentLocation.value = CameraAction.NO_ACTION
-      }
-    } else if (moveToCurrentLocation.value == CameraAction.ANIMATE) {
-      coroutineScope.launch {
-        cameraPositionState.animate(
-            update =
-                CameraUpdateFactory.newCameraPosition(
-                    CameraPosition.fromLatLngZoom(currentPosition.value, defaultZoom)),
-            durationMs = 1000)
-        moveToCurrentLocation.value = CameraAction.NO_ACTION
-      }
+    val uiSettings by remember {
+        mutableStateOf(
+            MapUiSettings(
+                compassEnabled = false, zoomControlsEnabled = false, myLocationButtonEnabled = false))
     }
-  }
-
-
-    LaunchedEffect(events.value) {
-        eventViewModel.loadCustomPins(context, events.value)
+    val mapProperties by remember {
+        mutableStateOf(MapProperties(mapType = MapType.NORMAL, isMyLocationEnabled = locationPermitted))
     }
+    val mapVisible by remember { mutableStateOf(true) }
+    val cameraPositionState = rememberCameraPositionState()
 
-
-
-
-    if (mapVisible) {
-        Box(Modifier.fillMaxSize()) {
-            GoogleMap(
-                modifier = modifier,
-                cameraPositionState = cameraPositionState,
-                properties = mapProperties,
-                uiSettings = uiSettings,
-                onMapLoaded = onMapLoaded,
-                onMapClick = { isButtonVisible.value = true },
-                onPOIClick = {}
-            ) {
-                val markerClick: (Marker) -> Boolean = {
-                    isButtonVisible.value = false
-                    false
-                }
-
-                // Fetch the list of BitmapDescriptors from your ViewModel
-                val bitmapDescriptors = eventViewModel.bitmapDescriptors
-
-                events.value.forEachIndexed { index, event ->
-                    // Retrieve the corresponding BitmapDescriptor for the event
-                    val customPinBitmapDescriptor = bitmapDescriptors[event.uid]
-
-                    MarkerInfoWindowContent(
-                        state = eventStates[index],
-                        title = event.title,
-                        icon = customPinBitmapDescriptor ?: BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED), // Use custom pin if available, otherwise default
-                        onClick = markerClick,
-                        visible = event.title.contains(query.value, ignoreCase = true)
-                    ) {
-                        Text(it.title!!, color = Color.Black)
-                    }
-                }
-                content()
+    LaunchedEffect(moveToCurrentLocation.value, Unit) {
+        if (moveToCurrentLocation.value == CameraAction.MOVE) {
+            coroutineScope.launch {
+                cameraPositionState.move(
+                    update =
+                    CameraUpdateFactory.newCameraPosition(
+                        CameraPosition.fromLatLngZoom(currentPosition.value, defaultZoom)))
+                moveToCurrentLocation.value = CameraAction.NO_ACTION
+            }
+        } else if (moveToCurrentLocation.value == CameraAction.ANIMATE) {
+            coroutineScope.launch {
+                cameraPositionState.animate(
+                    update =
+                    CameraUpdateFactory.newCameraPosition(
+                        CameraPosition.fromLatLngZoom(currentPosition.value, defaultZoom)),
+                    durationMs = 1000)
+                moveToCurrentLocation.value = CameraAction.NO_ACTION
             }
         }
     }
 
+    val context = LocalContext.current
+
+    LaunchedEffect(events.value) {
+        Log.d("ViewModel", "Loading custom pins for ${events.value.size} events.")
+        eventViewModel.loadCustomPins(context, events.value)
+    }
+
+    val isLoading by eventViewModel.loading
+
+    // React to changes in isLoading
+    LaunchedEffect(isLoading) {
+        // Side effects go here. For example:
+        if (!isLoading) {
+            Log.d("ViewModel", "Loading complete, map is now displayed.")
+        }
+    }
+
+//    LaunchedEffect(isLoading) {
+
+        if (mapVisible) {
+            Box(Modifier.fillMaxSize()) {
+                if (isLoading) {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                } else {
+                    GoogleMap(
+                        modifier = modifier,
+                        cameraPositionState = cameraPositionState,
+                        properties = mapProperties,
+                        uiSettings = uiSettings,
+                        onMapLoaded = onMapLoaded,
+                        onMapClick = { isButtonVisible.value = true },
+                        onPOIClick = {}
+                    ) {
+                        val markerClick: (Marker) -> Boolean = {
+                            isButtonVisible.value = false
+                            false
+                        }
+
+                        events.value.forEachIndexed { index, event ->
+                            val customPinBitmapDescriptor =
+                                eventViewModel.bitmapDescriptors[event.uid]
+                            MarkerInfoWindowContent(
+                                state = eventStates[index],
+                                title = event.title,
+                                icon = customPinBitmapDescriptor
+                                    ?: BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED),
+                                onClick = markerClick,
+                                visible = event.title.contains(query.value, ignoreCase = true)
+                            ) {
+                                Text(it.title!!, color = Color.Black)
+                            }
+                        }
+                        content()
+                    }
+                }
+            }
+        }
 }

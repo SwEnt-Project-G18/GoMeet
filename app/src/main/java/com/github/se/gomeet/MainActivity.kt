@@ -35,6 +35,7 @@ import com.github.se.gomeet.ui.theme.SetStatusBarColor
 import com.github.se.gomeet.viewmodel.AuthViewModel
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
+import com.google.android.gms.maps.MapsInitializer
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -42,7 +43,9 @@ import com.google.firebase.ktx.Firebase
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContent {
+      MapsInitializer.initialize(this)
+
+      setContent {
       GoMeetTheme {
         SetStatusBarColor(color = MaterialTheme.colorScheme.background)
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
