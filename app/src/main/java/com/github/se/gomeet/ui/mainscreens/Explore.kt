@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -185,7 +186,7 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
             CircularProgressIndicator()
           }
         }
-        SearchBar(query, Color.White)
+        SearchBar(query, MaterialTheme.colorScheme.background, MaterialTheme.colorScheme.tertiary)
       }
 }
 
@@ -238,34 +239,32 @@ fun GoogleMapView(
   }
 
   if (mapVisible) {
-    Box(Modifier.fillMaxSize()) {
-      GoogleMap(
-          modifier = modifier,
-          cameraPositionState = cameraPositionState,
-          properties = mapProperties,
-          uiSettings = uiSettings,
-          onMapLoaded = onMapLoaded,
-          onMapClick = { isButtonVisible.value = true },
-          onPOIClick = {}) {
-            val markerClick: (Marker) -> Boolean = {
-              isButtonVisible.value = false
-              false
-            }
-
-            for (i in eventStates.indices) {
-              MarkerInfoWindowContent(
-                  state = eventStates[i],
-                  title = events.value[i].title,
-                  icon =
-                      BitmapDescriptorFactory.defaultMarker(
-                          BitmapDescriptorFactory.HUE_RED), // TODO: change this
-                  onClick = markerClick,
-                  visible = events.value[i].title.contains(query.value, ignoreCase = true)) {
-                    Text(it.title!!, color = Color.Black)
-                  }
-            }
-            content()
+    GoogleMap(
+        modifier = modifier,
+        cameraPositionState = cameraPositionState,
+        properties = mapProperties,
+        uiSettings = uiSettings,
+        onMapLoaded = onMapLoaded,
+        onMapClick = { isButtonVisible.value = true },
+        onPOIClick = {}) {
+          val markerClick: (Marker) -> Boolean = {
+            isButtonVisible.value = false
+            false
           }
-    }
+
+          for (i in eventStates.indices) {
+            MarkerInfoWindowContent(
+                state = eventStates[i],
+                title = events.value[i].title,
+                icon =
+                    BitmapDescriptorFactory.defaultMarker(
+                        BitmapDescriptorFactory.HUE_RED), // TODO: change this
+                onClick = markerClick,
+                visible = events.value[i].title.contains(query.value, ignoreCase = true)) {
+                  Text(it.title!!, color = Color.Black)
+                }
+          }
+          content()
+        }
   }
 }

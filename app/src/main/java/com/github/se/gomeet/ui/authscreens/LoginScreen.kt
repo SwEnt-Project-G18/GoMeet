@@ -18,6 +18,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -45,7 +46,8 @@ fun LoginScreen(authViewModel: AuthViewModel, onNavToExplore: () -> Unit) {
             painter = painterResource(id = R.drawable.gomeet_text),
             contentDescription = "GoMeet",
             modifier = Modifier.padding(top = 40.dp),
-            alignment = Alignment.Center)
+            alignment = Alignment.Center,
+            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.tertiary))
 
         Spacer(modifier = Modifier.size(40.dp))
 

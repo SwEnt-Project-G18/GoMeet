@@ -46,6 +46,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -132,7 +133,7 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(innerPadding)) {
-              SearchBar(query, NavBarUnselected)
+              SearchBar(query, NavBarUnselected, Color.DarkGray)
               Spacer(modifier = Modifier.height(5.dp))
               Row(
                   verticalAlignment = Alignment.CenterVertically,
@@ -196,30 +197,33 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
                           Modifier.padding(10.dp).align(Alignment.Start).testTag("MyTicketsText"))
 
                   eventList.forEach { event ->
-                    val painter: Painter =
-                        if (event.images.isNotEmpty()) {
-                          rememberAsyncImagePainter(
-                              ImageRequest.Builder(LocalContext.current)
-                                  .data(data = event.images[0])
-                                  .apply(
-                                      block =
-                                          fun ImageRequest.Builder.() {
-                                            crossfade(true)
-                                            placeholder(R.drawable.gomeet_logo)
-                                          })
-                                  .build())
-                        } else {
-                          painterResource(id = R.drawable.gomeet_logo)
-                        }
+                    if (event.title.contains(query.value, ignoreCase = true)) {
+                      val painter: Painter =
+                          if (event.images.isNotEmpty()) {
+                            rememberAsyncImagePainter(
+                                ImageRequest.Builder(LocalContext.current)
+                                    .data(data = event.images[0])
+                                    .apply(
+                                        block =
+                                            fun ImageRequest.Builder.() {
+                                              crossfade(true)
+                                              placeholder(R.drawable.gomeet_logo)
+                                            })
+                                    .build())
+                          } else {
+                            painterResource(id = R.drawable.gomeet_logo)
+                          }
 
-                    EventWidget(
-                        userName = event.creator,
-                        eventName = event.title,
-                        eventDate =
-                            Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant()),
-                        eventPicture = painter,
-                        verified = false,
-                        nav = nav) // verification to be done using user details
+                      EventWidget(
+                          userName = event.creator,
+                          eventName = event.title,
+                          eventDate =
+                              Date.from(
+                                  event.date.atStartOfDay(ZoneId.systemDefault()).toInstant()),
+                          eventPicture = painter,
+                          verified = false,
+                          nav = nav) // verification to be done using user details
+                    }
                   }
                 }
 
@@ -241,29 +245,32 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
                           Modifier.padding(10.dp).align(Alignment.Start).testTag("FavouritesText"))
 
                   eventList.forEach { event ->
-                    val painter: Painter =
-                        if (event.images.isNotEmpty()) {
-                          rememberAsyncImagePainter(
-                              ImageRequest.Builder(LocalContext.current)
-                                  .data(data = event.images[0])
-                                  .apply(
-                                      block =
-                                          fun ImageRequest.Builder.() {
-                                            crossfade(true)
-                                            placeholder(R.drawable.gomeet_logo)
-                                          })
-                                  .build())
-                        } else {
-                          painterResource(id = R.drawable.gomeet_logo)
-                        }
-                    EventWidget(
-                        userName = event.creator,
-                        eventName = event.title,
-                        eventDate =
-                            Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant()),
-                        eventPicture = painter,
-                        verified = false,
-                        nav = nav)
+                    if (event.title.contains(query.value, ignoreCase = true)) {
+                      val painter: Painter =
+                          if (event.images.isNotEmpty()) {
+                            rememberAsyncImagePainter(
+                                ImageRequest.Builder(LocalContext.current)
+                                    .data(data = event.images[0])
+                                    .apply(
+                                        block =
+                                            fun ImageRequest.Builder.() {
+                                              crossfade(true)
+                                              placeholder(R.drawable.gomeet_logo)
+                                            })
+                                    .build())
+                          } else {
+                            painterResource(id = R.drawable.gomeet_logo)
+                          }
+                      EventWidget(
+                          userName = event.creator,
+                          eventName = event.title,
+                          eventDate =
+                              Date.from(
+                                  event.date.atStartOfDay(ZoneId.systemDefault()).toInstant()),
+                          eventPicture = painter,
+                          verified = false,
+                          nav = nav)
+                    }
                   }
                 }
 
@@ -284,29 +291,32 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
                           Modifier.padding(10.dp).align(Alignment.Start).testTag("MyEventsText"))
 
                   eventList.forEach { event ->
-                    val painter: Painter =
-                        if (event.images.isNotEmpty()) {
-                          rememberAsyncImagePainter(
-                              ImageRequest.Builder(LocalContext.current)
-                                  .data(data = event.images[0])
-                                  .apply(
-                                      block =
-                                          fun ImageRequest.Builder.() {
-                                            crossfade(true)
-                                            placeholder(R.drawable.gomeet_logo)
-                                          })
-                                  .build())
-                        } else {
-                          painterResource(id = R.drawable.gomeet_logo)
-                        }
-                    EventWidget(
-                        userName = event.creator,
-                        eventName = event.title,
-                        eventDate =
-                            Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant()),
-                        eventPicture = painter,
-                        verified = false,
-                        nav = nav)
+                    if (event.title.contains(query.value, ignoreCase = true)) {
+                      val painter: Painter =
+                          if (event.images.isNotEmpty()) {
+                            rememberAsyncImagePainter(
+                                ImageRequest.Builder(LocalContext.current)
+                                    .data(data = event.images[0])
+                                    .apply(
+                                        block =
+                                            fun ImageRequest.Builder.() {
+                                              crossfade(true)
+                                              placeholder(R.drawable.gomeet_logo)
+                                            })
+                                    .build())
+                          } else {
+                            painterResource(id = R.drawable.gomeet_logo)
+                          }
+                      EventWidget(
+                          userName = event.creator,
+                          eventName = event.title,
+                          eventDate =
+                              Date.from(
+                                  event.date.atStartOfDay(ZoneId.systemDefault()).toInstant()),
+                          eventPicture = painter,
+                          verified = false,
+                          nav = nav)
+                    }
                   }
                 }
               }
@@ -459,7 +469,7 @@ fun EventWidget(
 }
 
 @Composable
-fun SearchBar(query: MutableState<String>, backgroundColor: Color) {
+fun SearchBar(query: MutableState<String>, backgroundColor: Color, contentColor: Color) {
   BasicTextField(
       value = query.value,
       onValueChange = { query.value = it },
@@ -469,6 +479,7 @@ fun SearchBar(query: MutableState<String>, backgroundColor: Color) {
               .height(50.dp)
               .background(backgroundColor, RoundedCornerShape(25.dp)),
       singleLine = true,
+      cursorBrush = SolidColor(Color.White),
       decorationBox = {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -479,8 +490,8 @@ fun SearchBar(query: MutableState<String>, backgroundColor: Color) {
                     ImageVector.vectorResource(R.drawable.gomeet_icon),
                     contentDescription = null,
                     modifier = Modifier.padding(end = 20.dp),
-                    tint = Color.Black)
-                Text(text = if (query.value == "") "Search" else query.value, color = Color.Black)
+                    tint = contentColor)
+                Text(text = if (query.value == "") "Search" else query.value, color = contentColor)
               }
               Row(
                   verticalAlignment = Alignment.CenterVertically,
@@ -492,7 +503,7 @@ fun SearchBar(query: MutableState<String>, backgroundColor: Color) {
                         colors =
                             ButtonColors(
                                 containerColor = Color.Transparent,
-                                contentColor = Color.Black,
+                                contentColor = contentColor,
                                 disabledContainerColor = Color.Transparent,
                                 disabledContentColor = Color.Transparent),
                         modifier = Modifier.wrapContentSize(),
@@ -500,9 +511,9 @@ fun SearchBar(query: MutableState<String>, backgroundColor: Color) {
                       Icon(
                           ImageVector.vectorResource(R.drawable.mic_icon),
                           contentDescription = null,
-                          tint = Color.Black)
+                          tint = contentColor)
                     }
-                    Icon(Icons.Default.Search, contentDescription = null, tint = Color.Black)
+                    Icon(Icons.Default.Search, contentDescription = null, tint = contentColor)
                   }
             }
       })
