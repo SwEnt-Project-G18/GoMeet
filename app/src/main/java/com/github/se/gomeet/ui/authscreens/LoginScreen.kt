@@ -9,10 +9,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
@@ -76,7 +78,16 @@ fun LoginScreen(authViewModel: AuthViewModel, onNavToExplore: () -> Unit) {
             onValueChange = { newValue -> authViewModel.onEmailChange(newValue) },
             modifier = Modifier.fillMaxWidth().testTag("EmailField"),
             label = { Text("Email") },
-            isError = isError)
+            isError = isError,
+            colors =
+                TextFieldDefaults.colors(
+                    focusedTextColor = DarkCyan,
+                    unfocusedTextColor = DarkCyan,
+                    unfocusedContainerColor = Color.Transparent,
+                    focusedContainerColor = Color.Transparent,
+                    cursorColor = DarkCyan,
+                    focusedLabelColor = MaterialTheme.colorScheme.tertiary,
+                    focusedIndicatorColor = MaterialTheme.colorScheme.tertiary))
 
         Spacer(modifier = Modifier.size(16.dp))
 
@@ -87,6 +98,15 @@ fun LoginScreen(authViewModel: AuthViewModel, onNavToExplore: () -> Unit) {
             modifier = Modifier.fillMaxWidth().testTag("LogInField"),
             label = { Text("Password") },
             isError = isError,
+            colors =
+                TextFieldDefaults.colors(
+                    focusedTextColor = DarkCyan,
+                    unfocusedTextColor = DarkCyan,
+                    unfocusedContainerColor = Color.Transparent,
+                    focusedContainerColor = Color.Transparent,
+                    cursorColor = DarkCyan,
+                    focusedLabelColor = MaterialTheme.colorScheme.tertiary,
+                    focusedIndicatorColor = MaterialTheme.colorScheme.tertiary),
             visualTransformation = PasswordVisualTransformation())
 
         Spacer(modifier = Modifier.size(50.dp))
@@ -94,6 +114,12 @@ fun LoginScreen(authViewModel: AuthViewModel, onNavToExplore: () -> Unit) {
         Button(
             onClick = { authViewModel.signInWithEmailPassword(context) },
             modifier = Modifier.fillMaxWidth().testTag("LogInButton"),
+            colors =
+                ButtonColors(
+                    disabledContainerColor = MaterialTheme.colorScheme.primary,
+                    containerColor = DarkCyan,
+                    disabledContentColor = Color.White,
+                    contentColor = Color.White),
             enabled =
                 signInState.value.email.isNotEmpty() && signInState.value.password.isNotEmpty()) {
               Text("Log in")

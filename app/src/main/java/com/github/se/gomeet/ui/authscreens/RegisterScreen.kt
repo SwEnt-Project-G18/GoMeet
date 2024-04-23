@@ -9,10 +9,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
@@ -82,7 +84,16 @@ fun RegisterScreen(
             onValueChange = { newValue -> authViewModel.onEmailRegisterChange(newValue) },
             label = { Text("Email") },
             singleLine = true,
-            modifier = Modifier.fillMaxWidth())
+            modifier = Modifier.fillMaxWidth(),
+            colors =
+                TextFieldDefaults.colors(
+                    focusedTextColor = DarkCyan,
+                    unfocusedTextColor = DarkCyan,
+                    unfocusedContainerColor = Color.Transparent,
+                    focusedContainerColor = Color.Transparent,
+                    cursorColor = DarkCyan,
+                    focusedLabelColor = MaterialTheme.colorScheme.tertiary,
+                    focusedIndicatorColor = MaterialTheme.colorScheme.tertiary))
 
         Spacer(modifier = Modifier.size(16.dp))
 
@@ -92,7 +103,16 @@ fun RegisterScreen(
             label = { Text("Password") },
             singleLine = true,
             visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier.fillMaxWidth())
+            modifier = Modifier.fillMaxWidth(),
+            colors =
+                TextFieldDefaults.colors(
+                    focusedTextColor = DarkCyan,
+                    unfocusedTextColor = DarkCyan,
+                    unfocusedContainerColor = Color.Transparent,
+                    focusedContainerColor = Color.Transparent,
+                    cursorColor = DarkCyan,
+                    focusedLabelColor = MaterialTheme.colorScheme.tertiary,
+                    focusedIndicatorColor = MaterialTheme.colorScheme.tertiary))
 
         Spacer(modifier = Modifier.size(16.dp))
 
@@ -102,13 +122,28 @@ fun RegisterScreen(
             label = { Text("Confirm Password") },
             visualTransformation = PasswordVisualTransformation(),
             singleLine = true,
-            modifier = Modifier.fillMaxWidth())
+            modifier = Modifier.fillMaxWidth(),
+            colors =
+                TextFieldDefaults.colors(
+                    focusedTextColor = DarkCyan,
+                    unfocusedTextColor = DarkCyan,
+                    unfocusedContainerColor = Color.Transparent,
+                    focusedContainerColor = Color.Transparent,
+                    cursorColor = DarkCyan,
+                    focusedLabelColor = MaterialTheme.colorScheme.tertiary,
+                    focusedIndicatorColor = MaterialTheme.colorScheme.tertiary))
 
         Spacer(modifier = Modifier.size(50.dp))
 
         Button(
             onClick = { authViewModel.signUpWithEmailPassword(context) },
             modifier = Modifier.fillMaxWidth().testTag("register_button"),
+            colors =
+                ButtonColors(
+                    disabledContainerColor = MaterialTheme.colorScheme.primary,
+                    containerColor = DarkCyan,
+                    disabledContentColor = Color.White,
+                    contentColor = Color.White),
             enabled =
                 signInState.value.emailRegister.isNotEmpty() &&
                     signInState.value.passwordRegister.isNotEmpty() &&
