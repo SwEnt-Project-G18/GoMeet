@@ -46,21 +46,28 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.tasks.CancellationTokenSource
-import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapType
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.MarkerInfoWindowContent
+import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 private val defaultPosition = LatLng(46.51912357457158, 6.568023741881372)
-private val deafaultZoom = 16f
+private const val defaultZoom = 16f
 
-private var moveToCurrentLocation = mutableStateOf(false)
+private enum class CameraAction {
+  NO_ACTION,
+  MOVE,
+  ANIMATE
+}
+
+private var moveToCurrentLocation =
+    mutableStateOf(CameraAction.NO_ACTION) // 0 = false, 1 = map opened, 2 = button clicked
 
 @Composable
 fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
@@ -95,43 +102,46 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
 
   var eventList = remember { mutableListOf<Event>() }
   val query = remember { mutableStateOf("") }
-  var currentPosition by remember { mutableStateOf(defaultPosition) }
+  val currentPosition = remember { mutableStateOf(defaultPosition) }
   var isMapLoaded by remember { mutableStateOf(false) }
 
   LaunchedEffect(Unit) {
-    coroutineScope.launch {
-      if (locationPermissionsAlreadyGranted) {
-        locationPermitted.value = true
-      } else {
-        locationPermissionLauncher.launch(locationPermissions)
-      }
+    if (locationPermissionsAlreadyGranted) {
+      locationPermitted.value = true
+    } else {
+      locationPermissionLauncher.launch(locationPermissions)
+    }
 
-      val allEvents = eventViewModel.getAllEvents()
-      if (allEvents != null) {
-        eventList.addAll(allEvents)
-      }
+    // wait for user input
+    while (locationPermitted.value == null) {
+      delay(100)
+    }
 
-      // wait for user input
-      while (locationPermitted.value == null) {
-        delay(100)
-      }
+    while (true) {
+      coroutineScope.launch {
+        val allEvents = eventViewModel.getAllEvents()
+        if (allEvents != null) {
+          eventList.addAll(allEvents)
+        }
 
-      if (locationPermitted.value == true) {
-        val priority = PRIORITY_BALANCED_POWER_ACCURACY
-        val result =
-            locationClient
-                .getCurrentLocation(
-                    priority,
-                    CancellationTokenSource().token,
-                )
-                .await()
-        result?.let { fetchedLocation ->
-          currentPosition = LatLng(fetchedLocation.latitude, fetchedLocation.longitude)
+        if (locationPermitted.value == true) {
+          val priority = PRIORITY_BALANCED_POWER_ACCURACY
+          val result =
+              locationClient
+                  .getCurrentLocation(
+                      priority,
+                      CancellationTokenSource().token,
+                  )
+                  .await()
+          result?.let { fetchedLocation ->
+            currentPosition.value = LatLng(fetchedLocation.latitude, fetchedLocation.longitude)
+            isMapLoaded = true
+          }
+        } else if (locationPermitted.value == false) {
           isMapLoaded = true
         }
-      } else if (locationPermitted.value == false) {
-        isMapLoaded = true
       }
+      delay(5000) // map is updated every 5s (events and current location)
     }
   }
 
@@ -139,7 +149,7 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
       floatingActionButton = {
         if (locationPermitted.value == true) {
           FloatingActionButton(
-              onClick = { moveToCurrentLocation.value = true },
+              onClick = { moveToCurrentLocation.value = CameraAction.ANIMATE },
               modifier = Modifier.size(45.dp),
               containerColor = DarkCyan) {
                 Icon(
@@ -160,6 +170,8 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
             selectedItem = Route.EXPLORE)
       }) { innerPadding ->
         if (isMapLoaded) {
+          moveToCurrentLocation.value = CameraAction.MOVE
+
           Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
             GoogleMapView(
                 currentPosition = currentPosition,
@@ -180,7 +192,7 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
 @Composable
 fun GoogleMapView(
     modifier: Modifier = Modifier,
-    currentPosition: LatLng,
+    currentPosition: MutableState<LatLng>,
     onMapLoaded: () -> Unit = {},
     content: @Composable () -> Unit = {},
     events: List<Event>,
@@ -202,17 +214,26 @@ fun GoogleMapView(
     mutableStateOf(MapProperties(mapType = MapType.NORMAL, isMyLocationEnabled = locationPermitted))
   }
   val mapVisible by remember { mutableStateOf(true) }
-  val cameraPositionState =
-      CameraPositionState(position = CameraPosition.fromLatLngZoom(currentPosition, deafaultZoom))
+  val cameraPositionState = rememberCameraPositionState()
 
-  LaunchedEffect(moveToCurrentLocation.value) {
-    coroutineScope.launch {
-      cameraPositionState.animate(
-          update =
-              CameraUpdateFactory.newCameraPosition(
-                  CameraPosition.fromLatLngZoom(currentPosition, deafaultZoom)),
-          durationMs = 1000)
-      moveToCurrentLocation.value = false
+  LaunchedEffect(moveToCurrentLocation.value, Unit) {
+    if (moveToCurrentLocation.value == CameraAction.MOVE) {
+      coroutineScope.launch {
+        cameraPositionState.move(
+            update =
+                CameraUpdateFactory.newCameraPosition(
+                    CameraPosition.fromLatLngZoom(currentPosition.value, defaultZoom)))
+        moveToCurrentLocation.value = CameraAction.NO_ACTION
+      }
+    } else if (moveToCurrentLocation.value == CameraAction.ANIMATE) {
+      coroutineScope.launch {
+        cameraPositionState.animate(
+            update =
+                CameraUpdateFactory.newCameraPosition(
+                    CameraPosition.fromLatLngZoom(currentPosition.value, defaultZoom)),
+            durationMs = 1000)
+        moveToCurrentLocation.value = CameraAction.NO_ACTION
+      }
     }
   }
 
