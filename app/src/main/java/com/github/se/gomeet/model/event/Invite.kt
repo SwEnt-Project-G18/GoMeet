@@ -1,14 +1,14 @@
 package com.github.se.gomeet.model.event
 
-data class EventInvite(
+data class EventInviteUsers(
     val e: String,
-    val usersInvited: List<Pair<String, InviteStatus>>,
+    val usersInvited: MutableList<Pair<String, InviteStatus>>,
     //List of users uid invited to the event e
 )
 
-data class UsersInvited(
+data class UserInvitedToEvents(
     val u: String,
-    val invitedToEvents: List<Pair<String, InviteStatus>> // List of events id the user u has been invited to
+    val invitedToEvents: MutableList<Pair<String, InviteStatus>> // List of events id the user u has been invited to
 )
 
 
