@@ -1,16 +1,27 @@
 package com.github.se.gomeet.viewmodel
 
 import android.content.ContentValues.TAG
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.util.Log
+import android.widget.ImageView
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.location.Location
 import com.github.se.gomeet.model.repository.EventRepository
+import com.github.se.gomeet.ui.mainscreens.create.CustomPins
+import com.google.android.gms.maps.model.BitmapDescriptor
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
+import com.squareup.picasso.Picasso
 import java.io.IOException
 import java.time.LocalDate
 import kotlinx.coroutines.CompletableDeferred
@@ -25,6 +36,50 @@ import org.json.JSONArray
 
 class EventViewModel(private val creatorId: String? = null) : ViewModel() {
   private val db = EventRepository(Firebase.firestore)
+    private val _bitmapDescriptors = mutableStateMapOf<String, BitmapDescriptor>()
+    val bitmapDescriptors: Map<String, BitmapDescriptor> = _bitmapDescriptors
+
+
+    fun loadCustomPins(context: Context, events: List<Event>) {
+        events.forEach { event ->
+            // Assume you store or can derive the Firebase Storage path or URL for each event's pin
+            val imagePath = "event_icons/${event.uid}.png" // Example path in Firebase Storage
+
+            // Fetch the URL from Firebase Storage
+            val storageRef = FirebaseStorage.getInstance().reference.child(imagePath)
+            storageRef.downloadUrl.addOnSuccessListener { uri ->
+                // Convert URI to BitmapDescriptor
+                loadBitmapFromUri(context, uri) { bitmapDescriptor ->
+                    _bitmapDescriptors[event.uid] = bitmapDescriptor
+                }
+            }.addOnFailureListener {
+                // Handle possible failures, e.g., log an error or use a default icon
+                Log.e("ViewModel", "Failed to fetch image for event ${event.uid}: ${it.message}")
+                _bitmapDescriptors[event.uid] = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED) // Use default or error icon
+            }
+        }
+    }
+
+    private fun loadBitmapFromUri(context: Context, uri: Uri, callback: (BitmapDescriptor) -> Unit) {
+        // Temporary ImageView
+        val imageView = ImageView(context)
+        imageView.layout(0, 0, 1, 1)  // Minimal size
+
+        Picasso.get().load(uri).into(imageView, object : com.squareup.picasso.Callback {
+            override fun onSuccess() {
+                imageView.drawable?.let { drawable ->
+                    val bitmap = (drawable as BitmapDrawable).bitmap
+                    callback(BitmapDescriptorFactory.fromBitmap(bitmap))
+                } ?: run {
+                    callback(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+                }
+            }
+
+            override fun onError(e: Exception?) {
+                callback(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+            }
+        })
+    }
 
   suspend fun getEvent(uid: String): Event? {
     return try {
@@ -65,7 +120,8 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
       public: Boolean,
       tags: List<String>,
       images: List<String>,
-      imageUri: Uri?
+      imageUri: Uri?,
+      uid: String
   ) {
     CoroutineScope(Dispatchers.IO).launch {
       try {
@@ -73,7 +129,7 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
         val updatedImages = images.toMutableList().apply { imageUrl?.let { add(it) } }
         val event =
             Event(
-                db.getNewId(),
+                uid,
                 creatorId!!,
                 title,
                 description,
@@ -87,6 +143,7 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
                 public,
                 tags,
                 updatedImages)
+
         db.addEvent(event)
       } catch (e: Exception) {
         Log.w(TAG, "Error uploading image or adding event", e)

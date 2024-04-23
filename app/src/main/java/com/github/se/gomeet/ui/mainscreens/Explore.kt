@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
+import com.github.se.gomeet.ui.mainscreens.create.CustomPins
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
@@ -178,7 +179,8 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
                 events = eventList,
                 modifier = Modifier.testTag("Map"),
                 query = query,
-                locationPermitted = locationPermitted.value!!)
+                locationPermitted = locationPermitted.value!!,
+                eventViewModel = eventViewModel)
           }
         } else {
           Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -197,8 +199,10 @@ fun GoogleMapView(
     content: @Composable () -> Unit = {},
     events: MutableState<List<Event>>,
     query: MutableState<String>,
-    locationPermitted: Boolean
+    locationPermitted: Boolean,
+    eventViewModel: EventViewModel
 ) {
+    val context = LocalContext.current
   val coroutineScope = rememberCoroutineScope()
 
   val eventLocations =
@@ -237,35 +241,50 @@ fun GoogleMapView(
     }
   }
 
-  if (mapVisible) {
-    Box(Modifier.fillMaxSize()) {
-      GoogleMap(
-          modifier = modifier,
-          cameraPositionState = cameraPositionState,
-          properties = mapProperties,
-          uiSettings = uiSettings,
-          onMapLoaded = onMapLoaded,
-          onMapClick = { isButtonVisible.value = true },
-          onPOIClick = {}) {
-            val markerClick: (Marker) -> Boolean = {
-              isButtonVisible.value = false
-              false
-            }
 
-            for (i in eventStates.indices) {
-              MarkerInfoWindowContent(
-                  state = eventStates[i],
-                  title = events.value[i].title,
-                  icon =
-                      BitmapDescriptorFactory.defaultMarker(
-                          BitmapDescriptorFactory.HUE_RED), // TODO: change this
-                  onClick = markerClick,
-                  visible = events.value[i].title.contains(query.value, ignoreCase = true)) {
-                    Text(it.title!!, color = Color.Black)
-                  }
-            }
-            content()
-          }
+    LaunchedEffect(events.value) {
+        eventViewModel.loadCustomPins(context, events.value)
     }
-  }
+
+
+
+
+    if (mapVisible) {
+        Box(Modifier.fillMaxSize()) {
+            GoogleMap(
+                modifier = modifier,
+                cameraPositionState = cameraPositionState,
+                properties = mapProperties,
+                uiSettings = uiSettings,
+                onMapLoaded = onMapLoaded,
+                onMapClick = { isButtonVisible.value = true },
+                onPOIClick = {}
+            ) {
+                val markerClick: (Marker) -> Boolean = {
+                    isButtonVisible.value = false
+                    false
+                }
+
+                // Fetch the list of BitmapDescriptors from your ViewModel
+                val bitmapDescriptors = eventViewModel.bitmapDescriptors
+
+                events.value.forEachIndexed { index, event ->
+                    // Retrieve the corresponding BitmapDescriptor for the event
+                    val customPinBitmapDescriptor = bitmapDescriptors[event.uid]
+
+                    MarkerInfoWindowContent(
+                        state = eventStates[index],
+                        title = event.title,
+                        icon = customPinBitmapDescriptor ?: BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED), // Use custom pin if available, otherwise default
+                        onClick = markerClick,
+                        visible = event.title.contains(query.value, ignoreCase = true)
+                    ) {
+                        Text(it.title!!, color = Color.Black)
+                    }
+                }
+                content()
+            }
+        }
+    }
+
 }
