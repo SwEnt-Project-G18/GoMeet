@@ -22,6 +22,7 @@ import com.github.se.gomeet.ui.mainscreens.Events
 import com.github.se.gomeet.ui.mainscreens.Explore
 import com.github.se.gomeet.ui.mainscreens.Profile
 import com.github.se.gomeet.ui.mainscreens.Trends
+import com.github.se.gomeet.ui.mainscreens.create.AddParticipants
 import com.github.se.gomeet.ui.mainscreens.create.Create
 import com.github.se.gomeet.ui.mainscreens.create.CreateEvent
 import com.github.se.gomeet.ui.mainscreens.profile.OthersProfile
@@ -79,7 +80,7 @@ class MainActivity : ComponentActivity() {
               }
             }
             composable(Route.EXPLORE) { Explore(navAction, EventViewModel()) }
-            composable(Route.EVENTS) { Events(navAction) }
+            composable(Route.EVENTS) { Events(navAction, EventViewModel()) }
             composable(Route.TRENDS) { Trends(navAction) }
             composable(Route.CREATE) { Create(navAction) }
             composable(Route.PROFILE) { Profile(navAction) }
@@ -90,7 +91,7 @@ class MainActivity : ComponentActivity() {
             composable(Route.PUBLIC_CREATE) {
               CreateEvent(navAction, EventViewModel(userIdState.value), false)
             }
-
+            composable(Route.ADD_PARTICIPANTS) { AddParticipants(navAction) }
             composable(
                 route = Route.EVENT_INFO,
                 arguments =

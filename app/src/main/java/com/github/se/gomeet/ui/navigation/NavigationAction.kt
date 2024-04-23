@@ -34,6 +34,7 @@ object Route {
   const val PUBLIC_CREATE = "Public Create"
   const val PRIVATE_CREATE = "Private Create"
   const val OTHERS_PROFILE = "Others Profile"
+  const val ADD_PARTICIPANTS = "Add Participants"
   const val EVENT_INFO =
       "eventInfo/{title}/{date}/{time}/{organizer}/{rating}/{description}/{latitude}/{longitude}"
 }
@@ -77,6 +78,10 @@ val SECOND_LEVEL_DESTINATION =
             route = Route.OTHERS_PROFILE,
             icon = Icons.Default.Person,
             textId = Route.OTHERS_PROFILE),
+        TopLevelDestination(
+            route = Route.ADD_PARTICIPANTS,
+            icon = Icons.Default.Person,
+            textId = Route.ADD_PARTICIPANTS),
         TopLevelDestination(
             route = Route.EVENT_INFO, icon = Icons.Default.Person, textId = Route.EVENT_INFO))
 
