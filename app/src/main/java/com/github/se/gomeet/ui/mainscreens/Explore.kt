@@ -18,12 +18,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -102,7 +100,7 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
           })
   val locationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
 
-  val eventList = remember { mutableStateListOf<Event>() }
+  val eventList = remember { mutableStateOf<List<Event>>(emptyList()) }
   val query = remember { mutableStateOf("") }
   val currentPosition = remember { mutableStateOf(defaultPosition) }
   var isMapLoaded by remember { mutableStateOf(false) }
@@ -114,6 +112,11 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
       locationPermissionLauncher.launch(locationPermissions)
     }
 
+    val allEvents = eventViewModel.getAllEvents()
+    if (allEvents != null) {
+      eventList.value = allEvents
+    }
+
     // wait for user input
     while (locationPermitted.value == null) {
       delay(100)
@@ -121,12 +124,6 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
 
     while (true) {
       coroutineScope.launch {
-        val allEvents = eventViewModel.getAllEvents()
-        if (allEvents != null) {
-          eventList.retainAll(allEvents)
-          eventList.addAll(allEvents - eventList)
-        }
-
         if (locationPermitted.value == true) {
           val priority = PRIORITY_BALANCED_POWER_ACCURACY
           val result =
@@ -199,14 +196,14 @@ fun GoogleMapView(
     currentPosition: MutableState<LatLng>,
     onMapLoaded: () -> Unit = {},
     content: @Composable () -> Unit = {},
-    events: SnapshotStateList<Event>,
+    events: MutableState<List<Event>>,
     query: MutableState<String>,
     locationPermitted: Boolean
 ) {
   val coroutineScope = rememberCoroutineScope()
 
   val eventLocations =
-      events.map { event -> LatLng(event.location.latitude, event.location.longitude) }
+      events.value.map { event -> LatLng(event.location.latitude, event.location.longitude) }
   val eventStates = eventLocations.map { location -> rememberMarkerState(position = location) }
 
   val uiSettings by remember {
@@ -255,12 +252,12 @@ fun GoogleMapView(
             for (i in eventStates.indices) {
               MarkerInfoWindowContent(
                   state = eventStates[i],
-                  title = events[i].title,
+                  title = events.value[i].title,
                   icon =
                       BitmapDescriptorFactory.defaultMarker(
                           BitmapDescriptorFactory.HUE_RED), // TODO: change this
                   onClick = markerClick,
-                  visible = events[i].title.contains(query.value, ignoreCase = true)) {
+                  visible = events.value[i].title.contains(query.value, ignoreCase = true)) {
                     Text(it.title!!, color = Color.Black)
                   }
             }
