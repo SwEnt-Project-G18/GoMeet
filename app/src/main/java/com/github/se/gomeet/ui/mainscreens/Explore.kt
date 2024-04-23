@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -67,7 +66,8 @@ private enum class CameraAction {
   ANIMATE
 }
 
-private var moveToCurrentLocation = mutableStateOf(CameraAction.NO_ACTION)
+private val moveToCurrentLocation = mutableStateOf(CameraAction.NO_ACTION)
+private val isButtonVisible = mutableStateOf(true)
 
 @Composable
 fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
@@ -147,10 +147,10 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
 
   Scaffold(
       floatingActionButton = {
-        if (locationPermitted.value == true) {
+        if (locationPermitted.value == true && isButtonVisible.value) {
           FloatingActionButton(
               onClick = { moveToCurrentLocation.value = CameraAction.ANIMATE },
-              modifier = Modifier.size(45.dp),
+              modifier = Modifier.size(45.dp).testTag("CurrentLocationButton"),
               containerColor = DarkCyan) {
                 Icon(
                     imageVector = ImageVector.vectorResource(R.drawable.location_icon),
@@ -159,7 +159,6 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
               }
         }
       },
-      floatingActionButtonPosition = FabPosition.Start,
       bottomBar = {
         BottomNavigationMenu(
             onTabSelect = { selectedTab ->
@@ -246,8 +245,12 @@ fun GoogleMapView(
           properties = mapProperties,
           uiSettings = uiSettings,
           onMapLoaded = onMapLoaded,
+          onMapClick = { isButtonVisible.value = true },
           onPOIClick = {}) {
-            val markerClick: (Marker) -> Boolean = { false }
+            val markerClick: (Marker) -> Boolean = {
+              isButtonVisible.value = false
+              false
+            }
 
             for (i in eventStates.indices) {
               MarkerInfoWindowContent(
