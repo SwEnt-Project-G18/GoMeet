@@ -3,6 +3,7 @@ package com.github.se.gomeet.model.repository
 import android.util.Log
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.EventInvite
+import com.github.se.gomeet.model.event.InviteStatus
 import com.github.se.gomeet.model.event.UsersInvited
 import com.github.se.gomeet.model.event.location.Location
 import com.github.se.gomeet.model.user.GoMeetUser
@@ -49,7 +50,7 @@ class InvitesRepository (db: FirebaseFirestore) {
     private fun Map<String, Any>.toEventInvite(id: String? = null): EventInvite {
         return EventInvite(
             e = id ?: this["e"] as? String ?: "",
-            usersInvited = this["usersInvited"] as? List<String> ?: emptyList()
+            usersInvited = this["usersInvited"] as? List<Pair<String, InviteStatus>> ?: emptyList()
         )
     }
 
@@ -63,7 +64,7 @@ class InvitesRepository (db: FirebaseFirestore) {
     private fun Map<String, Any>.toUsersInvited(id: String? = null): UsersInvited {
         return UsersInvited(
             u = id ?: this["u"] as? String ?: "",
-            invitedToEvents = this["invitedToEvents"] as? List<String> ?: emptyList()
+            invitedToEvents = this["invitedToEvents"] as? List<Pair<String, InviteStatus>> ?: emptyList()
         )
     }
 
