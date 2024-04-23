@@ -35,6 +35,8 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONArray
 import androidx.compose.runtime.State
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -47,34 +49,38 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
     private val _bitmapDescriptors = mutableStateMapOf<String, BitmapDescriptor>()
     val bitmapDescriptors: MutableMap<String, BitmapDescriptor> = _bitmapDescriptors
 
-    private val _loading = mutableStateOf(true) // Default to true
-    val loading: State<Boolean> = _loading
+    private var lastLoadedEvents: List<Event>? = null
+    private val _loading = MutableLiveData(false)
+    val loading: LiveData<Boolean> = _loading
 
     fun loadCustomPins(context: Context, events: List<Event>) = viewModelScope.launch {
-        _loading.value = true
-        val loadJobs = events.map { event ->
-            async {
-                val imagePath = "event_icons/${event.uid}.png"
-                val storageRef = FirebaseStorage.getInstance().reference.child(imagePath)
-                val uri = storageRef.downloadUrl.await()  // Await the download URL
-                try {
-                    val bitmapDescriptor = loadBitmapFromUri(context, uri)  // Load the bitmap as a BitmapDescriptor
-                    _bitmapDescriptors[event.uid] = bitmapDescriptor
-                } catch (e: Exception) {
-                    Log.e("ViewModel", "Error loading bitmap descriptor: ${e.message}")
-                    _bitmapDescriptors[event.uid] = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)
+        // Check if the current events are different from the last loaded events
+        if (events != lastLoadedEvents) {
+            _loading.value = true
+            val loadJobs = events.map { event ->
+                async {
+                    val imagePath = "event_icons/${event.uid}.png"
+                    val storageRef = FirebaseStorage.getInstance().reference.child(imagePath)
+                    val uri = storageRef.downloadUrl.await()  // Await the download URL
+                    try {
+                        val bitmapDescriptor = loadBitmapFromUri(context, uri)  // Load the bitmap as a BitmapDescriptor
+                        _bitmapDescriptors[event.uid] = bitmapDescriptor
+                    } catch (e: Exception) {
+                        Log.e("ViewModel", "Error loading bitmap descriptor: ${e.message}")
+                        _bitmapDescriptors[event.uid] = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)
+                    }
                 }
             }
-        }
 
-        try {
-            loadJobs.awaitAll()  // Await all loading jobs
-        } finally {
-            Log.d("ViewModel", "Finished loading custom pins")
-            _loading.value = false
+            try {
+                loadJobs.awaitAll()  // Await all loading jobs
+            } finally {
+                lastLoadedEvents = events.toList()  // Update the last loaded events
+                Log.d("ViewModel", "Finished loading custom pins")
+                _loading.value = false
+            }
         }
     }
-
 
     suspend fun loadBitmapFromUri(context: Context, uri: Uri): BitmapDescriptor = suspendCancellableCoroutine { continuation ->
         // Create a temporary ImageView to load the image.

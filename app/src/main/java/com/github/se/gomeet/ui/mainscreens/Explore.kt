@@ -58,6 +58,8 @@ import com.google.maps.android.compose.rememberMarkerState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import androidx.compose.runtime.livedata.observeAsState
+
 
 private val defaultPosition = LatLng(46.51912357457158, 6.568023741881372)
 private const val defaultZoom = 16f
@@ -248,7 +250,7 @@ fun GoogleMapView(
         eventViewModel.loadCustomPins(context, events.value)
     }
 
-    val isLoading by eventViewModel.loading
+    val isLoading by eventViewModel.loading.observeAsState(false)
 
     // React to changes in isLoading
     LaunchedEffect(isLoading) {
@@ -280,8 +282,9 @@ fun GoogleMapView(
                         }
 
                         events.value.forEachIndexed { index, event ->
+                            val stablePins = remember { eventViewModel.bitmapDescriptors }
                             val customPinBitmapDescriptor =
-                                eventViewModel.bitmapDescriptors[event.uid]
+                                stablePins[event.uid]
                             MarkerInfoWindowContent(
                                 state = eventStates[index],
                                 title = event.title,
