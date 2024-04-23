@@ -66,8 +66,7 @@ private enum class CameraAction {
   ANIMATE
 }
 
-private var moveToCurrentLocation =
-    mutableStateOf(CameraAction.NO_ACTION) // 0 = false, 1 = map opened, 2 = button clicked
+private var moveToCurrentLocation = mutableStateOf(CameraAction.NO_ACTION)
 
 @Composable
 fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
