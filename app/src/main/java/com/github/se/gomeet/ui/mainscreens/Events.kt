@@ -46,7 +46,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -479,7 +478,6 @@ fun SearchBar(query: MutableState<String>, backgroundColor: Color, contentColor:
               .height(50.dp)
               .background(backgroundColor, RoundedCornerShape(25.dp)),
       singleLine = true,
-      cursorBrush = SolidColor(Color.White),
       decorationBox = {
         Row(
             verticalAlignment = Alignment.CenterVertically,
