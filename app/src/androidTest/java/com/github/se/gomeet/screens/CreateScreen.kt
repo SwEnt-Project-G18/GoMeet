@@ -8,5 +8,5 @@ class CreateScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
     ComposeScreen<CreateScreen>(
         semanticsProvider = semanticsProvider, viewBuilderAction = { hasTestTag("CreateUI") }) {
 
-  val createPublicEventButton: KNode = child { hasTestTag("CreatePublic") }
+  val createPublicEventButton: KNode = onNode { hasTestTag("CreatePublic") }
 }

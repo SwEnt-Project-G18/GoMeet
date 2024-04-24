@@ -375,71 +375,68 @@ fun LocationField(
   var expanded by remember { mutableStateOf(false) }
   val locationSuggestions = remember { mutableStateOf(emptyList<Location>()) }
 
-  Box(
-      modifier = Modifier.wrapContentSize().testTag("Location"),
-      contentAlignment = Alignment.TopCenter) {
-        OutlinedTextField(
-            value = locationQuery.value,
-            onValueChange = {
-              expanded = true
-              locationQuery.value = it
-              eventViewModel.location(locationQuery.value, NUMBER_OF_SUGGESTIONS) { locations ->
-                locationSuggestions.value = locations
+  Box(modifier = Modifier.wrapContentSize(), contentAlignment = Alignment.TopCenter) {
+    OutlinedTextField(
+        value = locationQuery.value,
+        onValueChange = {
+          expanded = true
+          locationQuery.value = it
+          eventViewModel.location(locationQuery.value, NUMBER_OF_SUGGESTIONS) { locations ->
+            locationSuggestions.value = locations
+          }
+        },
+        label = { Text("Location") },
+        placeholder = { Text("Enter an address") },
+        singleLine = true,
+        shape = RoundedCornerShape(10.dp),
+        textStyle = TextStyle(color = MaterialTheme.colorScheme.onBackground),
+        colors =
+            TextFieldDefaults.outlinedTextFieldColors(
+                focusedBorderColor = MaterialTheme.colorScheme.onBackground,
+                unfocusedBorderColor = MaterialTheme.colorScheme.onBackground),
+        modifier = Modifier.fillMaxWidth().padding(start = 7.dp, end = 7.dp).testTag("Location"))
+    DropdownMenu(
+        expanded = expanded,
+        onDismissRequest = { expanded = false },
+        modifier =
+            Modifier.fillMaxWidth()
+                .background(MaterialTheme.colorScheme.background)
+                .wrapContentHeight(),
+        properties = PopupProperties(focusable = false),
+    ) {
+      locationSuggestions.value.forEachIndexed { i, location ->
+        DropdownMenuItem(
+            modifier = Modifier.wrapContentSize(),
+            text = {
+              Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    Icons.Default.LocationOn,
+                    contentDescription = null,
+                    modifier = Modifier.padding(end = 10.dp),
+                    tint = MaterialTheme.colorScheme.tertiary)
+                Text(location.name)
               }
             },
-            label = { Text("Location") },
-            placeholder = { Text("Enter an address") },
-            singleLine = true,
-            shape = RoundedCornerShape(10.dp),
-            textStyle = TextStyle(color = MaterialTheme.colorScheme.onBackground),
+            onClick = {
+              locationQuery.value = location.name
+              selectedLocation.value = location
+              expanded = false
+            },
             colors =
-                TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = MaterialTheme.colorScheme.onBackground,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.onBackground),
-            modifier = Modifier.fillMaxWidth().padding(start = 7.dp, end = 7.dp))
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-            modifier =
-                Modifier.fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.background)
-                    .wrapContentHeight(),
-            properties = PopupProperties(focusable = false),
-        ) {
-          locationSuggestions.value.forEachIndexed { i, location ->
-            DropdownMenuItem(
-                modifier = Modifier.wrapContentSize(),
-                text = {
-                  Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        Icons.Default.LocationOn,
-                        contentDescription = null,
-                        modifier = Modifier.padding(end = 10.dp),
-                        tint = MaterialTheme.colorScheme.tertiary)
-                    Text(location.name)
-                  }
-                },
-                onClick = {
-                  locationQuery.value = location.name
-                  selectedLocation.value = location
-                  expanded = false
-                },
-                colors =
-                    MenuItemColors(
-                        textColor = MaterialTheme.colorScheme.onBackground,
-                        leadingIconColor = Color.Transparent,
-                        trailingIconColor = Color.Transparent,
-                        disabledTextColor = MaterialTheme.colorScheme.onBackground,
-                        disabledLeadingIconColor = Color.Transparent,
-                        disabledTrailingIconColor = Color.Transparent),
-            )
-            if (i != locationSuggestions.value.size - 1) {
-              HorizontalDivider(
-                  modifier =
-                      Modifier.padding(start = 45.dp, top = 5.dp, bottom = 5.dp, end = 15.dp),
-                  color = MaterialTheme.colorScheme.tertiary)
-            }
-          }
+                MenuItemColors(
+                    textColor = MaterialTheme.colorScheme.onBackground,
+                    leadingIconColor = Color.Transparent,
+                    trailingIconColor = Color.Transparent,
+                    disabledTextColor = MaterialTheme.colorScheme.onBackground,
+                    disabledLeadingIconColor = Color.Transparent,
+                    disabledTrailingIconColor = Color.Transparent),
+        )
+        if (i != locationSuggestions.value.size - 1) {
+          HorizontalDivider(
+              modifier = Modifier.padding(start = 45.dp, top = 5.dp, bottom = 5.dp, end = 15.dp),
+              color = MaterialTheme.colorScheme.tertiary)
         }
       }
+    }
+  }
 }

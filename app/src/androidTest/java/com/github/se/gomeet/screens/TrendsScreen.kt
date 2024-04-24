@@ -9,5 +9,5 @@ class TrendsScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
     ComposeScreen<TrendsScreen>(
         semanticsProvider = semanticsProvider, viewBuilderAction = { hasTestTag("TrendsScreen") }) {
 
-  val createButton: KNode = child { hasTestTag(Route.CREATE) }
+  val createButton: KNode = onNode { hasTestTag(Route.CREATE) }
 }
