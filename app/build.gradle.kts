@@ -136,7 +136,7 @@ dependencies {
 
     implementation("androidx.fragment:fragment:1.5.5")
 
-    implementation("com.squareup.okhttp3:okhttp:3.10.0")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
 
     testImplementation("org.mockito:mockito-inline:2.13.0")
