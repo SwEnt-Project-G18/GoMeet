@@ -2,7 +2,6 @@ package com.github.se.gomeet.ui.mainscreens
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,23 +17,23 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.selection.LocalTextSelectionColors
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
@@ -84,6 +83,7 @@ import java.util.Date
 import java.util.Locale
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
 
@@ -132,7 +132,8 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(innerPadding)) {
-              SearchBar(query, NavBarUnselected, Color.DarkGray)
+              Spacer(modifier = Modifier.height(5.dp))
+              GoMeetSearchBar(query, NavBarUnselected, Color.DarkGray)
               Spacer(modifier = Modifier.height(5.dp))
               Row(
                   verticalAlignment = Alignment.CenterVertically,
@@ -467,54 +468,47 @@ fun EventWidget(
       }
 }
 
+@ExperimentalMaterial3Api
 @Composable
-fun SearchBar(query: MutableState<String>, backgroundColor: Color, contentColor: Color) {
-  BasicTextField(
-      value = query.value,
-      onValueChange = { query.value = it },
-      modifier =
-          Modifier.fillMaxWidth()
-              .padding(top = 10.dp, start = 5.dp, end = 5.dp)
-              .height(50.dp)
-              .background(backgroundColor, RoundedCornerShape(25.dp)),
-      singleLine = true,
-      decorationBox = {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.padding(start = 15.dp, end = 5.dp).background(Color.Transparent)) {
-              Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    ImageVector.vectorResource(R.drawable.gomeet_icon),
-                    contentDescription = null,
-                    modifier = Modifier.padding(end = 20.dp),
-                    tint = contentColor)
-                Text(text = if (query.value == "") "Search" else query.value, color = contentColor)
-              }
-              Row(
-                  verticalAlignment = Alignment.CenterVertically,
-                  modifier = Modifier.padding(end = 10.dp)) {
-                    Button(
-                        onClick = {
-                          // TODO: handle voice search
-                        },
-                        colors =
-                            ButtonColors(
-                                containerColor = Color.Transparent,
-                                contentColor = contentColor,
-                                disabledContainerColor = Color.Transparent,
-                                disabledContentColor = Color.Transparent),
-                        modifier = Modifier.wrapContentSize(),
-                    ) {
-                      Icon(
-                          ImageVector.vectorResource(R.drawable.mic_icon),
-                          contentDescription = null,
-                          tint = contentColor)
-                    }
-                    Icon(Icons.Default.Search, contentDescription = null, tint = contentColor)
-                  }
-            }
-      })
+fun GoMeetSearchBar(query: MutableState<String>, backgroundColor: Color, contentColor: Color) {
+  val customTextSelectionColors =
+      TextSelectionColors(handleColor = DarkCyan, backgroundColor = DarkCyan.copy(alpha = 0.4f))
+  CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
+    androidx.compose.material3.SearchBar(
+        query = query.value,
+        onQueryChange = { query.value = it },
+        active = false,
+        modifier = Modifier.fillMaxWidth().padding(start = 5.dp, end = 5.dp),
+        placeholder = { Text("Search", color = contentColor) },
+        leadingIcon = {
+          Icon(
+              ImageVector.vectorResource(R.drawable.gomeet_icon),
+              contentDescription = null,
+              tint = contentColor)
+        },
+        trailingIcon = {
+          Icon(
+              ImageVector.vectorResource(R.drawable.mic_icon),
+              contentDescription = null,
+              tint = contentColor,
+              modifier =
+                  Modifier.clickable {
+                    // TODO: handle voice search
+                  })
+        },
+        colors =
+            SearchBarDefaults.colors(
+                containerColor = backgroundColor,
+                inputFieldColors =
+                    TextFieldDefaults.colors(
+                        focusedTextColor = contentColor,
+                        unfocusedTextColor = contentColor,
+                        cursorColor = DarkCyan,
+                    ),
+            ),
+        onActiveChange = {},
+        onSearch = {}) {}
+  }
 }
 
 @Composable
