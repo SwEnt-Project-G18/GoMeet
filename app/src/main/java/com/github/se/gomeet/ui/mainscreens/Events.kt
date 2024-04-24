@@ -132,7 +132,7 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(innerPadding)) {
-                Spacer(modifier = Modifier.height(5.dp))
+              Spacer(modifier = Modifier.height(5.dp))
               GoMeetSearchBar(query, NavBarUnselected, Color.DarkGray)
               Spacer(modifier = Modifier.height(5.dp))
               Row(
@@ -487,18 +487,14 @@ fun GoMeetSearchBar(query: MutableState<String>, backgroundColor: Color, content
               tint = contentColor)
         },
         trailingIcon = {
-          Row(
-              modifier = Modifier.padding(start = 5.dp, end = 10.dp),
-              horizontalArrangement = Arrangement.spacedBy(15.dp)) {
-                Icon(
-                    ImageVector.vectorResource(R.drawable.mic_icon),
-                    contentDescription = null,
-                    tint = contentColor,
-                    modifier =
-                        Modifier.clickable {
-                          // TODO: handle voice search
-                        })
-              }
+          Icon(
+              ImageVector.vectorResource(R.drawable.mic_icon),
+              contentDescription = null,
+              tint = contentColor,
+              modifier =
+                  Modifier.clickable {
+                    // TODO: handle voice search
+                  })
         },
         colors =
             SearchBarDefaults.colors(
