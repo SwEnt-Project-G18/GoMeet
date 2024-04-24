@@ -243,6 +243,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                   placeholder = { Text("Enter a link") },
                   singleLine = true,
                   shape = RoundedCornerShape(10.dp),
+                  textStyle = TextStyle(color = MaterialTheme.colorScheme.onBackground),
                   colors =
                       TextFieldDefaults.outlinedTextFieldColors(
                           focusedBorderColor = MaterialTheme.colorScheme.onBackground,
