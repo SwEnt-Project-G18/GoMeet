@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.net.Uri
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
@@ -15,49 +16,52 @@ import com.google.firebase.storage.FirebaseStorage
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import java.io.ByteArrayOutputStream
+import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
+import java.time.format.TextStyle
+import java.time.temporal.TemporalAdjusters
+import java.util.Locale
 
 class CustomPins {
 
     fun createCustomPin(
         context: Context,
         date: LocalDate,
-        imageUri: Uri?,
+        time: LocalTime,  // Add a LocalTime parameter for the event time
         callback: (BitmapDescriptor, Bitmap) -> Unit
     ) {
-        // Inflate the custom layout to create the pin
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        val customPinView = inflater.inflate(R.layout.custom_pin_layout, null, false) // Ensure attachToRoot=false
+        val customPinView = inflater.inflate(R.layout.custom_pin_layout, null, false)
 
-        // Set the event date in the TextView
-        val eventDate = customPinView.findViewById<TextView>(R.id.eventDate)
-        val formattedDate = date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT))
-        eventDate.text = formattedDate
+        val today = LocalDate.now()
+        val oneWeekLater = today.plusWeeks(1)
 
-        val eventImage = customPinView.findViewById<ImageView>(R.id.eventImage)
-        // Use Picasso to load the image and then create the bitmap
-        Picasso.get().load(imageUri).into(eventImage, object : Callback {
-            override fun onSuccess() {
-                // Measure and layout the view
-                customPinView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
-                customPinView.layout(0, 0, customPinView.measuredWidth, customPinView.measuredHeight)
+        val eventDate = customPinView.findViewById<TextView>(R.id.eventDay)
+        val eventTime = customPinView.findViewById<TextView>(R.id.eventTime)  // Find the event time TextView
 
-                // Create a bitmap from the custom pin layout
-                val bitmap = Bitmap.createBitmap(customPinView.measuredWidth, customPinView.measuredHeight, Bitmap.Config.ARGB_8888)
-                val canvas = Canvas(bitmap)
-                customPinView.draw(canvas)
+        if (date.isAfter(today.minusDays(1)) && date.isBefore(oneWeekLater.plusDays(1))) {
+            val dayOfWeek = date.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault())
+            eventDate.text = dayOfWeek.uppercase(Locale.getDefault())
+            eventTime.text = time.format(DateTimeFormatter.ofPattern("HH:mm"))  // Format and set the event time
+        } else {
+            eventDate.text = ""
+            eventTime.text = ""  // Clear or hide the time if the date is not within the range
+        }
 
-                // Return the bitmap descriptor via callback
-                callback(BitmapDescriptorFactory.fromBitmap(bitmap), bitmap)
-            }
+        customPinView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
+        customPinView.layout(0, 0, customPinView.measuredWidth, customPinView.measuredHeight)
 
-            override fun onError(e: Exception?) {
+        val bitmap = Bitmap.createBitmap(customPinView.measuredWidth, customPinView.measuredHeight, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        customPinView.draw(canvas)
 
-            }
-        })
+        callback(BitmapDescriptorFactory.fromBitmap(bitmap), bitmap)
     }
+
+
 
 
 

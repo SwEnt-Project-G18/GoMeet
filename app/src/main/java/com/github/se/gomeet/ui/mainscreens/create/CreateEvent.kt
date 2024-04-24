@@ -59,6 +59,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.io.InputStream
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 
@@ -347,7 +348,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                       dateState?.let {
 
                           customPins.createCustomPin(context,
-                              it, imageUri) { bitmapDescriptor, bitmap ->
+                              it, LocalTime.MIDNIGHT) { bitmapDescriptor, bitmap ->
                               // Handle the bitmap descriptor and bitmap as needed
                               val byteArray = customPins.bitmapToByteArray(bitmap)
                               customPins.uploadEventIcon(context, byteArray, uid)
