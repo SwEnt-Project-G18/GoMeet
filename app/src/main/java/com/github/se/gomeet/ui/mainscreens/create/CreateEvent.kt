@@ -8,7 +8,9 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,12 +22,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuItemColors
 import androidx.compose.material3.OutlinedButton
@@ -362,7 +366,6 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
       }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LocationField(
     selectedLocation: MutableState<Location?>,
@@ -372,10 +375,9 @@ fun LocationField(
   var expanded by remember { mutableStateOf(false) }
   val locationSuggestions = remember { mutableStateOf(emptyList<Location>()) }
 
-  ExposedDropdownMenuBox(
-      modifier = Modifier.testTag("Location"),
-      expanded = expanded,
-      onExpandedChange = { expanded = !expanded }) {
+  Box(
+      modifier = Modifier.wrapContentSize().testTag("Location"),
+      contentAlignment = Alignment.TopCenter) {
         OutlinedTextField(
             value = locationQuery.value,
             onValueChange = {
@@ -394,7 +396,7 @@ fun LocationField(
                 TextFieldDefaults.outlinedTextFieldColors(
                     focusedBorderColor = MaterialTheme.colorScheme.onBackground,
                     unfocusedBorderColor = MaterialTheme.colorScheme.onBackground),
-            modifier = Modifier.menuAnchor().fillMaxWidth().padding(start = 7.dp, end = 7.dp))
+            modifier = Modifier.fillMaxWidth().padding(start = 7.dp, end = 7.dp))
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
@@ -404,10 +406,19 @@ fun LocationField(
                     .wrapContentHeight(),
             properties = PopupProperties(focusable = false),
         ) {
-          locationSuggestions.value.forEach { location ->
+          locationSuggestions.value.forEachIndexed { i, location ->
             DropdownMenuItem(
                 modifier = Modifier.wrapContentSize(),
-                text = { Text(location.name) },
+                text = {
+                  Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        Icons.Default.LocationOn,
+                        contentDescription = null,
+                        modifier = Modifier.padding(end = 10.dp),
+                        tint = MaterialTheme.colorScheme.tertiary)
+                    Text(location.name)
+                  }
+                },
                 onClick = {
                   locationQuery.value = location.name
                   selectedLocation.value = location
@@ -422,6 +433,12 @@ fun LocationField(
                         disabledLeadingIconColor = Color.Transparent,
                         disabledTrailingIconColor = Color.Transparent),
             )
+            if (i != locationSuggestions.value.size - 1) {
+              HorizontalDivider(
+                  modifier =
+                      Modifier.padding(start = 45.dp, top = 5.dp, bottom = 5.dp, end = 15.dp),
+                  color = MaterialTheme.colorScheme.tertiary)
+            }
           }
         }
       }
