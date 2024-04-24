@@ -297,7 +297,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                             lineHeight = 16.sp,
                             fontFamily = FontFamily(Font(R.font.roboto)),
                             fontWeight = FontWeight(1000),
-                            color = Color(0xFF000000),
+                            color = MaterialTheme.colorScheme.onBackground,
                             textAlign = TextAlign.Center,
                             letterSpacing = 0.5.sp,
                         ))
