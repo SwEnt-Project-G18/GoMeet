@@ -102,7 +102,7 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
     db.removeEvent(uid)
   }
 
-  fun location(locationName: String, onResult: (Location?) -> Unit) {
+  fun location(locationName: String, numberOfResults: Int, onResult: (List<Location>) -> Unit) {
     viewModelScope.launch {
       try {
         val client = OkHttpClient()
@@ -112,27 +112,35 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
                             " ",
                             "+"
                         )
-                    }&format=json&limit=1"
+                    }&format=json&limit=$numberOfResults"
         val req = Request.Builder().url(url).build()
         val res = withContext(Dispatchers.IO) { client.newCall(req).execute() }
         if (!res.isSuccessful) throw IOException("IOException")
         val resBody = res.body?.string() ?: throw IOException("No response from nominatim")
-        val location = locHelper(resBody)
-        withContext(Dispatchers.Main) { onResult(location) }
+        val locations = locHelper(resBody, numberOfResults)
+        withContext(Dispatchers.Main) { onResult(locations) }
       } catch (e: Exception) {
-        onResult(null)
+        onResult(emptyList())
       }
     }
   }
 
-  private fun locHelper(responseBody: String): Location {
+  private fun locHelper(responseBody: String, numberOfResults: Int): List<Location> {
+    val locations: MutableList<Location> = mutableListOf()
     val jar = JSONArray(responseBody)
-    return if (jar.length() > 0) {
-      val jObj = jar.getJSONObject(0)
-      val displayName = jObj.optString("display_name", "Unknown Location")
-      Location(jObj.getString("lat").toDouble(), jObj.getString("lon").toDouble(), displayName)
-    } else {
-      Location(0.0, 0.0, "Null Island")
+    if (jar.length() > 0) {
+      for (i in 0 until numberOfResults) {
+        try {
+          val jObj = jar.getJSONObject(i)
+          val displayName = jObj.optString("display_name", "Unknown Location")
+          locations.add(
+              Location(
+                  jObj.getString("lat").toDouble(), jObj.getString("lon").toDouble(), displayName))
+        } catch (e: Exception) {
+          return locations
+        }
+      }
     }
+    return locations
   }
 }
