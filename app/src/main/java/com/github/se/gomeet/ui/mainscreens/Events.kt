@@ -132,6 +132,7 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(innerPadding)) {
+                Spacer(modifier = Modifier.height(5.dp))
               GoMeetSearchBar(query, NavBarUnselected, Color.DarkGray)
               Spacer(modifier = Modifier.height(5.dp))
               Row(
