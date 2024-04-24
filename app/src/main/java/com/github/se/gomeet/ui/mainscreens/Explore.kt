@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -70,6 +71,7 @@ private enum class CameraAction {
 private val moveToCurrentLocation = mutableStateOf(CameraAction.NO_ACTION)
 private val isButtonVisible = mutableStateOf(true)
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
   val coroutineScope = rememberCoroutineScope()
@@ -186,7 +188,8 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
             CircularProgressIndicator()
           }
         }
-        SearchBar(query, MaterialTheme.colorScheme.background, MaterialTheme.colorScheme.tertiary)
+        GoMeetSearchBar(
+            query, MaterialTheme.colorScheme.background, MaterialTheme.colorScheme.tertiary)
       }
 }
 
