@@ -29,7 +29,7 @@ class RegisterScreenTest {
 
   @Before
   fun setup() {
-    // Make all subsequent calls to Firebase use the emulator
+    // Make all subsequent calls to Firebase auth use the emulator
     Firebase.auth.useEmulator("10.0.2.2", 9099)
   }
 
@@ -69,10 +69,10 @@ class RegisterScreenTest {
 
     rule.onNodeWithTag("register_button").assertIsEnabled().performClick()
 
-    assert(authViewModel.signInState.value.signInError == null)
+    rule.waitForIdle()
 
     // Assert that the register worked
-    rule.waitForIdle()
+    assert(authViewModel.signInState.value.signInError == null)
     assert(authViewModel.signInState.value.isSignInSuccessful)
 
   }

@@ -70,10 +70,10 @@ class LoginScreenTest {
     rule.onNodeWithText("Log in").assertIsEnabled().assertHasClickAction()
     rule.onNodeWithText("Log in").performClick()
 
+    rule.waitForIdle()
+
     // Sign-in should complete successfully
     assert(authViewModel.signInState.value.signInError == null)
-
-    rule.waitForIdle()
     assert(authViewModel.signInState.value.isSignInSuccessful)
   }
 }
