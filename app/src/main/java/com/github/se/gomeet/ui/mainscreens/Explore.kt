@@ -59,6 +59,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import androidx.compose.runtime.livedata.observeAsState
+import java.time.LocalDate
 
 
 private val defaultPosition = LatLng(46.51912357457158, 6.568023741881372)
@@ -282,23 +283,31 @@ fun GoogleMapView(
                         }
 
                         events.value.forEachIndexed { index, event ->
+                            val today = LocalDate.now()
+                            val oneWeekLater = today.plusWeeks(1)
+
+                            val isEventThisWeek = event.date.isAfter(today.minusDays(1)) && event.date.isBefore(oneWeekLater.plusDays(1))
+
                             val stablePins = remember { eventViewModel.bitmapDescriptors }
+                            val defaultPin = BitmapDescriptorFactory.fromResource(R.drawable.default_pin)
+
                             val customPinBitmapDescriptor =
-                                stablePins[event.uid]
+                                if (isEventThisWeek) stablePins[event.uid] else defaultPin
+
                             MarkerInfoWindowContent(
                                 state = eventStates[index],
                                 title = event.title,
-                                icon = customPinBitmapDescriptor
-                                    ?: BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED),
+                                icon = customPinBitmapDescriptor ?: BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED),
                                 onClick = markerClick,
                                 visible = event.title.contains(query.value, ignoreCase = true)
                             ) {
                                 Text(it.title!!, color = Color.Black)
                             }
                         }
+
+                    }
                         content()
                     }
                 }
             }
         }
-}

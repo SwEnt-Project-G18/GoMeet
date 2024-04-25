@@ -30,26 +30,18 @@ class CustomPins {
     fun createCustomPin(
         context: Context,
         date: LocalDate,
-        time: LocalTime,  // Add a LocalTime parameter for the event time
+        time: LocalTime,
         callback: (BitmapDescriptor, Bitmap) -> Unit
     ) {
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val customPinView = inflater.inflate(R.layout.custom_pin_layout, null, false)
 
-        val today = LocalDate.now()
-        val oneWeekLater = today.plusWeeks(1)
-
         val eventDate = customPinView.findViewById<TextView>(R.id.eventDay)
-        val eventTime = customPinView.findViewById<TextView>(R.id.eventTime)  // Find the event time TextView
+        val eventTime = customPinView.findViewById<TextView>(R.id.eventTime)
 
-        if (date.isAfter(today.minusDays(1)) && date.isBefore(oneWeekLater.plusDays(1))) {
-            val dayOfWeek = date.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault())
-            eventDate.text = dayOfWeek.uppercase(Locale.getDefault())
-            eventTime.text = time.format(DateTimeFormatter.ofPattern("HH:mm"))  // Format and set the event time
-        } else {
-            eventDate.text = ""
-            eventTime.text = ""  // Clear or hide the time if the date is not within the range
-        }
+        val dayOfWeek = date.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault())
+        eventDate.text = dayOfWeek.uppercase(Locale.getDefault())
+        eventTime.text = time.format(DateTimeFormatter.ofPattern("HH:mm"))
 
         customPinView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
         customPinView.layout(0, 0, customPinView.measuredWidth, customPinView.measuredHeight)
@@ -60,6 +52,7 @@ class CustomPins {
 
         callback(BitmapDescriptorFactory.fromBitmap(bitmap), bitmap)
     }
+
 
 
 
