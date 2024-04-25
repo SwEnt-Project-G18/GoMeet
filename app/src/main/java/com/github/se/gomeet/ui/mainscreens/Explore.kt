@@ -263,7 +263,6 @@ fun GoogleMapView(
     }
   }
 
-
   if (mapVisible) {
     Box(Modifier.fillMaxSize()) {
       if (isLoading) {
