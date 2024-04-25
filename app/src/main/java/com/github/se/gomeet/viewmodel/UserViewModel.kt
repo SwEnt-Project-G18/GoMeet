@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 class UserViewModel : ViewModel() {
   private val db = UserFirebaseConnection(Firebase.firestore)
 
-  fun createUserIfNew(uid: String, username: String) {
+  fun createUserIfNew(uid: String, username: String, callback : (GoMeetUser) -> Unit) {
     CoroutineScope(Dispatchers.IO).launch {
       if (getUser(uid) == null) {
         try {
@@ -27,6 +27,7 @@ class UserViewModel : ViewModel() {
                   followers = emptyList(),
                   pendingRequests = emptyList())
           db.addUser(user)
+          callback(user)
         } catch (e: Exception) {
           Log.w(ContentValues.TAG, "Error adding user", e)
         }

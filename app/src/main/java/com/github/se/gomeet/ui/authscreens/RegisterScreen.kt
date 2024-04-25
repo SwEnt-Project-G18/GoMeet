@@ -31,14 +31,20 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.se.gomeet.R
+import com.github.se.gomeet.ui.navigation.NavigationActions
+import com.github.se.gomeet.ui.navigation.Route
+import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.viewmodel.AuthViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import io.getstream.chat.android.client.ChatClient
+import io.getstream.chat.android.models.User
 
 @Composable
 fun RegisterScreen(
+    client : ChatClient,
     authViewModel: AuthViewModel,
     userViewModel: UserViewModel,
     onNavToExplore: () -> Unit
@@ -143,14 +149,22 @@ fun RegisterScreen(
         if (signInState.value.isSignInSuccessful) {
           userViewModel.createUserIfNew(
               Firebase.auth.currentUser!!.uid,
-              Firebase.auth.currentUser!!.email!!) // TODO: currently username = email
+              Firebase.auth.currentUser!!.email!!){ goMeetUser ->
+              val user = User(
+                  id = goMeetUser.uid,
+                  name = goMeetUser.username,
+                  //TODO: change image by profile picture
+                  image = "https://bit.ly/2TIt8NR"
+              )
+
+              client.connectUser(
+                  user = user,
+                  //TODO: Generate Token, see https://getstream.io/tutorials/android-chat/
+                  token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidHV0b3JpYWwtZHJvaWQifQ.WwfBzU1GZr0brt_fXnqKdKhz3oj0rbDUm2DqJO_SS5U"
+              ).enqueue()} // TODO: currently username = email
           onNavToExplore()
         }
       }
 }
 
-@Preview
-@Composable
-fun RegisterScreenPreview() {
-  RegisterScreen(AuthViewModel(), UserViewModel()) {}
-}
+

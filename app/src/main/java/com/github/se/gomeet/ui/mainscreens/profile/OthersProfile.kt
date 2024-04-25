@@ -26,10 +26,9 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -59,11 +58,11 @@ import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.R
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
+import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.ui.theme.NavBarUnselected
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OthersProfile(nav: NavigationActions) { // TODO Add parameters to the function
   Scaffold(
@@ -123,7 +122,7 @@ fun OthersProfile(nav: NavigationActions) { // TODO Add parameters to the functi
                               verticalAlignment = Alignment.CenterVertically,
                               modifier = Modifier.padding(start = 30.dp)) {
                                 Text(
-                                    "Username",
+                                    text = "Username",
                                     textAlign = TextAlign.Center,
                                     style =
                                         TextStyle(
@@ -167,7 +166,7 @@ fun OthersProfile(nav: NavigationActions) { // TODO Add parameters to the functi
                     Spacer(Modifier.width(5.dp))
 
                     Button(
-                        onClick = { /*TODO*/},
+                        onClick = {nav.navigateToScreen(Route.MESSAGE)},
                         modifier = Modifier.height(40.dp).width(180.dp),
                         shape = RoundedCornerShape(10.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFECEFF1))) {
@@ -210,7 +209,7 @@ fun OthersProfile(nav: NavigationActions) { // TODO Add parameters to the functi
                               ),
                           modifier = Modifier.align(Alignment.CenterHorizontally))
                     }
-                    Divider(
+                    HorizontalDivider(
                         modifier =
                             Modifier
                                 // .fillMaxHeight()
@@ -244,7 +243,7 @@ fun OthersProfile(nav: NavigationActions) { // TODO Add parameters to the functi
                               ),
                           modifier = Modifier.align(Alignment.CenterHorizontally))
                     }
-                    Divider(
+                    HorizontalDivider(
                         modifier =
                             Modifier
                                 // .fillMaxHeight()

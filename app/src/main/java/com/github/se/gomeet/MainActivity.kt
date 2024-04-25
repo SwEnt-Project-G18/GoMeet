@@ -7,6 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -38,12 +39,39 @@ import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.res.stringResource
+import com.github.se.gomeet.ChannelActivity
+import com.github.se.gomeet.model.user.GoMeetUser
+import io.getstream.chat.android.client.ChatClient
+import io.getstream.chat.android.client.logger.ChatLogLevel
+import io.getstream.chat.android.compose.ui.channels.ChannelsScreen
+import io.getstream.chat.android.compose.ui.theme.ChatTheme
+import io.getstream.chat.android.models.InitializationState
+import io.getstream.chat.android.models.User
+import io.getstream.chat.android.offline.plugin.factory.StreamOfflinePluginFactory
+import io.getstream.chat.android.state.plugin.config.StatePluginConfig
+import io.getstream.chat.android.state.plugin.factory.StreamStatePluginFactory
+
 
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+      // 1 - Set up the OfflinePlugin for offline storage
+      val offlinePluginFactory = StreamOfflinePluginFactory(appContext = applicationContext)
+      val statePluginFactory = StreamStatePluginFactory(config = StatePluginConfig(), appContext = this)
+
+      // 2 - Set up the client for API calls and with the plugin for offline storage
+      //TODO Secure API KEY
+      val client = ChatClient.Builder("e43k9kfvgyze", applicationContext)
+          .withPlugins(offlinePluginFactory, statePluginFactory)
+          .logLevel(ChatLogLevel.ALL) // Set to NOTHING in prod
+          .build()
     setContent {
-      GoMeetTheme {
+        val clientInitialisationState by client.clientState.initializationState.collectAsState()
+
+        GoMeetTheme {
         SetStatusBarColor(color = MaterialTheme.colorScheme.background)
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
           val userIdState = remember { mutableStateOf<String?>(null) }
@@ -58,9 +86,22 @@ class MainActivity : ComponentActivity() {
                   onNavToRegister = { NavigationActions(nav).navigateTo(LOGIN_ITEMS[2]) },
                   onSignInSuccess = { userId ->
                     userIdState.value = userId
+                      // TODO: currently username = email
                     userViewModel.createUserIfNew(
                         Firebase.auth.currentUser!!.uid,
-                        Firebase.auth.currentUser!!.email!!) // TODO: currently username = email
+                        Firebase.auth.currentUser!!.email!!) { goMeetUser ->
+                            val user = User(
+                                id = goMeetUser.uid,
+                                name = goMeetUser.username,
+                                //TODO: change image by profile picture
+                                image = "https://bit.ly/2TIt8NR"
+                            )
+
+                        client.connectUser(
+                                user = user,
+                                //TODO: Generate Token, see https://getstream.io/tutorials/android-chat/
+                                token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidHV0b3JpYWwtZHJvaWQifQ.WwfBzU1GZr0brt_fXnqKdKhz3oj0rbDUm2DqJO_SS5U"
+                            ).enqueue()}
                     NavigationActions(nav)
                         .navigateTo(
                             TOP_LEVEL_DESTINATIONS.first { it.route == Route.CREATE },
@@ -74,7 +115,7 @@ class MainActivity : ComponentActivity() {
               }
             }
             composable(Route.REGISTER) {
-              RegisterScreen(authViewModel, userViewModel) {
+              RegisterScreen(client, authViewModel, userViewModel) {
                 NavigationActions(nav)
                     .navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == Route.CREATE })
               }
@@ -121,6 +162,26 @@ class MainActivity : ComponentActivity() {
 
                   EventInfoScreen(nav)
                 }
+              composable(Route.MESSAGE){
+                  when (clientInitialisationState) {
+                      InitializationState.COMPLETE -> {
+                          ChannelsScreen(
+                              title = stringResource(id = R.string.app_name),
+                              isShowingSearch = true,
+                              onItemClick = { channel ->
+                                  startActivity(ChannelActivity.getIntent(this@MainActivity, channel.cid))
+                              },
+                              onBackPressed = { finish() }
+                          )
+                      }
+                      InitializationState.INITIALIZING -> {
+                          Text(text = "Initializing...")
+                      }
+                      InitializationState.NOT_INITIALIZED -> {
+                          Text(text = "Not initialized...")
+                      }
+                  }
+              }
           }
         }
       }
