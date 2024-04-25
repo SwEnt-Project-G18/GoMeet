@@ -11,10 +11,13 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.se.gomeet.model.repository.AuthRepository
 import com.github.se.gomeet.viewmodel.AuthViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.test.runTest
 import org.junit.After
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -24,6 +27,14 @@ class RegisterScreenTest {
 
   @get:Rule val rule = createAndroidComposeRule<ComponentActivity>()
 
+  @Before
+  fun setup() {
+    // Make all subsequent calls to Firebase use the emulator
+    FirebaseAuth.getInstance().useEmulator("10.0.2.2", 9099)
+  }
+
+
+
   @After
   fun tearDown() {
     // Clean up the test data
@@ -32,12 +43,6 @@ class RegisterScreenTest {
 
   @Test
   fun testRegisterScreen() = runTest {
-
-    //        val repo: AuthRepository = mock()
-    //        whenever(repo.signUpWithEmailPassword(any(), any(), {
-    //
-    //        }))
-    //        val authViewModel: AuthViewModel = AuthViewModel(repo)
 
     val authViewModel = AuthViewModel()
     val userViewModel = UserViewModel()

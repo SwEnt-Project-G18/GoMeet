@@ -12,3 +12,6 @@ app/build
 app/.env
 app/google-services.json
 secrets.properties
+database-debug.log
+firestore-debug.log
+ui-debug.log
