@@ -43,9 +43,9 @@ import com.google.firebase.ktx.Firebase
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-      MapsInitializer.initialize(this)
+    MapsInitializer.initialize(this)
 
-      setContent {
+    setContent {
       GoMeetTheme {
         SetStatusBarColor(color = MaterialTheme.colorScheme.background)
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {

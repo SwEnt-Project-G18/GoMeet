@@ -66,7 +66,7 @@ import java.time.format.DateTimeParseException
 @Composable
 fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivate: Boolean) {
 
-    val db = EventRepository(Firebase.firestore)
+  val db = EventRepository(Firebase.firestore)
   val titleState = remember { mutableStateOf("") }
   val descriptionState = remember { mutableStateOf("") }
   val locationState = remember { mutableStateOf("") }
@@ -78,9 +78,9 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
   val url = remember { mutableStateOf("") }
   val isPrivateEvent = remember { mutableStateOf(false) }
 
-    val customPins = remember { CustomPins() }
+  val customPins = remember { CustomPins() }
 
-    val context = LocalContext.current
+  val context = LocalContext.current
 
   var imageUri by remember { mutableStateOf<android.net.Uri?>(null) }
   var imageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
@@ -323,7 +323,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
 
               OutlinedButton(
                   onClick = {
-                      val uid = db.getNewId()
+                    val uid = db.getNewId()
                     if (!dateFormatError && dateState != null && titleState.value.isNotEmpty()) {
                       eventViewModel.location(locationState.value) { location ->
                         eventViewModel.createEvent(
@@ -345,17 +345,15 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                       }
                     }
 
-                      dateState?.let {
-
-                          customPins.createCustomPin(context,
-                              it, LocalTime.MIDNIGHT) { bitmapDescriptor, bitmap ->
-                              // Handle the bitmap descriptor and bitmap as needed
-                              val byteArray = customPins.bitmapToByteArray(bitmap)
-                              customPins.uploadEventIcon(context, byteArray, uid)
-                          }
+                    dateState?.let {
+                      customPins.createCustomPin(context, it, LocalTime.MIDNIGHT) {
+                          bitmapDescriptor,
+                          bitmap ->
+                        // Handle the bitmap descriptor and bitmap as needed
+                        val byteArray = customPins.bitmapToByteArray(bitmap)
+                        customPins.uploadEventIcon(context, byteArray, uid)
                       }
-
-
+                    }
                   },
                   modifier = Modifier.testTag("PostButton"),
                   shape = RoundedCornerShape(10.dp),
