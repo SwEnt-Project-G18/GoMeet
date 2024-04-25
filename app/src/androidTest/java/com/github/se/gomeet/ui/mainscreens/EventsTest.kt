@@ -62,7 +62,8 @@ class EventsTest {
           public = true,
           tags = emptyList(),
           images = emptyList(),
-          imageUri = null)
+          imageUri = null,
+          uid = "test_uid")
     }
 
     composeTestRule.setContent {
