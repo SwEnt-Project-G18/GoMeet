@@ -11,10 +11,10 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.github.se.gomeet.model.repository.AuthRepository
 import com.github.se.gomeet.viewmodel.AuthViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
-import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
@@ -30,15 +30,14 @@ class RegisterScreenTest {
   @Before
   fun setup() {
     // Make all subsequent calls to Firebase use the emulator
-    FirebaseAuth.getInstance().useEmulator("10.0.2.2", 9099)
+    Firebase.auth.useEmulator("10.0.2.2", 9099)
   }
-
-
 
   @After
   fun tearDown() {
     // Clean up the test data
-    // FirebaseAuth.getInstance().currentUser?.delete()
+    rule.waitForIdle()
+     Firebase.auth.currentUser?.delete()
   }
 
   @Test
@@ -73,7 +72,8 @@ class RegisterScreenTest {
     assert(authViewModel.signInState.value.signInError == null)
 
     // Assert that the register worked
-    //        assert(authViewModel.signInState.value.isSignInSuccessful)
+    rule.waitForIdle()
+    assert(authViewModel.signInState.value.isSignInSuccessful)
 
   }
 }
