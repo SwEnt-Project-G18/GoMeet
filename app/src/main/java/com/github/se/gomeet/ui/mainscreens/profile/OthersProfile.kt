@@ -64,7 +64,7 @@ import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.ui.theme.NavBarUnselected
 
 @Composable
-fun OthersProfile(nav: NavigationActions) { // TODO Add parameters to the function
+fun OthersProfile(nav: NavigationActions, uid: String) { // TODO Add parameters to the function
   Scaffold(
       bottomBar = {
         BottomNavigationMenu(
@@ -166,7 +166,7 @@ fun OthersProfile(nav: NavigationActions) { // TODO Add parameters to the functi
                     Spacer(Modifier.width(5.dp))
 
                     Button(
-                        onClick = {nav.navigateToScreen(Route.MESSAGE)},
+                        onClick = { nav.navigateToScreen(Route.MESSAGE+ "/{"+uid+"}") },
                         modifier = Modifier.height(40.dp).width(180.dp),
                         shape = RoundedCornerShape(10.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFECEFF1))) {
@@ -354,5 +354,5 @@ fun MoreActionsButton() {
 @Preview
 @Composable
 fun OthersProfilePreview() {
-  OthersProfile(nav = NavigationActions(rememberNavController()))
+  OthersProfile(nav = NavigationActions(rememberNavController()), "")
 }

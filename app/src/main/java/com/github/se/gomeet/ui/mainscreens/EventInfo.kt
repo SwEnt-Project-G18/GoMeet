@@ -45,6 +45,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.R
 import com.github.se.gomeet.ui.navigation.NavigationActions
+import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.SECOND_LEVEL_DESTINATION
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -85,7 +86,7 @@ fun EventInfo(
               }
             },
             actions = {
-              IconButton(onClick = { /* Handle share action */}) {
+              IconButton(onClick = { nav.navigateToScreen(Route.MESSAGE+"/{"+organizer+"}") }) {
                 Icon(
                     imageVector =
                         ImageVector.vectorResource(id = R.drawable.baseline_chat_bubble_outline_24),
