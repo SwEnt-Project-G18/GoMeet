@@ -33,6 +33,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
@@ -68,6 +69,7 @@ import java.io.InputStream
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
+import kotlinx.coroutines.delay
 
 private const val NUMBER_OF_SUGGESTIONS = 3
 
@@ -372,6 +374,17 @@ fun LocationField(
   var expanded by remember { mutableStateOf(false) }
   val locationSuggestions = remember { mutableStateOf(emptyList<Location>()) }
 
+  LaunchedEffect(locationQuery.value) {
+    if (locationQuery.value == "") return@LaunchedEffect
+
+    // fetch locations when user finished typing
+    delay(1000)
+
+    eventViewModel.location(locationQuery.value, NUMBER_OF_SUGGESTIONS) { locations ->
+      locationSuggestions.value = locations
+    }
+  }
+
   ExposedDropdownMenuBox(
       expanded = expanded,
       onExpandedChange = { expanded = !expanded },
@@ -381,9 +394,6 @@ fun LocationField(
             onValueChange = {
               expanded = true
               locationQuery.value = it
-              eventViewModel.location(locationQuery.value, NUMBER_OF_SUGGESTIONS) { locations ->
-                locationSuggestions.value = locations
-              }
             },
             label = { Text("Location") },
             placeholder = { Text("Enter an address") },
