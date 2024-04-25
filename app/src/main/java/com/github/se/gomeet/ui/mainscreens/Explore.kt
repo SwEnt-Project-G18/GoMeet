@@ -12,8 +12,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -74,6 +76,7 @@ private enum class CameraAction {
 private val moveToCurrentLocation = mutableStateOf(CameraAction.NO_ACTION)
 private val isButtonVisible = mutableStateOf(true)
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
   val coroutineScope = rememberCoroutineScope()
@@ -191,7 +194,8 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
             CircularProgressIndicator()
           }
         }
-        SearchBar(query, Color.White)
+        GoMeetSearchBar(
+            query, MaterialTheme.colorScheme.background, MaterialTheme.colorScheme.tertiary)
       }
 }
 
@@ -253,15 +257,12 @@ fun GoogleMapView(
 
   val isLoading by eventViewModel.loading.observeAsState(false)
 
-  // React to changes in isLoading
   LaunchedEffect(isLoading) {
-    // Side effects go here. For example:
     if (!isLoading) {
       Log.d("ViewModel", "Loading complete, map is now displayed.")
     }
   }
 
-  //    LaunchedEffect(isLoading) {
 
   if (mapVisible) {
     Box(Modifier.fillMaxSize()) {

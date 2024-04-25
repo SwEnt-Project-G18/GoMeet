@@ -9,15 +9,18 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -36,6 +39,15 @@ fun LoginScreen(authViewModel: AuthViewModel, onNavToExplore: () -> Unit) {
   val signInState = authViewModel.signInState.collectAsState()
   val isError = signInState.value.signInError != null
   val context = LocalContext.current
+  val textFieldColors =
+      TextFieldDefaults.colors(
+          focusedTextColor = DarkCyan,
+          unfocusedTextColor = DarkCyan,
+          unfocusedContainerColor = Color.Transparent,
+          focusedContainerColor = Color.Transparent,
+          cursorColor = DarkCyan,
+          focusedLabelColor = MaterialTheme.colorScheme.tertiary,
+          focusedIndicatorColor = MaterialTheme.colorScheme.tertiary)
 
   Column(
       verticalArrangement = Arrangement.Top,
@@ -45,7 +57,8 @@ fun LoginScreen(authViewModel: AuthViewModel, onNavToExplore: () -> Unit) {
             painter = painterResource(id = R.drawable.gomeet_text),
             contentDescription = "GoMeet",
             modifier = Modifier.padding(top = 40.dp),
-            alignment = Alignment.Center)
+            alignment = Alignment.Center,
+            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.tertiary))
 
         Spacer(modifier = Modifier.size(40.dp))
 
@@ -74,7 +87,8 @@ fun LoginScreen(authViewModel: AuthViewModel, onNavToExplore: () -> Unit) {
             onValueChange = { newValue -> authViewModel.onEmailChange(newValue) },
             modifier = Modifier.fillMaxWidth().testTag("EmailField"),
             label = { Text("Email") },
-            isError = isError)
+            isError = isError,
+            colors = textFieldColors)
 
         Spacer(modifier = Modifier.size(16.dp))
 
@@ -85,6 +99,7 @@ fun LoginScreen(authViewModel: AuthViewModel, onNavToExplore: () -> Unit) {
             modifier = Modifier.fillMaxWidth().testTag("LogInField"),
             label = { Text("Password") },
             isError = isError,
+            colors = textFieldColors,
             visualTransformation = PasswordVisualTransformation())
 
         Spacer(modifier = Modifier.size(50.dp))
@@ -92,6 +107,12 @@ fun LoginScreen(authViewModel: AuthViewModel, onNavToExplore: () -> Unit) {
         Button(
             onClick = { authViewModel.signInWithEmailPassword(context) },
             modifier = Modifier.fillMaxWidth().testTag("LogInButton"),
+            colors =
+                ButtonColors(
+                    disabledContainerColor = MaterialTheme.colorScheme.primary,
+                    containerColor = DarkCyan,
+                    disabledContentColor = Color.White,
+                    contentColor = Color.White),
             enabled =
                 signInState.value.email.isNotEmpty() && signInState.value.password.isNotEmpty()) {
               Text("Log in")
