@@ -433,7 +433,7 @@ fun LocationField(
         )
         if (i != locationSuggestions.value.size - 1) {
           HorizontalDivider(
-              modifier = Modifier.padding(start = 45.dp, top = 5.dp, bottom = 5.dp, end = 15.dp),
+              modifier = Modifier.padding(start = 45.dp, top = 5.dp, bottom = 5.dp, end = 7.dp),
               color = MaterialTheme.colorScheme.tertiary)
         }
       }
