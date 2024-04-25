@@ -22,13 +22,6 @@
             android:value="${MAPS_API_KEY}" />
 
         <activity
-            android:name=".ChannelActivity"
-            android:exported="false"
-            android:label="@string/title_activity_channel"
-            android:theme="@style/Theme.GoMeet"
-            android:windowSoftInputMode="adjustResize"/>
-
-        <activity
             android:name=".MainActivity"
             android:exported="true"
             android:theme="@style/Theme.GoMeet">
