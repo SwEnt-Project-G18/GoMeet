@@ -102,6 +102,8 @@ class NavigationActions(val navController: NavHostController) {
     navController.navigate(route)
   }
 
+
+
   fun navigateToEventInfo(
       title: String,
       date: String,

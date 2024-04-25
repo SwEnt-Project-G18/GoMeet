@@ -1,7 +1,5 @@
 package com.github.se.gomeet
 
-import EventInfo
-import EventInfoScreen
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -16,7 +14,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -25,6 +22,7 @@ import androidx.navigation.navArgument
 import com.github.se.gomeet.ui.authscreens.LoginScreen
 import com.github.se.gomeet.ui.authscreens.RegisterScreen
 import com.github.se.gomeet.ui.authscreens.WelcomeScreen
+import com.github.se.gomeet.ui.mainscreens.EventInfo
 import com.github.se.gomeet.ui.mainscreens.Events
 import com.github.se.gomeet.ui.mainscreens.Explore
 import com.github.se.gomeet.ui.mainscreens.Profile
@@ -47,8 +45,9 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import io.getstream.chat.android.client.ChatClient
 import io.getstream.chat.android.client.logger.ChatLogLevel
-import io.getstream.chat.android.compose.ui.channels.ChannelsScreen
-import io.getstream.chat.android.models.Channel
+import io.getstream.chat.android.compose.ui.messages.MessagesScreen
+import io.getstream.chat.android.compose.ui.theme.ChatTheme
+import io.getstream.chat.android.compose.viewmodel.messages.MessagesViewModelFactory
 import io.getstream.chat.android.models.InitializationState
 import io.getstream.chat.android.models.User
 import io.getstream.chat.android.offline.plugin.factory.StreamOfflinePluginFactory
@@ -105,7 +104,7 @@ class MainActivity : ComponentActivity() {
                                       clearBackStack = true)
                               } else {
                                   // Handle connection failure
-                                  Log.e("ChatClient", "Failed to connect user: ${userId}")
+                                  Log.e("ChatClient", "Failed to connect user: $userId")
                               }
                           }
                   })
@@ -166,30 +165,56 @@ class MainActivity : ComponentActivity() {
 
                   EventInfo(NavigationActions(nav), title, date, time, organizer, rating, painterResource(id = R.drawable.chess_demo), description, loc)
                 }
-            composable(route = Route.MESSAGE, arguments = listOf(navArgument("id"){type = NavType.StringType})) { it ->
-                val id = it.arguments?.getString("id") ?: ""
-              when (clientInitialisationState) {
-                InitializationState.COMPLETE -> {
-                    client.createChannel(channelType = "messaging",
-                        channelId = "",
-                        memberIds = listOf(id, Firebase.auth.currentUser!!.uid),
-                        extraData = emptyMap()
-                    ).enqueue{ res ->
-                        if (res.isSuccess){
-                            res.map { channel -> startActivity(ChannelActivity.getIntent(applicationContext, channel.id))}
-                        }
-                    }
-                }
+              composable(route = Route.MESSAGE, arguments = listOf(navArgument("id"){type = NavType.StringType})) {
+                  val id = it.arguments?.getString("id") ?: ""
+                  val success = remember { mutableStateOf(false) }
+                  val channelId = remember { mutableStateOf("") }
 
-                InitializationState.INITIALIZING -> {
-                  Text(text = "Initializing...")
-                }
+                  when (clientInitialisationState) {
+                      InitializationState.COMPLETE -> {
+                          Log.d("Sign in", "Sign in to chat works, $id, and ${Firebase.auth.currentUser!!.uid}")
+                          client.createChannel(
+                              channelType = "messaging",
+                              channelId = "",  // Let the API generate an ID
+                              memberIds = listOf(id, Firebase.auth.currentUser!!.uid),
+                              extraData = emptyMap()
+                          ).enqueue { res ->
+                              res.onError { error ->
+                                  Log.d("Creating channel", "Failed, Error: $error")
+                              }
+                              res.onSuccess { result ->
+                                  Log.d("Creating channel", "Success !")
+                                  success.value = true
+                                  channelId.value = "messaging:${result.id}"  // Correct format "channelType:channelId"
+                              }
+                          }
 
-                InitializationState.NOT_INITIALIZED -> {
-                  Text(text = "Not initialized...")
-                }
+                          if (success.value) {
+                              ChatTheme {
+                                  MessagesScreen(
+                                      viewModelFactory = MessagesViewModelFactory(
+                                          context = applicationContext,
+                                          channelId = channelId.value,  // Make sure this is in "channelType:channelId" format
+                                          messageLimit = 30
+                                      ),
+                                      onBackPressed = { NavigationActions(nav).goBack() }
+                                  )
+                              }
+                          }
+                      }
+
+                      InitializationState.INITIALIZING -> {
+                          Log.d("Initializing", "Sign in to Chat is initializing")
+                          Text(text = "Initializing...")
+                      }
+
+                      InitializationState.NOT_INITIALIZED -> {
+                          Log.d("Not initialized", "Sign in to Chat doesn't work, not initialized")
+                          Text(text = "Not initialized...")
+                      }
+                  }
               }
-            }
+
           }
         }
       }

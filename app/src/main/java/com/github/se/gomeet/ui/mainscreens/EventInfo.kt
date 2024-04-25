@@ -1,15 +1,26 @@
+package com.github.se.gomeet.ui.mainscreens
+
+import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -20,8 +31,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -68,7 +77,7 @@ fun EventInfo(
     description: String = "",
     loc: LatLng = LatLng(0.0, 0.0)
 ) {
-  Log.d("EventInfo", "Loc is $loc")
+  Log.d("EventInfo", "Organizer is $organizer")
   Scaffold(
       topBar = {
         TopAppBar(
@@ -86,7 +95,7 @@ fun EventInfo(
               }
             },
             actions = {
-              IconButton(onClick = { nav.navigateToScreen(Route.MESSAGE+"/{"+organizer+"}") }) {
+              IconButton(onClick = { nav.navigateToScreen(Route.MESSAGE.replace("{id}", Uri.encode(organizer))) }) {
                 Icon(
                     imageVector =
                         ImageVector.vectorResource(id = R.drawable.baseline_chat_bubble_outline_24),
@@ -156,7 +165,7 @@ fun EventHeader(
                       letterSpacing = 0.5.sp))
           Spacer(modifier = Modifier.height(5.dp))
           Text(
-              modifier = Modifier.clickable { nav.navigateTo(SECOND_LEVEL_DESTINATION.get(0)) },
+              modifier = Modifier.clickable { nav.navigateTo(SECOND_LEVEL_DESTINATION[0]) },
               text = organizer,
               style =
                   TextStyle(
