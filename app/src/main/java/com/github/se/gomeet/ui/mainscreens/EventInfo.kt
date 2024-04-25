@@ -95,14 +95,18 @@ fun EventInfo(
               }
             },
             actions = {
-              IconButton(onClick = { nav.navigateToScreen(Route.MESSAGE.replace("{id}", Uri.encode(organizer))) }) {
-                Icon(
-                    imageVector =
-                        ImageVector.vectorResource(id = R.drawable.baseline_chat_bubble_outline_24),
-                    contentDescription = "Share",
-                    modifier = Modifier.size(24.dp),
-                    tint = MaterialTheme.colorScheme.onBackground)
-              }
+              IconButton(
+                  onClick = {
+                    nav.navigateToScreen(Route.MESSAGE.replace("{id}", Uri.encode(organizer)))
+                  }) {
+                    Icon(
+                        imageVector =
+                            ImageVector.vectorResource(
+                                id = R.drawable.baseline_chat_bubble_outline_24),
+                        contentDescription = "Share",
+                        modifier = Modifier.size(24.dp),
+                        tint = MaterialTheme.colorScheme.onBackground)
+                  }
 
               IconButton(onClick = { /* Handle more action */}) {
                 Icon(

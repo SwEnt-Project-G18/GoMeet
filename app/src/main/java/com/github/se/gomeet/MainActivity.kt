@@ -87,26 +87,28 @@ class MainActivity : ComponentActivity() {
                   onNavToLogin = { NavigationActions(nav).navigateTo(LOGIN_ITEMS[1]) },
                   onNavToRegister = { NavigationActions(nav).navigateTo(LOGIN_ITEMS[2]) },
                   onSignInSuccess = { userId ->
-                      userIdState.value = userId
-                      userViewModel.createUserIfNew(
-                          Firebase.auth.currentUser!!.uid, Firebase.auth.currentUser!!.email!!)
-                      val user = User(
-                          id = Firebase.auth.currentUser!!.uid,
-                          name = Firebase.auth.currentUser!!.email!!) // TODO: Add Profile Picture to User
+                    userIdState.value = userId
+                    userViewModel.createUserIfNew(
+                        Firebase.auth.currentUser!!.uid, Firebase.auth.currentUser!!.email!!)
+                    val user =
+                        User(
+                            id = Firebase.auth.currentUser!!.uid,
+                            name =
+                                Firebase.auth.currentUser!!
+                                    .email!!) // TODO: Add Profile Picture to User
 
-                      client.connectUser(
-                          user = user,
-                          token = client.devToken(userId))
-                          .enqueue { result ->
-                              if (result.isSuccess) {
-                                  NavigationActions(nav).navigateTo(
-                                      TOP_LEVEL_DESTINATIONS.first { it.route == Route.CREATE },
-                                      clearBackStack = true)
-                              } else {
-                                  // Handle connection failure
-                                  Log.e("ChatClient", "Failed to connect user: $userId")
-                              }
-                          }
+                    client.connectUser(user = user, token = client.devToken(userId)).enqueue {
+                        result ->
+                      if (result.isSuccess) {
+                        NavigationActions(nav)
+                            .navigateTo(
+                                TOP_LEVEL_DESTINATIONS.first { it.route == Route.CREATE },
+                                clearBackStack = true)
+                      } else {
+                        // Handle connection failure
+                        Log.e("ChatClient", "Failed to connect user: $userId")
+                      }
+                    }
                   })
             }
             composable(Route.LOGIN) {
@@ -126,9 +128,11 @@ class MainActivity : ComponentActivity() {
             composable(Route.TRENDS) { Trends(navAction) }
             composable(Route.CREATE) { Create(navAction) }
             composable(Route.PROFILE) { Profile(navAction) }
-            composable(route = Route.OTHERS_PROFILE, arguments = listOf(
-                navArgument("uid"){type = NavType.StringType}
-            )) { OthersProfile(navAction, it.arguments?.getString("uid") ?: "") }
+            composable(
+                route = Route.OTHERS_PROFILE,
+                arguments = listOf(navArgument("uid") { type = NavType.StringType })) {
+                  OthersProfile(navAction, it.arguments?.getString("uid") ?: "")
+                }
             composable(Route.PRIVATE_CREATE) {
               CreateEvent(navAction, EventViewModel(userIdState.value), true)
             }
@@ -163,58 +167,70 @@ class MainActivity : ComponentActivity() {
                   val longitude = entry.arguments?.getFloat("longitude") ?: 0.0
                   val loc = LatLng(latitude.toDouble(), longitude.toDouble())
 
-                  EventInfo(NavigationActions(nav), title, date, time, organizer, rating, painterResource(id = R.drawable.chess_demo), description, loc)
+                  EventInfo(
+                      NavigationActions(nav),
+                      title,
+                      date,
+                      time,
+                      organizer,
+                      rating,
+                      painterResource(id = R.drawable.chess_demo),
+                      description,
+                      loc)
                 }
-              composable(route = Route.MESSAGE, arguments = listOf(navArgument("id"){type = NavType.StringType})) {
+            composable(
+                route = Route.MESSAGE,
+                arguments = listOf(navArgument("id") { type = NavType.StringType })) {
                   val id = it.arguments?.getString("id") ?: ""
                   val success = remember { mutableStateOf(false) }
                   val channelId = remember { mutableStateOf("") }
 
                   when (clientInitialisationState) {
-                      InitializationState.COMPLETE -> {
-                          Log.d("Sign in", "Sign in to chat works, $id, and ${Firebase.auth.currentUser!!.uid}")
-                          client.createChannel(
+                    InitializationState.COMPLETE -> {
+                      Log.d(
+                          "Sign in",
+                          "Sign in to chat works, $id, and ${Firebase.auth.currentUser!!.uid}")
+                      client
+                          .createChannel(
                               channelType = "messaging",
-                              channelId = "",  // Let the API generate an ID
+                              channelId = "", // Let the API generate an ID
                               memberIds = listOf(id, Firebase.auth.currentUser!!.uid),
-                              extraData = emptyMap()
-                          ).enqueue { res ->
-                              res.onError { error ->
-                                  Log.d("Creating channel", "Failed, Error: $error")
-                              }
-                              res.onSuccess { result ->
-                                  Log.d("Creating channel", "Success !")
-                                  success.value = true
-                                  channelId.value = "messaging:${result.id}"  // Correct format "channelType:channelId"
-                              }
+                              extraData = emptyMap())
+                          .enqueue { res ->
+                            res.onError { error ->
+                              Log.d("Creating channel", "Failed, Error: $error")
+                            }
+                            res.onSuccess { result ->
+                              Log.d("Creating channel", "Success !")
+                              success.value = true
+                              channelId.value =
+                                  "messaging:${result.id}" // Correct format "channelType:channelId"
+                            }
                           }
 
-                          if (success.value) {
-                              ChatTheme {
-                                  MessagesScreen(
-                                      viewModelFactory = MessagesViewModelFactory(
-                                          context = applicationContext,
-                                          channelId = channelId.value,  // Make sure this is in "channelType:channelId" format
-                                          messageLimit = 30
-                                      ),
-                                      onBackPressed = { NavigationActions(nav).goBack() }
-                                  )
-                              }
-                          }
+                      if (success.value) {
+                        ChatTheme {
+                          MessagesScreen(
+                              viewModelFactory =
+                                  MessagesViewModelFactory(
+                                      context = applicationContext,
+                                      channelId = channelId.value, // Make sure this is in
+                                      // "channelType:channelId" format
+                                      messageLimit = 30),
+                              onBackPressed = { NavigationActions(nav).goBack() })
+                        }
                       }
-
-                      InitializationState.INITIALIZING -> {
-                          Log.d("Initializing", "Sign in to Chat is initializing")
-                          Text(text = "Initializing...")
-                      }
-
-                      InitializationState.NOT_INITIALIZED -> {
-                          Log.d("Not initialized", "Sign in to Chat doesn't work, not initialized")
-                          Text(text = "Not initialized...")
-                      }
+                    }
+                    InitializationState.INITIALIZING -> {
+                      Log.d("Initializing", "Sign in to Chat is initializing")
+                      Text(text = "Initializing...")
+                    }
+                    InitializationState.NOT_INITIALIZED -> {
+                      Log.d("Not initialized", "Sign in to Chat doesn't work, not initialized")
+                      Text(text = "Not initialized...")
+                    }
                   }
-              }
-
+                }
           }
         }
       }

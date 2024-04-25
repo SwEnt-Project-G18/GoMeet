@@ -32,9 +32,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.se.gomeet.R
-import com.github.se.gomeet.ui.navigation.NavigationActions
-import com.github.se.gomeet.ui.navigation.Route
-import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.viewmodel.AuthViewModel
 import com.google.firebase.auth.ktx.auth
@@ -131,21 +128,19 @@ fun LoginScreen(authViewModel: AuthViewModel, onNavToExplore: () -> Unit) {
         }
 
         if (signInState.value.isSignInSuccessful) {
-            val user = User(
-                id = Firebase.auth.currentUser!!.uid,
-                name = Firebase.auth.currentUser!!.email!!) // TODO: Add Profile Picture to User
-            val client = ChatClient.instance()
-            client.connectUser(
-                user = user,
-                token = client.devToken(user.id))
-                .enqueue { result ->
-                    if (result.isSuccess) {
-                        onNavToExplore()
-                    } else {
-                        // Handle connection failure
-                        Log.e("ChatClient", "Failed to connect user: ${user.id}")
-                    }
-                }
+          val user =
+              User(
+                  id = Firebase.auth.currentUser!!.uid,
+                  name = Firebase.auth.currentUser!!.email!!) // TODO: Add Profile Picture to User
+          val client = ChatClient.instance()
+          client.connectUser(user = user, token = client.devToken(user.id)).enqueue { result ->
+            if (result.isSuccess) {
+              onNavToExplore()
+            } else {
+              // Handle connection failure
+              Log.e("ChatClient", "Failed to connect user: ${user.id}")
+            }
+          }
         }
       }
 }

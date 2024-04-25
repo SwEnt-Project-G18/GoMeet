@@ -166,7 +166,7 @@ fun OthersProfile(nav: NavigationActions, uid: String) { // TODO Add parameters 
                     Spacer(Modifier.width(5.dp))
 
                     Button(
-                        onClick = { nav.navigateToScreen(Route.MESSAGE+ "/{"+uid+"}") },
+                        onClick = { nav.navigateToScreen(Route.MESSAGE + "/{" + uid + "}") },
                         modifier = Modifier.height(40.dp).width(180.dp),
                         shape = RoundedCornerShape(10.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFECEFF1))) {
