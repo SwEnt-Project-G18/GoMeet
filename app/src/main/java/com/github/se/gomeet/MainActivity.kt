@@ -26,6 +26,7 @@ import com.github.se.gomeet.ui.mainscreens.create.AddParticipants
 import com.github.se.gomeet.ui.mainscreens.create.Create
 import com.github.se.gomeet.ui.mainscreens.create.CreateEvent
 import com.github.se.gomeet.ui.mainscreens.profile.OthersProfile
+import com.github.se.gomeet.ui.mainscreens.profile.SettingsScreen
 import com.github.se.gomeet.ui.navigation.LOGIN_ITEMS
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
@@ -121,6 +122,8 @@ class MainActivity : ComponentActivity() {
 
                   EventInfoScreen(nav)
                 }
+
+            composable(Route.SETTINGS) { SettingsScreen(navAction) }
           }
         }
       }

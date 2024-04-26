@@ -51,6 +51,7 @@ import com.github.se.gomeet.R
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
+import com.github.se.gomeet.ui.navigation.SECOND_LEVEL_DESTINATION
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.ui.theme.Grey
@@ -84,7 +85,8 @@ fun Profile(nav: NavigationActions) { // TODO Add parameters to the function
           Spacer(Modifier.weight(1f))
           IconButton(
               modifier = Modifier.align(Alignment.CenterVertically).padding(end = 15.dp),
-              onClick = {}) {
+              onClick = { nav.navigateTo(
+                  SECOND_LEVEL_DESTINATION.first { it.route == Route.SETTINGS }) }) {
                 Icon(
                     imageVector = ImageVector.vectorResource(R.drawable.settings_icon),
                     contentDescription = "Settings",
