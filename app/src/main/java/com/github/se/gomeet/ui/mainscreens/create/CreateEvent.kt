@@ -318,7 +318,8 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                   onClick = {
                     if (selectedLocation.value != null &&
                         titleState.value.isNotEmpty() &&
-                        !dateFormatError) {
+                        !dateFormatError &&
+                        dateState != null) {
                       eventViewModel.createEvent(
                           titleState.value,
                           descriptionState.value,
