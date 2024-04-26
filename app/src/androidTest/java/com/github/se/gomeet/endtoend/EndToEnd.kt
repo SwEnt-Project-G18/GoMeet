@@ -9,12 +9,27 @@ import com.github.se.gomeet.screens.CreateEventScreen
 import com.github.se.gomeet.screens.CreateScreen
 import com.github.se.gomeet.screens.LoginScreen
 import com.github.se.gomeet.screens.WelcomeScreenScreen
+import com.github.se.gomeet.viewmodel.EventViewModel
+import com.github.se.gomeet.viewmodel.UserViewModel
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.ktx.storage
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen
 import io.mockk.junit4.MockKRule
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.test.runTest
+import org.junit.After
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
 class EndToEndTest : TestCase() {
@@ -22,6 +37,46 @@ class EndToEndTest : TestCase() {
   @get:Rule val composeTestRule = createAndroidComposeRule<MainActivity>()
 
   @get:Rule val mockkRule = MockKRule(this)
+
+  private lateinit var userVM: UserViewModel
+  private lateinit var eventVM: EventViewModel
+
+  private val email = "qwe@asd.com"
+  private val pwd = "123456"
+  private val uid = "testuid"
+  private val username = "testuser"
+
+@Before
+fun setup() {
+  Firebase.auth.useEmulator("10.0.2.2", 9099)
+  Firebase.firestore.useEmulator("10.0.2.2", 8080)
+  Firebase.storage.useEmulator("10.0.2.2", 9199)
+
+  userVM = UserViewModel()
+  userVM.createUserIfNew(uid, username)
+  Firebase.auth.createUserWithEmailAndPassword(email, pwd)
+  TimeUnit.SECONDS.sleep(2)
+
+  eventVM = EventViewModel(uid)
+  println("eventVM created")
+}
+
+  @After
+  fun tearDown() {
+
+    runBlocking {
+      eventVM.getAllEvents()?.forEach {
+        if (it.creator == uid)
+          eventVM.removeEvent(it.uid)
+      }
+    }
+
+    // Clean up the user
+    userVM.deleteUser("testuid")
+    Firebase.auth.currentUser?.delete()
+  }
+
+
 
   @Test
   fun test() = run {
@@ -33,7 +88,6 @@ class EndToEndTest : TestCase() {
         }
       }
     }
-    // how to change screen ???
     ComposeScreen.onComposeScreen<LoginScreen>(composeTestRule) {
       step("Log in with email and password") {
         logInButton {
@@ -42,11 +96,11 @@ class EndToEndTest : TestCase() {
         }
         emailField {
           assertIsDisplayed()
-          performTextInput("qwe@asd.com")
+          performTextInput(email)
         }
         passwordField {
           assertIsDisplayed()
-          performTextInput("123456")
+          performTextInput(pwd)
         }
         logInButton {
           assertIsEnabled()
@@ -55,14 +109,7 @@ class EndToEndTest : TestCase() {
       }
     }
 
-    // First ensure login and switch to the expected screen
-    ComposeScreen.onComposeScreen<LoginScreen>(composeTestRule) {
-      step("Log in with email and password") { logInButton { performClick() } }
-      composeTestRule.waitUntil(timeoutMillis = 100000) {
-        // Your condition, for example, checking if a button is enabled
-        composeTestRule.onNodeWithTag("CreateUI").isDisplayed()
-      }
-    }
+    composeTestRule.waitForIdle()
 
     ComposeScreen.onComposeScreen<CreateScreen>(composeTestRule) {
       step("goTo publicCreate") {

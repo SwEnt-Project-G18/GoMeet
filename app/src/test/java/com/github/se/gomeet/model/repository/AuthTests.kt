@@ -28,7 +28,7 @@ class AuthTests {
   @Before
   fun setUp() {
     // Initialize your repository with the mocked FirebaseAuth
-    authRepository = AuthRepository(firebaseAuth)
+    authRepository = AuthRepository()
   }
 
   @Test
