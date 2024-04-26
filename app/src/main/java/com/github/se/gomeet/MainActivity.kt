@@ -25,6 +25,7 @@ import com.github.se.gomeet.ui.mainscreens.Trends
 import com.github.se.gomeet.ui.mainscreens.create.AddParticipants
 import com.github.se.gomeet.ui.mainscreens.create.Create
 import com.github.se.gomeet.ui.mainscreens.create.CreateEvent
+import com.github.se.gomeet.ui.mainscreens.profile.Notifications
 import com.github.se.gomeet.ui.mainscreens.profile.OthersProfile
 import com.github.se.gomeet.ui.navigation.LOGIN_ITEMS
 import com.github.se.gomeet.ui.navigation.NavigationActions
@@ -33,6 +34,7 @@ import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.GoMeetTheme
 import com.github.se.gomeet.ui.theme.SetStatusBarColor
 import com.github.se.gomeet.viewmodel.AuthViewModel
+import com.github.se.gomeet.viewmodel.EventInviteViewModel
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.android.gms.maps.model.LatLng
@@ -83,8 +85,9 @@ class MainActivity : ComponentActivity() {
             composable(Route.EVENTS) { Events(navAction, EventViewModel()) }
             composable(Route.TRENDS) { Trends(navAction) }
             composable(Route.CREATE) { Create(navAction) }
-            composable(Route.PROFILE) { Profile(navAction) }
+            composable(Route.PROFILE) { Profile(navAction, userId =  Firebase.auth.currentUser!!.uid) }
             composable(Route.OTHERS_PROFILE) { OthersProfile(navAction) }
+            composable(Route.NOTIFICATIONS) { Notifications(navAction)}
             composable(Route.PRIVATE_CREATE) {
               CreateEvent(navAction, EventViewModel(userIdState.value), true)
             }

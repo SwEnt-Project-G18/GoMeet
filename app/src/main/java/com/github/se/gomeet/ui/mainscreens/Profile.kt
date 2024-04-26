@@ -59,7 +59,7 @@ import com.github.se.gomeet.ui.theme.Grey
 import com.github.se.gomeet.ui.theme.NavBarUnselected
 
 @Composable
-fun Profile(nav: NavigationActions) { // TODO Add parameters to the function
+fun Profile(nav: NavigationActions, userId: String) { // TODO Add parameters to the function
   Scaffold(
       bottomBar = {
         BottomNavigationMenu(
@@ -353,5 +353,5 @@ fun Profile(nav: NavigationActions) { // TODO Add parameters to the function
 @Preview
 @Composable
 fun ProfilePreview() {
-  Profile(nav = NavigationActions(rememberNavController()))
+  Profile(nav = NavigationActions(rememberNavController()), userId = "John")
 }

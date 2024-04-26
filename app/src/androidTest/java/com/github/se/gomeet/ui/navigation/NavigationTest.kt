@@ -36,7 +36,7 @@ class NavigationTest {
         }
         composable(TOP_LEVEL_DESTINATIONS[2].route) { Trends(NavigationActions(nav)) }
         composable(TOP_LEVEL_DESTINATIONS[3].route) { Create(NavigationActions(nav)) }
-        composable(TOP_LEVEL_DESTINATIONS[4].route) { Profile(NavigationActions(nav)) }
+        composable(TOP_LEVEL_DESTINATIONS[4].route) { Profile(NavigationActions(nav), userId = "1234") }
         // Add more destinations as needed
       }
 

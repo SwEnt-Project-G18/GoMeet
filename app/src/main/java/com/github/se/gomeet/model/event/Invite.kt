@@ -1,5 +1,4 @@
 package com.github.se.gomeet.model.event
-
 data class EventInviteUsers(
     val e: String,
     val usersInvited: MutableList<Pair<String, InviteStatus>>,
@@ -17,3 +16,9 @@ enum class InviteStatus {
   PENDING,
   REFUSED
 }
+
+data class Invite(
+    val eventId: String,
+    val userId: String,
+    val status: InviteStatus
+)

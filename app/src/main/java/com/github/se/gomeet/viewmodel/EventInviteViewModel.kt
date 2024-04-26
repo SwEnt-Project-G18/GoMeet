@@ -13,10 +13,10 @@ class EventInviteViewModel {
 
   private val repository = InvitesRepository(Firebase.firestore)
 
-  suspend fun getUsersInvitedToEvent(eventId: String): UserInvitedToEvents? {
+  suspend fun getUsersInvitedToEvent(userId: String): UserInvitedToEvents? {
     return try {
       val userInvitedToEvents = CompletableDeferred<UserInvitedToEvents?>()
-      repository.getEventInvites(eventId) { t -> userInvitedToEvents.complete(t) }
+      repository.getEventInvites(userId) { t -> userInvitedToEvents.complete(t) }
       userInvitedToEvents.await()
     } catch (e: Exception) {
       null
