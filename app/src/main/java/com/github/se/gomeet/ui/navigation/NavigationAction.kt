@@ -38,7 +38,7 @@ object Route {
   const val ADD_PARTICIPANTS = "Add Participants"
   const val EVENT_INFO =
       "eventInfo/{title}/{date}/{time}/{organizer}/{rating}/{description}/{latitude}/{longitude}"
-    const val SETTINGS = "Settings"
+  const val SETTINGS = "Settings"
 }
 
 val CREATE_ITEMS =

@@ -8,11 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -36,119 +32,117 @@ import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
-import com.github.se.gomeet.viewmodel.UserViewModel
 
 @Composable
-fun SettingsScreen(nav: NavigationActions, /*userViewModel: UserViewModel*/) {
-    Scaffold(
-        modifier = Modifier.testTag("SettingsScreen"),
-        topBar = {
-            Column {
-                Text(
-                    text = "Settings",
-                    modifier = Modifier.padding(top = 15.dp, start = 15.dp, end = 18.dp, bottom = 0.dp),
-                    color = DarkCyan,
-                    fontStyle = FontStyle.Normal,
-                    fontWeight = FontWeight.SemiBold,
-                    fontFamily = FontFamily.Default,
-                    textAlign = TextAlign.Start,
-                    style = MaterialTheme.typography.headlineLarge)
+fun SettingsScreen(
+    nav: NavigationActions, /*userViewModel: UserViewModel*/
+) {
+  Scaffold(
+      modifier = Modifier.testTag("SettingsScreen"),
+      topBar = {
+        Column {
+          Text(
+              text = "Settings",
+              modifier = Modifier.padding(top = 15.dp, start = 15.dp, end = 18.dp, bottom = 0.dp),
+              color = DarkCyan,
+              fontStyle = FontStyle.Normal,
+              fontWeight = FontWeight.SemiBold,
+              fontFamily = FontFamily.Default,
+              textAlign = TextAlign.Start,
+              style = MaterialTheme.typography.headlineLarge)
 
-                Row(
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Surface(
-                        onClick = { nav.goBack() },
-                        shape = CircleShape,
-                        color = Color.Transparent
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.arrow_back),
-                            contentDescription = "Back button",
-                            modifier = Modifier.padding(15.dp),
-                            tint = Color.Black
-                        )
-                    }
-
-                    Text(
-                        text = "Back",
-                        color = Color.Black,
-                        fontStyle = FontStyle.Normal,
-                        fontWeight = FontWeight.SemiBold,
-                        fontFamily = FontFamily.Default,
-                        textAlign = TextAlign.Start,
-                        style = MaterialTheme.typography.titleSmall
-                    )
-                }
+          Row(
+              horizontalArrangement = Arrangement.Start,
+              verticalAlignment = Alignment.CenterVertically,
+          ) {
+            Surface(onClick = { nav.goBack() }, shape = CircleShape, color = Color.Transparent) {
+              Icon(
+                  painter = painterResource(id = R.drawable.arrow_back),
+                  contentDescription = "Back button",
+                  modifier = Modifier.padding(15.dp),
+                  tint = Color.Black)
             }
-        },
-        bottomBar = {
-            BottomNavigationMenu(
-                onTabSelect = { selectedTab ->
-                    nav.navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == selectedTab })
-                },
-                tabList = TOP_LEVEL_DESTINATIONS,
-                selectedItem = Route.PROFILE)
-        }) { innerPadding ->
-            Column(
-                modifier = Modifier
-                    .padding(innerPadding)
+
+            Text(
+                text = "Back",
+                color = Color.Black,
+                fontStyle = FontStyle.Normal,
+                fontWeight = FontWeight.SemiBold,
+                fontFamily = FontFamily.Default,
+                textAlign = TextAlign.Start,
+                style = MaterialTheme.typography.titleSmall)
+          }
+        }
+      },
+      bottomBar = {
+        BottomNavigationMenu(
+            onTabSelect = { selectedTab ->
+              nav.navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == selectedTab })
+            },
+            tabList = TOP_LEVEL_DESTINATIONS,
+            selectedItem = Route.PROFILE)
+      }) { innerPadding ->
+        Column(
+            modifier =
+                Modifier.padding(innerPadding)
                     .verticalScroll(rememberScrollState())
                     .testTag("Settings"),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                SettingsSubtitle("Who can see your content",
-                    Modifier
-                        .padding(15.dp)
-                        .align(Alignment.Start))
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center) {
+              SettingsSubtitle(
+                  "Who can see your content", Modifier.padding(15.dp).align(Alignment.Start))
 
-                SettingsComposable(R.drawable.indeterminate_check_box, "Account privacy")
-                SettingsComposable(R.drawable.star, "Close friends")
-                SettingsComposable(R.drawable.star, "Blocked")
-                SettingsComposable(R.drawable.star, "Messages")
+              SettingsComposable(R.drawable.indeterminate_check_box, "Account privacy")
+              SettingsComposable(R.drawable.star, "Close friends")
+              SettingsComposable(R.drawable.location_icon, "Blocked")
+              SettingsComposable(R.drawable.mail, "Messages")
 
-                SettingsSubtitle("Your app and media",
-                    Modifier
-                        .padding(15.dp)
-                        .align(Alignment.Start))
+              SettingsSubtitle("Your app and media", Modifier.padding(15.dp).align(Alignment.Start))
 
-                SettingsComposable(R.drawable.star, "Suggested content")
-                SettingsComposable(R.drawable.star, "Device permissions")
-                SettingsComposable(Icons.Default.Check.hashCode(), "Accessibility")
-                SettingsComposable(Icons.Default.Home.hashCode(), "Language")
+              SettingsComposable(R.drawable.folder, "Suggested content")
+              SettingsComposable(R.drawable.mobile_friendly, "Device permissions")
+              SettingsComposable(R.drawable.check_icon, "Accessibility")
+              SettingsComposable(R.drawable.language, "Language")
 
-                SettingsSubtitle("More info and support",
-                    Modifier
-                        .padding(15.dp)
-                        .align(Alignment.Start))
+              SettingsSubtitle(
+                  "More info and support", Modifier.padding(15.dp).align(Alignment.Start))
 
-                SettingsComposable(R.drawable.baseline_chat_bubble_outline_24, "Help")
-                SettingsComposable(R.drawable.gomeet_icon, "About")
+              SettingsComposable(R.drawable.baseline_chat_bubble_outline_24, "Help")
+              SettingsComposable(R.drawable.gomeet_icon, "About")
 
-                SettingsSubtitle("Login",
-                    Modifier
-                        .padding(15.dp)
-                        .align(Alignment.Start))
+              Text(
+                  text = "Log out",
+                  modifier = Modifier.padding(start = 15.dp),
+                  color = Color.Red,
+                  fontStyle = FontStyle.Normal,
+                  fontWeight = FontWeight.SemiBold,
+                  fontFamily = FontFamily.Default,
+                  textAlign = TextAlign.Start,
+                  style = MaterialTheme.typography.bodySmall)
 
-
+              Text(
+                  text = "Delete account",
+                  modifier = Modifier.padding(start = 15.dp),
+                  color = Color.Red,
+                  fontStyle = FontStyle.Normal,
+                  fontWeight = FontWeight.SemiBold,
+                  fontFamily = FontFamily.Default,
+                  textAlign = TextAlign.Start,
+                  style = MaterialTheme.typography.bodySmall)
             }
-    }
+      }
 }
 
 @Composable
 fun SettingsComposable(icon: Int, text: String) {
-    Row(
-        modifier = Modifier.padding(start = 15.dp),
-        horizontalArrangement = Arrangement.Start,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
+  Row(
+      modifier = Modifier.padding(start = 15.dp),
+      horizontalArrangement = Arrangement.Start,
+      verticalAlignment = Alignment.CenterVertically) {
         Icon(
             painter = painterResource(id = icon),
             contentDescription = text + "icon",
-            tint = Color.Black
-        )
+            tint = Color.Black)
 
         Text(
             text = text,
@@ -158,61 +152,44 @@ fun SettingsComposable(icon: Int, text: String) {
             fontWeight = FontWeight.SemiBold,
             fontFamily = FontFamily.Default,
             textAlign = TextAlign.Start,
-            style = MaterialTheme.typography.bodySmall
-        )
+            style = MaterialTheme.typography.bodySmall)
 
         Spacer(modifier = Modifier.weight(1f))
 
         NavigateNextComposable()
-    }
+      }
 }
 
 @Composable
 fun NavigateNextComposable() {
-    /*
-    Surface(
-        onClick = { /* Go to the settings more in depth */ },
-        modifier = Modifier.padding(end = 15.dp),
-        shape = CircleShape,
-        color = Color.Transparent
-    ) {
+  Surface(
+      onClick = { /* Go to the settings more in depth */},
+      modifier = Modifier.padding(end = 15.dp),
+      shape = CircleShape,
+      color = Color.Transparent) {
         Icon(
             painter = painterResource(id = R.drawable.navigate_next),
             contentDescription = "Back button",
             modifier = Modifier.padding(15.dp),
-            tint = Color.Black
-        )
-    }
-    
-     */
-
-    IconButton(onClick = { /* Go to the settings more in depth */ },
-        modifier = Modifier.padding(end = 15.dp)) {
-        Icon(
-            painter = painterResource(id = R.drawable.navigate_next),
-            contentDescription = "Back button",
-            modifier = Modifier.padding(15.dp),
-            tint = Color.Black
-        )
-    }
+            tint = Color.Black)
+      }
 }
 
 @Composable
-fun SettingsSubtitle(text:String, modifier: Modifier) {
-    Text(
-        text = text,
-        modifier = modifier,
-        color = Color.Gray,
-        fontStyle = FontStyle.Normal,
-        fontWeight = FontWeight.Light,
-        fontFamily = FontFamily.Default,
-        textAlign = TextAlign.Start,
-        style = MaterialTheme.typography.labelSmall
-    )
+fun SettingsSubtitle(text: String, modifier: Modifier) {
+  Text(
+      text = text,
+      modifier = modifier,
+      color = Color.Gray,
+      fontStyle = FontStyle.Normal,
+      fontWeight = FontWeight.Light,
+      fontFamily = FontFamily.Default,
+      textAlign = TextAlign.Start,
+      style = MaterialTheme.typography.labelSmall)
 }
 
 @Preview
 @Composable
 fun SettingsScreenPreview() {
-    SettingsScreen(nav = NavigationActions(rememberNavController()))
+  SettingsScreen(nav = NavigationActions(rememberNavController()))
 }
