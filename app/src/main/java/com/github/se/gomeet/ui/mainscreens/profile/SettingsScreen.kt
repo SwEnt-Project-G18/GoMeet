@@ -169,7 +169,7 @@ fun NavigateNextComposable() {
       color = Color.Transparent) {
         Icon(
             painter = painterResource(id = R.drawable.navigate_next),
-            contentDescription = "Back button",
+            contentDescription = "Navigate next icon",
             modifier = Modifier.padding(15.dp),
             tint = Color.Black)
       }
