@@ -39,6 +39,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
@@ -81,6 +82,7 @@ fun EventInfo(
   Scaffold(
       topBar = {
         TopAppBar(
+            modifier = Modifier.testTag("TopBar"),
             backgroundColor = MaterialTheme.colorScheme.background,
             elevation = 0.dp,
             title = {
@@ -155,7 +157,7 @@ fun EventHeader(
     time: String
 ) {
   Row(
-      modifier = Modifier.fillMaxWidth(),
+      modifier = Modifier.fillMaxWidth().testTag("EventHeader"),
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.SpaceBetween) {
         Column {
@@ -212,7 +214,7 @@ fun EventDateTime(day: String, time: String) {
 
 @Composable
 fun EventImage(painter: Painter) {
-  Column(modifier = Modifier.fillMaxWidth()) {
+  Column(modifier = Modifier.fillMaxWidth().testTag("EventImage")) {
     Image(
         painter = painter,
         contentScale = ContentScale.Crop,
@@ -235,29 +237,32 @@ fun EventDescription(text: String) {
               color = MaterialTheme.colorScheme.onBackground,
               fontFamily = FontFamily(Font(R.font.roboto)),
               fontWeight = FontWeight.SemiBold,
-              letterSpacing = 0.5.sp))
+              letterSpacing = 0.5.sp),
+      modifier = Modifier.testTag("EventDescription"))
 }
 
 @Composable
 fun EventButtons() {
-  Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-    TextButton(
-        onClick = { /* Handle button click */},
-        shape = RoundedCornerShape(20.dp),
-        modifier = Modifier.weight(1f),
-        colors =
-            ButtonDefaults.textButtonColors(
-                containerColor = Color(0xFFECEFF1), contentColor = Color.Black)) {
-          Text("Get tickets")
+  Row(
+      modifier = Modifier.fillMaxWidth().testTag("EventButton"),
+      horizontalArrangement = Arrangement.SpaceBetween) {
+        TextButton(
+            onClick = { /* Handle button click */},
+            shape = RoundedCornerShape(20.dp),
+            modifier = Modifier.weight(1f),
+            colors =
+                ButtonDefaults.textButtonColors(
+                    containerColor = Color(0xFFECEFF1), contentColor = Color.Black)) {
+              Text("Get tickets")
+            }
+        IconButton(onClick = { /* Handle button click */}) {
+          Icon(
+              imageVector = ImageVector.vectorResource(id = R.drawable.heart),
+              contentDescription = "Email",
+              modifier = Modifier.size(30.dp),
+              tint = DarkCyan)
         }
-    IconButton(onClick = { /* Handle button click */}) {
-      Icon(
-          imageVector = ImageVector.vectorResource(id = R.drawable.heart),
-          contentDescription = "Email",
-          modifier = Modifier.size(30.dp),
-          tint = DarkCyan)
-    }
-  }
+      }
 }
 
 @Composable
@@ -273,7 +278,8 @@ fun MapViewComposable(
 
   // Set up the GoogleMap composable
   GoogleMap(
-      modifier = Modifier.fillMaxWidth().height(200.dp).clip(RoundedCornerShape(20.dp)),
+      modifier =
+          Modifier.testTag("MapView").fillMaxWidth().height(200.dp).clip(RoundedCornerShape(20.dp)),
       cameraPositionState = cameraPositionState) {
         Marker(
             state = markerState,

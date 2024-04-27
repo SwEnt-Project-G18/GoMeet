@@ -8,12 +8,13 @@ import io.github.kakaocup.compose.node.element.KNode
 class CreateEventScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
     ComposeScreen<CreateEventScreen>(
         semanticsProvider = semanticsProvider, viewBuilderAction = { hasTestTag("CreateEvent") }) {
-
-  val title: KNode = onNode { hasTestTag("Title") }
-  val description: KNode = onNode { hasTestTag("Description") }
-  val location: KNode = onNode { hasTestTag("Location") }
-  val date: KNode = onNode { hasTestTag("Date") }
-  val price: KNode = onNode { hasTestTag("Price") }
-  val link: KNode = onNode { hasTestTag("Link") }
-  val postButton: KNode = onNode { hasTestTag("PostButton") }
+  val title: KNode = onNode { hasText("Title") }
+  val description: KNode = onNode { hasText("Description") }
+  val location: KNode = onNode { hasText("Location") }
+  val dropDownMenu: KNode = onNode { hasTestTag("DropdownMenu") }
+  val date: KNode = onNode { hasText("Date") }
+  val price: KNode = onNode { hasText("Price") }
+  val link: KNode = onNode { hasText("Link") }
+  val postButton: KNode = onNode { hasText("Post") }
+  val switchToExplore: KNode = onNode { hasText("Explore") }
 }

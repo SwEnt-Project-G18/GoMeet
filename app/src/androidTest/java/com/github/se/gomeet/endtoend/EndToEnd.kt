@@ -4,9 +4,11 @@ import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.rule.GrantPermissionRule
 import com.github.se.gomeet.MainActivity
 import com.github.se.gomeet.screens.CreateEventScreen
 import com.github.se.gomeet.screens.CreateScreen
+import com.github.se.gomeet.screens.ExploreScreen
 import com.github.se.gomeet.screens.LoginScreen
 import com.github.se.gomeet.screens.WelcomeScreenScreen
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -23,6 +25,9 @@ class EndToEndTest : TestCase() {
 
   @get:Rule val mockkRule = MockKRule(this)
 
+  @get:Rule
+  var permissionRule = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
+
   @Test
   fun test() = run {
     ComposeScreen.onComposeScreen<WelcomeScreenScreen>(composeTestRule) {
@@ -33,7 +38,7 @@ class EndToEndTest : TestCase() {
         }
       }
     }
-    // how to change screen ???
+
     ComposeScreen.onComposeScreen<LoginScreen>(composeTestRule) {
       step("Log in with email and password") {
         logInButton {
@@ -59,13 +64,12 @@ class EndToEndTest : TestCase() {
     ComposeScreen.onComposeScreen<LoginScreen>(composeTestRule) {
       step("Log in with email and password") { logInButton { performClick() } }
       composeTestRule.waitUntil(timeoutMillis = 100000) {
-        // Your condition, for example, checking if a button is enabled
         composeTestRule.onNodeWithTag("CreateUI").isDisplayed()
       }
     }
 
     ComposeScreen.onComposeScreen<CreateScreen>(composeTestRule) {
-      step("goTo publicCreate") {
+      step("Select which type of event to create") {
         createPublicEventButton {
           assertIsDisplayed()
           performClick()
@@ -74,7 +78,7 @@ class EndToEndTest : TestCase() {
     }
 
     ComposeScreen.onComposeScreen<CreateEventScreen>(composeTestRule) {
-      step("add event") {
+      step("Create an event") {
         title {
           assertIsDisplayed()
           performTextInput("Title")
@@ -87,9 +91,10 @@ class EndToEndTest : TestCase() {
           assertIsDisplayed()
           performTextInput("Lausanne")
         }
+        dropDownMenu { assertIsDisplayed() }
         date {
           assertIsDisplayed()
-          performTextInput("2003-01-01")
+          performTextInput("2024-07-23")
         }
         price {
           assertIsDisplayed()
@@ -100,6 +105,22 @@ class EndToEndTest : TestCase() {
           performTextInput("https://example.com")
         }
         postButton {
+          assertIsDisplayed()
+          performClick()
+        }
+        switchToExplore { performClick() }
+      }
+    }
+
+    ComposeScreen.onComposeScreen<ExploreScreen>(composeTestRule) {
+      composeTestRule.waitUntil(timeoutMillis = 100000) {
+        composeTestRule.onNodeWithTag("Map").isDisplayed()
+      }
+
+      step("Check that the map works") {
+        map { assertIsDisplayed() }
+        searchBar { assertIsDisplayed() }
+        currentLocationButton {
           assertIsDisplayed()
           performClick()
         }
