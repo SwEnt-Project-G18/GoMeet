@@ -149,6 +149,7 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
   }
 
   Scaffold(
+      modifier = Modifier.testTag("ExploreScreen"),
       floatingActionButton = {
         if (locationPermitted.value == true && isButtonVisible.value) {
           FloatingActionButton(

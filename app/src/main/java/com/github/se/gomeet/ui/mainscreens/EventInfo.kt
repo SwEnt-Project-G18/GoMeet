@@ -1,15 +1,26 @@
+package com.github.se.gomeet.ui.mainscreens
+
+import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -20,8 +31,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,6 +39,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
@@ -45,6 +55,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.R
 import com.github.se.gomeet.ui.navigation.NavigationActions
+import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.SECOND_LEVEL_DESTINATION
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -67,10 +78,11 @@ fun EventInfo(
     description: String = "",
     loc: LatLng = LatLng(0.0, 0.0)
 ) {
-  Log.d("EventInfo", "Loc is $loc")
+  Log.d("EventInfo", "Organizer is $organizer")
   Scaffold(
       topBar = {
         TopAppBar(
+            modifier = Modifier.testTag("TopBar"),
             backgroundColor = MaterialTheme.colorScheme.background,
             elevation = 0.dp,
             title = {
@@ -85,14 +97,18 @@ fun EventInfo(
               }
             },
             actions = {
-              IconButton(onClick = { /* Handle share action */}) {
-                Icon(
-                    imageVector =
-                        ImageVector.vectorResource(id = R.drawable.baseline_chat_bubble_outline_24),
-                    contentDescription = "Share",
-                    modifier = Modifier.size(24.dp),
-                    tint = MaterialTheme.colorScheme.onBackground)
-              }
+              IconButton(
+                  onClick = {
+                    nav.navigateToScreen(Route.MESSAGE.replace("{id}", Uri.encode(organizer)))
+                  }) {
+                    Icon(
+                        imageVector =
+                            ImageVector.vectorResource(
+                                id = R.drawable.baseline_chat_bubble_outline_24),
+                        contentDescription = "Share",
+                        modifier = Modifier.size(24.dp),
+                        tint = MaterialTheme.colorScheme.onBackground)
+                  }
 
               IconButton(onClick = { /* Handle more action */}) {
                 Icon(
@@ -141,7 +157,7 @@ fun EventHeader(
     time: String
 ) {
   Row(
-      modifier = Modifier.fillMaxWidth(),
+      modifier = Modifier.fillMaxWidth().testTag("EventHeader"),
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.SpaceBetween) {
         Column {
@@ -155,7 +171,7 @@ fun EventHeader(
                       letterSpacing = 0.5.sp))
           Spacer(modifier = Modifier.height(5.dp))
           Text(
-              modifier = Modifier.clickable { nav.navigateTo(SECOND_LEVEL_DESTINATION.get(0)) },
+              modifier = Modifier.clickable { nav.navigateTo(SECOND_LEVEL_DESTINATION[0]) },
               text = organizer,
               style =
                   TextStyle(
@@ -198,7 +214,7 @@ fun EventDateTime(day: String, time: String) {
 
 @Composable
 fun EventImage(painter: Painter) {
-  Column(modifier = Modifier.fillMaxWidth()) {
+  Column(modifier = Modifier.fillMaxWidth().testTag("EventImage")) {
     Image(
         painter = painter,
         contentScale = ContentScale.Crop,
@@ -221,29 +237,32 @@ fun EventDescription(text: String) {
               color = MaterialTheme.colorScheme.onBackground,
               fontFamily = FontFamily(Font(R.font.roboto)),
               fontWeight = FontWeight.SemiBold,
-              letterSpacing = 0.5.sp))
+              letterSpacing = 0.5.sp),
+      modifier = Modifier.testTag("EventDescription"))
 }
 
 @Composable
 fun EventButtons() {
-  Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-    TextButton(
-        onClick = { /* Handle button click */},
-        shape = RoundedCornerShape(20.dp),
-        modifier = Modifier.weight(1f),
-        colors =
-            ButtonDefaults.textButtonColors(
-                containerColor = Color(0xFFECEFF1), contentColor = Color.Black)) {
-          Text("Get tickets")
+  Row(
+      modifier = Modifier.fillMaxWidth().testTag("EventButton"),
+      horizontalArrangement = Arrangement.SpaceBetween) {
+        TextButton(
+            onClick = { /* Handle button click */},
+            shape = RoundedCornerShape(20.dp),
+            modifier = Modifier.weight(1f),
+            colors =
+                ButtonDefaults.textButtonColors(
+                    containerColor = Color(0xFFECEFF1), contentColor = Color.Black)) {
+              Text("Get tickets")
+            }
+        IconButton(onClick = { /* Handle button click */}) {
+          Icon(
+              imageVector = ImageVector.vectorResource(id = R.drawable.heart),
+              contentDescription = "Email",
+              modifier = Modifier.size(30.dp),
+              tint = DarkCyan)
         }
-    IconButton(onClick = { /* Handle button click */}) {
-      Icon(
-          imageVector = ImageVector.vectorResource(id = R.drawable.heart),
-          contentDescription = "Email",
-          modifier = Modifier.size(30.dp),
-          tint = DarkCyan)
-    }
-  }
+      }
 }
 
 @Composable
@@ -259,7 +278,8 @@ fun MapViewComposable(
 
   // Set up the GoogleMap composable
   GoogleMap(
-      modifier = Modifier.fillMaxWidth().height(200.dp).clip(RoundedCornerShape(20.dp)),
+      modifier =
+          Modifier.testTag("MapView").fillMaxWidth().height(200.dp).clip(RoundedCornerShape(20.dp)),
       cameraPositionState = cameraPositionState) {
         Marker(
             state = markerState,

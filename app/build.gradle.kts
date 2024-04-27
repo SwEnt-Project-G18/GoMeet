@@ -166,6 +166,11 @@ dependencies {
     implementation("com.google.firebase:firebase-storage-ktx")
 
     implementation("com.google.accompanist:accompanist-permissions:0.25.0")
+
+
+    //Messaging system using stream
+    implementation("io.getstream:stream-chat-android-compose:6.0.8")
+    implementation("io.getstream:stream-chat-android-offline:6.0.8")
 }
 
 

@@ -13,6 +13,7 @@ import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.viewmodel.AuthViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
+import io.getstream.chat.android.client.ChatClient
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Rule
@@ -42,7 +43,7 @@ class RegisterScreenTest {
     val authViewModel = AuthViewModel()
     val userViewModel = UserViewModel()
 
-    rule.setContent { RegisterScreen(authViewModel, userViewModel) {} }
+    rule.setContent { RegisterScreen(ChatClient.instance(), authViewModel, userViewModel) {} }
 
     rule.onNodeWithTag("register_title").assertIsDisplayed()
 

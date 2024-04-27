@@ -4,8 +4,10 @@ import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
 import io.github.kakaocup.compose.node.element.ComposeScreen
 import io.github.kakaocup.compose.node.element.KNode
 
-class CreateScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
-    ComposeScreen<CreateScreen>(
+class ExploreScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
+    ComposeScreen<ExploreScreen>(
         semanticsProvider = semanticsProvider, viewBuilderAction = { hasTestTag("CreateUI") }) {
-  val createPublicEventButton: KNode = onNode { hasTestTag("CreatePublic") }
+  val map: KNode = onNode { hasTestTag("Map") }
+  val currentLocationButton = onNode { hasTestTag("CurrentLocationButton") }
+  val searchBar = onNode { hasText("Search") }
 }

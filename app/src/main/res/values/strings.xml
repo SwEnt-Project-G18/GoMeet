@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">GoMeet</string>
+    <string name ="chat_api_key">e43k9kfvgyze</string>
+    <string name="title_activity_channel">ChannelActivity</string>
 </resources>

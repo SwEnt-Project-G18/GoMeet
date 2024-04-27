@@ -3,6 +3,7 @@ package com.github.se.gomeet.ui.mainscreens.create
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
@@ -34,11 +35,10 @@ class CreateEventTest {
     // Enter text into the Title field
     rule.onNodeWithText("Title").performTextInput("Sample Event")
 
-    // Enter text into the Description field
-    rule.onNodeWithText("Description").performTextInput("This is a test event.")
-
     // Enter text into the Location field
-    rule.onNodeWithText("Location").performTextInput("123 Test Street")
+    rule.onNodeWithText("Location").performTextInput("test")
+
+    rule.onNodeWithTag("DropdownMenu").assertIsDisplayed()
 
     // Enter date
     rule.onNodeWithText("Date").performTextInput(LocalDate.now().toString())
@@ -71,7 +71,9 @@ class CreateEventTest {
     rule.onNodeWithText("Description").performTextInput("This is a test event.")
 
     // Enter text into the Location field
-    rule.onNodeWithText("Location").performTextInput("123 Test Street")
+    rule.onNodeWithText("Location").performTextInput("test")
+
+    rule.onNodeWithTag("DropdownMenu").assertIsDisplayed()
 
     // Enter date
     rule.onNodeWithText("Date").performTextInput(LocalDate.now().toString())

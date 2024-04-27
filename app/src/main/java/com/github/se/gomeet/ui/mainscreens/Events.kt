@@ -110,9 +110,7 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
       topBar = {
         Text(
             text = "Events",
-            modifier =
-                Modifier.padding(start = 15.dp, top = 15.dp, end = 15.dp, bottom = 0.dp)
-                    .testTag("EventsTitle"),
+            modifier = Modifier.padding(start = 15.dp, top = 15.dp, end = 15.dp, bottom = 0.dp),
             color = DarkCyan,
             fontStyle = FontStyle.Normal,
             fontWeight = FontWeight.SemiBold,
@@ -149,8 +147,7 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
                                     else NavBarUnselected,
                                 contentColor =
                                     if (selectedFilter == "MyTickets") Color.White else DarkCyan),
-                        border = BorderStroke(1.dp, DarkCyan),
-                        modifier = Modifier.testTag("MyTicketsButton"))
+                        border = BorderStroke(1.dp, DarkCyan))
                     Spacer(modifier = Modifier.width(10.dp))
                     Button(
                         onClick = { onFilterButtonClick("Favourites") },
@@ -162,8 +159,7 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
                                     else NavBarUnselected,
                                 contentColor =
                                     if (selectedFilter == "Favourites") Color.White else DarkCyan),
-                        border = BorderStroke(1.dp, DarkCyan),
-                        modifier = Modifier.testTag("FavouritesButton"))
+                        border = BorderStroke(1.dp, DarkCyan))
                     Spacer(modifier = Modifier.width(10.dp))
                     Button(
                         onClick = { onFilterButtonClick("MyEvents") },
@@ -175,8 +171,7 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
                                     else NavBarUnselected,
                                 contentColor =
                                     if (selectedFilter == "MyEvents") Color.White else DarkCyan),
-                        border = BorderStroke(1.dp, DarkCyan),
-                        modifier = Modifier.testTag("MyEventsButton"))
+                        border = BorderStroke(1.dp, DarkCyan))
                   }
 
               Column(modifier = Modifier.verticalScroll(rememberScrollState()).fillMaxSize()) {
@@ -193,8 +188,7 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
                               textAlign = TextAlign.Center,
                               letterSpacing = 0.5.sp,
                           ),
-                      modifier =
-                          Modifier.padding(10.dp).align(Alignment.Start).testTag("MyTicketsText"))
+                      modifier = Modifier.padding(10.dp).align(Alignment.Start))
 
                   eventList.forEach { event ->
                     if (event.title.contains(query.value, ignoreCase = true)) {
@@ -241,8 +235,7 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
                               textAlign = TextAlign.Center,
                               letterSpacing = 0.5.sp,
                           ),
-                      modifier =
-                          Modifier.padding(10.dp).align(Alignment.Start).testTag("FavouritesText"))
+                      modifier = Modifier.padding(10.dp).align(Alignment.Start))
 
                   eventList.forEach { event ->
                     if (event.title.contains(query.value, ignoreCase = true)) {
@@ -287,8 +280,7 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
                               textAlign = TextAlign.Center,
                               letterSpacing = 0.5.sp,
                           ),
-                      modifier =
-                          Modifier.padding(10.dp).align(Alignment.Start).testTag("MyEventsText"))
+                      modifier = Modifier.padding(10.dp).align(Alignment.Start))
 
                   eventList.forEach { event ->
                     if (event.title.contains(query.value, ignoreCase = true)) {

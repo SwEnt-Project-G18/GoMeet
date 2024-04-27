@@ -34,11 +34,12 @@ object Route {
   const val PROFILE = "Profile"
   const val PUBLIC_CREATE = "Public Create"
   const val PRIVATE_CREATE = "Private Create"
-  const val OTHERS_PROFILE = "Others Profile"
+  const val OTHERS_PROFILE = "OthersProfile/{uid}"
   const val ADD_PARTICIPANTS = "Add Participants"
   const val EVENT_INFO =
       "eventInfo/{title}/{date}/{time}/{organizer}/{rating}/{description}/{latitude}/{longitude}"
   const val SETTINGS = "Settings"
+  const val MESSAGE = "Message/{id}"
 }
 
 val CREATE_ITEMS =
