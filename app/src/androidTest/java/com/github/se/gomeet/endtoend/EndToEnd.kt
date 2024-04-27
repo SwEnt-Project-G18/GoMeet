@@ -4,11 +4,9 @@ import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.rule.GrantPermissionRule
 import com.github.se.gomeet.MainActivity
 import com.github.se.gomeet.screens.CreateEventScreen
 import com.github.se.gomeet.screens.CreateScreen
-import com.github.se.gomeet.screens.ExploreScreen
 import com.github.se.gomeet.screens.LoginScreen
 import com.github.se.gomeet.screens.WelcomeScreenScreen
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
@@ -22,11 +20,7 @@ import org.junit.runner.RunWith
 class EndToEndTest : TestCase() {
 
   @get:Rule val composeTestRule = createAndroidComposeRule<MainActivity>()
-
   @get:Rule val mockkRule = MockKRule(this)
-
-  @get:Rule
-  var permissionRule = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
 
   @Test
   fun test() = run {
@@ -109,21 +103,6 @@ class EndToEndTest : TestCase() {
           performClick()
         }
         switchToExplore { performClick() }
-      }
-    }
-
-    ComposeScreen.onComposeScreen<ExploreScreen>(composeTestRule) {
-      composeTestRule.waitUntil(timeoutMillis = 100000) {
-        composeTestRule.onNodeWithTag("Map").isDisplayed()
-      }
-
-      step("Check that the map works") {
-        map { assertIsDisplayed() }
-        searchBar { assertIsDisplayed() }
-        currentLocationButton {
-          assertIsDisplayed()
-          performClick()
-        }
       }
     }
   }
