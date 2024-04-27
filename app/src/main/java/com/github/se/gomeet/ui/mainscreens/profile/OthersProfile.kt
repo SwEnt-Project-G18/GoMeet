@@ -45,6 +45,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -79,7 +80,7 @@ fun OthersProfile(nav: NavigationActions, uid: String) { // TODO Add parameters 
             title = {},
             backgroundColor = MaterialTheme.colorScheme.background,
             elevation = 0.dp,
-            modifier = Modifier.height(50.dp),
+            modifier = Modifier.height(50.dp).testTag("TopBar"),
             actions = {
               // Settings Icon
               IconButton(onClick = { /* Handle settings icon click */}) {
@@ -102,7 +103,8 @@ fun OthersProfile(nav: NavigationActions, uid: String) { // TODO Add parameters 
                   verticalAlignment = Alignment.CenterVertically,
                   modifier =
                       Modifier.fillMaxWidth()
-                          .padding(start = 15.dp, end = 0.dp, top = 0.dp, bottom = 30.dp)) {
+                          .padding(start = 15.dp, end = 0.dp, top = 0.dp, bottom = 30.dp)
+                          .testTag("UserInfo")) {
                     Image(
                         modifier =
                             Modifier.padding(start = 0.dp, end = 0.dp, top = 0.dp, bottom = 0.dp)
@@ -146,7 +148,8 @@ fun OthersProfile(nav: NavigationActions, uid: String) { // TODO Add parameters 
                                       color = MaterialTheme.colorScheme.onBackground,
                                       textAlign = TextAlign.Center,
                                       letterSpacing = 0.5.sp,
-                                  ))
+                                  ),
+                              modifier = Modifier)
                         }
                   }
 
@@ -180,8 +183,8 @@ fun OthersProfile(nav: NavigationActions, uid: String) { // TODO Add parameters 
               Row(
                   horizontalArrangement = Arrangement.SpaceEvenly,
                   verticalAlignment = Alignment.CenterVertically,
-                  modifier = Modifier.fillMaxWidth()) {
-                    Column {
+                  modifier = Modifier.fillMaxWidth().testTag("MoreUserInfo")) {
+                    Column() {
                       Text(
                           text = "10",
                           style =
@@ -296,25 +299,28 @@ fun OthersProfile(nav: NavigationActions, uid: String) { // TODO Add parameters 
                           .height(21.dp)
                           .align(Alignment.Start)
                           .padding(start = 15.dp))
-              Column(modifier = Modifier.padding(start = 0.dp, end = 0.dp).fillMaxWidth()) {
-                Spacer(modifier = Modifier.height(10.dp))
-                LazyRow(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    contentPadding = PaddingValues(start = 15.dp, end = 15.dp),
-                    modifier = Modifier.heightIn(min = 56.dp)) {
-                      items(10) {
-                        Button(
-                            onClick = {},
-                            content = { Text("Tag") },
-                            colors =
-                                ButtonDefaults.buttonColors(
-                                    containerColor = NavBarUnselected, contentColor = DarkCyan),
-                            border = BorderStroke(1.dp, DarkCyan),
-                        )
-                      }
-                    }
-              }
+              Column(
+                  modifier =
+                      Modifier.padding(start = 0.dp, end = 0.dp)
+                          .fillMaxWidth()
+                          .testTag("TagList")) {
+                    Spacer(modifier = Modifier.height(10.dp))
+                    LazyRow(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        contentPadding = PaddingValues(start = 15.dp, end = 15.dp),
+                        modifier = Modifier.heightIn(min = 56.dp)) {
+                          items(10) {
+                            Button(
+                                onClick = {},
+                                content = { Text("Tag") },
+                                colors =
+                                    ButtonDefaults.buttonColors(
+                                        containerColor = NavBarUnselected, contentColor = DarkCyan),
+                                border = BorderStroke(1.dp, DarkCyan))
+                          }
+                        }
+                  }
               Spacer(modifier = Modifier.height(10.dp))
               ProfileEventsList("My Events")
               Spacer(modifier = Modifier.height(10.dp))
@@ -335,7 +341,7 @@ fun MoreActionsButton() {
         tint = DarkCyan)
   }
 
-  DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }, modifier = Modifier) {
+  DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
     DropdownMenuItem(
         text = { Text("Share Profile") },
         onClick = {

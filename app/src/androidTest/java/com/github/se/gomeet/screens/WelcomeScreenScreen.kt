@@ -8,6 +8,5 @@ class WelcomeScreenScreen(semanticsProvider: SemanticsNodeInteractionsProvider) 
     ComposeScreen<WelcomeScreenScreen>(
         semanticsProvider = semanticsProvider,
         viewBuilderAction = { hasTestTag("WelcomeScreenCol") }) {
-
   val logInButton: KNode = onNode { hasTestTag("LogInButton") }
 }
