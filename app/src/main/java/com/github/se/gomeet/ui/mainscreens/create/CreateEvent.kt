@@ -315,16 +315,17 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
 
               Spacer(modifier = Modifier.height(16.dp))
 
-              OutlinedButton(
-                  onClick = {
-
+            OutlinedButton(
+                onClick = {
                     val uid = db.getNewId()
-                    if (!dateFormatError && dateState != null && titleState.value.isNotEmpty()) {
-                      eventViewModel.location(locationState.value) { location ->
+                    if (selectedLocation.value != null &&
+                        titleState.value.isNotEmpty() &&
+                        !dateFormatError &&
+                        dateState != null) {
                         eventViewModel.createEvent(
                             titleState.value,
                             descriptionState.value,
-                            location!!,
+                            selectedLocation.value!!,
                             dateState!!,
                             price,
                             url.value,
@@ -337,8 +338,8 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                             imageUri,
                             uid)
                         nav.goBack()
-                      }
                     }
+
 
                     dateState?.let {
                       customPins.createCustomPin(context, it, LocalTime.MIDNIGHT) {
