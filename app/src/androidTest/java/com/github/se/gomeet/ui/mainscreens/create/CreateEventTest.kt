@@ -112,6 +112,9 @@ class CreateEventTest {
     fun setup() {
       Firebase.storage.useEmulator("10.0.2.2", 9199)
       Firebase.firestore.useEmulator("10.0.2.2", 8080)
+
+      // TODO: Event now needs image to be created
+
     }
   }
 }

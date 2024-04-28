@@ -1,6 +1,7 @@
 package com.github.se.gomeet.ui.authscreens
 
 import androidx.activity.ComponentActivity
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
@@ -11,14 +12,18 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.se.gomeet.R
 import com.github.se.gomeet.viewmodel.AuthViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import io.getstream.chat.android.client.ChatClient
+import io.getstream.chat.android.client.logger.ChatLogLevel
+import io.github.kakaocup.kakao.common.utilities.getResourceString
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
+import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -27,12 +32,6 @@ import org.junit.runner.RunWith
 class RegisterScreenTest {
 
   @get:Rule val rule = createAndroidComposeRule<ComponentActivity>()
-
-  @Before
-  fun setup() {
-    // Make all subsequent calls to Firebase auth use the emulator
-    Firebase.auth.useEmulator("10.0.2.2", 9099)
-  }
 
   @After
   fun tearDown() {
@@ -46,7 +45,12 @@ class RegisterScreenTest {
     val authViewModel = AuthViewModel()
     val userViewModel = UserViewModel()
 
-    rule.setContent { RegisterScreen(ChatClient.instance(), authViewModel, userViewModel) {} }
+    rule.setContent {
+      val client =
+        ChatClient.Builder(getResourceString(R.string.chat_api_key), LocalContext.current)
+          .logLevel(ChatLogLevel.NOTHING) // Set to NOTHING in prod
+          .build()
+      RegisterScreen(client, authViewModel, userViewModel) {} }
 
     rule.onNodeWithTag("register_title").assertIsDisplayed()
 
@@ -75,4 +79,16 @@ class RegisterScreenTest {
     assert(authViewModel.signInState.value.signInError == null)
     assert(authViewModel.signInState.value.isSignInSuccessful)
   }
+
+  companion object {
+
+    @BeforeClass
+    @JvmStatic
+    fun setup() {
+      Firebase.auth.useEmulator("10.0.2.2", 9099)
+    }
+  }
+
+
+
 }

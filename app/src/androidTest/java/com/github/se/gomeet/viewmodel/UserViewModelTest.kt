@@ -7,20 +7,14 @@ import com.google.firebase.ktx.Firebase
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
+import org.junit.BeforeClass
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class UserViewModelTest {
-  private lateinit var userViewModel: UserViewModel
   private val uid = "testuid"
   private val username = "testuser"
-
-  @Before
-  fun setup() {
-    Firebase.firestore.useEmulator("10.0.2.2", 8080)
-    userViewModel = UserViewModel()
-  }
 
   @Test
   fun test() = runTest {
@@ -53,4 +47,17 @@ class UserViewModelTest {
     user = userViewModel.getUser(uid)
     assert(user == null)
   }
+
+  companion object{
+
+    private lateinit var userViewModel: UserViewModel
+    @BeforeClass
+    @JvmStatic
+    fun setup() {
+      Firebase.firestore.useEmulator("10.0.2.2", 8080)
+      userViewModel = UserViewModel()
+    }
+  }
+
+
 }
