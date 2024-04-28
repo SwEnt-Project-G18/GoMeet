@@ -190,12 +190,14 @@ fun Notifications(nav: NavigationActions) {
                                     })
                             .build())
                 NotificationsWidget(
-                    userName = "johnny",
+                    userName = "Bill Clinton",
                     eventName = "Chess night",
                     eventDate = Date(),
                     eventPicture = painter,
                     organizerName = "EPFL Chess Club",
                     verified = true)
+                  Spacer(Modifier.height(10.dp))
+
               }
             }
       }
@@ -218,7 +220,31 @@ fun NotificationsWidget(
   // Example logic to calculate text size based on screen width
   val smallTextSize = with(density) { screenWidth.toPx() / 85 }
   val bigTextSize = with(density) { screenWidth.toPx() / 60 }
-
+  Row(Modifier.padding(start = 10.dp)) {
+    Text(
+        text = userName,
+        style =
+            TextStyle(
+                fontSize = 11.sp,
+                lineHeight = 16.sp,
+                fontFamily = FontFamily(Font(R.font.roboto)),
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF202124),
+                letterSpacing = 0.5.sp,
+            ))
+    Spacer(modifier = Modifier.width(2.5.dp))
+    Text(
+        text = "invited you to attend",
+        style =
+            TextStyle(
+                fontSize = 11.sp,
+                lineHeight = 16.sp,
+                fontFamily = FontFamily(Font(R.font.roboto)),
+                fontWeight = FontWeight(700),
+                color = Color(0xFF202124),
+                letterSpacing = 0.5.sp,
+            ))
+  }
   Card(
       modifier =
           Modifier.fillMaxWidth().padding(start = 10.dp, top = 5.dp, end = 10.dp, bottom = 5.dp),
@@ -229,33 +255,9 @@ fun NotificationsWidget(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceAround) {
               Column(
-                  modifier = Modifier.weight(4f).padding(15.dp),
+                  modifier = Modifier.weight(4f).padding(10.dp),
                   horizontalAlignment = Alignment.Start, // Align text horizontally to center
                   verticalArrangement = Arrangement.Center) {
-                  Row{
-                    Text(text = userName,
-                        style = TextStyle(
-                            fontSize = 11.sp,
-                            lineHeight = 16.sp,
-                            fontFamily = FontFamily(Font(R.font.roboto)),
-                            fontWeight = FontWeight.ExtraBold,
-                            color = Color(0xFF202124),
-
-                            letterSpacing = 0.5.sp,
-                        )
-                    )
-                      Spacer(modifier = Modifier.width(2.5.dp))
-                  Text(text = "invited you to attend",
-                      style = TextStyle(
-                          fontSize = 11.sp,
-                          lineHeight = 16.sp,
-                          fontFamily = FontFamily(Font(R.font.roboto)),
-                          fontWeight = FontWeight(700),
-                          color = Color(0xFF202124),
-                          letterSpacing = 0.5.sp,
-                      )
-                  )
-                  }
                     Text(
                         text = eventName,
                         style =
@@ -316,25 +318,60 @@ fun NotificationsWidget(
 
                     // Convert the Date object to a formatted String
                     val dateString = dateFormat.format(eventDate)
-
-                    Text(
-                        dateString,
-                        style =
-                            TextStyle(
-                                fontSize = smallTextSize.sp,
-                                lineHeight = 20.sp,
-                                fontFamily = FontFamily(Font(R.font.roboto)),
-                                fontWeight = FontWeight(700),
-                                color = MaterialTheme.colorScheme.onBackground,
-                                letterSpacing = 0.25.sp,
-                            ))
+                    Column {
+                      Text(
+                          dateString,
+                          style =
+                              TextStyle(
+                                  fontSize = smallTextSize.sp,
+                                  lineHeight = 20.sp,
+                                  fontFamily = FontFamily(Font(R.font.roboto)),
+                                  fontWeight = FontWeight(700),
+                                  color = MaterialTheme.colorScheme.onBackground,
+                                  letterSpacing = 0.25.sp,
+                              ))
+                      Row {
+                        Button(
+                            onClick = {},
+                            content = {
+                              Row (){
+                                /*Icon(
+                                    painter = painterResource(id = R.drawable.check_circle),
+                                    contentDescription = "Accept",
+                                    modifier = Modifier.size(20.dp))*/
+                                Text("Accept")
+                              }
+                            },
+                            colors =
+                                ButtonDefaults.buttonColors(
+                                    containerColor = DarkCyan, contentColor = Color.White),
+                            border = BorderStroke(1.dp, DarkCyan))
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Button(
+                            onClick = {},
+                            content = {
+                              Row {
+                                /*Icon(
+                                    painter = painterResource(id = R.drawable.close),
+                                    contentDescription = "Reject",
+                                    modifier = Modifier.size(20.dp))*/
+                                Spacer(modifier = Modifier.width(5.dp))
+                                Text("Reject")
+                              }
+                            },
+                            colors =
+                                ButtonDefaults.buttonColors(
+                                    containerColor = DarkCyan, contentColor = Color.White),
+                            border = BorderStroke(1.dp, DarkCyan))
+                      }
+                    }
                   }
               Image(
                   painter = eventPicture,
                   contentDescription = "Event Picture",
                   modifier =
                       Modifier.weight(
-                              3f) // Take 1/3 of the card space because of the total weight of 4
+                              2f) // Take 1/3 of the card space because of the total weight of 4
                           // (3
                           // for the column and 1 for this image)
                           .fillMaxHeight() // Fill the height of the Row
