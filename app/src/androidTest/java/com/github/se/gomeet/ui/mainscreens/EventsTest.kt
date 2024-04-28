@@ -64,7 +64,6 @@ class EventsTest {
           images = emptyList(),
           imageUri = null,
           uid = ""
-
        )
     }
 
