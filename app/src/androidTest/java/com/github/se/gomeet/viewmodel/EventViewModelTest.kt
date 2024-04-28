@@ -3,6 +3,10 @@ package com.github.se.gomeet.viewmodel
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.location.Location
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 import java.time.LocalDate
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -11,11 +15,16 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class EventViewModelTest {
-  private val eventViewModel = EventViewModel("testuser")
+
+  private lateinit var eventViewModel: EventViewModel
   private val title = "testevent"
 
   @Before
-  fun createNewEvent() {
+  fun setup() {
+    Firebase.firestore.useEmulator("10.0.2.2", 8080)
+    Firebase.storage.useEmulator("10.0.2.2", 9199)
+    Firebase.auth.useEmulator("10.0.2.2", 9099)
+    eventViewModel = EventViewModel("testuser")
     eventViewModel.createEvent(
         title,
         "description",
@@ -29,7 +38,8 @@ class EventViewModelTest {
         false,
         emptyList(),
         emptyList(),
-        null)
+        null,
+        "")
   }
 
   @Test

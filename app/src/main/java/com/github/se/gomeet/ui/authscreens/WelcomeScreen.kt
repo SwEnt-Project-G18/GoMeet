@@ -178,19 +178,20 @@ fun WelcomeScreenPreview() {
 
 @Composable
 fun DividerWithText() {
+  val color = MaterialTheme.colorScheme.tertiary
   Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
     Canvas(modifier = Modifier.matchParentSize()) {
       val canvasWidth = size.width
       val canvasHalfHeight = size.height / 2
 
       drawLine(
-          color = Color.Black,
+          color = color,
           strokeWidth = 2f,
           start = Offset(x = 120f, y = canvasHalfHeight),
           end = Offset(x = (canvasWidth / 2) - 50f, y = canvasHalfHeight),
       )
       drawLine(
-          color = Color.Black,
+          color = color,
           strokeWidth = 2f,
           start = Offset(x = (canvasWidth / 2) + 50f, y = canvasHalfHeight),
           end = Offset(x = canvasWidth - 120, y = canvasHalfHeight),
@@ -204,7 +205,7 @@ fun DividerWithText() {
                 fontSize = 15.sp,
                 fontFamily = FontFamily(Font(R.font.roboto)),
                 fontWeight = FontWeight(700),
-                color = Color.Black,
+                color = color,
             ))
   }
 }

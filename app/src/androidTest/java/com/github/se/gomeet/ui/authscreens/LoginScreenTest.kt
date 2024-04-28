@@ -13,6 +13,10 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.viewmodel.AuthViewModel
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
+import org.junit.After
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -20,10 +24,24 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class LoginScreenTest {
 
-  private val emailDaniel = "iamdanielsspam@gmail.com"
-  private val pwdDaniel = "123456"
+  private val testEmail = "instrumented@test.com"
+  private val testPwd = "itest123456"
 
   @get:Rule val rule = createAndroidComposeRule<ComponentActivity>()
+
+  @Before
+  fun setup() {
+    // Use Firebase Emulator and create user for logging in
+    Firebase.auth.useEmulator("10.0.2.2", 9099)
+    Firebase.auth.createUserWithEmailAndPassword(testEmail, testPwd)
+  }
+
+  @After
+  fun teardown() {
+    // Clean up the test data
+    rule.waitForIdle()
+    Firebase.auth.currentUser?.delete()
+  }
 
   @SuppressLint("StateFlowValueCalledInComposition")
   @Test
@@ -41,8 +59,8 @@ class LoginScreenTest {
     rule.onNodeWithText("Log in").assertIsNotEnabled().assertHasClickAction().assertIsDisplayed()
 
     // Enter email and password
-    rule.onNodeWithText("Email").performTextInput(emailDaniel)
-    rule.onNodeWithText("Password").performTextInput(pwdDaniel)
+    rule.onNodeWithText("Email").performTextInput(testEmail)
+    rule.onNodeWithText("Password").performTextInput(testPwd)
 
     // Wait for the Compose framework to recompose the UI
     rule.waitForIdle()
@@ -51,7 +69,10 @@ class LoginScreenTest {
     rule.onNodeWithText("Log in").assertIsEnabled().assertHasClickAction()
     rule.onNodeWithText("Log in").performClick()
 
+    rule.waitForIdle()
+
     // Sign-in should complete successfully
     assert(authViewModel.signInState.value.signInError == null)
+    assert(authViewModel.signInState.value.isSignInSuccessful)
   }
 }

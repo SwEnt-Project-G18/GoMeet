@@ -26,10 +26,9 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -46,6 +45,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -59,13 +59,13 @@ import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.R
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
+import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.ui.theme.NavBarUnselected
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun OthersProfile(nav: NavigationActions) { // TODO Add parameters to the function
+fun OthersProfile(nav: NavigationActions, uid: String) { // TODO Add parameters to the function
   Scaffold(
       bottomBar = {
         BottomNavigationMenu(
@@ -80,7 +80,7 @@ fun OthersProfile(nav: NavigationActions) { // TODO Add parameters to the functi
             title = {},
             backgroundColor = MaterialTheme.colorScheme.background,
             elevation = 0.dp,
-            modifier = Modifier.height(50.dp),
+            modifier = Modifier.height(50.dp).testTag("TopBar"),
             actions = {
               // Settings Icon
               IconButton(onClick = { /* Handle settings icon click */}) {
@@ -103,7 +103,8 @@ fun OthersProfile(nav: NavigationActions) { // TODO Add parameters to the functi
                   verticalAlignment = Alignment.CenterVertically,
                   modifier =
                       Modifier.fillMaxWidth()
-                          .padding(start = 15.dp, end = 0.dp, top = 0.dp, bottom = 30.dp)) {
+                          .padding(start = 15.dp, end = 0.dp, top = 0.dp, bottom = 30.dp)
+                          .testTag("UserInfo")) {
                     Image(
                         modifier =
                             Modifier.padding(start = 0.dp, end = 0.dp, top = 0.dp, bottom = 0.dp)
@@ -123,7 +124,7 @@ fun OthersProfile(nav: NavigationActions) { // TODO Add parameters to the functi
                               verticalAlignment = Alignment.CenterVertically,
                               modifier = Modifier.padding(start = 30.dp)) {
                                 Text(
-                                    "Username",
+                                    text = "Username",
                                     textAlign = TextAlign.Center,
                                     style =
                                         TextStyle(
@@ -147,7 +148,8 @@ fun OthersProfile(nav: NavigationActions) { // TODO Add parameters to the functi
                                       color = MaterialTheme.colorScheme.onBackground,
                                       textAlign = TextAlign.Center,
                                       letterSpacing = 0.5.sp,
-                                  ))
+                                  ),
+                              modifier = Modifier)
                         }
                   }
 
@@ -167,7 +169,7 @@ fun OthersProfile(nav: NavigationActions) { // TODO Add parameters to the functi
                     Spacer(Modifier.width(5.dp))
 
                     Button(
-                        onClick = { /*TODO*/},
+                        onClick = { nav.navigateToScreen(Route.MESSAGE + "/{" + uid + "}") },
                         modifier = Modifier.height(40.dp).width(180.dp),
                         shape = RoundedCornerShape(10.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFECEFF1))) {
@@ -181,8 +183,8 @@ fun OthersProfile(nav: NavigationActions) { // TODO Add parameters to the functi
               Row(
                   horizontalArrangement = Arrangement.SpaceEvenly,
                   verticalAlignment = Alignment.CenterVertically,
-                  modifier = Modifier.fillMaxWidth()) {
-                    Column {
+                  modifier = Modifier.fillMaxWidth().testTag("MoreUserInfo")) {
+                    Column() {
                       Text(
                           text = "10",
                           style =
@@ -210,7 +212,7 @@ fun OthersProfile(nav: NavigationActions) { // TODO Add parameters to the functi
                               ),
                           modifier = Modifier.align(Alignment.CenterHorizontally))
                     }
-                    Divider(
+                    HorizontalDivider(
                         modifier =
                             Modifier
                                 // .fillMaxHeight()
@@ -244,7 +246,7 @@ fun OthersProfile(nav: NavigationActions) { // TODO Add parameters to the functi
                               ),
                           modifier = Modifier.align(Alignment.CenterHorizontally))
                     }
-                    Divider(
+                    HorizontalDivider(
                         modifier =
                             Modifier
                                 // .fillMaxHeight()
@@ -297,25 +299,28 @@ fun OthersProfile(nav: NavigationActions) { // TODO Add parameters to the functi
                           .height(21.dp)
                           .align(Alignment.Start)
                           .padding(start = 15.dp))
-              Column(modifier = Modifier.padding(start = 0.dp, end = 0.dp).fillMaxWidth()) {
-                Spacer(modifier = Modifier.height(10.dp))
-                LazyRow(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    contentPadding = PaddingValues(start = 15.dp, end = 15.dp),
-                    modifier = Modifier.heightIn(min = 56.dp)) {
-                      items(10) {
-                        Button(
-                            onClick = {},
-                            content = { Text("Tag") },
-                            colors =
-                                ButtonDefaults.buttonColors(
-                                    containerColor = NavBarUnselected, contentColor = DarkCyan),
-                            border = BorderStroke(1.dp, DarkCyan),
-                        )
-                      }
-                    }
-              }
+              Column(
+                  modifier =
+                      Modifier.padding(start = 0.dp, end = 0.dp)
+                          .fillMaxWidth()
+                          .testTag("TagList")) {
+                    Spacer(modifier = Modifier.height(10.dp))
+                    LazyRow(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        contentPadding = PaddingValues(start = 15.dp, end = 15.dp),
+                        modifier = Modifier.heightIn(min = 56.dp)) {
+                          items(10) {
+                            Button(
+                                onClick = {},
+                                content = { Text("Tag") },
+                                colors =
+                                    ButtonDefaults.buttonColors(
+                                        containerColor = NavBarUnselected, contentColor = DarkCyan),
+                                border = BorderStroke(1.dp, DarkCyan))
+                          }
+                        }
+                  }
               Spacer(modifier = Modifier.height(10.dp))
               ProfileEventsList("My Events")
               Spacer(modifier = Modifier.height(10.dp))
@@ -336,7 +341,7 @@ fun MoreActionsButton() {
         tint = DarkCyan)
   }
 
-  DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }, modifier = Modifier) {
+  DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
     DropdownMenuItem(
         text = { Text("Share Profile") },
         onClick = {
@@ -355,5 +360,5 @@ fun MoreActionsButton() {
 @Preview
 @Composable
 fun OthersProfilePreview() {
-  OthersProfile(nav = NavigationActions(rememberNavController()))
+  OthersProfile(nav = NavigationActions(rememberNavController()), "")
 }
