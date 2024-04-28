@@ -1,6 +1,8 @@
 package com.github.se.gomeet.endtoend
 
+import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.MainActivity
 import com.github.se.gomeet.screens.CreateEventScreen
@@ -28,7 +30,6 @@ class EndToEndTest : TestCase() {
 
   @get:Rule val composeTestRule = createAndroidComposeRule<MainActivity>()
 
-
   @After
   fun tearDown() {
 
@@ -40,7 +41,6 @@ class EndToEndTest : TestCase() {
     Firebase.auth.currentUser?.delete()
     userVM.deleteUser(uid)
   }
-
 
   @Test
   fun test() = run {
@@ -73,7 +73,6 @@ class EndToEndTest : TestCase() {
         }
       }
     }
-
 
     composeTestRule.waitForIdle()
 
