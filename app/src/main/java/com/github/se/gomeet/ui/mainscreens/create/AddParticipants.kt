@@ -11,6 +11,11 @@ import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 
+/**
+ * Composable function for the AddParticipants screen.
+ *
+ * @param nav The navigation actions.
+ */
 @Composable
 fun AddParticipants(nav: NavigationActions) {
   /* TODO: Code the UI of the AddParticipants screen when the logic of

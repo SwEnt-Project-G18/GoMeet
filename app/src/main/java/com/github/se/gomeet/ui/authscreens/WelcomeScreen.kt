@@ -45,6 +45,13 @@ import com.github.se.gomeet.R
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.google.firebase.auth.FirebaseAuth
 
+/**
+ * Composable function for the Welcome Screen.
+ *
+ * @param onNavToLogin The navigation function to navigate to the Login Screen.
+ * @param onNavToRegister The navigation function to navigate to the Register Screen.
+ * @param onSignInSuccess The function to call when the user successfully signs in.
+ */
 @Composable
 fun WelcomeScreen(
     onNavToLogin: () -> Unit,
@@ -176,6 +183,10 @@ fun WelcomeScreenPreview() {
       onSignInSuccess = { _ -> }) // Preview the WelcomeScreen
 }
 
+
+/**
+ * Composable function for the Divider with Text.
+ */
 @Composable
 fun DividerWithText() {
   val color = MaterialTheme.colorScheme.tertiary

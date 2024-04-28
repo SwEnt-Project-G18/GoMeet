@@ -39,6 +39,12 @@ import com.google.firebase.ktx.Firebase
 import io.getstream.chat.android.client.ChatClient
 import io.getstream.chat.android.models.User
 
+/**
+ * Composable function for the Login Screen.
+ *
+ * @param authViewModel The ViewModel for the authentication.
+ * @param onNavToExplore The navigation function to navigate to the Explore Screen.
+ */
 @Composable
 fun LoginScreen(authViewModel: AuthViewModel, onNavToExplore: () -> Unit) {
   val signInState = authViewModel.signInState.collectAsState()

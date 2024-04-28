@@ -43,11 +43,11 @@ class EventInviteViewModel {
   }
 
   fun userAcceptsInvite(userId: String, eventId: String) {
-    repository.udpateInvite(userId, eventId, InviteStatus.ACCEPTED)
+    repository.updateInvite(userId, eventId, InviteStatus.ACCEPTED)
   }
 
   fun userRefusesInvite(userId: String, eventId: String) {
-    repository.udpateInvite(userId, eventId, InviteStatus.REFUSED)
+    repository.updateInvite(userId, eventId, InviteStatus.REFUSED)
   }
 
   fun removeInvite(userId: String, eventId: String) {

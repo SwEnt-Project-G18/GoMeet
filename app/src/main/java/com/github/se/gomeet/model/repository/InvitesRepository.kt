@@ -7,20 +7,39 @@ import com.github.se.gomeet.model.event.UserInvitedToEvents
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
 
+/**
+ * This class represents the repository for the invites.
+ * A repository is a class that communicates with the data source.
+ *
+ * @param db The database firebase instance
+ */
 class InvitesRepository(private val db: FirebaseFirestore) {
   private val localInvitedTo: MutableList<UserInvitedToEvents> = mutableListOf()
 
+    /**
+     * This function initializes the repository by starting to listen for invites
+     */
   init {
     startListeningForInvites()
   }
 
+    /**
+     * This companion object contains the constants for the repository
+     */
   companion object {
     const val TAG = "FirebaseConnection"
     private const val USER_INVITES_COLLECTION = "UserInvites"
     private const val EVENT_INVITES_COLLECTION = "EventInvites"
   }
 
-  // Get all events the User have been invited to
+    /**
+     * This function retrieves all the events the user has been invited to
+     *
+     * @param uid The user ID
+     * @param callback The callback function to be called when the events are retrieved
+     *
+     * @return the events the user has been invited to if they exist, null otherwise
+     */
   fun getUserInvites(uid: String, callback: (EventInviteUsers?) -> Unit) {
     db.collection(USER_INVITES_COLLECTION)
         .document(uid)
@@ -40,6 +59,14 @@ class InvitesRepository(private val db: FirebaseFirestore) {
         }
   }
 
+    /**
+     * This function retrieves all the users invited to an event
+     *
+     * @param id The event ID
+     * @param callback The callback function to be called when the users are retrieved
+     *
+     * @return the users invited to the event if they exist, null otherwise
+     */
   fun getEventInvites(id: String, callback: (UserInvitedToEvents?) -> Unit) {
     db.collection(USER_INVITES_COLLECTION)
         .document(id)
@@ -59,7 +86,16 @@ class InvitesRepository(private val db: FirebaseFirestore) {
         }
   }
 
-  /* Calls back success with true if success, false otherwise */
+    /**
+     * This function updates the event invites
+     *
+     * @param eventID The event ID
+     * @param userID The user ID
+     * @param status The status of the invite
+     * @param success The callback function to be called when the event invites are updated
+     *
+     * @return true if the event invites are updated, false otherwise
+     */
   private fun updateEventInvites(
       eventID: String,
       userID: String,
@@ -89,7 +125,16 @@ class InvitesRepository(private val db: FirebaseFirestore) {
         }
   }
 
-  /* Calls back success with true if success, false otherwise */
+    /**
+     * This function updates the user invites
+     *
+     * @param userID The user ID
+     * @param eventID The event ID
+     * @param status The status of the invite
+     * @param success The callback function to be called when the user invites are updated
+     *
+     * @return true if the user invites are updated, false otherwise
+     */
   private fun updateUserInvites(
       userID: String,
       eventID: String,
@@ -119,7 +164,14 @@ class InvitesRepository(private val db: FirebaseFirestore) {
         }
   }
 
-  /* Return True if success, false otherwise */
+    /**
+     * This function updates the event invites and user invites with the status PENDING
+     *
+     * @param eventID The event ID
+     * @param toUserID The user ID
+     *
+     * @return true if the invite is sent, false otherwise
+     */
   fun sendInvite(eventID: String, toUserID: String): Boolean {
     var a = false
     updateEventInvites(eventID, toUserID, InviteStatus.PENDING) { a = it }
@@ -127,13 +179,28 @@ class InvitesRepository(private val db: FirebaseFirestore) {
     return a
   }
 
-  fun udpateInvite(eventID: String, toUserID: String, status: InviteStatus): Boolean {
+    /**
+     * This function updates the event invites and user invites with the given status
+     *
+     * @param eventID The event ID
+     * @param toUserID The user ID
+     * @param status The status of the invite
+     *
+     * @return true if the invite is updated, false otherwise
+     */
+  fun updateInvite(eventID: String, toUserID: String, status: InviteStatus): Boolean {
     var a = false
     updateEventInvites(eventID, toUserID, status) { a = it }
     updateUserInvites(toUserID, eventID, status) { a = a && it }
     return a
   }
 
+    /**
+     * This function removes the event invite and user invite
+     *
+     * @param eventID The event ID
+     * @param toUserID The user ID
+     */
   fun removeInvite(eventID: String, toUserID: String) {
     val eventInviteRef = db.collection(EVENT_INVITES_COLLECTION).document(eventID)
     val userInviteRef = db.collection(USER_INVITES_COLLECTION).document(toUserID)
@@ -163,28 +230,49 @@ class InvitesRepository(private val db: FirebaseFirestore) {
         .addOnFailureListener { e -> Log.d(TAG, "Transaction failed", e) }
   }
 
+    /**
+     * Maps the events and users to their respective fields in the database
+     */
   private fun EventInviteUsers.toMap(): Map<String, Any?> {
-    return mapOf("e" to e, "usersInvited" to usersInvited)
+    return mapOf("e" to event, "usersInvited" to usersInvited)
   }
 
+    /**
+     * Maps the fields in the database to the events and users
+     *
+     * @param id The event ID
+     */
   private fun Map<String, Any>.toEventInviteUsers(id: String? = null): EventInviteUsers {
     return EventInviteUsers(
-        e = id ?: this["e"] as? String ?: "",
+        event = id ?: this["e"] as? String ?: "",
         usersInvited =
             this["usersInvited"] as? MutableList<Pair<String, InviteStatus>> ?: mutableListOf())
   }
 
+    /**
+     * Maps the users and events to their respective fields in the database
+     */
   private fun UserInvitedToEvents.toMap(): Map<String, Any?> {
-    return mapOf("u" to u, "invitedToEvents" to invitedToEvents)
+    return mapOf("u" to user, "invitedToEvents" to invitedToEvents)
   }
 
+    /**
+     * Maps the fields in the database to the users and events
+     *
+     * @param id The user ID
+     */
   private fun Map<String, Any>.toUsersInvitedToEvents(id: String? = null): UserInvitedToEvents {
     return UserInvitedToEvents(
-        u = id ?: this["u"] as? String ?: "",
+        user = id ?: this["u"] as? String ?: "",
         invitedToEvents =
             this["invitedToEvents"] as? MutableList<Pair<String, InviteStatus>> ?: mutableListOf())
   }
 
+    /**
+     * This function starts listening for invites
+     *
+     * @return the list of users invited to events
+     */
   private fun startListeningForInvites() {
     db.collection("events").addSnapshotListener { snapshot, e ->
       if (e != null) {
