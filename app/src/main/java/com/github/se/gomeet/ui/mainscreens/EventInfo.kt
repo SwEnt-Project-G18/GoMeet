@@ -66,6 +66,19 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 
+/**
+ * EventInfo is a composable that displays the details of an event.
+ *
+ * @param nav NavigationActions object to handle navigation
+ * @param title Title of the event
+ * @param date Date of the event
+ * @param time Time of the event
+ * @param organizer Organizer of the event
+ * @param rating Rating of the event
+ * @param image Image of the event
+ * @param description Description of the event
+ * @param loc Location of the event
+ */
 @Composable
 fun EventInfo(
     nav: NavigationActions,
@@ -147,6 +160,16 @@ fun EventInfo(
       }
 }
 
+/**
+ * EventHeader is a composable that displays the header of an event.
+ *
+ * @param title Title of the event
+ * @param organizer Organizer of the event
+ * @param rating Rating of the event
+ * @param nav NavigationActions object to handle navigation
+ * @param date Date of the event
+ * @param time Time of the event
+ */
 @Composable
 fun EventHeader(
     title: String,
@@ -187,6 +210,12 @@ fun EventHeader(
       }
 }
 
+/**
+ * EventDateTime is a composable that displays the date and time of an event.
+ *
+ * @param day Day of the event
+ * @param time Time of the event
+ */
 @Composable
 fun EventDateTime(day: String, time: String) {
   Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(end = 15.dp)) {
@@ -212,6 +241,11 @@ fun EventDateTime(day: String, time: String) {
   }
 }
 
+/**
+ * EventImage is a composable that displays the image of an event.
+ *
+ * @param painter Painter object for the image
+ */
 @Composable
 fun EventImage(painter: Painter) {
   Column(modifier = Modifier.fillMaxWidth().testTag("EventImage")) {
@@ -227,6 +261,11 @@ fun EventImage(painter: Painter) {
   }
 }
 
+/**
+ * EventDescription is a composable that displays the description of an event.
+ *
+ * @param text Description of the event
+ */
 @Composable
 fun EventDescription(text: String) {
   Text(
@@ -241,6 +280,9 @@ fun EventDescription(text: String) {
       modifier = Modifier.testTag("EventDescription"))
 }
 
+/**
+ * EventButtons is a composable that displays the buttons for an event.
+ */
 @Composable
 fun EventButtons() {
   Row(
@@ -265,6 +307,12 @@ fun EventButtons() {
       }
 }
 
+/**
+ * MapViewComposable is a composable that displays the map view of an event.
+ *
+ * @param loc Location of the event
+ * @param zoomLevel Zoom level of the map
+ */
 @Composable
 fun MapViewComposable(
     loc: LatLng,
@@ -299,6 +347,11 @@ fun MapViewComposable(
   }
 }
 
+/**
+ * EventInfoScreen is a composable that displays the details of an event.
+ *
+ * @param navController NavHostController object to handle navigation
+ */
 @Composable
 fun EventInfoScreen(navController: NavHostController) {
   val backStackEntry = navController.currentBackStackEntryAsState().value

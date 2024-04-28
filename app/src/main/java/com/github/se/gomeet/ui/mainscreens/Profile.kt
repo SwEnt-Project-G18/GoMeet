@@ -58,6 +58,11 @@ import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.ui.theme.Grey
 import com.github.se.gomeet.ui.theme.NavBarUnselected
 
+/**
+ * Profile screen composable
+ *
+ * @param nav NavigationActions
+ */
 @Composable
 fun Profile(nav: NavigationActions) { // TODO Add parameters to the function
   Scaffold(

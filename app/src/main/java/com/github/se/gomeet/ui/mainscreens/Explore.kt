@@ -67,6 +67,12 @@ import kotlinx.coroutines.tasks.await
 private val defaultPosition = LatLng(46.51912357457158, 6.568023741881372)
 private const val defaultZoom = 16f
 
+/**
+ * Enum class to represent the different actions that can be taken by the camera:
+ * - NO_ACTION: No action is taken.
+ * - MOVE: The camera moves to a new location.
+ * - ANIMATE: The camera animates to a new location.
+ */
 private enum class CameraAction {
   NO_ACTION,
   MOVE,
@@ -76,6 +82,12 @@ private enum class CameraAction {
 private val moveToCurrentLocation = mutableStateOf(CameraAction.NO_ACTION)
 private val isButtonVisible = mutableStateOf(true)
 
+/**
+ * The Explore screen displays a map with events and a search bar.
+ *
+ * @param nav The navigation actions.
+ * @param eventViewModel The event view model.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
@@ -200,6 +212,18 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
       }
 }
 
+/**
+ * The GoogleMapView composable displays a Google Map with custom pins for events.
+ *
+ * @param modifier The modifier.
+ * @param currentPosition The current position.
+ * @param onMapLoaded The callback when the map is loaded.
+ * @param content The content.
+ * @param events The events.
+ * @param query The query for the search bar.
+ * @param locationPermitted The location permission.
+ * @param eventViewModel The event view model.
+ */
 @Composable
 fun GoogleMapView(
     modifier: Modifier = Modifier,

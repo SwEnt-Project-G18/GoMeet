@@ -83,6 +83,12 @@ import java.util.Date
 import java.util.Locale
 import kotlinx.coroutines.launch
 
+/**
+ * Composable function to display the Events screen.
+ *
+ * @param nav NavigationActions object to handle navigation
+ * @param eventViewModel EventViewModel object to handle events
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
@@ -316,6 +322,16 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
       }
 }
 
+/**
+ * Composable function to display an event widget.
+ *
+ * @param userName Name of the user who created the event
+ * @param eventName Name of the event
+ * @param eventDate Date and time of the event
+ * @param eventPicture Image of the event
+ * @param verified Boolean value indicating if the user is verified
+ * @param nav NavigationActions object to handle navigation
+ */
 @Composable
 fun EventWidget(
     userName: String,
@@ -460,6 +476,13 @@ fun EventWidget(
       }
 }
 
+/**
+ * Composable function to display the search bar.
+ *
+ * @param query MutableState object to store the search query
+ * @param backgroundColor Color of the search bar background
+ * @param contentColor Color of the search bar content
+ */
 @ExperimentalMaterial3Api
 @Composable
 fun GoMeetSearchBar(query: MutableState<String>, backgroundColor: Color, contentColor: Color) {

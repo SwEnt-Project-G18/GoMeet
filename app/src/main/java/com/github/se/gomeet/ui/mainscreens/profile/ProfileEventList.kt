@@ -33,6 +33,11 @@ import com.github.se.gomeet.R
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.ui.theme.Grey
 
+/**
+ * Composable function for the ProfileEventsList screen.
+ *
+ * @param title The title of the event.
+ */
 @Composable
 fun ProfileEventsList(title: String) {
   Spacer(modifier = Modifier.height(10.dp))
