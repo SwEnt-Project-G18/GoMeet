@@ -41,6 +41,7 @@ import com.github.se.gomeet.ui.theme.SetStatusBarColor
 import com.github.se.gomeet.viewmodel.AuthViewModel
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
+import com.google.android.gms.maps.MapsInitializer
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -58,6 +59,9 @@ import io.getstream.chat.android.state.plugin.factory.StreamStatePluginFactory
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+
+    MapsInitializer.initialize(this)
+
     // 1 - Set up the OfflinePlugin for offline storage
     val offlinePluginFactory = StreamOfflinePluginFactory(appContext = applicationContext)
     val statePluginFactory =
