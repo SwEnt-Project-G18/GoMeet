@@ -28,6 +28,7 @@ class EndToEndTest : TestCase() {
 
   @get:Rule val composeTestRule = createAndroidComposeRule<MainActivity>()
 
+
   @After
   fun tearDown() {
 
@@ -40,6 +41,7 @@ class EndToEndTest : TestCase() {
     userVM.deleteUser(uid)
   }
 
+
   @Test
   fun test() = run {
     ComposeScreen.onComposeScreen<WelcomeScreenScreen>(composeTestRule) {
@@ -50,6 +52,7 @@ class EndToEndTest : TestCase() {
         }
       }
     }
+
     ComposeScreen.onComposeScreen<LoginScreen>(composeTestRule) {
       step("Log in with email and password") {
         logInButton {
@@ -71,10 +74,19 @@ class EndToEndTest : TestCase() {
       }
     }
 
+
     composeTestRule.waitForIdle()
 
+    // First ensure login and switch to the expected screen
+    ComposeScreen.onComposeScreen<LoginScreen>(composeTestRule) {
+      step("Log in with email and password") { logInButton { performClick() } }
+      composeTestRule.waitUntil(timeoutMillis = 100000) {
+        composeTestRule.onNodeWithTag("CreateUI").isDisplayed()
+      }
+    }
+
     ComposeScreen.onComposeScreen<CreateScreen>(composeTestRule) {
-      step("goTo publicCreate") {
+      step("Select which type of event to create") {
         createPublicEventButton {
           assertIsDisplayed()
           performClick()
@@ -85,7 +97,7 @@ class EndToEndTest : TestCase() {
     composeTestRule.waitForIdle()
 
     ComposeScreen.onComposeScreen<CreateEventScreen>(composeTestRule) {
-      step("add event") {
+      step("Create an event") {
         title {
           assertIsDisplayed()
           performTextInput("Title")
@@ -98,9 +110,10 @@ class EndToEndTest : TestCase() {
           assertIsDisplayed()
           performTextInput("Lausanne")
         }
+        dropDownMenu { assertIsDisplayed() }
         date {
           assertIsDisplayed()
-          performTextInput("2003-01-01")
+          performTextInput("2024-07-23")
         }
         price {
           assertIsDisplayed()
@@ -114,6 +127,7 @@ class EndToEndTest : TestCase() {
           assertIsDisplayed()
           performClick()
         }
+        switchToExplore { performClick() }
       }
     }
   }

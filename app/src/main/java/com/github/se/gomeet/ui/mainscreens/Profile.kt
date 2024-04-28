@@ -81,13 +81,23 @@ fun Profile(nav: NavigationActions) { // TODO Add parameters to the function
               textAlign = TextAlign.Start,
               style = MaterialTheme.typography.headlineLarge)
 
+          IconButton(
+              modifier = Modifier.align(Alignment.CenterVertically).padding(end = 15.dp),
+              onClick = { /* Handles notification icon click */}) {
+                Icon(
+                    ImageVector.vectorResource(R.drawable.notifications_icon),
+                    contentDescription = "Notifications",
+                    modifier = Modifier.size(40.dp).align(Alignment.CenterVertically),
+                    tint = Grey)
+              }
+
           // settings icon
           // This will push the icon to the right
           Spacer(Modifier.weight(1f))
           IconButton(
               modifier = Modifier.align(Alignment.CenterVertically).padding(end = 15.dp),
               onClick = {
-                nav.navigateTo(SECOND_LEVEL_DESTINATION.first()) /* Handle settings icon click */
+                nav.navigateTo(SECOND_LEVEL_DESTINATION.first { it.route == Route.SETTINGS })
               }) {
                 Icon(
                     imageVector = ImageVector.vectorResource(R.drawable.settings_icon),

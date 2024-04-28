@@ -15,6 +15,7 @@ import com.github.se.gomeet.viewmodel.AuthViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import io.getstream.chat.android.client.ChatClient
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
@@ -45,7 +46,7 @@ class RegisterScreenTest {
     val authViewModel = AuthViewModel()
     val userViewModel = UserViewModel()
 
-    rule.setContent { RegisterScreen(authViewModel, userViewModel) {} }
+    rule.setContent { RegisterScreen(ChatClient.instance(), authViewModel, userViewModel) {} }
 
     rule.onNodeWithTag("register_title").assertIsDisplayed()
 

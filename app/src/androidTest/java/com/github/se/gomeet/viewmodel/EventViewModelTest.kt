@@ -38,7 +38,8 @@ class EventViewModelTest {
         false,
         emptyList(),
         emptyList(),
-        null)
+        null,
+        "")
   }
 
   @Test
