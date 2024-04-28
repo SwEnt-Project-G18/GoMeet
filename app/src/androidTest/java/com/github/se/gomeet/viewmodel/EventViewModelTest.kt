@@ -14,13 +14,31 @@ import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
 class EventViewModelTest {
 
   @Test
   fun test() = runTest {
-    // test getAllEvents and createEvent
+
+      // test getAllEvents and createEvent
+      eventViewModel.createEvent(
+          title,
+          "description",
+          Location(0.0, 0.0, "name"),
+          LocalDate.of(2024, 4, 19),
+          0.0,
+          "url",
+          emptyList(),
+          emptyList(),
+          0,
+          false,
+          emptyList(),
+          emptyList(),
+          null,
+          "testuser")
+
     val events = eventViewModel.getAllEvents()!!.filter { it.title == title }
 
     assert(events.isNotEmpty())
@@ -82,23 +100,6 @@ class EventViewModelTest {
             Firebase.auth.useEmulator("10.0.2.2", 9099)
             eventViewModel = EventViewModel("testuser")
 
-            // TODO: event now needs image to be created
-
-            eventViewModel.createEvent(
-                title,
-                "description",
-                Location(0.0, 0.0, "name"),
-                LocalDate.of(2024, 4, 19),
-                0.0,
-                "url",
-                emptyList(),
-                emptyList(),
-                0,
-                false,
-                emptyList(),
-                emptyList(),
-                null,
-                "")
         }
     }
 
