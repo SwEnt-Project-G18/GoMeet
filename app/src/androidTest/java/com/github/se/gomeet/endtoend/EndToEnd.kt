@@ -12,9 +12,7 @@ import com.github.se.gomeet.screens.WelcomeScreenScreen
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.ktx.storage
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen
 import java.util.concurrent.TimeUnit
@@ -144,9 +142,6 @@ class EndToEndTest : TestCase() {
     @JvmStatic
     @BeforeClass
     fun setup() {
-      Firebase.auth.useEmulator("10.0.2.2", 9099)
-      Firebase.firestore.useEmulator("10.0.2.2", 8080)
-      Firebase.storage.useEmulator("10.0.2.2", 9199)
 
       userVM = UserViewModel()
       userVM.createUserIfNew(uid, username)

@@ -22,7 +22,6 @@ import io.getstream.chat.android.client.logger.ChatLogLevel
 import io.github.kakaocup.kakao.common.utilities.getResourceString
 import kotlinx.coroutines.test.runTest
 import org.junit.After
-import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -31,6 +30,9 @@ import org.junit.runner.RunWith
 class RegisterScreenTest {
 
   @get:Rule val rule = createAndroidComposeRule<ComponentActivity>()
+
+  private lateinit var authViewModel: AuthViewModel
+  private lateinit var userViewModel: UserViewModel
 
   @After
   fun tearDown() {
@@ -41,8 +43,8 @@ class RegisterScreenTest {
 
   @Test
   fun testRegisterScreen() = runTest {
-    val authViewModel = AuthViewModel()
-    val userViewModel = UserViewModel()
+    authViewModel = AuthViewModel()
+    userViewModel = UserViewModel()
 
     rule.setContent {
       val client =
@@ -77,15 +79,8 @@ class RegisterScreenTest {
 
     // Assert that the register worked
     assert(authViewModel.signInState.value.signInError == null)
-    assert(authViewModel.signInState.value.isSignInSuccessful)
-  }
+    assert(authViewModel.signInState.value.isSignInSuccessful) // Error here in CI
 
-  companion object {
-
-    @BeforeClass
-    @JvmStatic
-    fun setup() {
-      Firebase.auth.useEmulator("10.0.2.2", 9099)
-    }
+    userViewModel.deleteUser(Firebase.auth.currentUser!!.uid)
   }
 }

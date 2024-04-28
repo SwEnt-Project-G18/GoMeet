@@ -13,10 +13,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.ktx.storage
-import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -41,14 +37,5 @@ class ExploreTest {
     rule.onNodeWithTag("Map").assertIsDisplayed()
     rule.onNodeWithText("Search").assertIsDisplayed()
     rule.onNodeWithTag("CurrentLocationButton").assertIsDisplayed().performClick()
-  }
-
-  companion object {
-    @BeforeClass
-    @JvmStatic
-    fun setup() {
-      Firebase.firestore.useEmulator("10.0.2.2", 8080)
-      Firebase.storage.useEmulator("10.0.2.2", 9199)
-    }
   }
 }

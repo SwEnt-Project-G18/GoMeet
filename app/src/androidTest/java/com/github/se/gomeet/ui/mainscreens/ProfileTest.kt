@@ -7,9 +7,6 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.ui.navigation.NavigationActions
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
@@ -28,12 +25,5 @@ class ProfileTest {
     composeTestRule.onNodeWithText("Edit Profile").performClick()
 
     composeTestRule.onNodeWithText("Share Profile").assertIsDisplayed()
-  }
-
-  companion object {
-    @Before
-    fun setUpClass() {
-      Firebase.firestore.useEmulator("10.0.2.2", 8080)
-    }
   }
 }

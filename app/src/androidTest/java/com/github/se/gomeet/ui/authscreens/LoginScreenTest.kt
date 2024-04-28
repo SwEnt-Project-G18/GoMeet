@@ -20,8 +20,9 @@ import com.google.firebase.ktx.Firebase
 import io.getstream.chat.android.client.ChatClient
 import io.getstream.chat.android.client.logger.ChatLogLevel
 import io.github.kakaocup.kakao.common.utilities.getResourceString
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.tasks.await
 import org.junit.After
-import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -30,6 +31,9 @@ import org.junit.runner.RunWith
 class LoginScreenTest {
 
   @get:Rule val rule = createAndroidComposeRule<ComponentActivity>()
+
+  private val testEmail = "instrumented@test.com"
+  private val testPwd = "itest123456"
 
   @After
   fun teardown() {
@@ -42,6 +46,8 @@ class LoginScreenTest {
   @Test
   fun testLoginScreen() {
     val authViewModel = AuthViewModel()
+
+    runBlocking { Firebase.auth.createUserWithEmailAndPassword(testEmail, testPwd).await() }
 
     rule.setContent {
       val client =
@@ -74,19 +80,6 @@ class LoginScreenTest {
 
     // Sign-in should complete successfully
     assert(authViewModel.signInState.value.signInError == null)
-    assert(authViewModel.signInState.value.isSignInSuccessful)
-  }
-
-  companion object {
-
-    private val testEmail = "instrumented@test.com"
-    private val testPwd = "itest123456"
-
-    @JvmStatic
-    @BeforeClass
-    fun setup() {
-      Firebase.auth.useEmulator("10.0.2.2", 9099)
-      Firebase.auth.createUserWithEmailAndPassword(testEmail, testPwd)
-    }
+    assert(authViewModel.signInState.value.isSignInSuccessful) // Error here in CI
   }
 }

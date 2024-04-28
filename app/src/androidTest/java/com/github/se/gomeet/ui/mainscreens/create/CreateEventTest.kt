@@ -14,9 +14,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.google.android.gms.maps.MapsInitializer
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.ktx.storage
 import java.time.LocalDate
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -111,12 +108,7 @@ class CreateEventTest {
     @JvmStatic
     @BeforeClass
     fun setup() {
-      Firebase.storage.useEmulator("10.0.2.2", 9199)
-      Firebase.firestore.useEmulator("10.0.2.2", 8080)
       eventViewModel = EventViewModel(uid)
-
-      // TODO: Event now needs image to be created
-
     }
   }
 }
