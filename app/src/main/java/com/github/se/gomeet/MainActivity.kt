@@ -75,7 +75,6 @@ class MainActivity : ComponentActivity() {
             .logLevel(ChatLogLevel.ALL) // Set to NOTHING in prod
             .build()
 
-
     setContent {
       val clientInitialisationState by client.clientState.initializationState.collectAsState()
 

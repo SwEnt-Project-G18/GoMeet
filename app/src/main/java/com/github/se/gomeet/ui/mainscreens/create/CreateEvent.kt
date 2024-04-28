@@ -57,8 +57,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.github.se.gomeet.R
-import com.github.se.gomeet.model.repository.EventRepository
 import com.github.se.gomeet.model.event.location.Location
+import com.github.se.gomeet.model.repository.EventRepository
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
@@ -315,31 +315,30 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
 
               Spacer(modifier = Modifier.height(16.dp))
 
-            OutlinedButton(
-                onClick = {
+              OutlinedButton(
+                  onClick = {
                     val uid = db.getNewId()
                     if (selectedLocation.value != null &&
                         titleState.value.isNotEmpty() &&
                         !dateFormatError &&
                         dateState != null) {
-                        eventViewModel.createEvent(
-                            titleState.value,
-                            descriptionState.value,
-                            selectedLocation.value!!,
-                            dateState!!,
-                            price,
-                            url.value,
-                            listOf(),
-                            listOf(),
-                            0,
-                            !isPrivateEvent.value,
-                            listOf(),
-                            listOf(),
-                            imageUri,
-                            uid)
-                        nav.goBack()
+                      eventViewModel.createEvent(
+                          titleState.value,
+                          descriptionState.value,
+                          selectedLocation.value!!,
+                          dateState!!,
+                          price,
+                          url.value,
+                          listOf(),
+                          listOf(),
+                          0,
+                          !isPrivateEvent.value,
+                          listOf(),
+                          listOf(),
+                          imageUri,
+                          uid)
+                      nav.goBack()
                     }
-
 
                     dateState?.let {
                       customPins.createCustomPin(context, it, LocalTime.MIDNIGHT) {
