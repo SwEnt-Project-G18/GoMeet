@@ -9,8 +9,16 @@ import androidx.compose.ui.test.performTextInput
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.se.gomeet.endtoend.EndToEndTest
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
+import kotlinx.coroutines.runBlocking
+import org.junit.After
+import org.junit.BeforeClass
 import java.time.LocalDate
 import org.junit.Rule
 import org.junit.Test
@@ -21,10 +29,24 @@ class CreateEventTest {
 
   @get:Rule val rule = createAndroidComposeRule<ComponentActivity>()
 
+  private lateinit var eventViewModel: EventViewModel
+  private val uid = "testuid"
+
+  @After
+  fun tearDown() {
+    runBlocking {
+      eventViewModel.getAllEvents()?.forEach {
+        if (it.creator == uid)
+          eventViewModel.removeEvent(it.uid)
+      }
+    }
+  }
+
+
   @Test
   fun testCreateEventScreen_InputFields() {
     lateinit var navController: NavHostController
-    val eventViewModel = EventViewModel()
+    eventViewModel = EventViewModel(uid)
 
     rule.setContent {
       navController = rememberNavController()
@@ -82,4 +104,16 @@ class CreateEventTest {
 
     rule.onNodeWithText("Post").performClick()
   }
+
+  companion object{
+
+    @JvmStatic
+    @BeforeClass
+    fun setup() {
+      Firebase.storage.useEmulator("10.0.2.2", 9199)
+      Firebase.firestore.useEmulator("10.0.2.2", 8080)
+    }
+  }
+
+
 }
