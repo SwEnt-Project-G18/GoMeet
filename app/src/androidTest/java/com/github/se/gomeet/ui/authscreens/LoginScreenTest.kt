@@ -21,7 +21,6 @@ import io.getstream.chat.android.client.ChatClient
 import io.getstream.chat.android.client.logger.ChatLogLevel
 import io.github.kakaocup.kakao.common.utilities.getResourceString
 import org.junit.After
-import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
@@ -31,7 +30,6 @@ import org.junit.runner.RunWith
 class LoginScreenTest {
 
   @get:Rule val rule = createAndroidComposeRule<ComponentActivity>()
-
 
   @After
   fun teardown() {
@@ -47,10 +45,11 @@ class LoginScreenTest {
 
     rule.setContent {
       val client =
-        ChatClient.Builder(getResourceString(R.string.chat_api_key), LocalContext.current)
-          .logLevel(ChatLogLevel.NOTHING) // Set to NOTHING in prod
-          .build()
-      LoginScreen(authViewModel) {} }
+          ChatClient.Builder(getResourceString(R.string.chat_api_key), LocalContext.current)
+              .logLevel(ChatLogLevel.NOTHING) // Set to NOTHING in prod
+              .build()
+      LoginScreen(authViewModel) {}
+    }
 
     // Test the UI elements
     rule.onNodeWithContentDescription("GoMeet").assertIsDisplayed()
@@ -82,14 +81,12 @@ class LoginScreenTest {
 
     private val testEmail = "instrumented@test.com"
     private val testPwd = "itest123456"
+
     @JvmStatic
     @BeforeClass
     fun setup() {
       Firebase.auth.useEmulator("10.0.2.2", 9099)
       Firebase.auth.createUserWithEmailAndPassword(testEmail, testPwd)
-
     }
   }
-
-
 }

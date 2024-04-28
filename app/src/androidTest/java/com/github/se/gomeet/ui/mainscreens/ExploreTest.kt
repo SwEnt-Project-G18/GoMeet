@@ -43,7 +43,7 @@ class ExploreTest {
     rule.onNodeWithTag("CurrentLocationButton").assertIsDisplayed().performClick()
   }
 
-  companion object{
+  companion object {
     @BeforeClass
     @JvmStatic
     fun setup() {
@@ -51,5 +51,4 @@ class ExploreTest {
       Firebase.storage.useEmulator("10.0.2.2", 9199)
     }
   }
-
 }

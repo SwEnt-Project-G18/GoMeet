@@ -7,14 +7,11 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
-import kotlinx.coroutines.runBlocking
 import java.time.LocalDate
 import kotlinx.coroutines.test.runTest
-import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
 class EventViewModelTest {
@@ -22,22 +19,22 @@ class EventViewModelTest {
   @Test
   fun test() = runTest {
 
-      // test getAllEvents and createEvent
-      eventViewModel.createEvent(
-          title,
-          "description",
-          Location(0.0, 0.0, "name"),
-          LocalDate.of(2024, 4, 19),
-          0.0,
-          "url",
-          emptyList(),
-          emptyList(),
-          0,
-          false,
-          emptyList(),
-          emptyList(),
-          null,
-          "testuser")
+    // test getAllEvents and createEvent
+    eventViewModel.createEvent(
+        title,
+        "description",
+        Location(0.0, 0.0, "name"),
+        LocalDate.of(2024, 4, 19),
+        0.0,
+        "url",
+        emptyList(),
+        emptyList(),
+        0,
+        false,
+        emptyList(),
+        emptyList(),
+        null,
+        "testuser")
 
     val events = eventViewModel.getAllEvents()!!.filter { it.title == title }
 
@@ -86,22 +83,18 @@ class EventViewModelTest {
     assert(event == null)
   }
 
+  companion object {
 
-    companion object{
+    private lateinit var eventViewModel: EventViewModel
+    private val title = "testevent"
 
-        private lateinit var eventViewModel: EventViewModel
-        private val title = "testevent"
-
-        @BeforeClass
-        @JvmStatic
-        fun setup() {
-            Firebase.firestore.useEmulator("10.0.2.2", 8080)
-            Firebase.storage.useEmulator("10.0.2.2", 9199)
-            Firebase.auth.useEmulator("10.0.2.2", 9099)
-            eventViewModel = EventViewModel("testuser")
-
-        }
+    @BeforeClass
+    @JvmStatic
+    fun setup() {
+      Firebase.firestore.useEmulator("10.0.2.2", 8080)
+      Firebase.storage.useEmulator("10.0.2.2", 9199)
+      Firebase.auth.useEmulator("10.0.2.2", 9099)
+      eventViewModel = EventViewModel("testuser")
     }
-
-
+  }
 }

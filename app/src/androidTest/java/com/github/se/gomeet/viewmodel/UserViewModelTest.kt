@@ -6,7 +6,6 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.test.runTest
-import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -48,9 +47,10 @@ class UserViewModelTest {
     assert(user == null)
   }
 
-  companion object{
+  companion object {
 
     private lateinit var userViewModel: UserViewModel
+
     @BeforeClass
     @JvmStatic
     fun setup() {
@@ -58,6 +58,4 @@ class UserViewModelTest {
       userViewModel = UserViewModel()
     }
   }
-
-
 }

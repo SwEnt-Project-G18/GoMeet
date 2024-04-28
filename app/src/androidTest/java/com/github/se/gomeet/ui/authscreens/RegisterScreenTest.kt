@@ -22,7 +22,6 @@ import io.getstream.chat.android.client.logger.ChatLogLevel
 import io.github.kakaocup.kakao.common.utilities.getResourceString
 import kotlinx.coroutines.test.runTest
 import org.junit.After
-import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
@@ -47,10 +46,11 @@ class RegisterScreenTest {
 
     rule.setContent {
       val client =
-        ChatClient.Builder(getResourceString(R.string.chat_api_key), LocalContext.current)
-          .logLevel(ChatLogLevel.NOTHING) // Set to NOTHING in prod
-          .build()
-      RegisterScreen(client, authViewModel, userViewModel) {} }
+          ChatClient.Builder(getResourceString(R.string.chat_api_key), LocalContext.current)
+              .logLevel(ChatLogLevel.NOTHING) // Set to NOTHING in prod
+              .build()
+      RegisterScreen(client, authViewModel, userViewModel) {}
+    }
 
     rule.onNodeWithTag("register_title").assertIsDisplayed()
 
@@ -88,7 +88,4 @@ class RegisterScreenTest {
       Firebase.auth.useEmulator("10.0.2.2", 9099)
     }
   }
-
-
-
 }
