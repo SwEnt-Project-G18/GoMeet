@@ -167,6 +167,7 @@ dependencies {
 
     implementation("com.google.accompanist:accompanist-permissions:0.25.0")
 
+
     implementation("com.squareup.picasso:picasso:2.71828")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.3.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.3.1")
@@ -174,6 +175,12 @@ dependencies {
 
 
 
+
+
+
+    //Messaging system using stream
+    implementation("io.getstream:stream-chat-android-compose:6.0.8")
+    implementation("io.getstream:stream-chat-android-offline:6.0.8")
 
 }
 

@@ -28,7 +28,6 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.se.gomeet.R
 import com.github.se.gomeet.ui.theme.DarkCyan
@@ -36,9 +35,12 @@ import com.github.se.gomeet.viewmodel.AuthViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import io.getstream.chat.android.client.ChatClient
+import io.getstream.chat.android.models.User
 
 @Composable
 fun RegisterScreen(
+    client: ChatClient,
     authViewModel: AuthViewModel,
     userViewModel: UserViewModel,
     onNavToExplore: () -> Unit
@@ -142,15 +144,18 @@ fun RegisterScreen(
 
         if (signInState.value.isSignInSuccessful) {
           userViewModel.createUserIfNew(
-              Firebase.auth.currentUser!!.uid,
-              Firebase.auth.currentUser!!.email!!) // TODO: currently username = email
+              Firebase.auth.currentUser!!.uid, Firebase.auth.currentUser!!.email!!)
+          val user =
+              User(
+                  id = Firebase.auth.currentUser!!.uid,
+                  name = Firebase.auth.currentUser!!.email!!) // TODO: currently username = email
+          client
+              .connectUser(
+                  user = user,
+                  // TODO: Generate Token, see https://getstream.io/tutorials/android-chat/
+                  token = client.devToken(user.id))
+              .enqueue()
           onNavToExplore()
         }
       }
-}
-
-@Preview
-@Composable
-fun RegisterScreenPreview() {
-  RegisterScreen(AuthViewModel(), UserViewModel()) {}
 }

@@ -1,5 +1,6 @@
 package com.github.se.gomeet.ui.authscreens
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -33,6 +34,10 @@ import androidx.compose.ui.unit.dp
 import com.github.se.gomeet.R
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.viewmodel.AuthViewModel
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
+import io.getstream.chat.android.client.ChatClient
+import io.getstream.chat.android.models.User
 
 @Composable
 fun LoginScreen(authViewModel: AuthViewModel, onNavToExplore: () -> Unit) {
@@ -123,7 +128,19 @@ fun LoginScreen(authViewModel: AuthViewModel, onNavToExplore: () -> Unit) {
         }
 
         if (signInState.value.isSignInSuccessful) {
-          onNavToExplore()
+          val user =
+              User(
+                  id = Firebase.auth.currentUser!!.uid,
+                  name = Firebase.auth.currentUser!!.email!!) // TODO: Add Profile Picture to User
+          val client = ChatClient.instance()
+          client.connectUser(user = user, token = client.devToken(user.id)).enqueue { result ->
+            if (result.isSuccess) {
+              onNavToExplore()
+            } else {
+              // Handle connection failure
+              Log.e("ChatClient", "Failed to connect user: ${user.id}")
+            }
+          }
         }
       }
 }
@@ -131,5 +148,5 @@ fun LoginScreen(authViewModel: AuthViewModel, onNavToExplore: () -> Unit) {
 @Preview
 @Composable
 fun PreviewLoginScreen() {
-  LoginScreen(AuthViewModel()) {}
+  LoginScreen(AuthViewModel(), {})
 }

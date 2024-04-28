@@ -5,13 +5,17 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -19,11 +23,18 @@ import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuItemColors
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -47,6 +58,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.repository.EventRepository
+import com.github.se.gomeet.model.event.location.Location
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
@@ -62,6 +74,9 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
+import kotlinx.coroutines.delay
+
+private const val NUMBER_OF_SUGGESTIONS = 3
 
 @Composable
 fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivate: Boolean) {
@@ -102,6 +117,8 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
           }
         }
       }
+
+  val selectedLocation: MutableState<Location?> = remember { mutableStateOf(null) }
 
   Scaffold(
       topBar = {
@@ -150,9 +167,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
             selectedItem = Route.CREATE)
       }) { innerPadding ->
         Column(
-            Modifier.padding(innerPadding)
-                .verticalScroll(rememberScrollState())
-                .testTag("CreateEvent"),
+            Modifier.padding(innerPadding).verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center) {
               // Spacer(modifier = Modifier.size((LocalConfiguration.current.screenHeightDp /
@@ -170,8 +185,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                       TextFieldDefaults.outlinedTextFieldColors(
                           focusedBorderColor = MaterialTheme.colorScheme.onBackground,
                           unfocusedBorderColor = MaterialTheme.colorScheme.onBackground),
-                  modifier =
-                      Modifier.fillMaxWidth().padding(start = 7.dp, end = 7.dp).testTag("Title"))
+                  modifier = Modifier.fillMaxWidth().padding(start = 7.dp, end = 7.dp))
 
               OutlinedTextField(
                   value = descriptionState.value,
@@ -185,26 +199,8 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                       TextFieldDefaults.outlinedTextFieldColors(
                           focusedBorderColor = MaterialTheme.colorScheme.onBackground,
                           unfocusedBorderColor = MaterialTheme.colorScheme.onBackground),
-                  modifier =
-                      Modifier.fillMaxWidth()
-                          .padding(start = 7.dp, end = 7.dp)
-                          .testTag("Description"))
-
-              OutlinedTextField(
-                  value = locationState.value,
-                  onValueChange = { newVal -> locationState.value = newVal },
-                  label = { Text("Location") },
-                  placeholder = { Text("Enter an address") },
-                  singleLine = true,
-                  shape = RoundedCornerShape(10.dp),
-                  textStyle = TextStyle(color = MaterialTheme.colorScheme.onBackground),
-                  colors =
-                      TextFieldDefaults.outlinedTextFieldColors(
-                          focusedBorderColor = MaterialTheme.colorScheme.onBackground,
-                          unfocusedBorderColor = MaterialTheme.colorScheme.onBackground),
-                  modifier =
-                      Modifier.fillMaxWidth().padding(start = 7.dp, end = 7.dp).testTag("Location"))
-
+                  modifier = Modifier.fillMaxWidth().padding(start = 7.dp, end = 7.dp))
+              LocationField(selectedLocation, locationState, eventViewModel)
               OutlinedTextField(
                   value = textDate.value,
                   onValueChange = { newText ->
@@ -225,8 +221,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                       TextFieldDefaults.outlinedTextFieldColors(
                           focusedBorderColor = MaterialTheme.colorScheme.onBackground,
                           unfocusedBorderColor = MaterialTheme.colorScheme.onBackground),
-                  modifier =
-                      Modifier.fillMaxWidth().padding(start = 7.dp, end = 7.dp).testTag("Date"))
+                  modifier = Modifier.fillMaxWidth().padding(start = 7.dp, end = 7.dp))
 
               OutlinedTextField(
                   value = priceText,
@@ -243,8 +238,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                       TextFieldDefaults.outlinedTextFieldColors(
                           focusedBorderColor = MaterialTheme.colorScheme.onBackground,
                           unfocusedBorderColor = MaterialTheme.colorScheme.onBackground),
-                  modifier =
-                      Modifier.fillMaxWidth().padding(start = 7.dp, end = 7.dp).testTag("Price"))
+                  modifier = Modifier.fillMaxWidth().padding(start = 7.dp, end = 7.dp))
 
               OutlinedTextField(
                   value = url.value,
@@ -258,8 +252,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                       TextFieldDefaults.outlinedTextFieldColors(
                           focusedBorderColor = MaterialTheme.colorScheme.onBackground,
                           unfocusedBorderColor = MaterialTheme.colorScheme.onBackground),
-                  modifier =
-                      Modifier.fillMaxWidth().padding(start = 7.dp, end = 7.dp).testTag("Link"))
+                  modifier = Modifier.fillMaxWidth().padding(start = 7.dp, end = 7.dp))
 
               Spacer(modifier = Modifier.height(16.dp))
 
@@ -303,7 +296,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                             lineHeight = 16.sp,
                             fontFamily = FontFamily(Font(R.font.roboto)),
                             fontWeight = FontWeight(1000),
-                            color = Color(0xFF000000),
+                            color = MaterialTheme.colorScheme.onBackground,
                             textAlign = TextAlign.Center,
                             letterSpacing = 0.5.sp,
                         ))
@@ -324,6 +317,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
 
               OutlinedButton(
                   onClick = {
+
                     val uid = db.getNewId()
                     if (!dateFormatError && dateState != null && titleState.value.isNotEmpty()) {
                       eventViewModel.location(locationState.value) { location ->
@@ -356,7 +350,6 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                       }
                     }
                   },
-                  modifier = Modifier.testTag("PostButton"),
                   shape = RoundedCornerShape(10.dp),
                   border = BorderStroke(1.dp, Color.Gray),
                   enabled = true,
@@ -381,5 +374,83 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                 Text("Error: Date Format Error", color = Color.Red)
               }
             }
+      }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun LocationField(
+    selectedLocation: MutableState<Location?>,
+    locationQuery: MutableState<String>,
+    eventViewModel: EventViewModel
+) {
+  var expanded by remember { mutableStateOf(false) }
+  val locationSuggestions = remember { mutableStateOf(emptyList<Location>()) }
+
+  LaunchedEffect(locationQuery.value) {
+    if (locationQuery.value == "") return@LaunchedEffect
+
+    // fetch locations when user finished typing
+    delay(1000)
+
+    eventViewModel.location(locationQuery.value, NUMBER_OF_SUGGESTIONS) { locations ->
+      locationSuggestions.value = locations
+    }
+  }
+
+  ExposedDropdownMenuBox(
+      expanded = expanded,
+      onExpandedChange = { expanded = !expanded },
+      modifier = Modifier.padding(start = 7.dp, end = 7.dp).fillMaxSize()) {
+        OutlinedTextField(
+            value = locationQuery.value,
+            onValueChange = {
+              expanded = true
+              locationQuery.value = it
+            },
+            label = { Text("Location") },
+            placeholder = { Text("Enter an address") },
+            singleLine = true,
+            shape = RoundedCornerShape(10.dp),
+            textStyle = TextStyle(color = MaterialTheme.colorScheme.onBackground),
+            colors =
+                TextFieldDefaults.outlinedTextFieldColors(
+                    focusedBorderColor = MaterialTheme.colorScheme.onBackground,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.onBackground),
+            modifier = Modifier.fillMaxWidth().menuAnchor())
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier =
+                Modifier.fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.background)
+                    .wrapContentHeight()
+                    .testTag("DropdownMenu"),
+        ) {
+          locationSuggestions.value.forEachIndexed { i, location ->
+            DropdownMenuItem(
+                modifier = Modifier.wrapContentSize(),
+                text = { Text(location.name) },
+                onClick = {
+                  locationQuery.value = location.name
+                  selectedLocation.value = location
+                  expanded = false
+                },
+                colors =
+                    MenuItemColors(
+                        textColor = MaterialTheme.colorScheme.onBackground,
+                        leadingIconColor = Color.Transparent,
+                        trailingIconColor = Color.Transparent,
+                        disabledTextColor = MaterialTheme.colorScheme.onBackground,
+                        disabledLeadingIconColor = Color.Transparent,
+                        disabledTrailingIconColor = Color.Transparent),
+            )
+            if (i != locationSuggestions.value.size - 1) {
+              HorizontalDivider(
+                  modifier = Modifier.padding(top = 5.dp, bottom = 5.dp),
+                  color = MaterialTheme.colorScheme.tertiary)
+            }
+          }
+        }
       }
 }

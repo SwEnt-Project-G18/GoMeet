@@ -8,6 +8,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
@@ -33,10 +34,12 @@ object Route {
   const val PROFILE = "Profile"
   const val PUBLIC_CREATE = "Public Create"
   const val PRIVATE_CREATE = "Private Create"
-  const val OTHERS_PROFILE = "Others Profile"
+  const val OTHERS_PROFILE = "OthersProfile/{uid}"
   const val ADD_PARTICIPANTS = "Add Participants"
   const val EVENT_INFO =
       "eventInfo/{title}/{date}/{time}/{organizer}/{rating}/{description}/{latitude}/{longitude}"
+  const val SETTINGS = "Settings"
+  const val MESSAGE = "Message/{id}"
 }
 
 val CREATE_ITEMS =
@@ -83,7 +86,9 @@ val SECOND_LEVEL_DESTINATION =
             icon = Icons.Default.Person,
             textId = Route.ADD_PARTICIPANTS),
         TopLevelDestination(
-            route = Route.EVENT_INFO, icon = Icons.Default.Person, textId = Route.EVENT_INFO))
+            route = Route.EVENT_INFO, icon = Icons.Default.Person, textId = Route.EVENT_INFO),
+        TopLevelDestination(
+            route = Route.SETTINGS, icon = Icons.Default.Settings, textId = Route.SETTINGS))
 
 class NavigationActions(val navController: NavHostController) {
   fun navigateTo(destination: TopLevelDestination, clearBackStack: Boolean = false) {
