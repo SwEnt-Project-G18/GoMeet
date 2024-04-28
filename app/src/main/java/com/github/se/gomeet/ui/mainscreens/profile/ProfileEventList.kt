@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -36,28 +37,31 @@ import com.github.se.gomeet.ui.theme.Grey
 fun ProfileEventsList(title: String) {
   Spacer(modifier = Modifier.height(10.dp))
   Column {
-    Row(Modifier.padding(start = 15.dp, end = 0.dp, top = 0.dp, bottom = 0.dp).fillMaxWidth()) {
-      Text(
-          text = title,
-          style =
-              TextStyle(
-                  fontSize = 18.sp,
-                  lineHeight = 16.sp,
-                  fontFamily = FontFamily(Font(R.font.roboto)),
-                  fontWeight = FontWeight(1000),
-                  color = DarkCyan,
-                  textAlign = TextAlign.Start,
-                  letterSpacing = 0.5.sp,
-              ),
-          modifier = Modifier.width(104.dp).height(21.dp).align(Alignment.Bottom))
-      Text(text = "View all", color = Grey, modifier = Modifier.align(Alignment.Bottom))
-    }
+    Row(
+        Modifier.padding(start = 15.dp, end = 0.dp, top = 0.dp, bottom = 0.dp)
+            .fillMaxWidth()
+            .testTag("EventsListHeader")) {
+          Text(
+              text = title,
+              style =
+                  TextStyle(
+                      fontSize = 18.sp,
+                      lineHeight = 16.sp,
+                      fontFamily = FontFamily(Font(R.font.roboto)),
+                      fontWeight = FontWeight(1000),
+                      color = DarkCyan,
+                      textAlign = TextAlign.Start,
+                      letterSpacing = 0.5.sp,
+                  ),
+              modifier = Modifier.width(104.dp).height(21.dp).align(Alignment.Bottom))
+          Text(text = "View all", color = Grey, modifier = Modifier.align(Alignment.Bottom))
+        }
     Spacer(modifier = Modifier.height(10.dp))
     LazyRow(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         contentPadding = PaddingValues(start = 15.dp, end = 15.dp),
-        modifier = Modifier.heightIn(min = 56.dp)) {
+        modifier = Modifier.heightIn(min = 56.dp).testTag("EventsListItems")) {
           items(10) {
             Column(modifier = Modifier.width(170.dp)) {
               Image(
