@@ -19,14 +19,12 @@ class EventViewModelTest {
   private lateinit var eventViewModel: EventViewModel
   private val title = "testevent"
 
-
-
   @Before
   fun setup() {
-      Firebase.firestore.useEmulator("10.0.2.2", 8080)
-      Firebase.storage.useEmulator("10.0.2.2", 9199)
-      Firebase.auth.useEmulator("10.0.2.2", 9099)
-      eventViewModel = EventViewModel("testuser")
+    Firebase.firestore.useEmulator("10.0.2.2", 8080)
+    Firebase.storage.useEmulator("10.0.2.2", 9199)
+    Firebase.auth.useEmulator("10.0.2.2", 9099)
+    eventViewModel = EventViewModel("testuser")
     eventViewModel.createEvent(
         title,
         "description",

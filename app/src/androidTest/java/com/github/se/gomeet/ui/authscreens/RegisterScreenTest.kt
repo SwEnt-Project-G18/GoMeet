@@ -37,12 +37,11 @@ class RegisterScreenTest {
   fun tearDown() {
     // Clean up the test data
     rule.waitForIdle()
-     Firebase.auth.currentUser?.delete()
+    Firebase.auth.currentUser?.delete()
   }
 
   @Test
   fun testRegisterScreen() = runTest {
-
     val authViewModel = AuthViewModel()
     val userViewModel = UserViewModel()
 
@@ -74,6 +73,5 @@ class RegisterScreenTest {
     // Assert that the register worked
     assert(authViewModel.signInState.value.signInError == null)
     assert(authViewModel.signInState.value.isSignInSuccessful)
-
   }
 }

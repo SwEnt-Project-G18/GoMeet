@@ -43,7 +43,6 @@ class LoginScreenTest {
     Firebase.auth.currentUser?.delete()
   }
 
-
   @SuppressLint("StateFlowValueCalledInComposition")
   @Test
   fun testLoginScreen() {

@@ -11,7 +11,6 @@ import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
-import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test

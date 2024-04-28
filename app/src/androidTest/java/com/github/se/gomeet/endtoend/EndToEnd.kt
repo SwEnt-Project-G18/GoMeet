@@ -1,8 +1,6 @@
 package com.github.se.gomeet.endtoend
 
-import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.MainActivity
 import com.github.se.gomeet.screens.CreateEventScreen
@@ -11,28 +9,19 @@ import com.github.se.gomeet.screens.LoginScreen
 import com.github.se.gomeet.screens.WelcomeScreenScreen
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen
-import io.mockk.junit4.MockKRule
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.test.runTest
 import org.junit.After
-import org.junit.AfterClass
-import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
 class EndToEndTest : TestCase() {
@@ -43,10 +32,7 @@ class EndToEndTest : TestCase() {
   fun tearDown() {
 
     runBlocking {
-      eventVM.getAllEvents()?.forEach {
-        if (it.creator == uid)
-          eventVM.removeEvent(it.uid)
-      }
+      eventVM.getAllEvents()?.forEach { if (it.creator == uid) eventVM.removeEvent(it.uid) }
     }
 
     // Clean up the user
@@ -132,7 +118,6 @@ class EndToEndTest : TestCase() {
     }
   }
 
-
   companion object {
 
     private val email = "qwe@asd.com"
@@ -142,6 +127,7 @@ class EndToEndTest : TestCase() {
 
     private lateinit var userVM: UserViewModel
     private lateinit var eventVM: EventViewModel
+
     @JvmStatic
     @BeforeClass
     fun setup() {
@@ -158,5 +144,3 @@ class EndToEndTest : TestCase() {
     }
   }
 }
-
-

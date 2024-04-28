@@ -9,17 +9,15 @@ import androidx.compose.ui.test.performTextInput
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.github.se.gomeet.endtoend.EndToEndTest
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
-import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
+import java.time.LocalDate
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.BeforeClass
-import java.time.LocalDate
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -36,12 +34,10 @@ class CreateEventTest {
   fun tearDown() {
     runBlocking {
       eventViewModel.getAllEvents()?.forEach {
-        if (it.creator == uid)
-          eventViewModel.removeEvent(it.uid)
+        if (it.creator == uid) eventViewModel.removeEvent(it.uid)
       }
     }
   }
-
 
   @Test
   fun testCreateEventScreen_InputFields() {
@@ -105,7 +101,7 @@ class CreateEventTest {
     rule.onNodeWithText("Post").performClick()
   }
 
-  companion object{
+  companion object {
 
     @JvmStatic
     @BeforeClass
@@ -114,6 +110,4 @@ class CreateEventTest {
       Firebase.firestore.useEmulator("10.0.2.2", 8080)
     }
   }
-
-
 }

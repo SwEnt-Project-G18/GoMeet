@@ -16,6 +16,7 @@ import org.junit.Test
 class ProfileTest {
 
   @get:Rule val composeTestRule = createComposeRule()
+
   @Test
   fun profileUiTest() {
     composeTestRule.setContent { Profile(NavigationActions(rememberNavController())) }
