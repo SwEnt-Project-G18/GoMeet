@@ -39,8 +39,6 @@ class EndToEndTest : TestCase() {
 
   @get:Rule val composeTestRule = createAndroidComposeRule<MainActivity>()
 
-  @get:Rule val mockkRule = MockKRule(this)
-
   @After
   fun tearDown() {
 
@@ -53,7 +51,7 @@ class EndToEndTest : TestCase() {
 
     // Clean up the user
     Firebase.auth.currentUser?.delete()
-    userVM.deleteUser("testuid")
+    userVM.deleteUser(uid)
   }
 
   @Test
@@ -89,7 +87,49 @@ class EndToEndTest : TestCase() {
 
     composeTestRule.waitForIdle()
 
+    ComposeScreen.onComposeScreen<CreateScreen>(composeTestRule) {
+      step("goTo publicCreate") {
+        createPublicEventButton {
+          assertIsDisplayed()
+          performClick()
+        }
+      }
+    }
 
+    composeTestRule.waitForIdle()
+
+    ComposeScreen.onComposeScreen<CreateEventScreen>(composeTestRule) {
+      step("add event") {
+        title {
+          assertIsDisplayed()
+          performTextInput("Title")
+        }
+        description {
+          assertIsDisplayed()
+          performTextInput("Description")
+        }
+        location {
+          assertIsDisplayed()
+          performTextInput("Lausanne")
+        }
+        date {
+          assertIsDisplayed()
+          performTextInput("2003-01-01")
+        }
+        price {
+          assertIsDisplayed()
+          performTextInput("0.0")
+        }
+        link {
+          assertIsDisplayed()
+          performTextInput("https://example.com")
+        }
+        postButton {
+          assertIsDisplayed()
+          performClick()
+        }
+      }
+    }
   }
 
 
