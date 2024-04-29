@@ -280,9 +280,7 @@ fun EventDescription(text: String) {
       modifier = Modifier.testTag("EventDescription"))
 }
 
-/**
- * EventButtons is a composable that displays the buttons for an event.
- */
+/** EventButtons is a composable that displays the buttons for an event. */
 @Composable
 fun EventButtons() {
   Row(

@@ -35,12 +35,10 @@ import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
 
 /**
- * Composable function for the Create screen.
- * This composable will navigate to either the PublicCreate
- * or PrivateCreate screen.
+ * Composable function for the Create screen. This composable will navigate to either the
+ * PublicCreate or PrivateCreate screen.
  *
  * @param nav The navigation actions.
-
  */
 @Composable
 fun Create(nav: NavigationActions) {

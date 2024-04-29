@@ -8,12 +8,11 @@ import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.tasks.await
 
 /**
- * This class represents the repository for the authentication of the user.
- * A repository is a class that communicates with the data source.
+ * This class represents the repository for the authentication of the user. A repository is a class
+ * that communicates with the data source.
  *
  * @param fAuth The firebase authentication instance
  */
-
 class AuthRepository(fAuth: FirebaseAuth? = null) {
 
   private val firebaseAuth = fAuth ?: FirebaseAuth.getInstance()
@@ -103,9 +102,7 @@ class AuthRepository(fAuth: FirebaseAuth? = null) {
     }
   }
 
-  /**
-   * This function signs out the user
-   */
+  /** This function signs out the user */
   fun signOut() {
     firebaseAuth.signOut()
   }

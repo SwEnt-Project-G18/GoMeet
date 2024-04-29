@@ -183,10 +183,7 @@ fun WelcomeScreenPreview() {
       onSignInSuccess = { _ -> }) // Preview the WelcomeScreen
 }
 
-
-/**
- * Composable function for the Divider with Text.
- */
+/** Composable function for the Divider with Text. */
 @Composable
 fun DividerWithText() {
   val color = MaterialTheme.colorScheme.tertiary

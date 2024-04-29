@@ -10,8 +10,8 @@ import kotlinx.coroutines.CompletableDeferred
 
 // _db argument to be able to pass a mock FirebaseFirestore instance for testing
 /**
- * ViewModel for event invitation logic. The viewModel is responsible for handling
- * the logic that comes from the UI and the repository.
+ * ViewModel for event invitation logic. The viewModel is responsible for handling the logic that
+ * comes from the UI and the repository.
  */
 class EventInviteViewModel {
 
@@ -21,7 +21,6 @@ class EventInviteViewModel {
    * Get the users invited to an event.
    *
    * @param eventId the id of the event
-   *
    * @return the users invited to the event
    */
   suspend fun getUsersInvitedToEvent(eventId: String): UserInvitedToEvents? {
@@ -38,7 +37,6 @@ class EventInviteViewModel {
    * Get the events a user has been invited to.
    *
    * @param userId the id of the user
-   *
    * @return the events the user has been invited to
    */
   suspend fun getEventsUserHasBeenInvitedTo(userId: String): EventInviteUsers? {
@@ -57,7 +55,6 @@ class EventInviteViewModel {
    *
    * @param userID the id of the user to send the invite to
    * @param eventId the id of the event to invite the user to
-   *
    * @return true if the invite has been successfully sent
    */
   fun sendInviteToUser(userID: String, eventId: String): Boolean? {
@@ -73,7 +70,6 @@ class EventInviteViewModel {
    *
    * @param userId the id of the user
    * @param eventId the id of the event
-   *
    * @return true if the status has been successfully updated to ACCEPTED
    */
   fun userAcceptsInvite(userId: String, eventId: String) {
@@ -85,7 +81,6 @@ class EventInviteViewModel {
    *
    * @param userId the id of the user
    * @param eventId the id of the event
-   *
    * @return true if the status has been successfully updated to REFUSED
    */
   fun userRefusesInvite(userId: String, eventId: String) {

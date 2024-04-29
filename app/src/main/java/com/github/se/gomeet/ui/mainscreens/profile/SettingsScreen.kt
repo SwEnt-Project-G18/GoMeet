@@ -171,9 +171,7 @@ fun SettingsComposable(icon: Int, text: String) {
       }
 }
 
-/**
- * Composable function for the navigate next icon.
- */
+/** Composable function for the navigate next icon. */
 @Composable
 fun NavigateNextComposable() {
   Surface(

@@ -6,9 +6,8 @@ import com.github.se.gomeet.viewmodel.EventInviteViewModel
 
 /**
  * Composable function for the EventInvites screen.
- * 
+ *
  * @param eventInviteViewModel The view model for the EventInvites screen.
- 
  */
 @Composable fun EventInvites(eventInviteViewModel: EventInviteViewModel) {}
 

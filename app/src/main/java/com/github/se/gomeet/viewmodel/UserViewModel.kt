@@ -13,8 +13,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 /**
- * ViewModel for the user. The viewModel is responsible for handling
- * the logic that comes from the UI and the repository.
+ * ViewModel for the user. The viewModel is responsible for handling the logic that comes from the
+ * UI and the repository.
  */
 class UserViewModel : ViewModel() {
   private val db = UserFirebaseConnection(Firebase.firestore)
@@ -48,7 +48,6 @@ class UserViewModel : ViewModel() {
    * Get the user with its id.
    *
    * @param uid the user id
-   *
    * @return the user
    */
   suspend fun getUser(uid: String): GoMeetUser? {

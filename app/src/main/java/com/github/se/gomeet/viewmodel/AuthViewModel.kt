@@ -11,8 +11,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 /**
- * ViewModel for the authentication. The viewModel is responsible for handling
- * the logic that comes from the UI and the repository.
+ * ViewModel for the authentication. The viewModel is responsible for handling the logic that comes
+ * from the UI and the repository.
  */
 class AuthViewModel : ViewModel() {
 
@@ -22,9 +22,7 @@ class AuthViewModel : ViewModel() {
 
   val currentUser = authRepository.currentUser
 
-  /**
-   * Check if the user is signed in.
-   */
+  /** Check if the user is signed in. */
   val hasUser: Boolean
     get() = authRepository.hasUserSignedIn()
 
@@ -73,16 +71,12 @@ class AuthViewModel : ViewModel() {
     _signInState.value = _signInState.value.copy(confirmPasswordRegister = confirmPasswordRegister)
   }
 
-  /**
-   * Validate the sign in form.
-   */
+  /** Validate the sign in form. */
   private fun validateSignInForm(): Boolean {
     return _signInState.value.email.isNotBlank() && _signInState.value.password.isNotBlank()
   }
 
-  /**
-   * Validate the register form.
-   */
+  /** Validate the register form. */
   private fun validateRegisterForm(): Boolean {
     return _signInState.value.emailRegister.isNotBlank() &&
         _signInState.value.passwordRegister.isNotBlank() &&
@@ -156,9 +150,7 @@ class AuthViewModel : ViewModel() {
     }
   }
 
-  /**
-   * Sign out the user.
-   */
+  /** Sign out the user. */
   fun signOut() {
     authRepository.signOut()
   }

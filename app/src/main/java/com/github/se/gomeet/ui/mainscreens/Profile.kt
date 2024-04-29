@@ -22,7 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -241,7 +241,7 @@ fun Profile(nav: NavigationActions) { // TODO Add parameters to the function
                               ),
                           modifier = Modifier.align(Alignment.CenterHorizontally))
                     }
-                    Divider(
+                    HorizontalDivider(
                         modifier =
                             Modifier
                                 // .fillMaxHeight()
@@ -275,7 +275,7 @@ fun Profile(nav: NavigationActions) { // TODO Add parameters to the function
                               ),
                           modifier = Modifier.align(Alignment.CenterHorizontally))
                     }
-                    Divider(
+                    HorizontalDivider(
                         modifier =
                             Modifier
                                 // .fillMaxHeight()

@@ -30,9 +30,7 @@ data class TopLevelDestination(
     val textId: String,
 )
 
-/**
- * Constants for the routes in the app.
- */
+/** Constants for the routes in the app. */
 object Route {
   const val WELCOME = "Welcome"
   const val LOGIN = "Login"
@@ -107,13 +105,13 @@ val SECOND_LEVEL_DESTINATION =
  */
 class NavigationActions(val navController: NavHostController) {
 
-    /**
-     * Navigates to the given destination.
-     *
-     * @param destination The destination to navigate to.
-     * @param clearBackStack Whether to clear the back stack.
-     */
-    fun navigateTo(destination: TopLevelDestination, clearBackStack: Boolean = false) {
+  /**
+   * Navigates to the given destination.
+   *
+   * @param destination The destination to navigate to.
+   * @param clearBackStack Whether to clear the back stack.
+   */
+  fun navigateTo(destination: TopLevelDestination, clearBackStack: Boolean = false) {
     Log.d("Navigation", "Navigating to ${destination.route}, clear back stack: $clearBackStack")
     navController.navigate(destination.route) {
       if (clearBackStack) {
@@ -124,26 +122,26 @@ class NavigationActions(val navController: NavHostController) {
     }
   }
 
-    /**
-     * Navigates to the given screen.
-     *
-     * @param route The route to navigate to.
-     */
+  /**
+   * Navigates to the given screen.
+   *
+   * @param route The route to navigate to.
+   */
   fun navigateToScreen(route: String) {
     navController.navigate(route)
   }
 
-    /**
-     * Navigates to the event info screen.
-     *
-     * @param title The title of the event.
-     * @param date The date of the event.
-     * @param time The time of the event.
-     * @param organizer The organizer of the event.
-     * @param rating The rating of the event.
-     * @param description The description of the event.
-     * @param loc The location of the event.
-     */
+  /**
+   * Navigates to the event info screen.
+   *
+   * @param title The title of the event.
+   * @param date The date of the event.
+   * @param time The time of the event.
+   * @param organizer The organizer of the event.
+   * @param rating The rating of the event.
+   * @param description The description of the event.
+   * @param loc The location of the event.
+   */
   fun navigateToEventInfo(
       title: String,
       date: String,
@@ -165,9 +163,7 @@ class NavigationActions(val navController: NavHostController) {
     navController.navigate(route)
   }
 
-    /**
-     * Navigates to the previous screen.
-     */
+  /** Navigates to the previous screen. */
   fun goBack() {
     navController.popBackStack()
   }

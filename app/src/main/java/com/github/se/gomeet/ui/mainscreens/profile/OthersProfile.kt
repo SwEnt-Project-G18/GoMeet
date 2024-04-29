@@ -190,7 +190,7 @@ fun OthersProfile(nav: NavigationActions, uid: String) { // TODO Add parameters 
                   horizontalArrangement = Arrangement.SpaceEvenly,
                   verticalAlignment = Alignment.CenterVertically,
                   modifier = Modifier.fillMaxWidth().testTag("MoreUserInfo")) {
-                    Column() {
+                    Column {
                       Text(
                           text = "10",
                           style =
@@ -335,9 +335,7 @@ fun OthersProfile(nav: NavigationActions, uid: String) { // TODO Add parameters 
       }
 }
 
-/**
- * Composable function for the MoreActionsButton.
- */
+/** Composable function for the MoreActionsButton. */
 @Composable
 fun MoreActionsButton() {
   var showMenu by remember { mutableStateOf(false) }
@@ -369,5 +367,5 @@ fun MoreActionsButton() {
 @Preview
 @Composable
 fun OthersProfilePreview() {
-    OthersProfile(nav = NavigationActions(rememberNavController()), "")
+  OthersProfile(nav = NavigationActions(rememberNavController()), "")
 }

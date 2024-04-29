@@ -17,19 +17,17 @@ import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
 
-/**
- * CustomPins class is responsible for creating custom pins for the map and uploading them.
- */
+/** CustomPins class is responsible for creating custom pins for the map and uploading them. */
 class CustomPins {
 
-    /**
-     * Create a custom pin with the given date and time.
-     *
-     * @param context The context of the activity.
-     * @param date The date of the event.
-     * @param time The time of the event.
-     * @param callback The callback function to be called when the pin is created.
-     */
+  /**
+   * Create a custom pin with the given date and time.
+   *
+   * @param context The context of the activity.
+   * @param date The date of the event.
+   * @param time The time of the event.
+   * @param callback The callback function to be called when the pin is created.
+   */
   fun createCustomPin(
       context: Context,
       date: LocalDate,
@@ -58,26 +56,25 @@ class CustomPins {
     callback(BitmapDescriptorFactory.fromBitmap(bitmap), bitmap)
   }
 
-    /**
-     * Convert a bitmap to a byte array.
-     *
-     * @param bitmap The bitmap to convert.
-     *
-     * @return The byte array of the bitmap.
-     */
+  /**
+   * Convert a bitmap to a byte array.
+   *
+   * @param bitmap The bitmap to convert.
+   * @return The byte array of the bitmap.
+   */
   fun bitmapToByteArray(bitmap: Bitmap): ByteArray {
     val stream = ByteArrayOutputStream()
     bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
     return stream.toByteArray()
   }
 
-    /**
-     * Upload the event icon to Firebase Storage.
-     *
-     * @param context The context of the activity.
-     * @param byteArray The byte array of the icon.
-     * @param eventID The ID of the event.
-     */
+  /**
+   * Upload the event icon to Firebase Storage.
+   *
+   * @param context The context of the activity.
+   * @param byteArray The byte array of the icon.
+   * @param eventID The ID of the event.
+   */
   fun uploadEventIcon(context: Context, byteArray: ByteArray, eventID: String) {
     val storageRef = FirebaseStorage.getInstance().reference
     val iconRef = storageRef.child("event_icons/$eventID.png")
