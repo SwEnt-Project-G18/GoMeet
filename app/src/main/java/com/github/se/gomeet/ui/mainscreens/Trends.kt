@@ -11,6 +11,11 @@ import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 
+/**
+ * Trends screen composable. This is where the popular trends are displayed.
+ *
+ * @param nav Navigation actions.
+ */
 @Composable
 fun Trends(nav: NavigationActions) {
   Scaffold(

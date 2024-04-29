@@ -3,6 +3,24 @@ package com.github.se.gomeet.model.event
 import com.github.se.gomeet.model.event.location.Location
 import java.time.LocalDate
 
+/**
+ * This data class represents an event. An event is the main entity of the application.
+ *
+ * @param uid Event's uid
+ * @param creator Creator of the event
+ * @param title Title of the event
+ * @param description Description of the event
+ * @param location Location of the event
+ * @param date Date of the event
+ * @param price Price of the Event
+ * @param url Website of the event (can be ticketLink)
+ * @param participants People participating to the event
+ * @param visibleToIfPrivate People that can enter the event if it's private
+ * @param maxParticipants Maximum number of Participants of the event
+ * @param public True if the event is public, false if it's private
+ * @param tags Tags of the event
+ * @param images Is it the right type?
+ */
 data class Event(
     val uid: String, // Event's uid
     val creator: String, // Creator of the event

@@ -33,6 +33,11 @@ import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
 
+/**
+ * Composable function for the profile Settings screen.
+ *
+ * @param nav The navigation actions for the screen.
+ */
 @Composable
 fun SettingsScreen(
     nav: NavigationActions, /*userViewModel: UserViewModel*/
@@ -133,6 +138,12 @@ fun SettingsScreen(
       }
 }
 
+/**
+ * Composable function for the settings items.
+ *
+ * @param icon The icon for the item.
+ * @param text The text for the item.
+ */
 @Composable
 fun SettingsComposable(icon: Int, text: String) {
   Row(
@@ -160,6 +171,7 @@ fun SettingsComposable(icon: Int, text: String) {
       }
 }
 
+/** Composable function for the navigate next icon. */
 @Composable
 fun NavigateNextComposable() {
   Surface(
@@ -175,6 +187,12 @@ fun NavigateNextComposable() {
       }
 }
 
+/**
+ * Composable function for the settings subtitle.
+ *
+ * @param text The text for the subtitle.
+ * @param modifier The modifier for the subtitle.
+ */
 @Composable
 fun SettingsSubtitle(text: String, modifier: Modifier) {
   Text(
