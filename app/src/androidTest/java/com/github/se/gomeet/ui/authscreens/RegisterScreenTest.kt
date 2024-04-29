@@ -81,6 +81,6 @@ class RegisterScreenTest {
     assert(authViewModel.signInState.value.signInError == null)
     //    assert(authViewModel.signInState.value.isSignInSuccessful) // Error here in CI
 
-    userViewModel.deleteUser(Firebase.auth.currentUser!!.uid)
+    if (Firebase.auth.currentUser != null) userViewModel.deleteUser(Firebase.auth.currentUser!!.uid)
   }
 }

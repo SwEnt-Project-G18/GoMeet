@@ -29,13 +29,13 @@ jobs:
           distribution: "temurin"
           java-version: "17"
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '20'
+#      - name: Setup Node.js
+#        uses: actions/setup-node@v2
+#        with:
+#          node-version: '20'
 
-      - name: Install Firebase CLI
-        run: npm install -g firebase-tools
+#      - name: Install Firebase CLI
+#        run: npm install -g firebase-tools
 
       - name: API Key Setup
         run: |
@@ -76,9 +76,9 @@ jobs:
       #    # To run the CI with debug informations, add --info
       #    ./gradlew ktfmtCheck
 
-      - name: Start Firebase Emulator
-        run: |
-          firebase emulators:start --only firestore,auth --project=dummy-project-id &
+#      - name: Start Firebase Emulator
+#        run: |
+#          firebase emulators:start --only firestore,auth,storage --project=dummy-project-id &
 
       - name: Assemble and Lint
         run: ./gradlew assembleDebug lint --build-cache
@@ -98,11 +98,7 @@ jobs:
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           script: ./gradlew connectedCheck
 
-      #      - name: Stop Emulator
-      #        if: always()
-      #        run: adb -s emulator-5554 emu kill
 
-
-      - name: Stop Firebase Emulator
-        if: always()
-        run: pkill -f "firebase" || true
+#      - name: Stop Firebase Emulator
+#        if: always()
+#        run: pkill -f "firebase" || true

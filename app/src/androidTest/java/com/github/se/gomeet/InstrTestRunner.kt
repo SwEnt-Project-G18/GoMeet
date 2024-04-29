@@ -11,7 +11,7 @@ class InstrTestRunner : AndroidJUnitRunner() {
   override fun onCreate(arguments: Bundle) {
     super.onCreate(arguments)
     // Code to execute before all tests
-    setupGlobalTestEnvironment()
+    //    setupGlobalTestEnvironment()
   }
 
   override fun finish(resultCode: Int, results: Bundle) {
