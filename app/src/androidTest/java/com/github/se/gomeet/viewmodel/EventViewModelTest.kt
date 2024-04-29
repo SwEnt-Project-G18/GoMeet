@@ -5,6 +5,7 @@ import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.location.Location
 import java.time.LocalDate
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -15,8 +16,7 @@ class EventViewModelTest {
   private val uid = "testuid"
 
   @Test
-  fun test() {
-
+  fun test() = runTest {
     val eventViewModel = EventViewModel(uid)
 
     // test getAllEvents and createEvent
@@ -38,10 +38,9 @@ class EventViewModelTest {
           uid)
     }
 
-    var events: List<Event> = emptyList()
-    runBlocking { events = eventViewModel.getAllEvents()!!.filter { it.title == title } }
-    if (events.isEmpty()) {
-      runBlocking { events = eventViewModel.getAllEvents()!!.filter { it.title == title } }
+    var events: List<Event> = eventViewModel.getAllEvents()!!.filter { it.title == title }
+    while (events.isEmpty()) {
+      events = eventViewModel.getAllEvents()!!.filter { it.title == title }
     }
 
     assert(events.isNotEmpty())
@@ -49,13 +48,13 @@ class EventViewModelTest {
     // test getEvent
     val uid = events[0].uid
     lateinit var event: Event
-    runBlocking { event = eventViewModel.getEvent(uid)!! }
+    event = eventViewModel.getEvent(uid)!!
 
     assert(event != null)
     assert(event.uid == uid)
     assert(event.title == title)
 
-    runBlocking { assert(eventViewModel.getEvent("this_event_does_not_exist") == null) }
+    assert(eventViewModel.getEvent("this_event_does_not_exist") == null)
 
     // test editEvent
     val newTitle = "newtestevent"
@@ -77,7 +76,7 @@ class EventViewModelTest {
             event.images)
 
     eventViewModel.editEvent(newEvent)
-    runBlocking { event = eventViewModel.getEvent(uid)!! }
+    event = eventViewModel.getEvent(uid)!!
 
     assert(event != null)
     assert(event.uid == uid)
@@ -85,6 +84,6 @@ class EventViewModelTest {
 
     // test removeEvent
     eventViewModel.removeEvent(uid)
-    runBlocking { assert(eventViewModel.getEvent(uid) == null) }
+    assert(eventViewModel.getEvent(uid) == null)
   }
 }
