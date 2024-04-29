@@ -38,6 +38,12 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONArray
 
+/**
+ * ViewModel for the event. The viewModel is responsible for handling the logic that comes from the
+ * UI and the repository.
+ *
+ * @param creatorId the id of the creator of the event
+ */
 class EventViewModel(private val creatorId: String? = null) : ViewModel() {
   private val db = EventRepository(Firebase.firestore)
   private val _bitmapDescriptors = mutableStateMapOf<String, BitmapDescriptor>()
@@ -47,6 +53,12 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
   private val _loading = MutableLiveData(false)
   val loading: LiveData<Boolean> = _loading
 
+  /**
+   * Load custom pins for the events.
+   *
+   * @param context the context of the application
+   * @param events the list of events to load the custom pins for
+   */
   fun loadCustomPins(context: Context, events: List<Event>) =
       viewModelScope.launch {
         // Check if the current events are different from the last loaded events
@@ -80,6 +92,12 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
         }
       }
 
+  /**
+   * Load a bitmap from a URI.
+   *
+   * @param context the context of the application
+   * @param uri the URI of the image to load
+   */
   suspend fun loadBitmapFromUri(context: Context, uri: Uri): BitmapDescriptor =
       suspendCancellableCoroutine { continuation ->
         // Create a temporary ImageView to load the image.
@@ -116,6 +134,12 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
         }
       }
 
+  /**
+   * Get an event by its UID.
+   *
+   * @param uid the UID of the event to get
+   * @return the event with the given UID, or null if it does not exist
+   */
   suspend fun getEvent(uid: String): Event? {
     return try {
       val event = CompletableDeferred<Event?>()
@@ -126,12 +150,19 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
     }
   }
 
+  /**
+   * Upload an image to Firebase Storage and get the download URL.
+   *
+   * @param imageUri the URI of the image to upload
+   * @return the download URL of the uploaded image
+   */
   suspend fun uploadImageAndGetUrl(imageUri: Uri): String {
     val imageRef = Firebase.storage.reference.child("images/${imageUri.lastPathSegment}")
     val uploadTaskSnapshot = imageRef.putFile(imageUri).await()
     return uploadTaskSnapshot.metadata?.reference?.downloadUrl?.await().toString()
   }
 
+  /** Get all events that exist in the database. */
   suspend fun getAllEvents(): List<Event>? {
     return try {
       val event = CompletableDeferred<List<Event>?>()
@@ -142,6 +173,24 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
     }
   }
 
+  /**
+   * Create an event.
+   *
+   * @param title the title of the event
+   * @param description the description of the event
+   * @param location the location of the event
+   * @param date the date of the event
+   * @param price the price of the event
+   * @param url the URL of the event
+   * @param participants the participants of the event
+   * @param visibleToIfPrivate the users that the event is visible to if it is private
+   * @param maxParticipants the maximum number of participants of the event
+   * @param public whether the event is public
+   * @param tags the tags of the event
+   * @param images the images of the event
+   * @param imageUri the URI of the image of the event
+   * @param uid the UID of the event
+   */
   fun createEvent(
       title: String,
       description: String,
@@ -190,10 +239,20 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
     }
   }
 
+  /**
+   * Edit an event.
+   *
+   * @param event the event to edit
+   */
   fun editEvent(event: Event) {
     db.updateEvent(event)
   }
 
+  /**
+   * Remove an event by its UID.
+   *
+   * @param uid the UID of the event to remove
+   */
   fun removeEvent(uid: String) {
     db.removeEvent(uid)
   }
@@ -202,6 +261,13 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
     db.updateEvent(event.copy(participants = event.participants.plus(userId)))
   }
 
+  /**
+   * Get the location of an event.
+   *
+   * @param locationName the name of the location
+   * @param numberOfResults the number of results to get
+   * @param onResult the function to call with the result
+   */
   fun location(locationName: String, numberOfResults: Int, onResult: (List<Location>) -> Unit) {
     viewModelScope.launch {
       try {
@@ -225,6 +291,13 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
     }
   }
 
+  /**
+   * Helper function to parse the location response.
+   *
+   * @param responseBody the response body
+   * @param numberOfResults the number of results to get
+   * @return the list of locations
+   */
   private fun locHelper(responseBody: String, numberOfResults: Int): List<Location> {
     val locations: MutableList<Location> = mutableListOf()
     val jar = JSONArray(responseBody)

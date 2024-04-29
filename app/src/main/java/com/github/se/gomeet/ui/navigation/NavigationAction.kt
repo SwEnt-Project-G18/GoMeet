@@ -17,12 +17,20 @@ import androidx.navigation.NavHostController
 import com.github.se.gomeet.R
 import com.google.android.gms.maps.model.LatLng
 
+/**
+ * Data class representing a top level destination in the app.
+ *
+ * @param route The route to navigate to when this item is clicked.
+ * @param icon The icon to display for this item.
+ * @param textId The string resource ID for the text to display for this item.
+ */
 data class TopLevelDestination(
     val route: String,
     val icon: ImageVector,
     val textId: String,
 )
 
+/** Constants for the routes in the app. */
 object Route {
   const val WELCOME = "Welcome"
   const val LOGIN = "Login"
@@ -90,7 +98,19 @@ val SECOND_LEVEL_DESTINATION =
         TopLevelDestination(
             route = Route.SETTINGS, icon = Icons.Default.Settings, textId = Route.SETTINGS))
 
+/**
+ * Class that handles navigation in the app.
+ *
+ * @param navController The navigation controller for the app.
+ */
 class NavigationActions(val navController: NavHostController) {
+
+  /**
+   * Navigates to the given destination.
+   *
+   * @param destination The destination to navigate to.
+   * @param clearBackStack Whether to clear the back stack.
+   */
   fun navigateTo(destination: TopLevelDestination, clearBackStack: Boolean = false) {
     Log.d("Navigation", "Navigating to ${destination.route}, clear back stack: $clearBackStack")
     navController.navigate(destination.route) {
@@ -102,10 +122,26 @@ class NavigationActions(val navController: NavHostController) {
     }
   }
 
+  /**
+   * Navigates to the given screen.
+   *
+   * @param route The route to navigate to.
+   */
   fun navigateToScreen(route: String) {
     navController.navigate(route)
   }
 
+  /**
+   * Navigates to the event info screen.
+   *
+   * @param title The title of the event.
+   * @param date The date of the event.
+   * @param time The time of the event.
+   * @param organizer The organizer of the event.
+   * @param rating The rating of the event.
+   * @param description The description of the event.
+   * @param loc The location of the event.
+   */
   fun navigateToEventInfo(
       eventId: String,
       title: String,
@@ -129,11 +165,17 @@ class NavigationActions(val navController: NavHostController) {
     navController.navigate(route)
   }
 
+  /** Navigates to the previous screen. */
   fun goBack() {
     navController.popBackStack()
   }
 }
 
+/**
+ * Gets the icon for the given route.
+ *
+ * @param route The route to get the icon for.
+ */
 @Composable
 fun getIconForRoute(route: String): ImageVector {
   return when (route) {

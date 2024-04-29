@@ -60,16 +60,14 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 
 /**
- * Displays the header section of an event which includes the event title, the organizer's name, and
- * the event's date and time. The organizer's name is clickable and navigates to a detailed profile
- * or page.
+ * EventHeader is a composable that displays the header of an event.
  *
- * @param title The title of the event.
- * @param organizer A GoMeetUser object representing the event organizer.
- * @param rating The numerical rating of the event (currently not displayed but can be included).
- * @param nav An instance of NavigationActions for handling navigation events.
- * @param date The date of the event in a readable format.
- * @param time The time of the event.
+ * @param title Title of the event
+ * @param organizer Organizer of the event
+ * @param rating Rating of the event
+ * @param nav NavigationActions object to handle navigation
+ * @param date Date of the event
+ * @param time Time of the event
  */
 @Composable
 fun EventHeader(
@@ -112,10 +110,10 @@ fun EventHeader(
 }
 
 /**
- * Displays the date and time of an event in a compact format.
+ * EventDateTime is a composable that displays the date and time of an event.
  *
- * @param day The formatted string of the event's day.
- * @param time The formatted string of the event's start time.
+ * @param day Day of the event
+ * @param time Time of the event
  */
 @Composable
 fun EventDateTime(day: String, time: String) {
@@ -144,10 +142,9 @@ fun EventDateTime(day: String, time: String) {
 }
 
 /**
- * Displays the main image for an event, utilizing a given Painter object for the image source. The
- * image is displayed with a specific aspect ratio and rounded corners.
+ * EventImage is a composable that displays the image of an event.
  *
- * @param painter A Painter object used to render the event's image.
+ * @param painter Painter object for the image
  */
 @Composable
 fun EventImage(painter: Painter) {
@@ -165,9 +162,9 @@ fun EventImage(painter: Painter) {
 }
 
 /**
- * Displays a textual description of an event. The text is styled according to the app's theme.
+ * EventDescription is a composable that displays the description of an event.
  *
- * @param text The description text of the event.
+ * @param text Description of the event
  */
 @Composable
 fun EventDescription(text: String) {
@@ -279,13 +276,10 @@ fun EventButtons(
 }
 
 /**
- * A composable that displays a Google Map centered on a specified location with a marker. The map
- * is interactive and shows a close-up view of the location at a specified zoom level.
+ * MapViewComposable is a composable that displays the map view of an event.
  *
- * @param loc A LatLng object representing the geographic coordinates where the map should be
- *   centered.
- * @param zoomLevel A float representing the zoom level for the map, defaulting to 15f for close-up
- *   views.
+ * @param loc Location of the event
+ * @param zoomLevel Zoom level of the map
  */
 @Composable
 fun MapViewComposable(

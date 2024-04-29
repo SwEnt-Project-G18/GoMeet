@@ -85,7 +85,14 @@ import java.util.Date
 import java.util.Locale
 import kotlinx.coroutines.launch
 
-// Composable function that provides the main interface for the events screen
+/**
+ * Composable function to display the Events screen.
+ *
+ * @param currentUser String object representing CurrentUserId
+ * @param nav NavigationActions object to handle navigation
+ * @param userViewModel UserViewModel object to handle users
+ * @param eventViewModel EventViewModel object to handle events
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Events(
@@ -353,9 +360,10 @@ fun Events(
 }
 
 /**
- * A composable function that displays detailed information about an event in a card layout. This
- * widget is designed to present event details including the name, description, date, and an image
- * if available. The card is interactive and can be tapped to navigate to further event details.
+ * <<<<<<< HEAD:app/src/main/java/com/github/se/gomeet/ui/mainscreens/events/Events.kt A composable
+ * function that displays detailed information about an event in a card layout. This widget is
+ * designed to present event details including the name, description, date, and an image if
+ * available. The card is interactive and can be tapped to navigate to further event details.
  *
  * @param userName The name of the event creator.
  * @param eventId The unique identifier for the event.
@@ -366,7 +374,14 @@ fun Events(
  * @param verified A boolean indicating whether the event or the creator is verified. This could
  *   influence the visual representation.
  * @param nav NavigationActions object to handle navigation events such as tapping on the event
- *   card.
+ *   card. ======= Composable function to display an event widget.
+ * @param userName Name of the user who created the event
+ * @param eventName Name of the event
+ * @param eventDate Date and time of the event
+ * @param eventPicture Image of the event
+ * @param verified Boolean value indicating if the user is verified
+ * @param nav NavigationActions object to handle navigation >>>>>>>
+ *   origin/main:app/src/main/java/com/github/se/gomeet/ui/mainscreens/Events.kt
  */
 @Composable
 fun EventWidget(
@@ -514,6 +529,13 @@ fun EventWidget(
       }
 }
 
+/**
+ * Composable function to display the search bar.
+ *
+ * @param query MutableState object to store the search query
+ * @param backgroundColor Color of the search bar background
+ * @param contentColor Color of the search bar content
+ */
 @ExperimentalMaterial3Api
 @Composable
 fun GoMeetSearchBar(query: MutableState<String>, backgroundColor: Color, contentColor: Color) {

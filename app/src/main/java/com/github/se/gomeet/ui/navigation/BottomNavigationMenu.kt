@@ -18,6 +18,13 @@ import androidx.compose.ui.unit.dp
 import com.github.se.gomeet.ui.theme.Cyan
 import com.github.se.gomeet.ui.theme.TranslucentCyan
 
+/**
+ * Bottom navigation menu for the app.
+ *
+ * @param onTabSelect callback for when a tab is selected
+ * @param tabList list of top level destinations
+ * @param selectedItem the currently selected item
+ */
 @Composable
 fun BottomNavigationMenu(
     onTabSelect: (String) -> Unit,

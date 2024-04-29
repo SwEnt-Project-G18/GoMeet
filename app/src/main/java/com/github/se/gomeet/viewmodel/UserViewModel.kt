@@ -12,9 +12,19 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+/**
+ * ViewModel for the user. The viewModel is responsible for handling the logic that comes from the
+ * UI and the repository.
+ */
 class UserViewModel : ViewModel() {
   private val db = UserRepository(Firebase.firestore)
 
+  /**
+   * Create a new user if the user is new.
+   *
+   * @param uid the user id
+   * @param username the username
+   */
   fun createUserIfNew(uid: String, username: String) {
     CoroutineScope(Dispatchers.IO).launch {
       if (getUser(uid) == null) {
@@ -37,6 +47,12 @@ class UserViewModel : ViewModel() {
     }
   }
 
+  /**
+   * Get the user with its id.
+   *
+   * @param uid the user id
+   * @return the user
+   */
   suspend fun getUser(uid: String): GoMeetUser? {
     return try {
       Log.d("UID IS", "User id is $uid")
@@ -48,10 +64,20 @@ class UserViewModel : ViewModel() {
     }
   }
 
+  /**
+   * Edit the user.
+   *
+   * @param user the user to edit
+   */
   fun editUser(user: GoMeetUser) {
     db.updateUser(user)
   }
 
+  /**
+   * Delete the user.
+   *
+   * @param uid the user id
+   */
   fun deleteUser(uid: String) {
     db.removeUser(uid)
   }

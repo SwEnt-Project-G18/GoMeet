@@ -55,6 +55,11 @@ import kotlinx.coroutines.launch
 //  It is showing ALL EVENTS IN FIREBASE,
 //  THIS IS NOT THE IMPLEMENTATION OF TRENDS
 
+/**
+ * Trends screen composable. This is where the popular trends are displayed.
+ *
+ * @param nav Navigation actions.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Trends(

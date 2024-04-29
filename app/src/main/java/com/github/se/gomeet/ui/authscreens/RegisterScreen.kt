@@ -38,6 +38,14 @@ import com.google.firebase.ktx.Firebase
 import io.getstream.chat.android.client.ChatClient
 import io.getstream.chat.android.models.User
 
+/**
+ * Composable function for the Login Screen.
+ *
+ * @param client The ChatClient instance.
+ * @param authViewModel The ViewModel for the authentication.
+ * @param userViewModel The ViewModel for the user.
+ * @param onNavToExplore The navigation function to navigate to the Explore Screen.
+ */
 @Composable
 fun RegisterScreen(
     client: ChatClient,

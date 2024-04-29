@@ -79,6 +79,13 @@ import kotlinx.coroutines.delay
 
 private const val NUMBER_OF_SUGGESTIONS = 3
 
+/**
+ * Composable function for the CreateEvent screen.
+ *
+ * @param nav The navigation actions.
+ * @param eventViewModel The event view model.
+ * @param isPrivate The boolean value to determine if the event is private or not.
+ */
 @Composable
 fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivate: Boolean) {
 
@@ -380,6 +387,13 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
       }
 }
 
+/**
+ * Composable function for the LocationField.
+ *
+ * @param selectedLocation The selected location.
+ * @param locationQuery The location query.
+ * @param eventViewModel The event view model.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LocationField(
