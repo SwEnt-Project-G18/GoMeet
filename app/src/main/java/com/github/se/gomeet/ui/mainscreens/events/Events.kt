@@ -1,4 +1,4 @@
-package com.github.se.gomeet.ui.mainscreens
+package com.github.se.gomeet.ui.mainscreens.events
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -68,6 +68,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
+import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
@@ -75,7 +76,10 @@ import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.ui.theme.NavBarUnselected
 import com.github.se.gomeet.viewmodel.EventViewModel
+import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.android.gms.maps.model.LatLng
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import java.text.SimpleDateFormat
 import java.time.ZoneId
 import java.util.Calendar
@@ -85,17 +89,22 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
+fun Events(currentUser: String, nav: NavigationActions, userViewModel: UserViewModel, eventViewModel: EventViewModel) {
 
   var selectedFilter by remember { mutableStateOf("All") }
   val eventList = remember { mutableListOf<Event>() }
   val coroutineScope = rememberCoroutineScope()
   val query = remember { mutableStateOf("") }
+  val user = remember{ mutableStateOf<GoMeetUser?>(null) }
 
   LaunchedEffect(Unit) {
     coroutineScope.launch {
-      val allEvents = eventViewModel.getAllEvents()
-      if (!allEvents.isNullOrEmpty()) {
+      user.value = userViewModel.getUser(Firebase.auth.currentUser!!.uid)
+      val allEvents = eventViewModel.getAllEvents()!!.filter {
+          e -> user.value!!.myEvents.contains(e.uid) ||
+              user.value!!.myFavorites.contains(e.uid) ||
+              user.value!!.joinedEvents.contains(e.uid) }
+      if (allEvents.isNotEmpty()) {
         eventList.addAll(allEvents)
       }
     }
@@ -138,15 +147,15 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
                   horizontalArrangement = Arrangement.SpaceEvenly,
                   modifier = Modifier.heightIn(min = 56.dp).fillMaxWidth()) {
                     Button(
-                        onClick = { onFilterButtonClick("MyTickets") },
-                        content = { Text("My tickets") },
+                        onClick = { onFilterButtonClick("Joined") },
+                        content = { Text("Joined Events") },
                         colors =
                             ButtonDefaults.buttonColors(
                                 containerColor =
-                                    if (selectedFilter == "MyTickets") DarkCyan
+                                    if (selectedFilter == "Joined") DarkCyan
                                     else NavBarUnselected,
                                 contentColor =
-                                    if (selectedFilter == "MyTickets") Color.White else DarkCyan),
+                                    if (selectedFilter == "Joined") Color.White else DarkCyan),
                         border = BorderStroke(1.dp, DarkCyan))
                     Spacer(modifier = Modifier.width(10.dp))
                     Button(
@@ -175,9 +184,9 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
                   }
 
               Column(modifier = Modifier.verticalScroll(rememberScrollState()).fillMaxSize()) {
-                if (selectedFilter == "All" || selectedFilter == "MyTickets") {
+                if (selectedFilter == "All" || selectedFilter == "Joined") {
                   Text(
-                      text = "My Tickets",
+                      text = "Joined Events",
                       style =
                           TextStyle(
                               fontSize = 20.sp,
@@ -190,7 +199,7 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
                           ),
                       modifier = Modifier.padding(10.dp).align(Alignment.Start))
 
-                  eventList.forEach { event ->
+                  eventList.filter{e -> user.value!!.myEvents.contains(e.uid)}.forEach { event ->
                     if (event.title.contains(query.value, ignoreCase = true)) {
                       val painter: Painter =
                           if (event.images.isNotEmpty()) {
@@ -211,6 +220,8 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
                       EventWidget(
                           userName = event.creator,
                           eventName = event.title,
+                          eventId = event.uid,
+                          eventDescription = event.description,
                           eventDate =
                               Date.from(
                                   event.date.atStartOfDay(ZoneId.systemDefault()).toInstant()),
@@ -237,7 +248,7 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
                           ),
                       modifier = Modifier.padding(10.dp).align(Alignment.Start))
 
-                  eventList.forEach { event ->
+                  eventList.filter{e -> user.value!!.myFavorites.contains(e.uid)}.forEach { event ->
                     if (event.title.contains(query.value, ignoreCase = true)) {
                       val painter: Painter =
                           if (event.images.isNotEmpty()) {
@@ -256,7 +267,9 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
                           }
                       EventWidget(
                           userName = event.creator,
+                          eventId = event.uid,
                           eventName = event.title,
+                          eventDescription = event.description,
                           eventDate =
                               Date.from(
                                   event.date.atStartOfDay(ZoneId.systemDefault()).toInstant()),
@@ -282,7 +295,7 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
                           ),
                       modifier = Modifier.padding(10.dp).align(Alignment.Start))
 
-                  eventList.forEach { event ->
+                  eventList.filter{e -> e.creator == user.value!!.uid}.forEach { event ->
                     if (event.title.contains(query.value, ignoreCase = true)) {
                       val painter: Painter =
                           if (event.images.isNotEmpty()) {
@@ -301,7 +314,9 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
                           }
                       EventWidget(
                           userName = event.creator,
+                          eventId = event.uid,
                           eventName = event.title,
+                          eventDescription = event.description,
                           eventDate =
                               Date.from(
                                   event.date.atStartOfDay(ZoneId.systemDefault()).toInstant()),
@@ -319,7 +334,9 @@ fun Events(nav: NavigationActions, eventViewModel: EventViewModel) {
 @Composable
 fun EventWidget(
     userName: String,
+    eventId: String,
     eventName: String,
+    eventDescription: String,
     eventDate: Date,
     eventPicture: Painter,
     verified: Boolean,
@@ -370,11 +387,11 @@ fun EventWidget(
               .padding(start = 10.dp, top = 5.dp, end = 10.dp, bottom = 5.dp)
               .clickable {
                 nav.navigateToEventInfo(
+                    eventId = eventId,
                     title = eventName,
                     date = dayString,
                     time = timeString,
-                    description =
-                        "Howdy!\n\nAfter months of planning, La Dame Blanche is finally offering you a rapid tournament!\n\nJoin us on Saturday 23rd of March afternoon for 6 rounds of 12+3” games in the chill and cozy vibe of Satellite. Take your chance to have fun and play, and maybe win one of our many prizes\n\nOnly 50 spots available, with free entry!",
+                    description = eventDescription,
                     organizer = userName,
                     loc = LatLng(46.5191, 6.5668), // replace with actual location
                     rating = 0.0 // replace with actual rating
@@ -506,7 +523,7 @@ fun GoMeetSearchBar(query: MutableState<String>, backgroundColor: Color, content
 @Composable
 @Preview
 fun EventPreview() {
-  Events(nav = NavigationActions(rememberNavController()), EventViewModel())
+  Events("", nav = NavigationActions(rememberNavController()), UserViewModel(), EventViewModel())
   /*EventWidget(
   "EPFL Chess Club",
   "Chess Tournament",

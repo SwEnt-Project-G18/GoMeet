@@ -65,8 +65,10 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
       public: Boolean,
       tags: List<String>,
       images: List<String>,
-      imageUri: Uri?
+      imageUri: Uri?,
+      userViewModel: UserViewModel,
   ) {
+    Log.d("CreatorID", "Creator ID is $creatorId")
     CoroutineScope(Dispatchers.IO).launch {
       try {
         val imageUrl = imageUri?.let { uploadImageAndGetUrl(it) }
@@ -88,6 +90,8 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
                 tags,
                 updatedImages)
         db.addEvent(event)
+        joinEvent(event, creatorId)
+        userViewModel.joinEvent(event.uid, creatorId)
       } catch (e: Exception) {
         Log.w(TAG, "Error uploading image or adding event", e)
       }
@@ -100,6 +104,10 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
 
   fun removeEvent(uid: String) {
     db.removeEvent(uid)
+  }
+
+  fun joinEvent(event: Event, userId: String) {
+    db.updateEvent(event.copy(participants = event.participants.plus(userId)))
   }
 
   fun location(locationName: String, numberOfResults: Int, onResult: (List<Location>) -> Unit) {

@@ -36,7 +36,9 @@ object Route {
   const val OTHERS_PROFILE = "OthersProfile/{uid}"
   const val ADD_PARTICIPANTS = "Add Participants"
   const val EVENT_INFO =
-      "eventInfo/{title}/{date}/{time}/{organizer}/{rating}/{description}/{latitude}/{longitude}"
+      "eventInfo/{eventId}/{title}/{date}/{time}/{organizer}/{rating}/{description}/{latitude}/{longitude}"
+  const val OTHERS_EVENT_INFO =
+      "othersEventInfo/{eventId}/{title}/{date}/{time}/{organizer}/{rating}/{description}/{latitude}/{longitude}"
   const val MESSAGE = "Message/{id}"
 }
 
@@ -103,6 +105,7 @@ class NavigationActions(val navController: NavHostController) {
   }
 
   fun navigateToEventInfo(
+      eventId: String,
       title: String,
       date: String,
       time: String,
@@ -111,16 +114,17 @@ class NavigationActions(val navController: NavHostController) {
       description: String,
       loc: LatLng
   ) {
-    val route =
-        Route.EVENT_INFO.replace("{title}", Uri.encode(title))
-            .replace("{date}", Uri.encode(date))
-            .replace("{time}", Uri.encode(time))
-            .replace("{organizer}", Uri.encode(organizer))
-            .replace("{rating}", rating.toString())
-            .replace("{description}", Uri.encode(description))
-            .replace("{latitude}", loc.latitude.toString())
-            .replace("{longitude}", loc.longitude.toString())
-    navController.navigate(route)
+      val route =
+          Route.EVENT_INFO.replace("{eventId}", Uri.encode(eventId))
+              .replace("{title}", Uri.encode(title))
+              .replace("{date}", Uri.encode(date))
+              .replace("{time}", Uri.encode(time))
+              .replace("{organizer}", Uri.encode(organizer))
+              .replace("{rating}", rating.toString())
+              .replace("{description}", Uri.encode(description))
+              .replace("{latitude}", loc.latitude.toString())
+              .replace("{longitude}", loc.longitude.toString())
+      navController.navigate(route)
   }
 
   fun goBack() {
