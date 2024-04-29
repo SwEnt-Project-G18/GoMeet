@@ -30,7 +30,7 @@ class EventViewModelTest {
         emptyList(),
         emptyList(),
         null,
-        "")
+        "testuser")
   }
 
   @Test
