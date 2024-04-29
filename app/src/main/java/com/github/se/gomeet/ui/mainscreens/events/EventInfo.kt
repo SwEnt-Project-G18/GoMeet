@@ -59,6 +59,18 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 
+/**
+ * Displays the header section of an event which includes the event title, the organizer's name, and
+ * the event's date and time. The organizer's name is clickable and navigates to a detailed profile
+ * or page.
+ *
+ * @param title The title of the event.
+ * @param organizer A GoMeetUser object representing the event organizer.
+ * @param rating The numerical rating of the event (currently not displayed but can be included).
+ * @param nav An instance of NavigationActions for handling navigation events.
+ * @param date The date of the event in a readable format.
+ * @param time The time of the event.
+ */
 @Composable
 fun EventHeader(
     title: String,
@@ -99,6 +111,12 @@ fun EventHeader(
       }
 }
 
+/**
+ * Displays the date and time of an event in a compact format.
+ *
+ * @param day The formatted string of the event's day.
+ * @param time The formatted string of the event's start time.
+ */
 @Composable
 fun EventDateTime(day: String, time: String) {
   Log.d(day, "This is the day")
@@ -125,6 +143,12 @@ fun EventDateTime(day: String, time: String) {
   }
 }
 
+/**
+ * Displays the main image for an event, utilizing a given Painter object for the image source. The
+ * image is displayed with a specific aspect ratio and rounded corners.
+ *
+ * @param painter A Painter object used to render the event's image.
+ */
 @Composable
 fun EventImage(painter: Painter) {
   Column(modifier = Modifier.fillMaxWidth().testTag("EventImage")) {
@@ -140,6 +164,11 @@ fun EventImage(painter: Painter) {
   }
 }
 
+/**
+ * Displays a textual description of an event. The text is styled according to the app's theme.
+ *
+ * @param text The description text of the event.
+ */
 @Composable
 fun EventDescription(text: String) {
   Text(
@@ -154,6 +183,18 @@ fun EventDescription(text: String) {
       modifier = Modifier.testTag("EventDescription"))
 }
 
+/**
+ * Renders actionable buttons for an event. This includes the ability to join or leave an event,
+ * edit an event (if the current user is the organizer), and navigate to messaging with the
+ * organizer. Favorite toggling is also managed here.
+ *
+ * @param currentUser The currently logged-in user, as a GoMeetUser object.
+ * @param organizer The organizer of the event, also a GoMeetUser object.
+ * @param eventId The unique identifier of the event.
+ * @param userViewModel An instance of UserViewModel for performing operations like editing user
+ *   details.
+ * @param nav An instance of NavigationActions for handling navigation events.
+ */
 @Composable
 fun EventButtons(
     currentUser: GoMeetUser,
@@ -237,6 +278,15 @@ fun EventButtons(
       }
 }
 
+/**
+ * A composable that displays a Google Map centered on a specified location with a marker. The map
+ * is interactive and shows a close-up view of the location at a specified zoom level.
+ *
+ * @param loc A LatLng object representing the geographic coordinates where the map should be
+ *   centered.
+ * @param zoomLevel A float representing the zoom level for the map, defaulting to 15f for close-up
+ *   views.
+ */
 @Composable
 fun MapViewComposable(
     loc: LatLng,

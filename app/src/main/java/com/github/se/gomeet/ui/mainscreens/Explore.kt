@@ -2,6 +2,9 @@ package com.github.se.gomeet.ui.mainscreens
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
@@ -19,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -56,6 +60,7 @@ import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.MarkerInfoWindowContent
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
+import java.time.LocalDate
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -183,7 +188,8 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
                 events = eventList,
                 modifier = Modifier.testTag("Map"),
                 query = query,
-                locationPermitted = locationPermitted.value!!)
+                locationPermitted = locationPermitted.value!!,
+                eventViewModel = eventViewModel)
           }
         } else {
           Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -203,7 +209,8 @@ fun GoogleMapView(
     content: @Composable () -> Unit = {},
     events: MutableState<List<Event>>,
     query: MutableState<String>,
-    locationPermitted: Boolean
+    locationPermitted: Boolean,
+    eventViewModel: EventViewModel
 ) {
   val coroutineScope = rememberCoroutineScope()
 
@@ -243,33 +250,77 @@ fun GoogleMapView(
     }
   }
 
-  if (mapVisible) {
-    GoogleMap(
-        modifier = modifier,
-        cameraPositionState = cameraPositionState,
-        properties = mapProperties,
-        uiSettings = uiSettings,
-        onMapLoaded = onMapLoaded,
-        onMapClick = { isButtonVisible.value = true },
-        onPOIClick = {}) {
-          val markerClick: (Marker) -> Boolean = {
-            isButtonVisible.value = false
-            false
-          }
+  val context = LocalContext.current
 
-          for (i in eventStates.indices) {
-            MarkerInfoWindowContent(
-                state = eventStates[i],
-                title = events.value[i].title,
-                icon =
-                    BitmapDescriptorFactory.defaultMarker(
-                        BitmapDescriptorFactory.HUE_RED), // TODO: change this
-                onClick = markerClick,
-                visible = events.value[i].title.contains(query.value, ignoreCase = true)) {
-                  Text(it.title!!, color = Color.Black)
-                }
-          }
-          content()
-        }
+  LaunchedEffect(events.value) {
+    Log.d("ViewModel", "Loading custom pins for ${events.value.size} events.")
+    eventViewModel.loadCustomPins(context, events.value)
+  }
+
+  val isLoading by eventViewModel.loading.observeAsState(false)
+
+  LaunchedEffect(isLoading) {
+    if (!isLoading) {
+      Log.d("ViewModel", "Loading complete, map is now displayed.")
+    }
+  }
+
+  if (mapVisible) {
+    Box(Modifier.fillMaxSize()) {
+      if (isLoading) {
+        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+      } else {
+        GoogleMap(
+            modifier = modifier,
+            cameraPositionState = cameraPositionState,
+            properties = mapProperties,
+            uiSettings = uiSettings,
+            onMapLoaded = onMapLoaded,
+            onMapClick = { isButtonVisible.value = true },
+            onPOIClick = {}) {
+              val markerClick: (Marker) -> Boolean = {
+                isButtonVisible.value = false
+                false
+              }
+
+              events.value.forEachIndexed { index, event ->
+                val today = LocalDate.now()
+                val oneWeekLater = today.plusWeeks(1)
+
+                val isEventThisWeek =
+                    event.date.isAfter(today.minusDays(1)) &&
+                        event.date.isBefore(oneWeekLater.plusDays(1))
+
+                val stablePins = remember { eventViewModel.bitmapDescriptors }
+                val originalBitmap =
+                    BitmapFactory.decodeResource(context.resources, R.drawable.default_pin)
+
+                val desiredWidth = 94
+                val desiredHeight = 140
+
+                val scaledBitmap =
+                    Bitmap.createScaledBitmap(originalBitmap, desiredWidth, desiredHeight, true)
+
+                val scaledPin = BitmapDescriptorFactory.fromBitmap(scaledBitmap)
+
+                val customPinBitmapDescriptor =
+                    if (isEventThisWeek) stablePins[event.uid] else scaledPin
+
+                MarkerInfoWindowContent(
+                    state = eventStates[index],
+                    title = event.title,
+                    icon =
+                        customPinBitmapDescriptor
+                            ?: BitmapDescriptorFactory.defaultMarker(
+                                BitmapDescriptorFactory.HUE_RED),
+                    onClick = markerClick,
+                    visible = event.title.contains(query.value, ignoreCase = true)) {
+                      Text(it.title!!, color = Color.Black)
+                    }
+              }
+            }
+        content()
+      }
+    }
   }
 }

@@ -45,6 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -57,6 +58,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.location.Location
+import com.github.se.gomeet.model.repository.EventRepository
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
@@ -66,8 +68,11 @@ import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.ui.theme.Grey
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import java.io.InputStream
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 import kotlinx.coroutines.delay
@@ -77,6 +82,7 @@ private const val NUMBER_OF_SUGGESTIONS = 3
 @Composable
 fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivate: Boolean) {
 
+  val db = EventRepository(Firebase.firestore)
   val titleState = remember { mutableStateOf("") }
   val descriptionState = remember { mutableStateOf("") }
   val locationState = remember { mutableStateOf("") }
@@ -87,6 +93,10 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
   var priceText by remember { mutableStateOf("") }
   val url = remember { mutableStateOf("") }
   val isPrivateEvent = remember { mutableStateOf(false) }
+
+  val customPins = remember { CustomPins() }
+
+  val context = LocalContext.current
 
   var imageUri by remember { mutableStateOf<android.net.Uri?>(null) }
   var imageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
@@ -308,6 +318,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
 
               OutlinedButton(
                   onClick = {
+                    val uid = db.getNewId()
                     if (selectedLocation.value != null &&
                         titleState.value.isNotEmpty() &&
                         !dateFormatError &&
@@ -326,9 +337,20 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                           listOf(),
                           listOf(),
                           imageUri,
-                          UserViewModel())
+                          UserViewModel(),
+                          uid)
 
                       nav.goBack()
+                    }
+
+                    dateState?.let {
+                      customPins.createCustomPin(context, it, LocalTime.MIDNIGHT) {
+                          bitmapDescriptor,
+                          bitmap ->
+                        // Handle the bitmap descriptor and bitmap as needed
+                        val byteArray = customPins.bitmapToByteArray(bitmap)
+                        customPins.uploadEventIcon(context, byteArray, uid)
+                      }
                     }
                   },
                   shape = RoundedCornerShape(10.dp),

@@ -96,7 +96,7 @@ fun Profile(nav: NavigationActions) { // TODO Add parameters to the function
           IconButton(
               modifier = Modifier.align(Alignment.CenterVertically).padding(end = 15.dp),
               onClick = {
-                nav.navigateTo(SECOND_LEVEL_DESTINATION.first()) /* Handle settings icon click */
+                nav.navigateTo(SECOND_LEVEL_DESTINATION.first { it.route == Route.SETTINGS })
               }) {
                 Icon(
                     imageVector = ImageVector.vectorResource(R.drawable.settings_icon),

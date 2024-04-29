@@ -4,47 +4,55 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.location.Location
 import java.time.LocalDate
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class EventViewModelTest {
-  private val eventViewModel = EventViewModel("testuser")
-  private val title = "testevent"
 
-  @Before
-  fun createNewEvent() {
-    eventViewModel.createEvent(
-        title,
-        "description",
-        Location(0.0, 0.0, "name"),
-        LocalDate.of(2024, 4, 19),
-        0.0,
-        "url",
-        emptyList(),
-        emptyList(),
-        0,
-        false,
-        emptyList(),
-        emptyList(),
-        null)
-  }
+  private val title = "testevent2"
+  private val uid = "testuid"
 
   @Test
   fun test() = runTest {
+    val eventViewModel = EventViewModel(uid)
+
     // test getAllEvents and createEvent
-    val events = eventViewModel.getAllEvents()!!.filter { it.title == title }
+    runBlocking {
+      eventViewModel.createEvent(
+          title,
+          "description",
+          Location(0.0, 0.0, "name"),
+          LocalDate.of(2024, 4, 29),
+          0.0,
+          "url",
+          emptyList(),
+          emptyList(),
+          0,
+          false,
+          emptyList(),
+          emptyList(),
+          null,
+          UserViewModel(),
+          uid)
+    }
+
+    var events: List<Event> = eventViewModel.getAllEvents()!!.filter { it.title == title }
+    while (events.isEmpty()) {
+      events = eventViewModel.getAllEvents()!!.filter { it.title == title }
+    }
 
     assert(events.isNotEmpty())
 
     // test getEvent
     val uid = events[0].uid
-    var event = eventViewModel.getEvent(uid)
+    lateinit var event: Event
+    event = eventViewModel.getEvent(uid)!!
 
     assert(event != null)
-    assert(event!!.uid == uid)
+    assert(event.uid == uid)
     assert(event.title == title)
 
     assert(eventViewModel.getEvent("this_event_does_not_exist") == null)
@@ -69,16 +77,14 @@ class EventViewModelTest {
             event.images)
 
     eventViewModel.editEvent(newEvent)
-    event = eventViewModel.getEvent(uid)
+    event = eventViewModel.getEvent(uid)!!
 
     assert(event != null)
-    assert(event!!.uid == uid)
+    assert(event.uid == uid)
     assert(event.title == newTitle)
 
     // test removeEvent
     eventViewModel.removeEvent(uid)
-    event = eventViewModel.getEvent(uid)
-
-    assert(event == null)
+    assert(eventViewModel.getEvent(uid) == null)
   }
 }

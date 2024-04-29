@@ -37,7 +37,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.github.se.gomeet.InstrTestRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -168,9 +168,18 @@ dependencies {
     implementation("com.google.accompanist:accompanist-permissions:0.25.0")
 
 
+    implementation("com.squareup.picasso:picasso:2.71828")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.3.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.3.1")
+    implementation("androidx.compose.runtime:runtime-livedata:1.4.0")
+
+
     //Messaging system using stream
-    implementation("io.getstream:stream-chat-android-compose:6.0.8")
     implementation("io.getstream:stream-chat-android-offline:6.0.8")
+    implementation("io.getstream:stream-chat-android-compose:6.0.8")
+    androidTestImplementation("io.getstream:stream-chat-android-compose:6.0.8")
+    androidTestImplementation("io.getstream:stream-chat-android-offline:6.0.8")
+
 }
 
 

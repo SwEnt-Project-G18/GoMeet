@@ -1,6 +1,7 @@
 package com.github.se.gomeet.ui.mainscreens.create
 
 import androidx.activity.ComponentActivity
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -12,7 +13,11 @@ import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
+import com.google.android.gms.maps.MapsInitializer
 import java.time.LocalDate
+import kotlinx.coroutines.runBlocking
+import org.junit.After
+import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -22,13 +27,22 @@ class CreateEventTest {
 
   @get:Rule val rule = createAndroidComposeRule<ComponentActivity>()
 
+  @After
+  fun tearDown() {
+    runBlocking {
+      eventViewModel.getAllEvents()?.forEach {
+        if (it.creator == uid) eventViewModel.removeEvent(it.uid)
+      }
+    }
+  }
+
   @Test
   fun testCreateEventScreen_InputFields() {
     lateinit var navController: NavHostController
-    val eventViewModel = EventViewModel()
 
     rule.setContent {
       navController = rememberNavController()
+      MapsInitializer.initialize(LocalContext.current)
       CreateEvent(NavigationActions(navController), eventViewModel, isPrivate = true)
     }
 
@@ -57,7 +71,6 @@ class CreateEventTest {
   @Test
   fun testPublicCreateEventScreen_InputFields() {
     lateinit var navController: NavHostController
-    val eventViewModel = EventViewModel()
 
     rule.setContent {
       navController = rememberNavController()
@@ -85,5 +98,17 @@ class CreateEventTest {
     rule.onNodeWithText("Add Image").assertIsDisplayed()
 
     rule.onNodeWithText("Post").performClick()
+  }
+
+  companion object {
+
+    private lateinit var eventViewModel: EventViewModel
+    private val uid = "testuid"
+
+    @JvmStatic
+    @BeforeClass
+    fun setup() {
+      eventViewModel = EventViewModel(uid)
+    }
   }
 }

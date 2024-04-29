@@ -8,6 +8,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.ui.navigation.NavigationActions
+import com.github.se.gomeet.viewmodel.EventViewModel
+import com.github.se.gomeet.viewmodel.UserViewModel
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -23,7 +25,11 @@ class TrendsTest {
 
     rule.setContent {
       navController = rememberNavController()
-      Trends(NavigationActions(navController))
+      Trends(
+          currentUser = "NEEGn5cbkJZDXaezeGdfd2D4u6b2",
+          nav = NavigationActions(rememberNavController()),
+          userViewModel = UserViewModel(),
+          eventViewModel = EventViewModel())
     }
 
     rule.onAllNodesWithText("Trends").apply {

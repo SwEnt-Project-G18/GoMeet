@@ -78,8 +78,6 @@ import com.github.se.gomeet.ui.theme.NavBarUnselected
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.android.gms.maps.model.LatLng
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 import java.text.SimpleDateFormat
 import java.time.ZoneId
 import java.util.Calendar
@@ -87,6 +85,7 @@ import java.util.Date
 import java.util.Locale
 import kotlinx.coroutines.launch
 
+// Composable function that provides the main interface for the events screen
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Events(
@@ -96,15 +95,17 @@ fun Events(
     eventViewModel: EventViewModel
 ) {
 
+  // State management for event filters and list
   var selectedFilter by remember { mutableStateOf("All") }
   val eventList = remember { mutableListOf<Event>() }
   val coroutineScope = rememberCoroutineScope()
   val query = remember { mutableStateOf("") }
   val user = remember { mutableStateOf<GoMeetUser?>(null) }
 
+  // Initial data loading using LaunchedEffect
   LaunchedEffect(Unit) {
     coroutineScope.launch {
-      user.value = userViewModel.getUser(Firebase.auth.currentUser!!.uid)
+      user.value = userViewModel.getUser(currentUser)
       val allEvents =
           eventViewModel.getAllEvents()!!.filter { e ->
             user.value!!.myEvents.contains(e.uid) ||
@@ -117,11 +118,13 @@ fun Events(
     }
   }
 
-  // Define a function to handle button clicks
+  // Event filtering functionality
+
   fun onFilterButtonClick(filterType: String) {
     selectedFilter = if (selectedFilter == filterType) "All" else filterType
   }
 
+  // Scaffold is a structure that supports top bar, content area, and bottom navigation
   Scaffold(
       topBar = {
         Text(
@@ -155,7 +158,7 @@ fun Events(
                   modifier = Modifier.heightIn(min = 56.dp).fillMaxWidth()) {
                     Button(
                         onClick = { onFilterButtonClick("Joined") },
-                        content = { Text("Joined Events") },
+                        content = { Text("JoinedEvents") },
                         colors =
                             ButtonDefaults.buttonColors(
                                 containerColor =
@@ -188,8 +191,9 @@ fun Events(
                                     if (selectedFilter == "MyEvents") Color.White else DarkCyan),
                         border = BorderStroke(1.dp, DarkCyan))
                   }
-
+              // Display events based on the selected filter
               Column(modifier = Modifier.verticalScroll(rememberScrollState()).fillMaxSize()) {
+                // Display joined events if 'All' or 'Joined' is selected
                 if (selectedFilter == "All" || selectedFilter == "Joined") {
                   Text(
                       text = "Joined Events",
@@ -205,6 +209,7 @@ fun Events(
                           ),
                       modifier = Modifier.padding(10.dp).align(Alignment.Start))
 
+                  // Loop through and display events that match the joined events criteria
                   eventList
                       .filter { e -> user.value!!.myEvents.contains(e.uid) }
                       .forEach { event ->
@@ -224,9 +229,9 @@ fun Events(
                               } else {
                                 painterResource(id = R.drawable.gomeet_logo)
                               }
-
+                          // Reusable widget for displaying event details
                           EventWidget(
-                              userName = event.creator,
+                              userName = user.value!!.username,
                               eventName = event.title,
                               eventId = event.uid,
                               eventDescription = event.description,
@@ -240,6 +245,7 @@ fun Events(
                       }
                 }
 
+                // Display favourite events if 'All' or 'Favourites' is selected
                 if (selectedFilter == "All" || selectedFilter == "Favourites") {
 
                   Text(
@@ -256,6 +262,7 @@ fun Events(
                           ),
                       modifier = Modifier.padding(10.dp).align(Alignment.Start))
 
+                  // Loop through and display events are marked favourites by the currentUser
                   eventList
                       .filter { e -> user.value!!.myFavorites.contains(e.uid) }
                       .forEach { event ->
@@ -276,7 +283,7 @@ fun Events(
                                 painterResource(id = R.drawable.gomeet_logo)
                               }
                           EventWidget(
-                              userName = event.creator,
+                              userName = user.value!!.username,
                               eventId = event.uid,
                               eventName = event.title,
                               eventDescription = event.description,
@@ -290,6 +297,7 @@ fun Events(
                       }
                 }
 
+                // Display user's own events if 'All' or 'MyEvents' is selected
                 if (selectedFilter == "All" || selectedFilter == "MyEvents") {
                   Text(
                       text = "My Events",
@@ -305,6 +313,7 @@ fun Events(
                           ),
                       modifier = Modifier.padding(10.dp).align(Alignment.Start))
 
+                  // Loop through and display events created by currentUser
                   eventList
                       .filter { e -> e.creator == user.value!!.uid }
                       .forEach { event ->
@@ -325,7 +334,7 @@ fun Events(
                                 painterResource(id = R.drawable.gomeet_logo)
                               }
                           EventWidget(
-                              userName = event.creator,
+                              userName = user.value!!.username,
                               eventId = event.uid,
                               eventName = event.title,
                               eventDescription = event.description,
@@ -343,6 +352,22 @@ fun Events(
       }
 }
 
+/**
+ * A composable function that displays detailed information about an event in a card layout. This
+ * widget is designed to present event details including the name, description, date, and an image
+ * if available. The card is interactive and can be tapped to navigate to further event details.
+ *
+ * @param userName The name of the event creator.
+ * @param eventId The unique identifier for the event.
+ * @param eventName The name of the event.
+ * @param eventDescription A short description of the event.
+ * @param eventDate The date and time at which the event is scheduled.
+ * @param eventPicture A painter object that handles the rendering of the event's image.
+ * @param verified A boolean indicating whether the event or the creator is verified. This could
+ *   influence the visual representation.
+ * @param nav NavigationActions object to handle navigation events such as tapping on the event
+ *   card.
+ */
 @Composable
 fun EventWidget(
     userName: String,
@@ -532,6 +557,17 @@ fun GoMeetSearchBar(query: MutableState<String>, backgroundColor: Color, content
   }
 }
 
+/**
+ * A custom search bar composable function that provides a user interface for inputting search
+ * queries. This search bar includes visual customizations and functionality adjustments tailored to
+ * the GoMeet application's theme. It features a leading icon that represents the app, a trailing
+ * icon for voice search, and custom color schemes for different states of the search input field.
+ *
+ * @param query A mutable state holding the current query string, allowing the text to be updated
+ *   dynamically.
+ * @param backgroundColor The color of the search bar's background.
+ * @param contentColor The color of the text and icons within the search bar.
+ */
 @Composable
 @Preview
 fun EventPreview() {

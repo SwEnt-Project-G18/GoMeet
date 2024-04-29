@@ -31,6 +31,7 @@ import com.github.se.gomeet.ui.mainscreens.events.Events
 import com.github.se.gomeet.ui.mainscreens.events.MyEventInfo
 import com.github.se.gomeet.ui.mainscreens.profile.OthersProfile
 import com.github.se.gomeet.ui.mainscreens.profile.Profile
+import com.github.se.gomeet.ui.mainscreens.profile.SettingsScreen
 import com.github.se.gomeet.ui.navigation.LOGIN_ITEMS
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
@@ -40,6 +41,7 @@ import com.github.se.gomeet.ui.theme.SetStatusBarColor
 import com.github.se.gomeet.viewmodel.AuthViewModel
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
+import com.google.android.gms.maps.MapsInitializer
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -57,6 +59,9 @@ import io.getstream.chat.android.state.plugin.factory.StreamStatePluginFactory
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+
+    MapsInitializer.initialize(this)
+
     // 1 - Set up the OfflinePlugin for offline storage
     val offlinePluginFactory = StreamOfflinePluginFactory(appContext = applicationContext)
     val statePluginFactory =
@@ -125,6 +130,7 @@ class MainActivity : ComponentActivity() {
             }
             composable(Route.EXPLORE) { Explore(navAction, EventViewModel()) }
             composable(Route.EVENTS) {
+              userIdState.value = Firebase.auth.currentUser!!.uid
               Events(userIdState.value, navAction, UserViewModel(), EventViewModel())
             }
             composable(Route.TRENDS) {
@@ -240,6 +246,8 @@ class MainActivity : ComponentActivity() {
                     }
                   }
                 }
+
+            composable(Route.SETTINGS) { SettingsScreen(navAction) }
           }
         }
       }

@@ -1,6 +1,7 @@
 package com.github.se.gomeet.ui.authscreens
 
 import androidx.activity.ComponentActivity
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
@@ -11,9 +12,14 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.se.gomeet.R
 import com.github.se.gomeet.viewmodel.AuthViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import io.getstream.chat.android.client.ChatClient
+import io.getstream.chat.android.client.logger.ChatLogLevel
+import io.github.kakaocup.kakao.common.utilities.getResourceString
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Rule
@@ -25,25 +31,28 @@ class RegisterScreenTest {
 
   @get:Rule val rule = createAndroidComposeRule<ComponentActivity>()
 
+  private lateinit var authViewModel: AuthViewModel
+  private lateinit var userViewModel: UserViewModel
+
   @After
   fun tearDown() {
     // Clean up the test data
-    // FirebaseAuth.getInstance().currentUser?.delete()
+    rule.waitForIdle()
+    Firebase.auth.currentUser?.delete()
   }
 
   @Test
   fun testRegisterScreen() = runTest {
+    authViewModel = AuthViewModel()
+    userViewModel = UserViewModel()
 
-    //        val repo: AuthRepository = mock()
-    //        whenever(repo.signUpWithEmailPassword(any(), any(), {
-    //
-    //        }))
-    //        val authViewModel: AuthViewModel = AuthViewModel(repo)
-
-    val authViewModel = AuthViewModel()
-    val userViewModel = UserViewModel()
-
-    rule.setContent { RegisterScreen(ChatClient.instance(), authViewModel, userViewModel) {} }
+    rule.setContent {
+      val client =
+          ChatClient.Builder(getResourceString(R.string.chat_api_key), LocalContext.current)
+              .logLevel(ChatLogLevel.NOTHING) // Set to NOTHING in prod
+              .build()
+      RegisterScreen(client, authViewModel, userViewModel) {}
+    }
 
     rule.onNodeWithTag("register_title").assertIsDisplayed()
 
@@ -66,10 +75,12 @@ class RegisterScreenTest {
 
     rule.onNodeWithTag("register_button").assertIsEnabled().performClick()
 
-    assert(authViewModel.signInState.value.signInError == null)
+    rule.waitForIdle()
 
     // Assert that the register worked
-    //        assert(authViewModel.signInState.value.isSignInSuccessful)
+    assert(authViewModel.signInState.value.signInError == null)
+    //    assert(authViewModel.signInState.value.isSignInSuccessful) // Error here in CI
 
+    if (Firebase.auth.currentUser != null) userViewModel.deleteUser(Firebase.auth.currentUser!!.uid)
   }
 }

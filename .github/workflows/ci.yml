@@ -9,6 +9,7 @@ on:
       - opened
       - synchronize
       - reopened
+  workflow_dispatch:
 
 jobs:
   ci:
@@ -28,6 +29,14 @@ jobs:
           distribution: "temurin"
           java-version: "17"
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20'
+
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
+
       - name: API Key Setup
         run: |
           echo MAPS_API_KEY="${{ secrets.MAPS_API_KEY }}" >> ./secrets.properties
@@ -38,13 +47,23 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      - name: Cache Gradle
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+#      - name: Cache Gradle
+#        uses: actions/cache@v3
+#        with:
+#          path: |
+#            ~/.gradle/caches
+#            ~/.gradle/wrapper
+#          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+
+# TODO: fix caching node modules
+#      - name: Cache Node modules
+#        uses: actions/cache@v2
+#        with:
+#          path: ~/.npm
+#          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+#          restore-keys: |
+#            ${{ runner.os }}-node-
+
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
@@ -58,12 +77,15 @@ jobs:
       #    # To run the CI with debug informations, add --info
       #    ./gradlew ktfmtCheck
 
+      - name: Start Firebase Emulator
+        run: |
+          firebase emulators:start --only firestore,auth,storage --project=dummy-project-id &
+
       - name: Assemble and Lint
         run: ./gradlew assembleDebug lint --parallel --build-cache
 
       - name: Run tests
         run: ./gradlew check --parallel --build-cache
-
 
       - name: Run Connected Tests
         uses: reactivecircus/android-emulator-runner@v2
@@ -75,8 +97,12 @@ jobs:
           avd-name: github
           force-avd-creation: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: true
-          script: ./gradlew connectedCheck --info # To run the CI with debug informations, add --info
+          script: ./gradlew connectedCheck
+
+
+      - name: Stop Firebase Emulator
+        if: always()
+        run: pkill -f "firebase" || true
 
       - name: Generate Coverage Report
         run: ./gradlew jacocoTestReport

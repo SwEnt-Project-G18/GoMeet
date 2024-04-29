@@ -4,24 +4,19 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.model.user.GoMeetUser
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.test.runTest
-import org.junit.Before
+import org.junit.BeforeClass
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class UserViewModelTest {
-  private val userViewModel = UserViewModel()
   private val uid = "testuid"
   private val username = "testuser"
 
-  @Before
-  fun createNewUser() {
-    userViewModel.createUserIfNew(uid, username)
-  }
-
   @Test
   fun test() = runTest {
-    // wait for user to be created
+    // Create user and wait for it to be created
+    userViewModel.createUserIfNew(uid, username)
     TimeUnit.SECONDS.sleep(2)
 
     // test getUser and createUser
@@ -35,7 +30,16 @@ class UserViewModelTest {
 
     // test editUser
     val newUsername = "newtestuser"
-    val newUser = GoMeetUser(user.uid, newUsername, emptyList(), emptyList(), emptyList())
+    val newUser =
+        GoMeetUser(
+            user.uid,
+            newUsername,
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            emptyList())
 
     userViewModel.editUser(newUser)
     user = userViewModel.getUser(uid)
@@ -47,7 +51,17 @@ class UserViewModelTest {
     // test deleteUser
     userViewModel.deleteUser(uid)
     user = userViewModel.getUser(uid)
-
     assert(user == null)
+  }
+
+  companion object {
+
+    private lateinit var userViewModel: UserViewModel
+
+    @BeforeClass
+    @JvmStatic
+    fun setup() {
+      userViewModel = UserViewModel()
+    }
   }
 }

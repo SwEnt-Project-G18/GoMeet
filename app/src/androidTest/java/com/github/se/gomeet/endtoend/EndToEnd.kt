@@ -9,9 +9,16 @@ import com.github.se.gomeet.screens.CreateEventScreen
 import com.github.se.gomeet.screens.CreateScreen
 import com.github.se.gomeet.screens.LoginScreen
 import com.github.se.gomeet.screens.WelcomeScreenScreen
+import com.github.se.gomeet.viewmodel.EventViewModel
+import com.github.se.gomeet.viewmodel.UserViewModel
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen
-import io.mockk.junit4.MockKRule
+import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.runBlocking
+import org.junit.After
+import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -20,7 +27,18 @@ import org.junit.runner.RunWith
 class EndToEndTest : TestCase() {
 
   @get:Rule val composeTestRule = createAndroidComposeRule<MainActivity>()
-  @get:Rule val mockkRule = MockKRule(this)
+
+  @After
+  fun tearDown() {
+
+    runBlocking {
+      eventVM.getAllEvents()?.forEach { if (it.creator == uid) eventVM.removeEvent(it.uid) }
+    }
+
+    // Clean up the user
+    Firebase.auth.currentUser?.delete()
+    userVM.deleteUser(uid)
+  }
 
   @Test
   fun test() = run {
@@ -41,11 +59,11 @@ class EndToEndTest : TestCase() {
         }
         emailField {
           assertIsDisplayed()
-          performTextInput("qwe@asd.com")
+          performTextInput(email)
         }
         passwordField {
           assertIsDisplayed()
-          performTextInput("123456")
+          performTextInput(pwd)
         }
         logInButton {
           assertIsEnabled()
@@ -53,6 +71,8 @@ class EndToEndTest : TestCase() {
         }
       }
     }
+
+    composeTestRule.waitForIdle()
 
     // First ensure login and switch to the expected screen
     ComposeScreen.onComposeScreen<LoginScreen>(composeTestRule) {
@@ -70,6 +90,8 @@ class EndToEndTest : TestCase() {
         }
       }
     }
+
+    composeTestRule.waitForIdle()
 
     ComposeScreen.onComposeScreen<CreateEventScreen>(composeTestRule) {
       step("Create an event") {
@@ -104,6 +126,29 @@ class EndToEndTest : TestCase() {
         }
         switchToExplore { performClick() }
       }
+    }
+  }
+
+  companion object {
+
+    private val email = "qwe@asd.com"
+    private val pwd = "123456"
+    private val uid = "testuid"
+    private val username = "testuser"
+
+    private lateinit var userVM: UserViewModel
+    private lateinit var eventVM: EventViewModel
+
+    @JvmStatic
+    @BeforeClass
+    fun setup() {
+
+      userVM = UserViewModel()
+      userVM.createUserIfNew(uid, username)
+      Firebase.auth.createUserWithEmailAndPassword(email, pwd)
+      TimeUnit.SECONDS.sleep(2)
+
+      eventVM = EventViewModel(uid)
     }
   }
 }
