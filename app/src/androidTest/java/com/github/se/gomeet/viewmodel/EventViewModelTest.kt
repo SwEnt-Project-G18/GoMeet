@@ -3,58 +3,53 @@ package com.github.se.gomeet.viewmodel
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.location.Location
-import kotlinx.coroutines.runBlocking
 import java.time.LocalDate
-import java.util.concurrent.TimeUnit
-import kotlinx.coroutines.test.runTest
-import org.junit.BeforeClass
+import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class EventViewModelTest {
 
-
-    private val title = "testevent2"
-    private val uid = "testuid"
+  private val title = "testevent2"
+  private val uid = "testuid"
 
   @Test
   fun test() {
 
-      val eventViewModel = EventViewModel(uid)
+    val eventViewModel = EventViewModel(uid)
 
     // test getAllEvents and createEvent
     runBlocking {
-        eventViewModel.createEvent(
-            title,
-            "description",
-            Location(0.0, 0.0, "name"),
-            LocalDate.of(2024, 4, 29),
-            0.0,
-            "url",
-            emptyList(),
-            emptyList(),
-            0,
-            false,
-            emptyList(),
-            emptyList(),
-            null,
-            uid
-        )
+      eventViewModel.createEvent(
+          title,
+          "description",
+          Location(0.0, 0.0, "name"),
+          LocalDate.of(2024, 4, 29),
+          0.0,
+          "url",
+          emptyList(),
+          emptyList(),
+          0,
+          false,
+          emptyList(),
+          emptyList(),
+          null,
+          uid)
     }
 
-      var events: List<Event> = emptyList()
-     runBlocking { events = eventViewModel.getAllEvents()!!.filter { it.title == title } }
-      if(events.isEmpty()) {
-          runBlocking { events = eventViewModel.getAllEvents()!!.filter { it.title == title } }
-      }
+    var events: List<Event> = emptyList()
+    runBlocking { events = eventViewModel.getAllEvents()!!.filter { it.title == title } }
+    if (events.isEmpty()) {
+      runBlocking { events = eventViewModel.getAllEvents()!!.filter { it.title == title } }
+    }
 
     assert(events.isNotEmpty())
 
     // test getEvent
     val uid = events[0].uid
     lateinit var event: Event
-      runBlocking { event = eventViewModel.getEvent(uid)!! }
+    runBlocking { event = eventViewModel.getEvent(uid)!! }
 
     assert(event != null)
     assert(event.uid == uid)
@@ -79,8 +74,7 @@ class EventViewModelTest {
             event.maxParticipants,
             event.public,
             event.tags,
-            event.images
-        )
+            event.images)
 
     eventViewModel.editEvent(newEvent)
     runBlocking { event = eventViewModel.getEvent(uid)!! }
