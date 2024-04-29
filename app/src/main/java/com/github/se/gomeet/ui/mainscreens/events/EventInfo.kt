@@ -155,7 +155,13 @@ fun EventDescription(text: String) {
 }
 
 @Composable
-fun EventButtons(currentUser: GoMeetUser, organizer: GoMeetUser, eventId: String, userViewModel: UserViewModel, nav: NavigationActions) {
+fun EventButtons(
+    currentUser: GoMeetUser,
+    organizer: GoMeetUser,
+    eventId: String,
+    userViewModel: UserViewModel,
+    nav: NavigationActions
+) {
 
   val isFavorite = remember { mutableStateOf(currentUser.myFavorites.contains(eventId)) }
   val isJoined = remember { mutableStateOf(currentUser.myEvents.contains(eventId)) }
@@ -164,18 +170,18 @@ fun EventButtons(currentUser: GoMeetUser, organizer: GoMeetUser, eventId: String
       horizontalArrangement = Arrangement.SpaceBetween) {
         TextButton(
             onClick = {
-                if (organizer.uid.contentEquals(Firebase.auth.currentUser!!.uid)) {
-                    //TODO: GO TO EDIT EVENT PARAMETERS SCREEN
+              if (organizer.uid.contentEquals(Firebase.auth.currentUser!!.uid)) {
+                // TODO: GO TO EDIT EVENT PARAMETERS SCREEN
+              } else {
+                if (!isJoined.value) {
+                  currentUser.myEvents = currentUser.myEvents.plus(eventId)
                 } else {
-                    if (!isJoined.value) {
-                        currentUser.myEvents = currentUser.myEvents.plus(eventId)
-                    } else {
-                        currentUser.myEvents = currentUser.myEvents.minus(eventId)
-                    }
-                    userViewModel.editUser(currentUser)
-                    isJoined.value = !isJoined.value
-
-            }},
+                  currentUser.myEvents = currentUser.myEvents.minus(eventId)
+                }
+                userViewModel.editUser(currentUser)
+                isJoined.value = !isJoined.value
+              }
+            },
             shape = RoundedCornerShape(20.dp),
             modifier = Modifier.weight(1f),
             colors =
@@ -191,26 +197,25 @@ fun EventButtons(currentUser: GoMeetUser, organizer: GoMeetUser, eventId: String
                 }
               }
             }
-      if (organizer.uid != com.google.firebase.Firebase.auth.currentUser!!.uid) {
+        if (organizer.uid != com.google.firebase.Firebase.auth.currentUser!!.uid) {
           IconButton(
               onClick = {
-                  nav.navigateToScreen(Route.MESSAGE.replace("{id}", Uri.encode(organizer.uid)))
+                nav.navigateToScreen(Route.MESSAGE.replace("{id}", Uri.encode(organizer.uid)))
               }) {
-              Icon(
-                  imageVector =
-                  ImageVector.vectorResource(
-                      id = R.drawable.baseline_chat_bubble_outline_24),
-                  contentDescription = "Chat",
-                  modifier = Modifier.size(24.dp),
-                  tint = MaterialTheme.colorScheme.onBackground)
-          }
-      }
+                Icon(
+                    imageVector =
+                        ImageVector.vectorResource(id = R.drawable.baseline_chat_bubble_outline_24),
+                    contentDescription = "Chat",
+                    modifier = Modifier.size(24.dp),
+                    tint = MaterialTheme.colorScheme.onBackground)
+              }
+        }
         IconButton(
             onClick = {
               if (!isFavorite.value) {
                 currentUser.myFavorites = currentUser.myFavorites.plus(eventId)
               } else {
-                  currentUser.myFavorites = currentUser.myFavorites.minus(eventId)
+                currentUser.myFavorites = currentUser.myFavorites.minus(eventId)
               }
               userViewModel.editUser(currentUser)
               isFavorite.value = !isFavorite.value

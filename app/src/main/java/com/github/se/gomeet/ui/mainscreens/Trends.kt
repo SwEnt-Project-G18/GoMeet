@@ -1,20 +1,13 @@
 package com.github.se.gomeet.ui.mainscreens
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -64,7 +57,12 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Trends(currentUser: String, nav: NavigationActions, userViewModel: UserViewModel, eventViewModel: EventViewModel) {
+fun Trends(
+    currentUser: String,
+    nav: NavigationActions,
+    userViewModel: UserViewModel,
+    eventViewModel: EventViewModel
+) {
 
   val eventList = remember { mutableListOf<Event>() }
   val coroutineScope = rememberCoroutineScope()
@@ -107,51 +105,50 @@ fun Trends(currentUser: String, nav: NavigationActions, userViewModel: UserViewM
               GoMeetSearchBar(query, NavBarUnselected, Color.DarkGray)
               Spacer(modifier = Modifier.height(5.dp))
               Column(modifier = Modifier.verticalScroll(rememberScrollState()).fillMaxSize()) {
-                  Text(
-                      text = "All Events",
-                      style =
-                          TextStyle(
-                              fontSize = 20.sp,
-                              lineHeight = 16.sp,
-                              fontFamily = FontFamily(Font(R.font.roboto)),
-                              fontWeight = FontWeight(1000),
-                              color = DarkCyan,
-                              textAlign = TextAlign.Center,
-                              letterSpacing = 0.5.sp,
-                          ),
-                      modifier = Modifier.padding(10.dp).align(Alignment.Start))
+                Text(
+                    text = "All Events",
+                    style =
+                        TextStyle(
+                            fontSize = 20.sp,
+                            lineHeight = 16.sp,
+                            fontFamily = FontFamily(Font(R.font.roboto)),
+                            fontWeight = FontWeight(1000),
+                            color = DarkCyan,
+                            textAlign = TextAlign.Center,
+                            letterSpacing = 0.5.sp,
+                        ),
+                    modifier = Modifier.padding(10.dp).align(Alignment.Start))
 
-                  eventList.forEach { event ->
-                    if (event.title.contains(query.value, ignoreCase = true)) {
-                      val painter: Painter =
-                          if (event.images.isNotEmpty()) {
-                            rememberAsyncImagePainter(
-                                ImageRequest.Builder(LocalContext.current)
-                                    .data(data = event.images[0])
-                                    .apply(
-                                        block =
-                                            fun ImageRequest.Builder.() {
-                                              crossfade(true)
-                                              placeholder(R.drawable.gomeet_logo)
-                                            })
-                                    .build())
-                          } else {
-                            painterResource(id = R.drawable.gomeet_logo)
-                          }
+                eventList.forEach { event ->
+                  if (event.title.contains(query.value, ignoreCase = true)) {
+                    val painter: Painter =
+                        if (event.images.isNotEmpty()) {
+                          rememberAsyncImagePainter(
+                              ImageRequest.Builder(LocalContext.current)
+                                  .data(data = event.images[0])
+                                  .apply(
+                                      block =
+                                          fun ImageRequest.Builder.() {
+                                            crossfade(true)
+                                            placeholder(R.drawable.gomeet_logo)
+                                          })
+                                  .build())
+                        } else {
+                          painterResource(id = R.drawable.gomeet_logo)
+                        }
 
-                      EventWidget(
-                          userName = event.creator,
-                          eventName = event.title,
-                          eventId = event.uid,
-                          eventDescription = event.description,
-                          eventDate =
-                              Date.from(
-                                  event.date.atStartOfDay(ZoneId.systemDefault()).toInstant()),
-                          eventPicture = painter,
-                          verified = false,
-                          nav = nav) // verification to be done using user details
-                    }
+                    EventWidget(
+                        userName = event.creator,
+                        eventName = event.title,
+                        eventId = event.uid,
+                        eventDescription = event.description,
+                        eventDate =
+                            Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant()),
+                        eventPicture = painter,
+                        verified = false,
+                        nav = nav) // verification to be done using user details
                   }
+                }
               }
             }
       }

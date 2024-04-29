@@ -53,14 +53,13 @@ fun MyEventInfo(
 ) {
 
   val organizer = remember { mutableStateOf<GoMeetUser?>(null) }
-    val currentUser = remember { mutableStateOf<GoMeetUser?>(null) }
+  val currentUser = remember { mutableStateOf<GoMeetUser?>(null) }
 
-    val coroutineScope = rememberCoroutineScope()
+  val coroutineScope = rememberCoroutineScope()
 
   LaunchedEffect(Unit) {
-    coroutineScope.launch {
-        organizer.value = userViewModel.getUser(organizerId) }
-      currentUser.value = userViewModel.getUser(Firebase.auth.currentUser!!.uid)
+    coroutineScope.launch { organizer.value = userViewModel.getUser(organizerId) }
+    currentUser.value = userViewModel.getUser(Firebase.auth.currentUser!!.uid)
   }
 
   Log.d("EventInfo", "Organizer is $organizerId")
@@ -82,7 +81,7 @@ fun MyEventInfo(
               }
             },
             actions = {
-                IconButton(onClick = { /* Handle more action */}) {
+              IconButton(onClick = { /* Handle more action */}) {
                 Icon(
                     imageVector = Icons.Filled.MoreVert,
                     contentDescription = "More",

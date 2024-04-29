@@ -114,17 +114,17 @@ class NavigationActions(val navController: NavHostController) {
       description: String,
       loc: LatLng
   ) {
-      val route =
-          Route.EVENT_INFO.replace("{eventId}", Uri.encode(eventId))
-              .replace("{title}", Uri.encode(title))
-              .replace("{date}", Uri.encode(date))
-              .replace("{time}", Uri.encode(time))
-              .replace("{organizer}", Uri.encode(organizer))
-              .replace("{rating}", rating.toString())
-              .replace("{description}", Uri.encode(description))
-              .replace("{latitude}", loc.latitude.toString())
-              .replace("{longitude}", loc.longitude.toString())
-      navController.navigate(route)
+    val route =
+        Route.EVENT_INFO.replace("{eventId}", Uri.encode(eventId))
+            .replace("{title}", Uri.encode(title))
+            .replace("{date}", Uri.encode(date))
+            .replace("{time}", Uri.encode(time))
+            .replace("{organizer}", Uri.encode(organizer))
+            .replace("{rating}", rating.toString())
+            .replace("{description}", Uri.encode(description))
+            .replace("{latitude}", loc.latitude.toString())
+            .replace("{longitude}", loc.longitude.toString())
+    navController.navigate(route)
   }
 
   fun goBack() {
