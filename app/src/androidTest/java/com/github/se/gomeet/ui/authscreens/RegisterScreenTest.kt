@@ -13,9 +13,12 @@ import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.viewmodel.AuthViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import io.getstream.chat.android.client.ChatClient
 import kotlinx.coroutines.test.runTest
 import org.junit.After
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -25,21 +28,21 @@ class RegisterScreenTest {
 
   @get:Rule val rule = createAndroidComposeRule<ComponentActivity>()
 
+  @Before
+  fun setup() {
+    // Make all subsequent calls to Firebase auth use the emulator
+    Firebase.auth.useEmulator("10.0.2.2", 9099)
+  }
+
   @After
   fun tearDown() {
     // Clean up the test data
-    // FirebaseAuth.getInstance().currentUser?.delete()
+    rule.waitForIdle()
+    Firebase.auth.currentUser?.delete()
   }
 
   @Test
   fun testRegisterScreen() = runTest {
-
-    //        val repo: AuthRepository = mock()
-    //        whenever(repo.signUpWithEmailPassword(any(), any(), {
-    //
-    //        }))
-    //        val authViewModel: AuthViewModel = AuthViewModel(repo)
-
     val authViewModel = AuthViewModel()
     val userViewModel = UserViewModel()
 
@@ -66,10 +69,10 @@ class RegisterScreenTest {
 
     rule.onNodeWithTag("register_button").assertIsEnabled().performClick()
 
-    assert(authViewModel.signInState.value.signInError == null)
+    rule.waitForIdle()
 
     // Assert that the register worked
-    //        assert(authViewModel.signInState.value.isSignInSuccessful)
-
+    assert(authViewModel.signInState.value.signInError == null)
+    assert(authViewModel.signInState.value.isSignInSuccessful)
   }
 }
