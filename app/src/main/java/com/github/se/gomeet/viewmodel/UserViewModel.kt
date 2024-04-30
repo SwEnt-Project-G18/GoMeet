@@ -41,12 +41,9 @@ class UserViewModel : ViewModel() {
                   myEvents = emptyList(),
                   myFavorites = emptyList())
           db.addUser(user)
-          Log.e("USER", "CREATED")
         } catch (e: Exception) {
           Log.w(ContentValues.TAG, "Error adding user", e)
         }
-      } else {
-        Log.e("NO", "NO")
       }
     }
   }
