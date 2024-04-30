@@ -29,6 +29,7 @@ import com.github.se.gomeet.ui.mainscreens.create.Create
 import com.github.se.gomeet.ui.mainscreens.create.CreateEvent
 import com.github.se.gomeet.ui.mainscreens.events.Events
 import com.github.se.gomeet.ui.mainscreens.events.MyEventInfo
+import com.github.se.gomeet.ui.mainscreens.profile.Notifications
 import com.github.se.gomeet.ui.mainscreens.profile.OthersProfile
 import com.github.se.gomeet.ui.mainscreens.profile.Profile
 import com.github.se.gomeet.ui.mainscreens.profile.SettingsScreen
@@ -138,12 +139,16 @@ class MainActivity : ComponentActivity() {
               Trends(userIdState.value, navAction, UserViewModel(), EventViewModel())
             }
             composable(Route.CREATE) { Create(navAction) }
-            composable(Route.PROFILE) { Profile(navAction) }
+
+            composable(Route.NOTIFICATIONS) { Notifications(navAction) }
+
+            composable(Route.PROFILE) { Profile(navAction, userId = userIdState.value) }
             composable(
                 route = Route.OTHERS_PROFILE,
                 arguments = listOf(navArgument("uid") { type = NavType.StringType })) {
                   OthersProfile(navAction, it.arguments?.getString("uid") ?: "")
                 }
+
             composable(Route.PRIVATE_CREATE) {
               CreateEvent(navAction, EventViewModel(Firebase.auth.currentUser!!.uid), true)
             }
