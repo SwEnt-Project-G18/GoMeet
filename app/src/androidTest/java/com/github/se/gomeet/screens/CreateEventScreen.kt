@@ -16,5 +16,5 @@ class CreateEventScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
   val price: KNode = onNode { hasText("Price") }
   val link: KNode = onNode { hasText("Link") }
   val postButton: KNode = onNode { hasText("Post") }
-  val switchToExplore: KNode = onNode { hasText("Explore") }
+  val dropdownMenuItem: KNode = onNode { hasTestTag("DropdownMenuItem") }
 }

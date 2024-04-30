@@ -446,7 +446,7 @@ fun LocationField(
         ) {
           locationSuggestions.value.forEachIndexed { i, location ->
             DropdownMenuItem(
-                modifier = Modifier.wrapContentSize(),
+                modifier = Modifier.wrapContentSize().testTag("DropdownMenuItem"),
                 text = { Text(location.name) },
                 onClick = {
                   locationQuery.value = location.name
