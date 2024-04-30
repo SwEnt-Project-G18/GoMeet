@@ -33,3 +33,5 @@ enum class InviteStatus {
   PENDING,
   REFUSED
 }
+
+data class Invite(val eventId: String, val userId: String, val status: InviteStatus)

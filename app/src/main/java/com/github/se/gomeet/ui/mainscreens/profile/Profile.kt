@@ -95,7 +95,6 @@ fun Profile(
       isProfileLoaded = true
     }
   }
-
   Scaffold(
       bottomBar = {
         BottomNavigationMenu(
@@ -410,5 +409,5 @@ fun Profile(
 @Preview
 @Composable
 fun ProfilePreview() {
-  Profile(nav = NavigationActions(rememberNavController()), "", UserViewModel())
+  Profile(nav = NavigationActions(rememberNavController()), "John", UserViewModel())
 }

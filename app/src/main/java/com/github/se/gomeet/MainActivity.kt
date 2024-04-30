@@ -31,6 +31,7 @@ import com.github.se.gomeet.ui.mainscreens.events.Events
 import com.github.se.gomeet.ui.mainscreens.events.MyEventInfo
 import com.github.se.gomeet.ui.mainscreens.profile.Followers
 import com.github.se.gomeet.ui.mainscreens.profile.Following
+import com.github.se.gomeet.ui.mainscreens.profile.Notifications
 import com.github.se.gomeet.ui.mainscreens.profile.OthersProfile
 import com.github.se.gomeet.ui.mainscreens.profile.Profile
 import com.github.se.gomeet.ui.mainscreens.profile.SettingsScreen
@@ -142,9 +143,9 @@ class MainActivity : ComponentActivity() {
             }
             composable(Route.CREATE) { Create(navAction) }
 
-            composable(Route.PROFILE) {
-              Profile(navAction, userId = userIdState.value, userViewModel)
-            }
+            composable(Route.NOTIFICATIONS) { Notifications(navAction) }
+
+            composable(Route.PROFILE) { Profile(navAction, userId = userIdState.value, userViewModel) }
             composable(
                 route = Route.OTHERS_PROFILE,
                 arguments = listOf(navArgument("uid") { type = NavType.StringType })) {
