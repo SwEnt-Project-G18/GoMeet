@@ -184,9 +184,5 @@ fun Following(
 @Preview
 @Composable
 fun FollowingPreview() {
-  Following(
-      NavigationActions(rememberNavController()),
-      "",
-      UserViewModel(),
-      true)
+  Following(NavigationActions(rememberNavController()), "", UserViewModel(), true)
 }

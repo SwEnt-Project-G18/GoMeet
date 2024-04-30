@@ -84,6 +84,7 @@ private var currentUser: GoMeetUser? = null
 @Composable
 fun Profile(
     nav: NavigationActions,
+    userId: String,
     userViewModel: UserViewModel
 ) { // TODO Add parameters to the function
   val coroutineScope = rememberCoroutineScope()
@@ -409,5 +410,5 @@ fun Profile(
 @Preview
 @Composable
 fun ProfilePreview() {
-  Profile(nav = NavigationActions(rememberNavController()), UserViewModel())
+  Profile(nav = NavigationActions(rememberNavController()), "", UserViewModel())
 }

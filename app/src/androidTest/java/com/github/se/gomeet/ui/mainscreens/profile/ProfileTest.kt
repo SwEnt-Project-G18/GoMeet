@@ -19,7 +19,7 @@ class ProfileTest {
   @Test
   fun profileUiTest() {
     composeTestRule.setContent {
-      Profile(NavigationActions(rememberNavController()), UserViewModel())
+      Profile(NavigationActions(rememberNavController()), userId = "1234", UserViewModel())
     }
 
     composeTestRule.onNodeWithText("My Profile").assertIsDisplayed()

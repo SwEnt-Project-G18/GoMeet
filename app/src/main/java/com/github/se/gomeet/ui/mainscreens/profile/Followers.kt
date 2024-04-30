@@ -142,6 +142,5 @@ fun Followers(nav: NavigationActions, uid: String, userViewModel: UserViewModel)
 @Preview
 @Composable
 fun FollowersPreview() {
-  Followers(
-      NavigationActions(rememberNavController()), "", UserViewModel())
+  Followers(NavigationActions(rememberNavController()), "", UserViewModel())
 }
