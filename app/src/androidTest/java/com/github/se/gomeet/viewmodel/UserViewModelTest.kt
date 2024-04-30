@@ -30,7 +30,16 @@ class UserViewModelTest {
 
     // test editUser
     val newUsername = "newtestuser"
-    val newUser = GoMeetUser(user.uid, newUsername, emptyList(), emptyList(), emptyList())
+    val newUser =
+        GoMeetUser(
+            user.uid,
+            newUsername,
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            emptyList())
 
     userViewModel.editUser(newUser)
     user = userViewModel.getUser(uid)
