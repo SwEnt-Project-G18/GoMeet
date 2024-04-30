@@ -71,7 +71,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 
-private val uid = Firebase.auth.currentUser!!.uid
+private val uid = Firebase.auth.currentUser?.uid ?: ""
 private var currentUser: GoMeetUser? = null
 
 /**
@@ -172,7 +172,7 @@ fun Profile(
                                 verticalAlignment = Alignment.CenterVertically,
                                 modifier = Modifier.padding(start = 30.dp)) {
                                   Text(
-                                      currentUser!!.username,
+                                      currentUser?.username ?: "username",
                                       textAlign = TextAlign.Center,
                                       style =
                                           TextStyle(
@@ -249,7 +249,7 @@ fun Profile(
                     modifier = Modifier.fillMaxWidth()) {
                       Column {
                         Text(
-                            text = currentUser!!.myEvents.size.toString(),
+                            text = currentUser?.myEvents?.size.toString(),
                             style =
                                 TextStyle(
                                     fontSize = 20.sp,
@@ -283,7 +283,7 @@ fun Profile(
                                   .width(2.dp))
                       Column(modifier = Modifier.clickable {}) {
                         Text(
-                            text = currentUser!!.followers.size.toString(),
+                            text = currentUser?.followers?.size.toString(),
                             style =
                                 TextStyle(
                                     fontSize = 20.sp,
@@ -317,7 +317,7 @@ fun Profile(
                                   .width(2.dp))
                       Column {
                         Text(
-                            text = currentUser!!.following.size.toString(),
+                            text = currentUser?.following?.size.toString(),
                             style =
                                 TextStyle(
                                     fontSize = 20.sp,

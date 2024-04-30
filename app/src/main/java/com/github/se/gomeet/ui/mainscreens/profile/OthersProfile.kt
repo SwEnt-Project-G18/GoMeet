@@ -156,7 +156,7 @@ fun OthersProfile(
                                 verticalAlignment = Alignment.CenterVertically,
                                 modifier = Modifier.padding(start = 30.dp)) {
                                   Text(
-                                      text = currentUser!!.username,
+                                      text = currentUser?.username ?: "username",
                                       textAlign = TextAlign.Center,
                                       style =
                                           TextStyle(
@@ -220,7 +220,7 @@ fun OthersProfile(
                     modifier = Modifier.fillMaxWidth().testTag("MoreUserInfo")) {
                       Column {
                         Text(
-                            text = currentUser!!.myEvents.size.toString(),
+                            text = currentUser?.myEvents?.size.toString(),
                             style =
                                 TextStyle(
                                     fontSize = 20.sp,
@@ -254,7 +254,7 @@ fun OthersProfile(
                                   .width(2.dp))
                       Column(modifier = Modifier.clickable {}) {
                         Text(
-                            text = currentUser!!.followers.size.toString(),
+                            text = currentUser?.followers?.size.toString(),
                             style =
                                 TextStyle(
                                     fontSize = 20.sp,
@@ -288,7 +288,7 @@ fun OthersProfile(
                                   .width(2.dp))
                       Column {
                         Text(
-                            text = currentUser!!.following.size.toString(),
+                            text = currentUser?.following?.size.toString(),
                             style =
                                 TextStyle(
                                     fontSize = 20.sp,
