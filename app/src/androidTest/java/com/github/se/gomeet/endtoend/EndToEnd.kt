@@ -144,7 +144,7 @@ class EndToEndTest : TestCase() {
     fun setup() {
 
       userVM = UserViewModel()
-      userVM.createUserIfNew(uid, username)
+      userVM.createUserIfNew(uid, username, "testfirstname", "testlastname", email, "testphonenumber", "testcountry")
       Firebase.auth.createUserWithEmailAndPassword(email, pwd)
       TimeUnit.SECONDS.sleep(2)
 
