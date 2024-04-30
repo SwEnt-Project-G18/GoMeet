@@ -1,6 +1,7 @@
 package com.github.se.gomeet.ui.mainscreens.create
 
 import androidx.activity.ComponentActivity
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -12,9 +13,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.ktx.storage
+import com.google.android.gms.maps.MapsInitializer
 import java.time.LocalDate
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -28,9 +27,6 @@ class CreateEventTest {
 
   @get:Rule val rule = createAndroidComposeRule<ComponentActivity>()
 
-  private lateinit var eventViewModel: EventViewModel
-  private val uid = "testuid"
-
   @After
   fun tearDown() {
     runBlocking {
@@ -43,10 +39,10 @@ class CreateEventTest {
   @Test
   fun testCreateEventScreen_InputFields() {
     lateinit var navController: NavHostController
-    eventViewModel = EventViewModel(uid)
 
     rule.setContent {
       navController = rememberNavController()
+      MapsInitializer.initialize(LocalContext.current)
       CreateEvent(NavigationActions(navController), eventViewModel, isPrivate = true)
     }
 
@@ -75,7 +71,6 @@ class CreateEventTest {
   @Test
   fun testPublicCreateEventScreen_InputFields() {
     lateinit var navController: NavHostController
-    val eventViewModel = EventViewModel()
 
     rule.setContent {
       navController = rememberNavController()
@@ -107,11 +102,13 @@ class CreateEventTest {
 
   companion object {
 
+    private lateinit var eventViewModel: EventViewModel
+    private val uid = "testuid"
+
     @JvmStatic
     @BeforeClass
     fun setup() {
-      Firebase.storage.useEmulator("10.0.2.2", 9199)
-      Firebase.firestore.useEmulator("10.0.2.2", 8080)
+      eventViewModel = EventViewModel(uid)
     }
   }
 }

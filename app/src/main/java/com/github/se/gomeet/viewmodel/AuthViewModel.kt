@@ -10,6 +10,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
+/**
+ * ViewModel for the authentication. The viewModel is responsible for handling the logic that comes
+ * from the UI and the repository.
+ */
 class AuthViewModel : ViewModel() {
 
   private val authRepository by lazy { AuthRepository() }
@@ -18,39 +22,72 @@ class AuthViewModel : ViewModel() {
 
   val currentUser = authRepository.currentUser
 
+  /** Check if the user is signed in. */
   val hasUser: Boolean
     get() = authRepository.hasUserSignedIn()
 
+  /**
+   * Update the email field in the signInState.
+   *
+   * @param email the email to update the field with
+   */
   fun onEmailChange(email: String) {
     _signInState.value = _signInState.value.copy(email = email)
   }
 
+  /**
+   * Update the password field in the signInState.
+   *
+   * @param password the password to update the field with
+   */
   fun onPasswordChange(password: String) {
     _signInState.value = _signInState.value.copy(password = password)
   }
 
+  /**
+   * Update the emailRegister field in the signInState.
+   *
+   * @param emailRegister the email to update the field with
+   */
   fun onEmailRegisterChange(emailRegister: String) {
     _signInState.value = _signInState.value.copy(emailRegister = emailRegister)
   }
 
+  /**
+   * Update the passwordRegister field in the signInState.
+   *
+   * @param passwordRegister the password to update the field with
+   */
   fun onPasswordRegisterChange(passwordRegister: String) {
     _signInState.value = _signInState.value.copy(passwordRegister = passwordRegister)
   }
 
+  /**
+   * Update the confirmPasswordRegister field in the signInState.
+   *
+   * @param confirmPasswordRegister the password to update the field with
+   */
   fun onConfirmPasswordRegisterChange(confirmPasswordRegister: String) {
     _signInState.value = _signInState.value.copy(confirmPasswordRegister = confirmPasswordRegister)
   }
 
+  /** Validate the sign in form. */
   private fun validateSignInForm(): Boolean {
     return _signInState.value.email.isNotBlank() && _signInState.value.password.isNotBlank()
   }
 
+  /** Validate the register form. */
   private fun validateRegisterForm(): Boolean {
     return _signInState.value.emailRegister.isNotBlank() &&
         _signInState.value.passwordRegister.isNotBlank() &&
         _signInState.value.confirmPasswordRegister.isNotBlank()
   }
 
+  /**
+   * Sign up the user with email-password authentication.
+   *
+   * @param context the context to display the toast
+   */
   fun signUpWithEmailPassword(context: Context) {
     viewModelScope.launch {
       try {
@@ -81,6 +118,11 @@ class AuthViewModel : ViewModel() {
     }
   }
 
+  /**
+   * Sign in the user with email-password authentication.
+   *
+   * @param context the context to display the toast
+   */
   fun signInWithEmailPassword(context: Context) {
     viewModelScope.launch {
       try {
@@ -108,6 +150,7 @@ class AuthViewModel : ViewModel() {
     }
   }
 
+  /** Sign out the user. */
   fun signOut() {
     authRepository.signOut()
   }

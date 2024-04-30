@@ -6,12 +6,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.github.se.gomeet.ui.mainscreens.Events
 import com.github.se.gomeet.ui.mainscreens.Explore
-import com.github.se.gomeet.ui.mainscreens.Profile
 import com.github.se.gomeet.ui.mainscreens.Trends
 import com.github.se.gomeet.ui.mainscreens.create.Create
+import com.github.se.gomeet.ui.mainscreens.events.Events
+import com.github.se.gomeet.ui.mainscreens.profile.Profile
 import com.github.se.gomeet.viewmodel.EventViewModel
+import com.github.se.gomeet.viewmodel.UserViewModel
 import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.Test
@@ -32,9 +33,19 @@ class NavigationTest {
           Explore(nav = NavigationActions(nav), EventViewModel())
         }
         composable(TOP_LEVEL_DESTINATIONS[1].route) {
-          Events(NavigationActions(nav), EventViewModel())
+          Events(
+              currentUser = "NEEGn5cbkJZDXaezeGdfd2D4u6b2",
+              nav = NavigationActions(rememberNavController()),
+              userViewModel = UserViewModel(),
+              eventViewModel = EventViewModel())
         }
-        composable(TOP_LEVEL_DESTINATIONS[2].route) { Trends(NavigationActions(nav)) }
+        composable(TOP_LEVEL_DESTINATIONS[2].route) {
+          Trends(
+              currentUser = "NEEGn5cbkJZDXaezeGdfd2D4u6b2",
+              nav = NavigationActions(rememberNavController()),
+              userViewModel = UserViewModel(),
+              eventViewModel = EventViewModel())
+        }
         composable(TOP_LEVEL_DESTINATIONS[3].route) { Create(NavigationActions(nav)) }
         composable(TOP_LEVEL_DESTINATIONS[4].route) { Profile(NavigationActions(nav), userId = "1234") }
         // Add more destinations as needed
@@ -59,9 +70,19 @@ class NavigationTest {
           Explore(nav = NavigationActions(nav), EventViewModel())
         }
         composable(TOP_LEVEL_DESTINATIONS[1].route) {
-          Events(NavigationActions(nav), EventViewModel())
+          Events(
+              currentUser = "NEEGn5cbkJZDXaezeGdfd2D4u6b2",
+              nav = NavigationActions(rememberNavController()),
+              userViewModel = UserViewModel(),
+              eventViewModel = EventViewModel())
         }
-        composable(TOP_LEVEL_DESTINATIONS[2].route) { Trends(NavigationActions(nav)) }
+        composable(TOP_LEVEL_DESTINATIONS[2].route) {
+          Trends(
+              currentUser = "NEEGn5cbkJZDXaezeGdfd2D4u6b2",
+              nav = NavigationActions(rememberNavController()),
+              userViewModel = UserViewModel(),
+              eventViewModel = EventViewModel())
+        }
         composable(TOP_LEVEL_DESTINATIONS[3].route) { Create(NavigationActions(nav)) }
         composable(TOP_LEVEL_DESTINATIONS[4].route) { Profile(NavigationActions(nav)) }
       }

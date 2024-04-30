@@ -4,15 +4,13 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.model.event.location.Location
+import com.github.se.gomeet.ui.mainscreens.events.Events
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.ktx.storage
+import com.github.se.gomeet.viewmodel.UserViewModel
 import java.time.LocalDate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 
@@ -24,14 +22,18 @@ class EventsTest {
   fun eventsScreen_RenderingCorrectness() {
     // Test rendering correctness with events available
     composeTestRule.setContent {
-      Events(nav = NavigationActions(rememberNavController()), eventViewModel = EventViewModel())
+      Events(
+          currentUser = "test",
+          nav = NavigationActions(rememberNavController()),
+          userViewModel = UserViewModel(),
+          eventViewModel = EventViewModel())
     }
 
     composeTestRule.onNode(hasText("My events")).assertIsDisplayed()
     composeTestRule.onAllNodesWithText("Favourites")[0].assertIsDisplayed()
     composeTestRule.onAllNodesWithText("Favourites")[1].assertIsDisplayed()
-    composeTestRule.onAllNodesWithText("My tickets")[0].assertIsDisplayed()
-    composeTestRule.onAllNodesWithText("My Tickets")[0].assertIsDisplayed()
+    composeTestRule.onAllNodesWithText("Joined Events")[0].assertIsDisplayed()
+    composeTestRule.onAllNodesWithText("Joined Events")[0].assertIsDisplayed()
     composeTestRule.onAllNodesWithText("My events")[0].assertIsDisplayed()
   }
 
@@ -39,10 +41,14 @@ class EventsTest {
   fun eventsScreen_FilterButtonClick() {
     // Test button click handling
     composeTestRule.setContent {
-      Events(nav = NavigationActions(rememberNavController()), eventViewModel = EventViewModel())
+      Events(
+          currentUser = "NEEGn5cbkJZDXaezeGdfd2D4u6b2",
+          nav = NavigationActions(rememberNavController()),
+          userViewModel = UserViewModel(),
+          eventViewModel = EventViewModel())
     }
 
-    composeTestRule.onNodeWithText("My tickets").performClick()
+    composeTestRule.onNodeWithText("JoinedEvents").performClick()
     composeTestRule.onNodeWithText("Favourites").performClick()
     composeTestRule.onNodeWithText("My events").performClick()
   }
@@ -67,20 +73,16 @@ class EventsTest {
           tags = emptyList(),
           images = emptyList(),
           imageUri = null,
+          userViewModel = UserViewModel(),
           uid = "")
     }
 
     composeTestRule.setContent {
-      Events(nav = NavigationActions(rememberNavController()), eventViewModel = EventViewModel())
-    }
-  }
-
-  companion object {
-    @JvmStatic
-    @BeforeClass
-    fun setup(): Unit {
-      Firebase.firestore.useEmulator("10.0.2.2", 8080)
-      Firebase.storage.useEmulator("10.0.2.2", 9199)
+      Events(
+          currentUser = "NEEGn5cbkJZDXaezeGdfd2D4u6b2",
+          nav = NavigationActions(rememberNavController()),
+          userViewModel = UserViewModel(),
+          eventViewModel = EventViewModel())
     }
   }
 }

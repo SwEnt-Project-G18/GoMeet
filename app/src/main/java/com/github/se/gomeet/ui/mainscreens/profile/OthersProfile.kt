@@ -64,6 +64,12 @@ import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.ui.theme.NavBarUnselected
 
+/**
+ * Composable function for the OthersProfile screen.
+ *
+ * @param nav The navigation actions for the OthersProfile screen.
+ * @param uid The user id of the user whose profile is being viewed.
+ */
 @Composable
 fun OthersProfile(nav: NavigationActions, uid: String) { // TODO Add parameters to the function
   Scaffold(
@@ -184,7 +190,7 @@ fun OthersProfile(nav: NavigationActions, uid: String) { // TODO Add parameters 
                   horizontalArrangement = Arrangement.SpaceEvenly,
                   verticalAlignment = Alignment.CenterVertically,
                   modifier = Modifier.fillMaxWidth().testTag("MoreUserInfo")) {
-                    Column() {
+                    Column {
                       Text(
                           text = "10",
                           style =
@@ -329,6 +335,7 @@ fun OthersProfile(nav: NavigationActions, uid: String) { // TODO Add parameters 
       }
 }
 
+/** Composable function for the MoreActionsButton. */
 @Composable
 fun MoreActionsButton() {
   var showMenu by remember { mutableStateOf(false) }

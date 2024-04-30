@@ -2,25 +2,16 @@ package com.github.se.gomeet.viewmodel
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.model.user.GoMeetUser
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.test.runTest
-import org.junit.Before
+import org.junit.BeforeClass
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class UserViewModelTest {
-  private lateinit var userViewModel: UserViewModel
   private val uid = "testuid"
   private val username = "testuser"
-
-  @Before
-  fun setup() {
-    Firebase.firestore.useEmulator("10.0.2.2", 8080)
-    userViewModel = UserViewModel()
-  }
 
   @Test
   fun test() = runTest {
@@ -39,7 +30,16 @@ class UserViewModelTest {
 
     // test editUser
     val newUsername = "newtestuser"
-    val newUser = GoMeetUser(user.uid, newUsername, emptyList(), emptyList(), emptyList())
+    val newUser =
+        GoMeetUser(
+            user.uid,
+            newUsername,
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            emptyList())
 
     userViewModel.editUser(newUser)
     user = userViewModel.getUser(uid)
@@ -52,5 +52,16 @@ class UserViewModelTest {
     userViewModel.deleteUser(uid)
     user = userViewModel.getUser(uid)
     assert(user == null)
+  }
+
+  companion object {
+
+    private lateinit var userViewModel: UserViewModel
+
+    @BeforeClass
+    @JvmStatic
+    fun setup() {
+      userViewModel = UserViewModel()
+    }
   }
 }

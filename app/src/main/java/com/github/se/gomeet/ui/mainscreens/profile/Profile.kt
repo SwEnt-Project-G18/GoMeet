@@ -1,4 +1,4 @@
-package com.github.se.gomeet.ui.mainscreens
+package com.github.se.gomeet.ui.mainscreens.profile
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -22,7 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -48,7 +48,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.R
-import com.github.se.gomeet.ui.mainscreens.profile.ProfileEventsList
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
@@ -58,6 +57,11 @@ import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.ui.theme.Grey
 import com.github.se.gomeet.ui.theme.NavBarUnselected
 
+/**
+ * Profile screen composable
+ *
+ * @param nav NavigationActions
+ */
 @Composable
 fun Profile(nav: NavigationActions, userId: String) { // TODO Add parameters to the function
   Scaffold(
@@ -236,7 +240,7 @@ fun Profile(nav: NavigationActions, userId: String) { // TODO Add parameters to 
                               ),
                           modifier = Modifier.align(Alignment.CenterHorizontally))
                     }
-                    Divider(
+                    HorizontalDivider(
                         modifier =
                             Modifier
                                 // .fillMaxHeight()
@@ -270,7 +274,7 @@ fun Profile(nav: NavigationActions, userId: String) { // TODO Add parameters to 
                               ),
                           modifier = Modifier.align(Alignment.CenterHorizontally))
                     }
-                    Divider(
+                    HorizontalDivider(
                         modifier =
                             Modifier
                                 // .fillMaxHeight()

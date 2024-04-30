@@ -8,10 +8,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.ui.navigation.NavigationActions
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.ktx.storage
-import org.junit.BeforeClass
+import com.github.se.gomeet.viewmodel.EventViewModel
+import com.github.se.gomeet.viewmodel.UserViewModel
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -27,20 +25,15 @@ class TrendsTest {
 
     rule.setContent {
       navController = rememberNavController()
-      Trends(NavigationActions(navController))
+      Trends(
+          currentUser = "NEEGn5cbkJZDXaezeGdfd2D4u6b2",
+          nav = NavigationActions(rememberNavController()),
+          userViewModel = UserViewModel(),
+          eventViewModel = EventViewModel())
     }
 
     rule.onAllNodesWithText("Trends").apply {
       fetchSemanticsNodes().forEachIndexed { i, _ -> get(i).assertIsDisplayed() }
-    }
-  }
-
-  companion object {
-    @BeforeClass
-    @JvmStatic
-    fun setUpClass() {
-      Firebase.firestore.useEmulator("10.0.2.2", 8080)
-      Firebase.storage.useEmulator("10.0.2.2", 9199)
     }
   }
 }

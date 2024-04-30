@@ -1,15 +1,29 @@
-package com.github.se.gomeet
+package com.github.se.gomeet.model.repository
 
 import android.util.Log
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.google.firebase.firestore.FirebaseFirestore
 
-class UserFirebaseConnection(private val db: FirebaseFirestore) {
+/**
+ * Class that connects to the Firebase Firestore database to get, add, update and remove users.
+ *
+ * @param db the Firestore database
+ */
+class UserRepository(private val db: FirebaseFirestore) {
+  /**
+   * Companion object for the UserFirebaseConnection class. Contains the constants for the class.
+   */
   companion object {
     private const val TAG = "FirebaseConnection"
     private const val USERS_COLLECTION = "users"
   }
 
+  /**
+   * Get the user with its id.
+   *
+   * @param uid the user id
+   * @param callback the callback function
+   */
   fun getUser(uid: String, callback: (GoMeetUser?) -> Unit) {
     db.collection(USERS_COLLECTION)
         .document(uid)
@@ -29,6 +43,11 @@ class UserFirebaseConnection(private val db: FirebaseFirestore) {
         }
   }
 
+  /**
+   * Add a user to the database.
+   *
+   * @param user the user to add
+   */
   fun addUser(user: GoMeetUser) {
     db.collection(USERS_COLLECTION)
         .document(user.uid)
@@ -37,6 +56,11 @@ class UserFirebaseConnection(private val db: FirebaseFirestore) {
         .addOnFailureListener { e -> Log.w(TAG, "Error adding document", e) }
   }
 
+  /**
+   * Update a user in the database.
+   *
+   * @param user the user to update
+   */
   fun updateUser(user: GoMeetUser) {
     val documentRef = db.collection(USERS_COLLECTION).document(user.uid)
     documentRef
@@ -45,6 +69,11 @@ class UserFirebaseConnection(private val db: FirebaseFirestore) {
         .addOnFailureListener { e -> Log.w(TAG, "Error updating document", e) }
   }
 
+  /**
+   * Remove a user from the database.
+   *
+   * @param uid the user id
+   */
   fun removeUser(uid: String) {
     db.collection(USERS_COLLECTION)
         .document(uid)
@@ -53,21 +82,38 @@ class UserFirebaseConnection(private val db: FirebaseFirestore) {
         .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }
   }
 
+  /**
+   * Convert a GoMeetUser to a map.
+   *
+   * @return the map
+   */
   private fun GoMeetUser.toMap(): Map<String, Any?> {
     return mapOf(
         "uid" to uid,
         "username" to username,
         "following" to following,
         "followers" to followers,
-        "pendingRequests" to pendingRequests)
+        "pendingRequests" to pendingRequests,
+        "myTickets" to joinedEvents,
+        "myEvents" to myEvents,
+        "myFavorites" to myFavorites)
   }
 
+  /**
+   * Convert a map to a GoMeetUser.
+   *
+   * @param id the user id
+   * @return the GoMeetUser
+   */
   private fun Map<String, Any>.fromMap(id: String): GoMeetUser {
     return GoMeetUser(
         uid = id,
         username = this["username"] as String,
         following = this["following"] as List<String>,
         followers = this["followers"] as List<String>,
-        pendingRequests = this["pendingRequests"] as List<String>)
+        pendingRequests = this["pendingRequests"] as List<String>,
+        joinedEvents = this["myTickets"] as List<String>,
+        myEvents = this["myEvents"] as List<String>,
+        myFavorites = this["myFavorites"] as List<String>)
   }
 }

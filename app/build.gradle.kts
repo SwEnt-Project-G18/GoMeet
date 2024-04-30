@@ -37,7 +37,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.github.se.gomeet.InstrTestRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -174,13 +174,9 @@ dependencies {
     implementation("androidx.compose.runtime:runtime-livedata:1.4.0")
 
 
-
-
-
-
     //Messaging system using stream
-    implementation("io.getstream:stream-chat-android-compose:6.0.8")
     implementation("io.getstream:stream-chat-android-offline:6.0.8")
+    implementation("io.getstream:stream-chat-android-compose:6.0.8")
     androidTestImplementation("io.getstream:stream-chat-android-compose:6.0.8")
     androidTestImplementation("io.getstream:stream-chat-android-offline:6.0.8")
 
