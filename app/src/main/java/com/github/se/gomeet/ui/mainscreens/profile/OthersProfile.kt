@@ -70,9 +70,12 @@ import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.ui.theme.NavBarUnselected
 import com.github.se.gomeet.viewmodel.UserViewModel
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 
-private var currentUser: GoMeetUser? = null
+private var user: GoMeetUser? = null
+private var currentUser = Firebase.auth.currentUser?.uid ?: ""
 
 /**
  * Composable function for the OthersProfile screen.
@@ -91,7 +94,7 @@ fun OthersProfile(
   var isProfileLoaded by remember { mutableStateOf(false) }
   LaunchedEffect(Unit) {
     coroutine.launch {
-      currentUser = userViewModel.getUser(uid)
+      user = userViewModel.getUser(uid)
       isProfileLoaded = true
     }
   }
@@ -156,7 +159,7 @@ fun OthersProfile(
                                 verticalAlignment = Alignment.CenterVertically,
                                 modifier = Modifier.padding(start = 30.dp)) {
                                   Text(
-                                      text = currentUser?.username ?: "username",
+                                      text = user?.username ?: "username",
                                       textAlign = TextAlign.Center,
                                       style =
                                           TextStyle(
@@ -190,14 +193,25 @@ fun OthersProfile(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.padding(horizontal = 15.dp, vertical = 15.dp)) {
                       // Edit Profile button
-                      Button(
-                          onClick = { userViewModel.follow(uid) },
-                          modifier = Modifier.height(40.dp).width(180.dp),
-                          shape = RoundedCornerShape(10.dp),
-                          colors =
-                              ButtonDefaults.buttonColors(containerColor = Color(0xFFECEFF1))) {
-                            Text(text = "Follow", color = Color.Black)
-                          }
+                      if (user?.followers?.contains(currentUser) == true) {
+                        Button(
+                            onClick = { userViewModel.unfollow(uid) },
+                            modifier = Modifier.height(40.dp).width(180.dp),
+                            shape = RoundedCornerShape(10.dp),
+                            colors =
+                                ButtonDefaults.buttonColors(containerColor = Color(0xFFECEFF1))) {
+                              Text(text = "Unfollow", color = Color.Black)
+                            }
+                      } else {
+                        Button(
+                            onClick = { userViewModel.follow(uid) },
+                            modifier = Modifier.height(40.dp).width(180.dp),
+                            shape = RoundedCornerShape(10.dp),
+                            colors =
+                                ButtonDefaults.buttonColors(containerColor = Color(0xFFECEFF1))) {
+                              Text(text = "Follow", color = Color.Black)
+                            }
+                      }
 
                       Spacer(Modifier.width(5.dp))
 
@@ -220,7 +234,7 @@ fun OthersProfile(
                     modifier = Modifier.fillMaxWidth().testTag("MoreUserInfo")) {
                       Column {
                         Text(
-                            text = currentUser?.myEvents?.size.toString(),
+                            text = user?.myEvents?.size.toString(),
                             style =
                                 TextStyle(
                                     fontSize = 20.sp,
@@ -254,7 +268,7 @@ fun OthersProfile(
                                   .width(2.dp))
                       Column(modifier = Modifier.clickable {}) {
                         Text(
-                            text = currentUser?.followers?.size.toString(),
+                            text = user?.followers?.size.toString(),
                             style =
                                 TextStyle(
                                     fontSize = 20.sp,
@@ -288,7 +302,7 @@ fun OthersProfile(
                                   .width(2.dp))
                       Column {
                         Text(
-                            text = currentUser?.following?.size.toString(),
+                            text = user?.following?.size.toString(),
                             style =
                                 TextStyle(
                                     fontSize = 20.sp,

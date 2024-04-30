@@ -92,7 +92,10 @@ fun EventHeader(
                       letterSpacing = 0.5.sp))
           Spacer(modifier = Modifier.height(5.dp))
           Text(
-              modifier = Modifier.clickable { nav.navigateToOthersProfile(organizer.uid) },
+              modifier =
+                  Modifier.clickable {
+                    nav.navigateToScreen(Route.OTHERS_PROFILE.replace("{uid}", organizer.uid))
+                  },
               text = organizer.username,
               style =
                   TextStyle(

@@ -118,4 +118,19 @@ class UserViewModel : ViewModel() {
       editUser(receiver!!.copy(followers = receiver.followers.plus(senderUid)))
     }
   }
+
+  /**
+   * Unfollow a user.
+   *
+   * @param uid The uid of the user to unfollow.
+   */
+  fun unfollow(uid: String) {
+    CoroutineScope(Dispatchers.IO).launch {
+      val senderUid = Firebase.auth.currentUser!!.uid
+      val sender = getUser(senderUid)
+      val receiver = getUser(uid)
+      editUser(sender!!.copy(following = sender.following.minus(uid)))
+      editUser(receiver!!.copy(followers = receiver.followers.minus(senderUid)))
+    }
+  }
 }

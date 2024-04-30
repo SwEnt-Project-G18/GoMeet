@@ -165,16 +165,6 @@ class NavigationActions(val navController: NavHostController) {
     navController.navigate(route)
   }
 
-  /**
-   * Navigates to the profile of another user.
-   *
-   * @param uid The user id of the user whose profile is being viewed.
-   */
-  fun navigateToOthersProfile(uid: String) {
-    val route = Route.OTHERS_PROFILE.replace("{uid}", uid)
-    navController.navigate(route)
-  }
-
   /** Navigates to the previous screen. */
   fun goBack() {
     navController.popBackStack()
