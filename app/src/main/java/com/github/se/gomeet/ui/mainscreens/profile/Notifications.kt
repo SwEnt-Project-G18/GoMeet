@@ -75,7 +75,7 @@ import java.util.Locale
 fun Notifications(nav: NavigationActions) {
 
   val initialState =
-      UserInvitedToEvents(u = "", invitedToEvents = mutableListOf("" to InviteStatus.PENDING))
+      UserInvitedToEvents(user = "", invitedToEvents = mutableListOf("" to InviteStatus.PENDING))
   var selectedFilter by remember { mutableStateOf("All") }
   val inviteList = remember { mutableStateOf(initialState) }
   val coroutineScope = rememberCoroutineScope()

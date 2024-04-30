@@ -26,7 +26,7 @@ class EventInviteViewModel {
   suspend fun getUsersInvitedToEvent(eventId: String): UserInvitedToEvents? {
     return try {
       val userInvitedToEvents = CompletableDeferred<UserInvitedToEvents?>()
-      repository.getEventInvites(userId) { t -> userInvitedToEvents.complete(t) }
+      repository.getEventInvites(eventId) { t -> userInvitedToEvents.complete(t) }
       userInvitedToEvents.await()
     } catch (e: Exception) {
       null
