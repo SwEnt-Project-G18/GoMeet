@@ -25,7 +25,7 @@ class UserViewModel : ViewModel() {
    * @param uid the user id
    * @param username the username
    */
-  fun createUserIfNew(uid: String, username: String) {
+  fun createUserIfNew(uid: String, username: String, firstName: String, lastName: String, email: String, phoneNumber: String, country: String) {
     CoroutineScope(Dispatchers.IO).launch {
       if (getUser(uid) == null) {
         try {
@@ -36,6 +36,11 @@ class UserViewModel : ViewModel() {
                   following = emptyList(),
                   followers = emptyList(),
                   pendingRequests = emptyList(),
+                firstName = firstName,
+                lastName = lastName,
+                email = email,
+                phoneNumber = phoneNumber,
+                country = country,
                   joinedEvents = emptyList(),
                   myEvents = emptyList(),
                   myFavorites = emptyList())

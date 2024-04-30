@@ -1,6 +1,7 @@
 package com.github.se.gomeet.ui.authscreens
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.CircularProgressIndicator
@@ -69,7 +71,7 @@ fun RegisterScreen(
   Column(
       verticalArrangement = Arrangement.Top,
       horizontalAlignment = Alignment.CenterHorizontally,
-      modifier = Modifier.fillMaxSize().padding(25.dp)) {
+      modifier = Modifier.fillMaxSize().padding(25.dp).verticalScroll(ScrollState(0))) {
         Image(
             painter = painterResource(id = R.drawable.gomeet_text),
             contentDescription = "Go Meet",
@@ -77,7 +79,7 @@ fun RegisterScreen(
             alignment = Alignment.Center,
             colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.tertiary))
 
-        Spacer(modifier = Modifier.size(40.dp))
+        Spacer(modifier = Modifier.size(15.dp))
 
         Text(
             text = "Create account",
@@ -88,7 +90,7 @@ fun RegisterScreen(
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.headlineLarge)
 
-        Spacer(modifier = Modifier.size(110.dp))
+        Spacer(modifier = Modifier.size(15.dp))
 
         if (isError) {
           Text(
@@ -98,15 +100,72 @@ fun RegisterScreen(
               textAlign = TextAlign.Center)
         }
 
-        TextField(
-            value = signInState.value.emailRegister,
-            onValueChange = { newValue -> authViewModel.onEmailRegisterChange(newValue) },
-            label = { Text("Email") },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-            colors = textFieldColors)
+      TextField(
+          value = signInState.value.firstNameRegister,
+          onValueChange = { newValue -> authViewModel.onFirstNameRegisterChange(newValue) },
+          label = { Text("First Name") },
+          singleLine = true,
+          modifier = Modifier.fillMaxWidth(),
+          colors = textFieldColors
+      )
+
+      Spacer(modifier = Modifier.size(16.dp))
+
+      TextField(
+          value = signInState.value.lastNameRegister,
+          onValueChange = { newValue -> authViewModel.onLastNameRegisterChange(newValue) },
+          label = { Text("Last Name") },
+          singleLine = true,
+          modifier = Modifier.fillMaxWidth(),
+          colors = textFieldColors
+      )
+
+      Spacer(modifier = Modifier.size(16.dp))
+
+
+      TextField(
+          value = signInState.value.usernameRegister,
+          onValueChange = { newValue -> authViewModel.onUsernameRegisterChange(newValue) },
+          label = { Text("Username") },
+          singleLine = true,
+          modifier = Modifier.fillMaxWidth(),
+          colors = textFieldColors
+      )
 
         Spacer(modifier = Modifier.size(16.dp))
+
+      TextField(
+          value = signInState.value.phoneNumberRegister,
+          onValueChange = { newValue -> authViewModel.onPhoneNumberRegisterChange(newValue) },
+          label = { Text("Phone Number") },
+          singleLine = true,
+          modifier = Modifier.fillMaxWidth(),
+          colors = textFieldColors
+      )
+
+      Spacer(modifier = Modifier.size(16.dp))
+
+      TextField(
+          value = signInState.value.emailRegister,
+          onValueChange = { newValue -> authViewModel.onEmailRegisterChange(newValue) },
+          label = { Text("Email") },
+          singleLine = true,
+          modifier = Modifier.fillMaxWidth(),
+          colors = textFieldColors)
+
+      Spacer(modifier = Modifier.size(16.dp))
+
+      TextField(
+          value = signInState.value.countryRegister,
+          onValueChange = { newValue -> authViewModel.onCountryRegisterChange(newValue) },
+          label = { Text("Country") },
+          singleLine = true,
+          modifier = Modifier.fillMaxWidth(),
+          colors = textFieldColors
+      )
+
+      Spacer(modifier = Modifier.size(16.dp))
+
 
         TextField(
             value = signInState.value.passwordRegister,
@@ -151,9 +210,28 @@ fun RegisterScreen(
         }
 
         if (signInState.value.isSignInSuccessful) {
-          userViewModel.createUserIfNew(
-              Firebase.auth.currentUser!!.uid, Firebase.auth.currentUser!!.email!!)
-          val user =
+            val currentUser = Firebase.auth.currentUser
+            if (currentUser != null) {
+                val uid = currentUser.uid
+                val email = currentUser.email ?: ""
+                val firstName = signInState.value.firstNameRegister
+                val lastName = signInState.value.lastNameRegister
+                val phoneNumber = signInState.value.phoneNumberRegister
+                val country = signInState.value.countryRegister
+                val username = signInState.value.usernameRegister
+
+                userViewModel.createUserIfNew(
+                    uid,
+                    username,
+                    firstName,
+                    lastName,
+                    email,
+                    phoneNumber,
+                    country
+                )
+            }
+
+            val user =
               User(
                   id = Firebase.auth.currentUser!!.uid,
                   name = Firebase.auth.currentUser!!.email!!) // TODO: currently username = email
