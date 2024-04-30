@@ -184,7 +184,7 @@ class MainActivity : ComponentActivity() {
                   val date = entry.arguments?.getString("date") ?: ""
                   val time = entry.arguments?.getString("time") ?: ""
                   val organizer = entry.arguments?.getString("organizer") ?: ""
-                  val rating = entry.arguments?.getDouble("rating") ?: 0.0
+                  val rating = entry.arguments?.getFloat("rating") ?: 0.0
                   val description = entry.arguments?.getString("description") ?: ""
                   val latitude = entry.arguments?.getFloat("latitude") ?: 0.0
                   val longitude = entry.arguments?.getFloat("longitude") ?: 0.0
@@ -197,7 +197,7 @@ class MainActivity : ComponentActivity() {
                       date,
                       time,
                       organizer,
-                      rating,
+                      rating.toDouble(),
                       painterResource(id = R.drawable.chess_demo),
                       description,
                       loc,
@@ -266,15 +266,8 @@ class MainActivity : ComponentActivity() {
                 }
             composable(
                 route = Route.FOLLOWING,
-                arguments =
-                    listOf(
-                        navArgument("uid") { type = NavType.StringType },
-                        navArgument("isOwnList") { type = NavType.StringType })) {
-                  Following(
-                      navAction,
-                      it.arguments?.getString("uid") ?: "",
-                      userViewModel,
-                      (it.arguments?.getString("isOwnList") ?: "true").toBoolean())
+                arguments = listOf(navArgument("uid") { type = NavType.StringType })) {
+                  Following(navAction, it.arguments?.getString("uid") ?: "", userViewModel)
                 }
           }
         }

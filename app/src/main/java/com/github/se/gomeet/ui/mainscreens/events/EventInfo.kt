@@ -94,8 +94,9 @@ fun EventHeader(
           Text(
               modifier =
                   Modifier.clickable {
-                    nav.navigateToScreen(Route.OTHERS_PROFILE.replace("{uid}", organizer.uid))
-                  },
+                        nav.navigateToScreen(Route.OTHERS_PROFILE.replace("{uid}", organizer.uid))
+                      }
+                      .testTag("Username"),
               text = organizer.username,
               style =
                   TextStyle(

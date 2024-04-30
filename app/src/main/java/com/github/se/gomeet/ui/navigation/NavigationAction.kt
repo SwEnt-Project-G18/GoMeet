@@ -50,7 +50,7 @@ object Route {
   const val SETTINGS = "Settings"
   const val MESSAGE = "Message/{id}"
   const val FOLLOWERS = "Followers/{uid}"
-  const val FOLLOWING = "Following/{uid}/{isOwnList}"
+  const val FOLLOWING = "Following/{uid}"
 }
 
 val CREATE_ITEMS =

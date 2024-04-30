@@ -105,6 +105,7 @@ fun OthersProfile(
   }
 
   Scaffold(
+      modifier = Modifier.testTag("OtherProfile"),
       bottomBar = {
         BottomNavigationMenu(
             onTabSelect = { selectedTab ->

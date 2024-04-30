@@ -326,28 +326,50 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
               OutlinedButton(
                   onClick = {
                     val uid = db.getNewId()
-                    if (selectedLocation.value != null &&
-                        titleState.value.isNotEmpty() &&
-                        !dateFormatError &&
-                        dateState != null) {
-                      eventViewModel.createEvent(
-                          titleState.value,
-                          descriptionState.value,
-                          selectedLocation.value!!,
-                          dateState!!,
-                          price,
-                          url.value,
-                          listOf(),
-                          listOf(),
-                          0,
-                          !isPrivateEvent.value,
-                          listOf(),
-                          listOf(),
-                          imageUri,
-                          UserViewModel(),
-                          uid)
+                    if (titleState.value.isNotEmpty() && !dateFormatError && dateState != null) {
+                      if (selectedLocation.value == null) {
+                        eventViewModel.location(locationState.value, 1) { locations ->
+                          if (locations.isNotEmpty()) {
+                            eventViewModel.createEvent(
+                                titleState.value,
+                                descriptionState.value,
+                                locations[0],
+                                dateState!!,
+                                price,
+                                url.value,
+                                listOf(),
+                                listOf(),
+                                0,
+                                !isPrivateEvent.value,
+                                listOf(),
+                                listOf(),
+                                imageUri,
+                                UserViewModel(),
+                                uid)
 
-                      nav.goBack()
+                            nav.goBack()
+                          }
+                        }
+                      } else {
+                        eventViewModel.createEvent(
+                            titleState.value,
+                            descriptionState.value,
+                            selectedLocation.value!!,
+                            dateState!!,
+                            price,
+                            url.value,
+                            listOf(),
+                            listOf(),
+                            0,
+                            !isPrivateEvent.value,
+                            listOf(),
+                            listOf(),
+                            imageUri,
+                            UserViewModel(),
+                            uid)
+
+                        nav.goBack()
+                      }
                     }
 
                     dateState?.let {
@@ -446,7 +468,7 @@ fun LocationField(
         ) {
           locationSuggestions.value.forEachIndexed { i, location ->
             DropdownMenuItem(
-                modifier = Modifier.wrapContentSize().testTag("DropdownMenuItem"),
+                modifier = Modifier.wrapContentSize(),
                 text = { Text(location.name) },
                 onClick = {
                   locationQuery.value = location.name

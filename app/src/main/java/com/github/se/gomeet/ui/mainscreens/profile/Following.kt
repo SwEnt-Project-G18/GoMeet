@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
@@ -48,16 +49,24 @@ import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.ui.theme.LightGray
 import com.github.se.gomeet.viewmodel.UserViewModel
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 
 private var currentUser: GoMeetUser? = null
 
+/**
+ * Composable function for a user's "following" list
+ *
+ * @param nav The navigation actions
+ * @param uid the uid of the user whose "following" list is displayed
+ * @param userViewModel The user view model
+ */
 @Composable
 fun Following(
     nav: NavigationActions,
     uid: String,
     userViewModel: UserViewModel,
-    isOwnList: Boolean
 ) {
   val coroutineScope = rememberCoroutineScope()
   var isLoaded by remember { mutableStateOf(false) }
@@ -76,6 +85,7 @@ fun Following(
   }
 
   Scaffold(
+      modifier = Modifier.testTag("Following"),
       topBar = {
         Column {
           Text(
@@ -122,7 +132,8 @@ fun Following(
                       .padding(start = 15.dp, end = 15.dp, bottom = 10.dp)
                       .clickable {
                         nav.navigateToScreen(Route.OTHERS_PROFILE.replace("{uid}", user.uid))
-                      },
+                      }
+                      .testTag("FollowingUser"),
               horizontalArrangement = Arrangement.SpaceBetween) {
                 Image(
                     modifier =
@@ -137,7 +148,7 @@ fun Following(
                   Text(text = user.username)
                   Text("@usertag")
                 }
-                if (isOwnList) {
+                if (uid == Firebase.auth.currentUser!!.uid) {
                   if (isFollowing) {
                     Button(
                         onClick = {
@@ -184,5 +195,5 @@ fun Following(
 @Preview
 @Composable
 fun FollowingPreview() {
-  Following(NavigationActions(rememberNavController()), "", UserViewModel(), true)
+  Following(NavigationActions(rememberNavController()), "", UserViewModel())
 }

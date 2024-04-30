@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
@@ -49,6 +50,13 @@ import kotlinx.coroutines.launch
 
 private var currentUser: GoMeetUser? = null
 
+/**
+ * Composable function for a user's followers list
+ *
+ * @param nav The navigation actions
+ * @param uid the uid of the user whose followers list is displayed
+ * @param userViewModel The user view model
+ */
 @Composable
 fun Followers(nav: NavigationActions, uid: String, userViewModel: UserViewModel) {
   val coroutineScope = rememberCoroutineScope()
@@ -68,6 +76,7 @@ fun Followers(nav: NavigationActions, uid: String, userViewModel: UserViewModel)
   }
 
   Scaffold(
+      modifier = Modifier.testTag("Followers"),
       topBar = {
         Column {
           Text(
@@ -113,7 +122,8 @@ fun Followers(nav: NavigationActions, uid: String, userViewModel: UserViewModel)
                       .padding(start = 15.dp, end = 15.dp, bottom = 10.dp)
                       .clickable {
                         nav.navigateToScreen(Route.OTHERS_PROFILE.replace("{uid}", user.uid))
-                      },
+                      }
+                      .testTag("Follower"),
               horizontalArrangement = Arrangement.SpaceBetween) {
                 Image(
                     modifier =
