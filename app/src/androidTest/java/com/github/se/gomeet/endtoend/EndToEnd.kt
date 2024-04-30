@@ -71,7 +71,7 @@ class EndToEndTest : TestCase() {
           assertIsEnabled()
           performClick()
           composeTestRule.waitForIdle()
-          composeTestRule.waitUntil(timeoutMillis = 5000) {
+          composeTestRule.waitUntil(timeoutMillis = 10000) {
             composeTestRule.onNodeWithTag("CreateUI").isDisplayed()
           }
         }

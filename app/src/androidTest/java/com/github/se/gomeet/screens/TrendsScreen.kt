@@ -8,5 +8,4 @@ import io.github.kakaocup.compose.node.element.KNode
 class TrendsScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
     ComposeScreen<TrendsScreen>(
         semanticsProvider = semanticsProvider, viewBuilderAction = { hasTestTag("TrendsScreen") }) {
-  val createButton: KNode = onNode { hasTestTag(Route.CREATE) }
 }
