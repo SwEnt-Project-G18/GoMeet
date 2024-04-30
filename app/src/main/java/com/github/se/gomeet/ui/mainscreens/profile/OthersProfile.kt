@@ -40,6 +40,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -90,12 +91,16 @@ fun OthersProfile(
     uid: String,
     userViewModel: UserViewModel
 ) { // TODO Add parameters to the function
-  val coroutine = rememberCoroutineScope()
+  var isFollowing by remember { mutableStateOf(false) }
+  var followerCount by remember { mutableIntStateOf(0) }
+  val coroutineScope = rememberCoroutineScope()
   var isProfileLoaded by remember { mutableStateOf(false) }
   LaunchedEffect(Unit) {
-    coroutine.launch {
+    coroutineScope.launch {
       user = userViewModel.getUser(uid)
       isProfileLoaded = true
+      isFollowing = user?.followers?.contains(currentUser) ?: false
+      followerCount = user?.followers?.size ?: 0
     }
   }
 
@@ -193,9 +198,13 @@ fun OthersProfile(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.padding(horizontal = 15.dp, vertical = 15.dp)) {
                       // Edit Profile button
-                      if (user?.followers?.contains(currentUser) == true) {
+                      if (isFollowing) {
                         Button(
-                            onClick = { userViewModel.unfollow(uid) },
+                            onClick = {
+                              isFollowing = false
+                              followerCount -= 1
+                              userViewModel.unfollow(uid)
+                            },
                             modifier = Modifier.height(40.dp).width(180.dp),
                             shape = RoundedCornerShape(10.dp),
                             colors =
@@ -204,7 +213,11 @@ fun OthersProfile(
                             }
                       } else {
                         Button(
-                            onClick = { userViewModel.follow(uid) },
+                            onClick = {
+                              isFollowing = true
+                              followerCount += 1
+                              userViewModel.follow(uid)
+                            },
                             modifier = Modifier.height(40.dp).width(180.dp),
                             shape = RoundedCornerShape(10.dp),
                             colors =
@@ -232,102 +245,116 @@ fun OthersProfile(
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth().testTag("MoreUserInfo")) {
-                      Column {
-                        Text(
-                            text = user?.myEvents?.size.toString(),
-                            style =
-                                TextStyle(
-                                    fontSize = 20.sp,
-                                    lineHeight = 16.sp,
-                                    fontFamily = FontFamily(Font(R.font.roboto)),
-                                    fontWeight = FontWeight(1000),
-                                    color = Color(0xFF2F6673),
-                                    textAlign = TextAlign.Center,
-                                    letterSpacing = 0.5.sp,
-                                ),
-                            modifier = Modifier.align(Alignment.CenterHorizontally))
-                        Text(
-                            text = "Events",
-                            style =
-                                TextStyle(
-                                    fontSize = 13.sp,
-                                    lineHeight = 16.sp,
-                                    fontFamily = FontFamily(Font(R.font.roboto)),
-                                    fontWeight = FontWeight(1000),
-                                    color = Color(0xFF2F6673),
-                                    textAlign = TextAlign.Center,
-                                    letterSpacing = 0.5.sp,
-                                ),
-                            modifier = Modifier.align(Alignment.CenterHorizontally))
-                      }
+                      Column(
+                          modifier =
+                              Modifier.clickable {
+                                // TODO
+                              }) {
+                            Text(
+                                text = user?.myEvents?.size.toString(),
+                                style =
+                                    TextStyle(
+                                        fontSize = 20.sp,
+                                        lineHeight = 16.sp,
+                                        fontFamily = FontFamily(Font(R.font.roboto)),
+                                        fontWeight = FontWeight(1000),
+                                        color = Color(0xFF2F6673),
+                                        textAlign = TextAlign.Center,
+                                        letterSpacing = 0.5.sp,
+                                    ),
+                                modifier = Modifier.align(Alignment.CenterHorizontally))
+                            Text(
+                                text = "Events",
+                                style =
+                                    TextStyle(
+                                        fontSize = 13.sp,
+                                        lineHeight = 16.sp,
+                                        fontFamily = FontFamily(Font(R.font.roboto)),
+                                        fontWeight = FontWeight(1000),
+                                        color = Color(0xFF2F6673),
+                                        textAlign = TextAlign.Center,
+                                        letterSpacing = 0.5.sp,
+                                    ),
+                                modifier = Modifier.align(Alignment.CenterHorizontally))
+                          }
                       HorizontalDivider(
                           modifier =
                               Modifier
                                   // .fillMaxHeight()
                                   .height(40.dp)
                                   .width(2.dp))
-                      Column(modifier = Modifier.clickable {}) {
-                        Text(
-                            text = user?.followers?.size.toString(),
-                            style =
-                                TextStyle(
-                                    fontSize = 20.sp,
-                                    lineHeight = 16.sp,
-                                    fontFamily = FontFamily(Font(R.font.roboto)),
-                                    fontWeight = FontWeight(1000),
-                                    color = Color(0xFF2F6673),
-                                    textAlign = TextAlign.Center,
-                                    letterSpacing = 0.5.sp,
-                                ),
-                            modifier = Modifier.align(Alignment.CenterHorizontally))
-                        Text(
-                            text = "Followers",
-                            style =
-                                TextStyle(
-                                    fontSize = 13.sp,
-                                    lineHeight = 16.sp,
-                                    fontFamily = FontFamily(Font(R.font.roboto)),
-                                    fontWeight = FontWeight(1000),
-                                    color = Color(0xFF2F6673),
-                                    textAlign = TextAlign.Center,
-                                    letterSpacing = 0.5.sp,
-                                ),
-                            modifier = Modifier.align(Alignment.CenterHorizontally))
-                      }
+                      Column(
+                          modifier =
+                              Modifier.clickable {
+                                nav.navigateToScreen(Route.FOLLOWERS.replace("{uid}", uid))
+                              }) {
+                            Text(
+                                text = followerCount.toString(),
+                                style =
+                                    TextStyle(
+                                        fontSize = 20.sp,
+                                        lineHeight = 16.sp,
+                                        fontFamily = FontFamily(Font(R.font.roboto)),
+                                        fontWeight = FontWeight(1000),
+                                        color = Color(0xFF2F6673),
+                                        textAlign = TextAlign.Center,
+                                        letterSpacing = 0.5.sp,
+                                    ),
+                                modifier = Modifier.align(Alignment.CenterHorizontally))
+                            Text(
+                                text = "Followers",
+                                style =
+                                    TextStyle(
+                                        fontSize = 13.sp,
+                                        lineHeight = 16.sp,
+                                        fontFamily = FontFamily(Font(R.font.roboto)),
+                                        fontWeight = FontWeight(1000),
+                                        color = Color(0xFF2F6673),
+                                        textAlign = TextAlign.Center,
+                                        letterSpacing = 0.5.sp,
+                                    ),
+                                modifier = Modifier.align(Alignment.CenterHorizontally))
+                          }
                       HorizontalDivider(
                           modifier =
                               Modifier
                                   // .fillMaxHeight()
                                   .height(40.dp)
                                   .width(2.dp))
-                      Column {
-                        Text(
-                            text = user?.following?.size.toString(),
-                            style =
-                                TextStyle(
-                                    fontSize = 20.sp,
-                                    lineHeight = 16.sp,
-                                    fontFamily = FontFamily(Font(R.font.roboto)),
-                                    fontWeight = FontWeight(1000),
-                                    color = Color(0xFF2F6673),
-                                    textAlign = TextAlign.Center,
-                                    letterSpacing = 0.5.sp,
-                                ),
-                            modifier = Modifier.align(Alignment.CenterHorizontally))
-                        Text(
-                            text = "Following",
-                            style =
-                                TextStyle(
-                                    fontSize = 13.sp,
-                                    lineHeight = 16.sp,
-                                    fontFamily = FontFamily(Font(R.font.roboto)),
-                                    fontWeight = FontWeight(1000),
-                                    color = Color(0xFF2F6673),
-                                    textAlign = TextAlign.Center,
-                                    letterSpacing = 0.5.sp,
-                                ),
-                            modifier = Modifier.align(Alignment.CenterHorizontally))
-                      }
+                      Column(
+                          modifier =
+                              Modifier.clickable {
+                                nav.navigateToScreen(
+                                    Route.FOLLOWING.replace("{uid}", uid)
+                                        .replace("{isOwnList}", "false"))
+                              }) {
+                            Text(
+                                text = user?.following?.size.toString(),
+                                style =
+                                    TextStyle(
+                                        fontSize = 20.sp,
+                                        lineHeight = 16.sp,
+                                        fontFamily = FontFamily(Font(R.font.roboto)),
+                                        fontWeight = FontWeight(1000),
+                                        color = Color(0xFF2F6673),
+                                        textAlign = TextAlign.Center,
+                                        letterSpacing = 0.5.sp,
+                                    ),
+                                modifier = Modifier.align(Alignment.CenterHorizontally))
+                            Text(
+                                text = "Following",
+                                style =
+                                    TextStyle(
+                                        fontSize = 13.sp,
+                                        lineHeight = 16.sp,
+                                        fontFamily = FontFamily(Font(R.font.roboto)),
+                                        fontWeight = FontWeight(1000),
+                                        color = Color(0xFF2F6673),
+                                        textAlign = TextAlign.Center,
+                                        letterSpacing = 0.5.sp,
+                                    ),
+                                modifier = Modifier.align(Alignment.CenterHorizontally))
+                          }
                     }
                 Spacer(modifier = Modifier.height(30.dp))
                 Text(

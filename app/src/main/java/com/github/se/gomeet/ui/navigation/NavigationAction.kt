@@ -48,6 +48,8 @@ object Route {
       "eventInfo/{eventId}/{title}/{date}/{time}/{organizer}/{rating}/{description}/{latitude}/{longitude}"
   const val SETTINGS = "Settings"
   const val MESSAGE = "Message/{id}"
+  const val FOLLOWERS = "Followers/{uid}"
+  const val FOLLOWING = "Following/{uid}/{isOwnList}"
 }
 
 val CREATE_ITEMS =

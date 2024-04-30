@@ -1,4 +1,4 @@
-package com.github.se.gomeet.ui.mainscreens
+package com.github.se.gomeet.ui.mainscreens.profile
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule

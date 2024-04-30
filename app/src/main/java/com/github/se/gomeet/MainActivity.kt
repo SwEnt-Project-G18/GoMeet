@@ -29,6 +29,8 @@ import com.github.se.gomeet.ui.mainscreens.create.Create
 import com.github.se.gomeet.ui.mainscreens.create.CreateEvent
 import com.github.se.gomeet.ui.mainscreens.events.Events
 import com.github.se.gomeet.ui.mainscreens.events.MyEventInfo
+import com.github.se.gomeet.ui.mainscreens.profile.Followers
+import com.github.se.gomeet.ui.mainscreens.profile.Following
 import com.github.se.gomeet.ui.mainscreens.profile.OthersProfile
 import com.github.se.gomeet.ui.mainscreens.profile.Profile
 import com.github.se.gomeet.ui.mainscreens.profile.SettingsScreen
@@ -249,6 +251,23 @@ class MainActivity : ComponentActivity() {
                 }
 
             composable(Route.SETTINGS) { SettingsScreen(navAction) }
+            composable(
+                route = Route.FOLLOWERS,
+                arguments = listOf(navArgument("uid") { type = NavType.StringType })) {
+                  Followers(navAction, it.arguments?.getString("uid") ?: "", UserViewModel())
+                }
+            composable(
+                route = Route.FOLLOWING,
+                arguments =
+                    listOf(
+                        navArgument("uid") { type = NavType.StringType },
+                        navArgument("isOwnList") { type = NavType.StringType })) {
+                  Following(
+                      navAction,
+                      it.arguments?.getString("uid") ?: "",
+                      UserViewModel(),
+                      (it.arguments?.getString("isOwnList") ?: "true").toBoolean())
+                }
           }
         }
       }
