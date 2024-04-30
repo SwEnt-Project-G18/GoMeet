@@ -127,11 +127,11 @@ class EndToEndTest2 : TestCase() {
           composeTestRule.onNodeWithText("Follow").isDisplayed()
         }
         composeTestRule.onNodeWithText("Follow").performClick()
-        TimeUnit.SECONDS.sleep(1)
+        TimeUnit.SECONDS.sleep(2)
         composeTestRule.onNodeWithText("Unfollow").assertIsDisplayed().performClick()
-        TimeUnit.SECONDS.sleep(1)
+        TimeUnit.SECONDS.sleep(2)
         composeTestRule.onNodeWithText("Follow").assertIsDisplayed().performClick()
-        TimeUnit.SECONDS.sleep(1)
+        TimeUnit.SECONDS.sleep(2)
         composeTestRule.onNodeWithText("Followers").performClick()
       }
     }
@@ -160,6 +160,7 @@ class EndToEndTest2 : TestCase() {
         }
         composeTestRule.onNodeWithTag("FollowingUser").assertIsDisplayed()
         composeTestRule.onNodeWithText("Unfollow").assertIsDisplayed().performClick()
+        TimeUnit.SECONDS.sleep(2)
         composeTestRule.onNodeWithTag("FollowingUser").performClick()
       }
     }
