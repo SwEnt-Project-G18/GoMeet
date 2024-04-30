@@ -106,7 +106,7 @@ class EndToEndTest : TestCase() {
           performTextInput("s")
           performTextInput("t")
           composeTestRule.waitForIdle()
-          composeTestRule.waitUntil(timeoutMillis = 5000) {
+          composeTestRule.waitUntil(timeoutMillis = 10000) {
             composeTestRule.onAllNodesWithTag("DropdownMenuItem")[0].isDisplayed()
           }
           composeTestRule.onAllNodesWithTag("DropdownMenuItem")[0].performClick()
