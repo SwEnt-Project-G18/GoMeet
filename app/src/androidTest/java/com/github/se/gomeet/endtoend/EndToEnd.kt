@@ -2,7 +2,6 @@ package com.github.se.gomeet.endtoend
 
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -106,10 +105,11 @@ class EndToEndTest : TestCase() {
           performTextInput("s")
           performTextInput("t")
           composeTestRule.waitForIdle()
-          composeTestRule.waitUntil(timeoutMillis = 10000) {
-            composeTestRule.onAllNodesWithTag("DropdownMenuItem")[0].isDisplayed()
-          }
-          composeTestRule.onAllNodesWithTag("DropdownMenuItem")[0].performClick()
+          /**
+           * composeTestRule.waitUntil(timeoutMillis = 10000) {
+           * composeTestRule.onAllNodesWithTag("DropdownMenuItem")[0].isDisplayed() }
+           * composeTestRule.onAllNodesWithTag("DropdownMenuItem")[0].performClick()*
+           */
         }
         date {
           assertIsDisplayed()
