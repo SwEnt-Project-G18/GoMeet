@@ -27,9 +27,9 @@ import com.github.se.gomeet.ui.mainscreens.Trends
 import com.github.se.gomeet.ui.mainscreens.create.AddParticipants
 import com.github.se.gomeet.ui.mainscreens.create.Create
 import com.github.se.gomeet.ui.mainscreens.create.CreateEvent
-import com.github.se.gomeet.ui.mainscreens.profile.Notifications
 import com.github.se.gomeet.ui.mainscreens.events.Events
 import com.github.se.gomeet.ui.mainscreens.events.MyEventInfo
+import com.github.se.gomeet.ui.mainscreens.profile.Notifications
 import com.github.se.gomeet.ui.mainscreens.profile.OthersProfile
 import com.github.se.gomeet.ui.mainscreens.profile.Profile
 import com.github.se.gomeet.ui.mainscreens.profile.SettingsScreen
@@ -40,7 +40,6 @@ import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.GoMeetTheme
 import com.github.se.gomeet.ui.theme.SetStatusBarColor
 import com.github.se.gomeet.viewmodel.AuthViewModel
-import com.github.se.gomeet.viewmodel.EventInviteViewModel
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.android.gms.maps.MapsInitializer
@@ -141,7 +140,7 @@ class MainActivity : ComponentActivity() {
             }
             composable(Route.CREATE) { Create(navAction) }
 
-            composable(Route.NOTIFICATIONS) { Notifications(navAction)}
+            composable(Route.NOTIFICATIONS) { Notifications(navAction) }
 
             composable(Route.PROFILE) { Profile(navAction, userId = userIdState.value) }
             composable(

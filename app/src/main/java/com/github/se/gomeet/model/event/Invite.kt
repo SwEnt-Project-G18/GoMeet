@@ -34,8 +34,4 @@ enum class InviteStatus {
   REFUSED
 }
 
-data class Invite(
-    val eventId: String,
-    val userId: String,
-    val status: InviteStatus
-)
+data class Invite(val eventId: String, val userId: String, val status: InviteStatus)

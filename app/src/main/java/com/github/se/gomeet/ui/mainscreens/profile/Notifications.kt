@@ -27,7 +27,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -64,8 +63,6 @@ import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.ui.theme.NavBarUnselected
-import com.github.se.gomeet.viewmodel.EventInviteViewModel
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -80,7 +77,7 @@ fun Notifications(nav: NavigationActions) {
   val inviteList = remember { mutableStateOf(initialState) }
   val coroutineScope = rememberCoroutineScope()
 
-    /*
+  /*
   LaunchedEffect(Unit) {
       coroutineScope.launch {
           val allInvitedEvents = inviteViewModel.getUsersInvitedToEvent(userId)
@@ -199,8 +196,7 @@ fun Notifications(nav: NavigationActions) {
                     eventPicture = painter,
                     organizerName = "EPFL Chess Club",
                     verified = true)
-                  Spacer(Modifier.height(10.dp))
-
+                Spacer(Modifier.height(10.dp))
               }
             }
       }
@@ -337,11 +333,11 @@ fun NotificationsWidget(
                         Button(
                             onClick = {},
                             content = {
-                              Row (){
+                              Row() {
                                 /*Icon(
-                                    painter = painterResource(id = R.drawable.check_circle),
-                                    contentDescription = "Accept",
-                                    modifier = Modifier.size(20.dp))*/
+                                painter = painterResource(id = R.drawable.check_circle),
+                                contentDescription = "Accept",
+                                modifier = Modifier.size(20.dp))*/
                                 Text("Accept")
                               }
                             },
@@ -355,9 +351,9 @@ fun NotificationsWidget(
                             content = {
                               Row {
                                 /*Icon(
-                                    painter = painterResource(id = R.drawable.close),
-                                    contentDescription = "Reject",
-                                    modifier = Modifier.size(20.dp))*/
+                                painter = painterResource(id = R.drawable.close),
+                                contentDescription = "Reject",
+                                modifier = Modifier.size(20.dp))*/
                                 Spacer(modifier = Modifier.width(5.dp))
                                 Text("Reject")
                               }
