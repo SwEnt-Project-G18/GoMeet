@@ -138,11 +138,11 @@ class MainActivity : ComponentActivity() {
               Trends(userIdState.value, navAction, UserViewModel(), EventViewModel())
             }
             composable(Route.CREATE) { Create(navAction) }
-            composable(Route.PROFILE) { Profile(navAction) }
+            composable(Route.PROFILE) { Profile(navAction, UserViewModel()) }
             composable(
                 route = Route.OTHERS_PROFILE,
                 arguments = listOf(navArgument("uid") { type = NavType.StringType })) {
-                  OthersProfile(navAction, it.arguments?.getString("uid") ?: "")
+                  OthersProfile(navAction, it.arguments?.getString("uid") ?: "", UserViewModel())
                 }
             composable(Route.PRIVATE_CREATE) {
               CreateEvent(navAction, EventViewModel(Firebase.auth.currentUser!!.uid), true)

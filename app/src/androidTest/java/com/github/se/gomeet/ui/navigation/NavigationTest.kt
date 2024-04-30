@@ -47,7 +47,9 @@ class NavigationTest {
               eventViewModel = EventViewModel())
         }
         composable(TOP_LEVEL_DESTINATIONS[3].route) { Create(NavigationActions(nav)) }
-        composable(TOP_LEVEL_DESTINATIONS[4].route) { Profile(NavigationActions(nav)) }
+        composable(TOP_LEVEL_DESTINATIONS[4].route) {
+          Profile(NavigationActions(nav), UserViewModel())
+        }
         // Add more destinations as needed
       }
 
@@ -84,7 +86,9 @@ class NavigationTest {
               eventViewModel = EventViewModel())
         }
         composable(TOP_LEVEL_DESTINATIONS[3].route) { Create(NavigationActions(nav)) }
-        composable(TOP_LEVEL_DESTINATIONS[4].route) { Profile(NavigationActions(nav)) }
+        composable(TOP_LEVEL_DESTINATIONS[4].route) {
+          Profile(NavigationActions(nav), UserViewModel())
+        }
       }
 
       val navActions = NavigationActions(nav)
