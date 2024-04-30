@@ -100,72 +100,65 @@ fun RegisterScreen(
               textAlign = TextAlign.Center)
         }
 
-      TextField(
-          value = signInState.value.firstNameRegister,
-          onValueChange = { newValue -> authViewModel.onFirstNameRegisterChange(newValue) },
-          label = { Text("First Name") },
-          singleLine = true,
-          modifier = Modifier.fillMaxWidth(),
-          colors = textFieldColors
-      )
-
-      Spacer(modifier = Modifier.size(16.dp))
-
-      TextField(
-          value = signInState.value.lastNameRegister,
-          onValueChange = { newValue -> authViewModel.onLastNameRegisterChange(newValue) },
-          label = { Text("Last Name") },
-          singleLine = true,
-          modifier = Modifier.fillMaxWidth(),
-          colors = textFieldColors
-      )
-
-      Spacer(modifier = Modifier.size(16.dp))
-
-
-      TextField(
-          value = signInState.value.usernameRegister,
-          onValueChange = { newValue -> authViewModel.onUsernameRegisterChange(newValue) },
-          label = { Text("Username") },
-          singleLine = true,
-          modifier = Modifier.fillMaxWidth(),
-          colors = textFieldColors
-      )
+        TextField(
+            value = signInState.value.firstNameRegister,
+            onValueChange = { newValue -> authViewModel.onFirstNameRegisterChange(newValue) },
+            label = { Text("First Name") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth(),
+            colors = textFieldColors)
 
         Spacer(modifier = Modifier.size(16.dp))
 
-      TextField(
-          value = signInState.value.phoneNumberRegister,
-          onValueChange = { newValue -> authViewModel.onPhoneNumberRegisterChange(newValue) },
-          label = { Text("Phone Number") },
-          singleLine = true,
-          modifier = Modifier.fillMaxWidth(),
-          colors = textFieldColors
-      )
+        TextField(
+            value = signInState.value.lastNameRegister,
+            onValueChange = { newValue -> authViewModel.onLastNameRegisterChange(newValue) },
+            label = { Text("Last Name") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth(),
+            colors = textFieldColors)
 
-      Spacer(modifier = Modifier.size(16.dp))
+        Spacer(modifier = Modifier.size(16.dp))
 
-      TextField(
-          value = signInState.value.emailRegister,
-          onValueChange = { newValue -> authViewModel.onEmailRegisterChange(newValue) },
-          label = { Text("Email") },
-          singleLine = true,
-          modifier = Modifier.fillMaxWidth(),
-          colors = textFieldColors)
+        TextField(
+            value = signInState.value.usernameRegister,
+            onValueChange = { newValue -> authViewModel.onUsernameRegisterChange(newValue) },
+            label = { Text("Username") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth(),
+            colors = textFieldColors)
 
-      Spacer(modifier = Modifier.size(16.dp))
+        Spacer(modifier = Modifier.size(16.dp))
 
-      TextField(
-          value = signInState.value.countryRegister,
-          onValueChange = { newValue -> authViewModel.onCountryRegisterChange(newValue) },
-          label = { Text("Country") },
-          singleLine = true,
-          modifier = Modifier.fillMaxWidth(),
-          colors = textFieldColors
-      )
+        TextField(
+            value = signInState.value.phoneNumberRegister,
+            onValueChange = { newValue -> authViewModel.onPhoneNumberRegisterChange(newValue) },
+            label = { Text("Phone Number") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth(),
+            colors = textFieldColors)
 
-      Spacer(modifier = Modifier.size(16.dp))
+        Spacer(modifier = Modifier.size(16.dp))
 
+        TextField(
+            value = signInState.value.emailRegister,
+            onValueChange = { newValue -> authViewModel.onEmailRegisterChange(newValue) },
+            label = { Text("Email") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth(),
+            colors = textFieldColors)
+
+        Spacer(modifier = Modifier.size(16.dp))
+
+        TextField(
+            value = signInState.value.countryRegister,
+            onValueChange = { newValue -> authViewModel.onCountryRegisterChange(newValue) },
+            label = { Text("Country") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth(),
+            colors = textFieldColors)
+
+        Spacer(modifier = Modifier.size(16.dp))
 
         TextField(
             value = signInState.value.passwordRegister,
@@ -210,28 +203,21 @@ fun RegisterScreen(
         }
 
         if (signInState.value.isSignInSuccessful) {
-            val currentUser = Firebase.auth.currentUser
-            if (currentUser != null) {
-                val uid = currentUser.uid
-                val email = currentUser.email ?: ""
-                val firstName = signInState.value.firstNameRegister
-                val lastName = signInState.value.lastNameRegister
-                val phoneNumber = signInState.value.phoneNumberRegister
-                val country = signInState.value.countryRegister
-                val username = signInState.value.usernameRegister
+          val currentUser = Firebase.auth.currentUser
+          if (currentUser != null) {
+            val uid = currentUser.uid
+            val email = currentUser.email ?: ""
+            val firstName = signInState.value.firstNameRegister
+            val lastName = signInState.value.lastNameRegister
+            val phoneNumber = signInState.value.phoneNumberRegister
+            val country = signInState.value.countryRegister
+            val username = signInState.value.usernameRegister
 
-                userViewModel.createUserIfNew(
-                    uid,
-                    username,
-                    firstName,
-                    lastName,
-                    email,
-                    phoneNumber,
-                    country
-                )
-            }
+            userViewModel.createUserIfNew(
+                uid, username, firstName, lastName, email, phoneNumber, country)
+          }
 
-            val user =
+          val user =
               User(
                   id = Firebase.auth.currentUser!!.uid,
                   name = Firebase.auth.currentUser!!.email!!) // TODO: currently username = email
