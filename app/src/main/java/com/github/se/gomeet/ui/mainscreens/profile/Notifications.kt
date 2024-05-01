@@ -41,6 +41,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -97,7 +98,9 @@ fun Notifications(nav: NavigationActions) {
       topBar = {
         Text(
             text = "Notifications",
-            modifier = Modifier.padding(start = 15.dp, top = 15.dp, end = 15.dp, bottom = 0.dp),
+            modifier =
+                Modifier.padding(start = 15.dp, top = 15.dp, end = 15.dp, bottom = 0.dp)
+                    .testTag("TopBar"),
             color = DarkCyan,
             fontStyle = FontStyle.Normal,
             fontWeight = FontWeight.SemiBold,
@@ -119,7 +122,8 @@ fun Notifications(nav: NavigationActions) {
             modifier = Modifier.padding(innerPadding)) {
               Row(
                   verticalAlignment = Alignment.CenterVertically,
-                  horizontalArrangement = Arrangement.Start) {
+                  horizontalArrangement = Arrangement.Start,
+                  modifier = Modifier.testTag("Back")) {
                     Icon(
                         painter = painterResource(id = R.drawable.arrow_back_24px),
                         contentDescription = "image description",
@@ -150,7 +154,8 @@ fun Notifications(nav: NavigationActions) {
                                     if (selectedFilter == "All") DarkCyan else NavBarUnselected,
                                 contentColor =
                                     if (selectedFilter == "All") Color.White else DarkCyan),
-                        border = BorderStroke(1.dp, DarkCyan))
+                        border = BorderStroke(1.dp, DarkCyan),
+                        modifier = Modifier.testTag("AllButton"))
                     Spacer(modifier = Modifier.width(10.dp))
                     Button(
                         onClick = { onFilterButtonClick("Invitations") },
@@ -158,11 +163,12 @@ fun Notifications(nav: NavigationActions) {
                         colors =
                             ButtonDefaults.buttonColors(
                                 containerColor =
-                                    if (selectedFilter == "My events") DarkCyan
+                                    if (selectedFilter == "Invitations") DarkCyan
                                     else NavBarUnselected,
                                 contentColor =
-                                    if (selectedFilter == "My events") Color.White else DarkCyan),
-                        border = BorderStroke(1.dp, DarkCyan))
+                                    if (selectedFilter == "Invitations") Color.White else DarkCyan),
+                        border = BorderStroke(1.dp, DarkCyan),
+                        modifier = Modifier.testTag("InvitationsButton"))
                     Spacer(modifier = Modifier.width(10.dp))
                     Button(
                         onClick = { onFilterButtonClick("My events") },
@@ -174,7 +180,8 @@ fun Notifications(nav: NavigationActions) {
                                     else NavBarUnselected,
                                 contentColor =
                                     if (selectedFilter == "MyEvents") Color.White else DarkCyan),
-                        border = BorderStroke(1.dp, DarkCyan))
+                        border = BorderStroke(1.dp, DarkCyan),
+                        modifier = Modifier.testTag("MyEventsButton"))
                   }
 
               Column(modifier = Modifier.verticalScroll(rememberScrollState()).fillMaxSize()) {
@@ -230,7 +237,8 @@ fun NotificationsWidget(
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF202124),
                 letterSpacing = 0.5.sp,
-            ))
+            ),
+        modifier = Modifier.testTag("InviterUserName"))
     Spacer(modifier = Modifier.width(2.5.dp))
     Text(
         text = "invited you to attend",
@@ -246,7 +254,9 @@ fun NotificationsWidget(
   }
   Card(
       modifier =
-          Modifier.fillMaxWidth().padding(start = 10.dp, top = 5.dp, end = 10.dp, bottom = 5.dp),
+          Modifier.fillMaxWidth()
+              .padding(start = 10.dp, top = 5.dp, end = 10.dp, bottom = 5.dp)
+              .testTag("EventCard"),
       colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
       border = BorderStroke(2.dp, DarkCyan)) {
         Row(
@@ -328,7 +338,8 @@ fun NotificationsWidget(
                                   fontWeight = FontWeight(700),
                                   color = MaterialTheme.colorScheme.onBackground,
                                   letterSpacing = 0.25.sp,
-                              ))
+                              ),
+                          modifier = Modifier.testTag("EventDate"))
                       Row {
                         Button(
                             onClick = {},
@@ -344,7 +355,8 @@ fun NotificationsWidget(
                             colors =
                                 ButtonDefaults.buttonColors(
                                     containerColor = DarkCyan, contentColor = Color.White),
-                            border = BorderStroke(1.dp, DarkCyan))
+                            border = BorderStroke(1.dp, DarkCyan),
+                            modifier = Modifier.testTag("AcceptButton"))
                         Spacer(modifier = Modifier.width(10.dp))
                         Button(
                             onClick = {},
@@ -361,7 +373,8 @@ fun NotificationsWidget(
                             colors =
                                 ButtonDefaults.buttonColors(
                                     containerColor = DarkCyan, contentColor = Color.White),
-                            border = BorderStroke(1.dp, DarkCyan))
+                            border = BorderStroke(1.dp, DarkCyan),
+                            modifier = Modifier.testTag("RejectButton"))
                       }
                     }
                   }
@@ -377,9 +390,10 @@ fun NotificationsWidget(
                           .aspectRatio(
                               3f / 1.75f) // Maintain an aspect ratio of 3:2, change it as needed
                           .clipToBounds()
-                          .padding(0.dp), // Clip the image if it overflows its bounds
-                  contentScale = ContentScale.Crop // Crop the image to fit the aspect ratio
-                  )
+                          .padding(0.dp)
+                          .testTag("EventImage"), // Clip the image if it overflows its bounds
+                  contentScale = ContentScale.Crop, // Crop the image to fit the aspect ratio
+              )
             }
       }
 }
