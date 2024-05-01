@@ -112,7 +112,7 @@ class EndToEndTest2 : TestCase() {
 
     ComposeScreen.onComposeScreen<EventInfoScreen>(composeTestRule) {
       step("Visit the event creator's profile") {
-        composeTestRule.waitUntil(timeoutMillis = 10000) {
+        composeTestRule.waitUntil(timeoutMillis = 10001) {
           composeTestRule.onNodeWithTag("EventHeader").isDisplayed()
         }
         eventHeader { composeTestRule.onNodeWithTag("Username").performClick() }
@@ -122,7 +122,7 @@ class EndToEndTest2 : TestCase() {
     ComposeScreen.onComposeScreen<OtherProfileScreen>(composeTestRule) {
       step("Follow the event creator") {
         composeTestRule.waitForIdle()
-        composeTestRule.waitUntil(timeoutMillis = 10000) {
+        composeTestRule.waitUntil(timeoutMillis = 10002) {
           composeTestRule.onNodeWithText("Follow").isDisplayed()
         }
         composeTestRule.onNodeWithText("Follow").performClick()
@@ -137,7 +137,7 @@ class EndToEndTest2 : TestCase() {
 
     ComposeScreen.onComposeScreen<FollowersScreen>(composeTestRule) {
       step("Check that the event creator's followers list has been updated") {
-        composeTestRule.waitUntil(timeoutMillis = 10000) {
+        composeTestRule.waitUntil(timeoutMillis = 10003) {
           composeTestRule.onNodeWithTag("Follower").isDisplayed()
         }
         composeTestRule.onNodeWithTag("Follower").assertIsDisplayed().performClick()
@@ -154,7 +154,7 @@ class EndToEndTest2 : TestCase() {
 
     ComposeScreen.onComposeScreen<FollowingScreen>(composeTestRule) {
       step("Check that the current user's following list has been updated") {
-        composeTestRule.waitUntil(timeoutMillis = 10000) {
+        composeTestRule.waitUntil(timeoutMillis = 10004) {
           composeTestRule.onNodeWithTag("FollowingUser").isDisplayed()
         }
         composeTestRule.onNodeWithTag("FollowingUser").assertIsDisplayed()
