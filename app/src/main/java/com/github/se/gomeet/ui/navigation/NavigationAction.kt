@@ -45,7 +45,8 @@ object Route {
   const val OTHERS_PROFILE = "OthersProfile/{uid}"
   const val ADD_PARTICIPANTS = "Add Participants"
   const val EVENT_INFO =
-      "eventInfo/{title}/{date}/{time}/{organizer}/{rating}/{description}/{latitude}/{longitude}"
+      "eventInfo/{eventId}/{title}/{date}/{time}/{organizer}/{rating}/{description}/{latitude}/{longitude}"
+  const val NOTIFICATIONS = "Notifications"
   const val SETTINGS = "Settings"
   const val MESSAGE = "Message/{id}"
 }
@@ -143,6 +144,7 @@ class NavigationActions(val navController: NavHostController) {
    * @param loc The location of the event.
    */
   fun navigateToEventInfo(
+      eventId: String,
       title: String,
       date: String,
       time: String,
@@ -152,7 +154,8 @@ class NavigationActions(val navController: NavHostController) {
       loc: LatLng
   ) {
     val route =
-        Route.EVENT_INFO.replace("{title}", Uri.encode(title))
+        Route.EVENT_INFO.replace("{eventId}", Uri.encode(eventId))
+            .replace("{title}", Uri.encode(title))
             .replace("{date}", Uri.encode(date))
             .replace("{time}", Uri.encode(time))
             .replace("{organizer}", Uri.encode(organizer))

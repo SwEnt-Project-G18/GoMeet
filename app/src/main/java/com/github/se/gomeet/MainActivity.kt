@@ -22,15 +22,16 @@ import androidx.navigation.navArgument
 import com.github.se.gomeet.ui.authscreens.LoginScreen
 import com.github.se.gomeet.ui.authscreens.RegisterScreen
 import com.github.se.gomeet.ui.authscreens.WelcomeScreen
-import com.github.se.gomeet.ui.mainscreens.EventInfo
-import com.github.se.gomeet.ui.mainscreens.Events
 import com.github.se.gomeet.ui.mainscreens.Explore
-import com.github.se.gomeet.ui.mainscreens.Profile
 import com.github.se.gomeet.ui.mainscreens.Trends
 import com.github.se.gomeet.ui.mainscreens.create.AddParticipants
 import com.github.se.gomeet.ui.mainscreens.create.Create
 import com.github.se.gomeet.ui.mainscreens.create.CreateEvent
+import com.github.se.gomeet.ui.mainscreens.events.Events
+import com.github.se.gomeet.ui.mainscreens.events.MyEventInfo
+import com.github.se.gomeet.ui.mainscreens.profile.Notifications
 import com.github.se.gomeet.ui.mainscreens.profile.OthersProfile
+import com.github.se.gomeet.ui.mainscreens.profile.Profile
 import com.github.se.gomeet.ui.mainscreens.profile.SettingsScreen
 import com.github.se.gomeet.ui.navigation.LOGIN_ITEMS
 import com.github.se.gomeet.ui.navigation.NavigationActions
@@ -82,7 +83,7 @@ class MainActivity : ComponentActivity() {
       GoMeetTheme {
         SetStatusBarColor(color = MaterialTheme.colorScheme.background)
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-          val userIdState = remember { mutableStateOf<String?>(null) }
+          val userIdState = remember { mutableStateOf<String>("") }
           val nav = rememberNavController()
           val authViewModel = AuthViewModel()
           val userViewModel = UserViewModel()
@@ -92,10 +93,20 @@ class MainActivity : ComponentActivity() {
               WelcomeScreen(
                   onNavToLogin = { NavigationActions(nav).navigateTo(LOGIN_ITEMS[1]) },
                   onNavToRegister = { NavigationActions(nav).navigateTo(LOGIN_ITEMS[2]) },
-                  onSignInSuccess = { userId ->
-                    userIdState.value = userId
-                    userViewModel.createUserIfNew(
-                        Firebase.auth.currentUser!!.uid, Firebase.auth.currentUser!!.email!!)
+                  onSignInSuccess = { userId: String ->
+                    val currentUser = Firebase.auth.currentUser
+                    if (currentUser != null) {
+                      val uid = currentUser.uid
+                      val email = currentUser.email ?: ""
+                      val firstName = authViewModel.signInState.value.firstNameRegister
+                      val lastName = authViewModel.signInState.value.lastNameRegister
+                      val phoneNumber = authViewModel.signInState.value.phoneNumberRegister
+                      val country = authViewModel.signInState.value.countryRegister
+                      val username = authViewModel.signInState.value.usernameRegister
+
+                      userViewModel.createUserIfNew(
+                          uid, username, firstName, lastName, email, phoneNumber, country)
+                    }
                     val user =
                         User(
                             id = Firebase.auth.currentUser!!.uid,
@@ -130,26 +141,36 @@ class MainActivity : ComponentActivity() {
               }
             }
             composable(Route.EXPLORE) { Explore(navAction, EventViewModel()) }
-            composable(Route.EVENTS) { Events(navAction, EventViewModel()) }
-            composable(Route.TRENDS) { Trends(navAction) }
+            composable(Route.EVENTS) {
+              userIdState.value = Firebase.auth.currentUser!!.uid
+              Events(userIdState.value, navAction, UserViewModel(), EventViewModel())
+            }
+            composable(Route.TRENDS) {
+              Trends(userIdState.value, navAction, UserViewModel(), EventViewModel())
+            }
             composable(Route.CREATE) { Create(navAction) }
-            composable(Route.PROFILE) { Profile(navAction) }
+
+            composable(Route.NOTIFICATIONS) { Notifications(navAction) }
+
+            composable(Route.PROFILE) { Profile(navAction, userId = userIdState.value) }
             composable(
                 route = Route.OTHERS_PROFILE,
                 arguments = listOf(navArgument("uid") { type = NavType.StringType })) {
                   OthersProfile(navAction, it.arguments?.getString("uid") ?: "")
                 }
+
             composable(Route.PRIVATE_CREATE) {
-              CreateEvent(navAction, EventViewModel(userIdState.value), true)
+              CreateEvent(navAction, EventViewModel(Firebase.auth.currentUser!!.uid), true)
             }
             composable(Route.PUBLIC_CREATE) {
-              CreateEvent(navAction, EventViewModel(userIdState.value), false)
+              CreateEvent(navAction, EventViewModel(Firebase.auth.currentUser!!.uid), false)
             }
             composable(Route.ADD_PARTICIPANTS) { AddParticipants(navAction) }
             composable(
                 route = Route.EVENT_INFO,
                 arguments =
                     listOf(
+                        navArgument("eventId") { type = NavType.StringType },
                         navArgument("title") { type = NavType.StringType },
                         navArgument("date") { type = NavType.StringType },
                         navArgument("time") { type = NavType.StringType },
@@ -163,6 +184,7 @@ class MainActivity : ComponentActivity() {
                           type = NavType.FloatType
                         } // Change to DoubleType
                         )) { entry ->
+                  val eventId = entry.arguments?.getString("eventId") ?: ""
                   val title = entry.arguments?.getString("title") ?: ""
                   val date = entry.arguments?.getString("date") ?: ""
                   val time = entry.arguments?.getString("time") ?: ""
@@ -173,17 +195,20 @@ class MainActivity : ComponentActivity() {
                   val longitude = entry.arguments?.getFloat("longitude") ?: 0.0
                   val loc = LatLng(latitude.toDouble(), longitude.toDouble())
 
-                  EventInfo(
+                  MyEventInfo(
                       NavigationActions(nav),
                       title,
+                      eventId,
                       date,
                       time,
                       organizer,
                       rating,
                       painterResource(id = R.drawable.chess_demo),
                       description,
-                      loc)
+                      loc,
+                      UserViewModel())
                 }
+
             composable(
                 route = Route.MESSAGE,
                 arguments = listOf(navArgument("id") { type = NavType.StringType })) {

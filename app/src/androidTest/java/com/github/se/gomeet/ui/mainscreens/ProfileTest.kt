@@ -6,6 +6,7 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.navigation.compose.rememberNavController
+import com.github.se.gomeet.ui.mainscreens.profile.Profile
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import org.junit.Rule
 import org.junit.Test
@@ -16,7 +17,9 @@ class ProfileTest {
 
   @Test
   fun profileUiTest() {
-    composeTestRule.setContent { Profile(NavigationActions(rememberNavController())) }
+    composeTestRule.setContent {
+      Profile(NavigationActions(rememberNavController()), userId = "1234")
+    }
 
     composeTestRule.onNodeWithText("My Profile").assertIsDisplayed()
 

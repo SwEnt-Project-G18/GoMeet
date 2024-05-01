@@ -1,4 +1,4 @@
-package com.github.se.gomeet
+package com.github.se.gomeet.model.repository
 
 import android.util.Log
 import com.github.se.gomeet.model.user.GoMeetUser
@@ -9,7 +9,7 @@ import com.google.firebase.firestore.FirebaseFirestore
  *
  * @param db the Firestore database
  */
-class UserFirebaseConnection(private val db: FirebaseFirestore) {
+class UserRepository(private val db: FirebaseFirestore) {
   /**
    * Companion object for the UserFirebaseConnection class. Contains the constants for the class.
    */
@@ -93,7 +93,15 @@ class UserFirebaseConnection(private val db: FirebaseFirestore) {
         "username" to username,
         "following" to following,
         "followers" to followers,
-        "pendingRequests" to pendingRequests)
+        "pendingRequests" to pendingRequests,
+        "firstName" to firstName,
+        "lastName" to lastName,
+        "email" to email,
+        "phoneNumber" to phoneNumber,
+        "country" to country,
+        "myTickets" to joinedEvents,
+        "myEvents" to myEvents,
+        "myFavorites" to myFavorites)
   }
 
   /**
@@ -108,6 +116,14 @@ class UserFirebaseConnection(private val db: FirebaseFirestore) {
         username = this["username"] as String,
         following = this["following"] as List<String>,
         followers = this["followers"] as List<String>,
-        pendingRequests = this["pendingRequests"] as List<String>)
+        pendingRequests = this["pendingRequests"] as List<String>,
+        firstName = this["firstName"] as? String ?: "",
+        lastName = this["lastName"] as? String ?: "",
+        email = this["email"] as? String ?: "",
+        phoneNumber = this["phoneNumber"] as? String ?: "",
+        country = this["country"] as? String ?: "",
+        joinedEvents = this["myTickets"] as List<String>,
+        myEvents = this["myEvents"] as List<String>,
+        myFavorites = this["myFavorites"] as List<String>)
   }
 }

@@ -35,6 +35,7 @@ class EventViewModelTest {
           emptyList(),
           emptyList(),
           null,
+          UserViewModel(),
           uid)
     }
 

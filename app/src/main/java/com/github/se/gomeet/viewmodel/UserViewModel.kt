@@ -3,7 +3,7 @@ package com.github.se.gomeet.viewmodel
 import android.content.ContentValues
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.github.se.gomeet.UserFirebaseConnection
+import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
  * UI and the repository.
  */
 class UserViewModel : ViewModel() {
-  private val db = UserFirebaseConnection(Firebase.firestore)
+  private val db = UserRepository(Firebase.firestore)
 
   /**
    * Create a new user if the user is new.
@@ -25,7 +25,15 @@ class UserViewModel : ViewModel() {
    * @param uid the user id
    * @param username the username
    */
-  fun createUserIfNew(uid: String, username: String) {
+  fun createUserIfNew(
+      uid: String,
+      username: String,
+      firstName: String,
+      lastName: String,
+      email: String,
+      phoneNumber: String,
+      country: String
+  ) {
     CoroutineScope(Dispatchers.IO).launch {
       if (getUser(uid) == null) {
         try {
@@ -35,7 +43,15 @@ class UserViewModel : ViewModel() {
                   username = username,
                   following = emptyList(),
                   followers = emptyList(),
-                  pendingRequests = emptyList())
+                  pendingRequests = emptyList(),
+                  firstName = firstName,
+                  lastName = lastName,
+                  email = email,
+                  phoneNumber = phoneNumber,
+                  country = country,
+                  joinedEvents = emptyList(),
+                  myEvents = emptyList(),
+                  myFavorites = emptyList())
           db.addUser(user)
         } catch (e: Exception) {
           Log.w(ContentValues.TAG, "Error adding user", e)
@@ -52,6 +68,7 @@ class UserViewModel : ViewModel() {
    */
   suspend fun getUser(uid: String): GoMeetUser? {
     return try {
+      Log.d("UID IS", "User id is $uid")
       val event = CompletableDeferred<GoMeetUser?>()
       db.getUser(uid) { t -> event.complete(t) }
       event.await()
@@ -76,6 +93,20 @@ class UserViewModel : ViewModel() {
    */
   fun deleteUser(uid: String) {
     db.removeUser(uid)
+  }
+
+  suspend fun joinEvent(eventId: String, userId: String) {
+    try {
+      val goMeetUser = getUser(userId)!!
+      editUser(goMeetUser.copy(myEvents = goMeetUser.myEvents.plus(eventId)))
+    } catch (e: Exception) {
+      Log.w(ContentValues.TAG, "Couldn't join the event", e)
+    }
+  }
+
+  suspend fun gotTicket(eventId: String, userId: String) {
+    val goMeetUser = getUser(userId)!!
+    editUser(goMeetUser.copy(joinedEvents = goMeetUser.joinedEvents.plus(eventId)))
   }
 
   // fun sendRequest() {

@@ -71,6 +71,96 @@ class AuthViewModel : ViewModel() {
     _signInState.value = _signInState.value.copy(confirmPasswordRegister = confirmPasswordRegister)
   }
 
+  /**
+   * Update the firstNameRegister field in the signInState.
+   *
+   * @param firstName the first name to update the field with
+   */
+  fun onFirstNameRegisterChange(firstNameRegister: String) {
+    _signInState.value = _signInState.value.copy(firstNameRegister = firstNameRegister)
+  }
+
+  /**
+   * Update the lastNameRegister field in the signInState.
+   *
+   * @param lastName the last name to update the field with
+   */
+  fun onLastNameRegisterChange(lastName: String) {
+    _signInState.value = _signInState.value.copy(lastNameRegister = lastName)
+  }
+
+  /**
+   * Update the phoneNumberRegister field in the signInState.
+   *
+   * @param phoneNumber the phone number to update the field with
+   */
+  fun onPhoneNumberRegisterChange(phoneNumber: String) {
+    _signInState.value = _signInState.value.copy(phoneNumberRegister = phoneNumber)
+  }
+
+  /**
+   * Update the countryRegister field in the signInState.
+   *
+   * @param country the country to update the field with
+   */
+  fun onCountryRegisterChange(country: String) {
+    _signInState.value = _signInState.value.copy(countryRegister = country)
+  }
+
+  /**
+   * Update the usernameReigsiter field in the signInState.
+   *
+   * @param username the username to update the field with
+   */
+  fun onUsernameRegisterChange(username: String) {
+    _signInState.value = _signInState.value.copy(usernameRegister = username)
+  }
+
+  /**
+   * Update the username field in the signInState.
+   *
+   * @param username the username to update the field with
+   */
+  fun onUsernameChange(username: String) {
+    _signInState.value = _signInState.value.copy(username = username)
+  }
+
+  /**
+   * Update the firstName field in the signInState.
+   *
+   * @param firstName the first name to update the field with
+   */
+  fun onFirstNameChange(firstName: String) {
+    _signInState.value = _signInState.value.copy(firstName = firstName)
+  }
+
+  /**
+   * Update the lastName field in the signInState.
+   *
+   * @param lastName the last name to update the field with
+   */
+  fun onLastNameChange(lastName: String) {
+    _signInState.value = _signInState.value.copy(lastName = lastName)
+  }
+
+  /**
+   * Update the phoneNumber field in the signInState.
+   *
+   * @param phoneNumber the phone number to update the field with
+   */
+  fun onPhoneNumberChange(phoneNumber: String) {
+    _signInState.value = _signInState.value.copy(phoneNumber = phoneNumber)
+  }
+
+  /**
+   * Update the country field in the signInState.
+   *
+   * @param country the country to update the field with
+   */
+  fun onCountryChange(country: String) {
+    _signInState.value = _signInState.value.copy(country = country)
+  }
+
   /** Validate the sign in form. */
   private fun validateSignInForm(): Boolean {
     return _signInState.value.email.isNotBlank() && _signInState.value.password.isNotBlank()
