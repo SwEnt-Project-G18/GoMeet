@@ -1,10 +1,9 @@
-package com.github.se.gomeet.endtoend
+package com.github.se.gomeet
 
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.github.se.gomeet.MainActivity
 import com.github.se.gomeet.screens.CreateEventScreen
 import com.github.se.gomeet.screens.CreateScreen
 import com.github.se.gomeet.screens.LoginScreen
@@ -36,13 +35,12 @@ class EndToEndTest : TestCase() {
   @After
   fun tearDown() {
     // Clean up the event
-    runBlocking {
-      eventVM.getAllEvents()?.forEach { if (it.creator == uid) eventVM.removeEvent(it.uid) }
-    }
+    runBlocking { eventVM.getAllEvents()?.forEach { eventVM.removeEvent(it.uid) } }
 
     // Clean up the user
     Firebase.auth.currentUser?.delete()
     userVM.deleteUser(uid)
+    TimeUnit.SECONDS.sleep(3)
   }
 
   @Test

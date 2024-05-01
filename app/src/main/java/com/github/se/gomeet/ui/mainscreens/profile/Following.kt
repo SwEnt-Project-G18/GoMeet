@@ -134,7 +134,8 @@ fun Following(
                         nav.navigateToScreen(Route.OTHERS_PROFILE.replace("{uid}", user.uid))
                       }
                       .testTag("FollowingUser"),
-              horizontalArrangement = Arrangement.SpaceBetween) {
+              horizontalArrangement = Arrangement.SpaceBetween,
+              verticalAlignment = Alignment.CenterVertically) {
                 Image(
                     modifier =
                         Modifier.width(60.dp)

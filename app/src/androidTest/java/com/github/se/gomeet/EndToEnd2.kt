@@ -1,14 +1,14 @@
-package com.github.se.gomeet.endtoend
+package com.github.se.gomeet
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.github.se.gomeet.MainActivity
 import com.github.se.gomeet.model.event.location.Location
 import com.github.se.gomeet.screens.EventInfoScreen
 import com.github.se.gomeet.screens.FollowersScreen
@@ -46,9 +46,7 @@ class EndToEndTest2 : TestCase() {
   @After
   fun tearDown() {
     // clean up the event
-    runBlocking {
-      eventVM.getAllEvents()?.forEach { if (it.creator == uid1) eventVM.removeEvent(it.uid) }
-    }
+    runBlocking { eventVM.getAllEvents()?.forEach { eventVM.removeEvent(it.uid) } }
 
     // clean up the users
     Firebase.auth.currentUser?.delete()
@@ -60,6 +58,7 @@ class EndToEndTest2 : TestCase() {
       TimeUnit.SECONDS.sleep(1)
     }
     Firebase.auth.currentUser?.delete()
+    TimeUnit.SECONDS.sleep(3)
   }
 
   @Test
@@ -105,9 +104,9 @@ class EndToEndTest2 : TestCase() {
         composeTestRule.waitForIdle()
         composeTestRule.onAllNodesWithText("Trends")[1].performClick()
         composeTestRule.waitUntil(timeoutMillis = 10000) {
-          composeTestRule.onNodeWithTag("Card").isDisplayed()
+          composeTestRule.onAllNodesWithTag("Card")[0].isDisplayed()
         }
-        composeTestRule.onNodeWithTag("Card").performClick()
+        composeTestRule.onAllNodesWithTag("Card")[0].performClick()
       }
     }
 
