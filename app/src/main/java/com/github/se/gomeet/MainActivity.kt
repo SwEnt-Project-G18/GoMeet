@@ -93,10 +93,20 @@ class MainActivity : ComponentActivity() {
               WelcomeScreen(
                   onNavToLogin = { NavigationActions(nav).navigateTo(LOGIN_ITEMS[1]) },
                   onNavToRegister = { NavigationActions(nav).navigateTo(LOGIN_ITEMS[2]) },
-                  onSignInSuccess = { userId ->
-                    userIdState.value = userId
-                    userViewModel.createUserIfNew(
-                        Firebase.auth.currentUser!!.uid, Firebase.auth.currentUser!!.email!!)
+                  onSignInSuccess = { userId: String ->
+                    val currentUser = Firebase.auth.currentUser
+                    if (currentUser != null) {
+                      val uid = currentUser.uid
+                      val email = currentUser.email ?: ""
+                      val firstName = authViewModel.signInState.value.firstNameRegister
+                      val lastName = authViewModel.signInState.value.lastNameRegister
+                      val phoneNumber = authViewModel.signInState.value.phoneNumberRegister
+                      val country = authViewModel.signInState.value.countryRegister
+                      val username = authViewModel.signInState.value.usernameRegister
+
+                      userViewModel.createUserIfNew(
+                          uid, username, firstName, lastName, email, phoneNumber, country)
+                    }
                     val user =
                         User(
                             id = Firebase.auth.currentUser!!.uid,

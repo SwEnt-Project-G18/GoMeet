@@ -12,11 +12,16 @@ import org.junit.runner.RunWith
 class UserViewModelTest {
   private val uid = "testuid"
   private val username = "testuser"
+  private val firstname = "testfirstname"
+  private val lastname = "testlastname"
+  private val email = "testemail"
+  private val phonenumber = "testphonenumber"
+  private val country = "testcountry"
 
   @Test
   fun test() = runTest {
     // Create user and wait for it to be created
-    userViewModel.createUserIfNew(uid, username)
+    userViewModel.createUserIfNew(uid, username, firstname, lastname, email, phonenumber, country)
     TimeUnit.SECONDS.sleep(2)
 
     // test getUser and createUser
@@ -34,6 +39,11 @@ class UserViewModelTest {
         GoMeetUser(
             user.uid,
             newUsername,
+            user.firstName,
+            user.lastName,
+            user.email,
+            user.phoneNumber,
+            user.country,
             emptyList(),
             emptyList(),
             emptyList(),
