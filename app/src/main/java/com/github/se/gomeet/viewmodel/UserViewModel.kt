@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.model.user.GoMeetUser
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.CompletableDeferred
@@ -24,6 +25,11 @@ class UserViewModel : ViewModel() {
    *
    * @param uid the user id
    * @param username the username
+   * @param firstName the first name
+   * @param lastName the last name
+   * @param email the email
+   * @param phoneNumber the phone number
+   * @param country the country
    */
   fun createUserIfNew(
       uid: String,
@@ -95,6 +101,12 @@ class UserViewModel : ViewModel() {
     db.removeUser(uid)
   }
 
+  /**
+   * Join an event.
+   *
+   * @param eventId The id of the event to join.
+   * @param userId The id of the user joining the event.
+   */
   suspend fun joinEvent(eventId: String, userId: String) {
     try {
       val goMeetUser = getUser(userId)!!
@@ -104,24 +116,41 @@ class UserViewModel : ViewModel() {
     }
   }
 
+  /** TODO */
   suspend fun gotTicket(eventId: String, userId: String) {
     val goMeetUser = getUser(userId)!!
     editUser(goMeetUser.copy(joinedEvents = goMeetUser.joinedEvents.plus(eventId)))
   }
 
-  // fun sendRequest() {
-  // TODO
-  // }
+  /**
+   * Follow a user.
+   *
+   * @param uid The uid of the user to follow.
+   */
+  fun follow(uid: String) {
+    CoroutineScope(Dispatchers.IO).launch {
+      val senderUid = Firebase.auth.currentUser!!.uid
+      val sender = getUser(senderUid)
+      val receiver = getUser(uid)
+      if (!sender!!.following.contains(uid) && !receiver!!.following.contains(senderUid)) {
+        editUser(sender.copy(following = sender.following.plus(uid)))
+        editUser(receiver.copy(followers = receiver.followers.plus(senderUid)))
+      }
+    }
+  }
 
-  // fun remove() {
-  // TODO
-  // }
-
-  // fun accept() {
-  // TODO
-  // }
-
-  // fun reject() {
-  // TODO
-  // }
+  /**
+   * Unfollow a user.
+   *
+   * @param uid The uid of the user to unfollow.
+   */
+  fun unfollow(uid: String) {
+    CoroutineScope(Dispatchers.IO).launch {
+      val senderUid = Firebase.auth.currentUser!!.uid
+      val sender = getUser(senderUid)
+      val receiver = getUser(uid)
+      editUser(sender!!.copy(following = sender.following.minus(uid)))
+      editUser(receiver!!.copy(followers = receiver.followers.minus(senderUid)))
+    }
+  }
 }

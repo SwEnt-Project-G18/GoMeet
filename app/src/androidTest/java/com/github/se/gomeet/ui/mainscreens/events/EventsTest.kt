@@ -1,16 +1,13 @@
-package com.github.se.gomeet.ui.mainscreens
+package com.github.se.gomeet.ui.mainscreens.events
 
-import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.isDisplayed
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.rule.GrantPermissionRule
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
@@ -25,10 +22,9 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class ExploreTest {
-  @get:Rule val rule = createAndroidComposeRule<ComponentActivity>()
-  @get:Rule
-  var permissionRule = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
+class EventsTest {
+
+  @get:Rule val composeTestRule = createComposeRule()
 
   @After
   fun tearDown() {
@@ -37,19 +33,38 @@ class ExploreTest {
   }
 
   @Test
-  fun uiElementsDisplayed() {
-    lateinit var navController: NavHostController
-
-    rule.setContent {
-      navController = rememberNavController()
-      Explore(nav = NavigationActions(navController), eventViewModel = EventViewModel())
+  fun eventsScreen_RenderingCorrectness() {
+    // Test rendering correctness with events available
+    composeTestRule.setContent {
+      Events(
+          currentUser = uid,
+          nav = NavigationActions(rememberNavController()),
+          userViewModel = userViewModel,
+          eventViewModel = eventViewModel)
     }
 
-    rule.waitUntil(timeoutMillis = 10000) { rule.onNodeWithTag("Map").isDisplayed() }
+    composeTestRule.onNode(hasText("My events")).assertIsDisplayed()
+    composeTestRule.onAllNodesWithText("Favourites")[0].assertIsDisplayed()
+    composeTestRule.onAllNodesWithText("Favourites")[1].assertIsDisplayed()
+    composeTestRule.onAllNodesWithText("Joined Events")[0].assertIsDisplayed()
+    composeTestRule.onAllNodesWithText("Joined Events")[0].assertIsDisplayed()
+    composeTestRule.onAllNodesWithText("My events")[0].assertIsDisplayed()
+  }
 
-    rule.onNodeWithTag("Map").assertIsDisplayed()
-    rule.onNodeWithText("Search").assertIsDisplayed()
-    rule.onNodeWithTag("CurrentLocationButton").assertIsDisplayed().performClick()
+  @Test
+  fun eventsScreen_FilterButtonClick() {
+    // Test button click handling
+    composeTestRule.setContent {
+      Events(
+          currentUser = uid,
+          nav = NavigationActions(rememberNavController()),
+          userViewModel = userViewModel,
+          eventViewModel = eventViewModel)
+    }
+
+    composeTestRule.onNodeWithText("JoinedEvents").performClick()
+    composeTestRule.onNodeWithText("Favourites").performClick()
+    composeTestRule.onNodeWithText("My events").performClick()
   }
 
   companion object {
@@ -57,7 +72,7 @@ class ExploreTest {
     private lateinit var eventViewModel: EventViewModel
     private lateinit var userViewModel: UserViewModel
 
-    private const val email = "user@exploretest.com"
+    private const val email = "user@eventstest.com"
     private const val pwd = "123456"
     private var uid = ""
 
@@ -65,8 +80,8 @@ class ExploreTest {
     @BeforeClass
     fun setup() {
       TimeUnit.SECONDS.sleep(3)
-      // create a new user
       userViewModel = UserViewModel()
+      // create a new user
       var result = Firebase.auth.createUserWithEmailAndPassword(email, pwd)
       while (!result.isComplete) {
         TimeUnit.SECONDS.sleep(1)
@@ -76,7 +91,7 @@ class ExploreTest {
       runBlocking {
         userViewModel.createUserIfNew(
             uid,
-            "explore_test_user",
+            "events_test_user",
             "testfirstname",
             "testlastname",
             email,

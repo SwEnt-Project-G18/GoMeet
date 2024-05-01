@@ -65,12 +65,12 @@ fun SettingsScreen(
                   painter = painterResource(id = R.drawable.arrow_back),
                   contentDescription = "Back button",
                   modifier = Modifier.padding(15.dp),
-                  tint = Color.Black)
+                  tint = MaterialTheme.colorScheme.onBackground)
             }
 
             Text(
                 text = "Back",
-                color = Color.Black,
+                color = MaterialTheme.colorScheme.onBackground,
                 fontStyle = FontStyle.Normal,
                 fontWeight = FontWeight.SemiBold,
                 fontFamily = FontFamily.Default,
@@ -153,12 +153,12 @@ fun SettingsComposable(icon: Int, text: String) {
         Icon(
             painter = painterResource(id = icon),
             contentDescription = text + "icon",
-            tint = Color.Black)
+            tint = MaterialTheme.colorScheme.onBackground)
 
         Text(
             text = text,
             modifier = Modifier.padding(start = 15.dp),
-            color = Color.Black,
+            color = MaterialTheme.colorScheme.onBackground,
             fontStyle = FontStyle.Normal,
             fontWeight = FontWeight.SemiBold,
             fontFamily = FontFamily.Default,
@@ -183,7 +183,7 @@ fun NavigateNextComposable() {
             painter = painterResource(id = R.drawable.navigate_next),
             contentDescription = "Navigate next icon",
             modifier = Modifier.padding(15.dp),
-            tint = Color.Black)
+            tint = MaterialTheme.colorScheme.onBackground)
       }
 }
 
