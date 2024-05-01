@@ -117,6 +117,7 @@ class EventsTest {
     @BeforeClass
     fun setup() {
       TimeUnit.SECONDS.sleep(3)
+      userViewModel = UserViewModel()
       // create a new user
       var result = Firebase.auth.createUserWithEmailAndPassword(email, pwd)
       while (!result.isComplete) {
@@ -133,7 +134,6 @@ class EventsTest {
       }
 
       eventViewModel = EventViewModel(uid)
-      userViewModel = UserViewModel()
     }
   }
 }
