@@ -1,9 +1,13 @@
-package com.github.se.gomeet
+package com.github.se.gomeet.endtoend
 
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.rule.GrantPermissionRule
+import com.github.se.gomeet.MainActivity
 import com.github.se.gomeet.screens.CreateEventScreen
 import com.github.se.gomeet.screens.CreateScreen
 import com.github.se.gomeet.screens.LoginScreen
@@ -31,6 +35,8 @@ import org.junit.runner.RunWith
 class EndToEndTest : TestCase() {
 
   @get:Rule val composeTestRule = createAndroidComposeRule<MainActivity>()
+  @get:Rule
+  var permissionRule = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
 
   @After
   fun tearDown() {
@@ -40,7 +46,6 @@ class EndToEndTest : TestCase() {
     // Clean up the user
     Firebase.auth.currentUser?.delete()
     userVM.deleteUser(uid)
-    TimeUnit.SECONDS.sleep(3)
   }
 
   @Test
@@ -122,6 +127,8 @@ class EndToEndTest : TestCase() {
         }
       }
     }
+    composeTestRule.onNodeWithText("Explore").performClick()
+    composeTestRule.waitForIdle()
   }
 
   companion object {

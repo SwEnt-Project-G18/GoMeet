@@ -1,4 +1,4 @@
-package com.github.se.gomeet
+package com.github.se.gomeet.endtoend
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.isDisplayed
@@ -9,6 +9,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.se.gomeet.MainActivity
 import com.github.se.gomeet.model.event.location.Location
 import com.github.se.gomeet.screens.EventInfoScreen
 import com.github.se.gomeet.screens.FollowersScreen
@@ -58,7 +59,6 @@ class EndToEndTest2 : TestCase() {
       TimeUnit.SECONDS.sleep(1)
     }
     Firebase.auth.currentUser?.delete()
-    TimeUnit.SECONDS.sleep(3)
   }
 
   @Test
