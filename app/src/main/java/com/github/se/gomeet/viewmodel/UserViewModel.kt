@@ -114,8 +114,10 @@ class UserViewModel : ViewModel() {
       val senderUid = Firebase.auth.currentUser!!.uid
       val sender = getUser(senderUid)
       val receiver = getUser(uid)
-      editUser(sender!!.copy(following = sender.following.plus(uid)))
-      editUser(receiver!!.copy(followers = receiver.followers.plus(senderUid)))
+      if (!sender!!.following.contains(uid) && !receiver!!.following.contains(senderUid)) {
+        editUser(sender.copy(following = sender.following.plus(uid)))
+        editUser(receiver.copy(followers = receiver.followers.plus(senderUid)))
+      }
     }
   }
 
