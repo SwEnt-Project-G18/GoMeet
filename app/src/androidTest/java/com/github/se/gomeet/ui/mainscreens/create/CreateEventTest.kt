@@ -29,11 +29,7 @@ class CreateEventTest {
 
   @After
   fun tearDown() {
-    runBlocking {
-      eventViewModel.getAllEvents()?.forEach {
-        if (it.creator == uid) eventViewModel.removeEvent(it.uid)
-      }
-    }
+    runBlocking { eventViewModel.getAllEvents()?.forEach { eventViewModel.removeEvent(it.uid) } }
   }
 
   @Test
@@ -47,7 +43,7 @@ class CreateEventTest {
     }
 
     // Enter text into the Title field
-    rule.onNodeWithText("Title").performTextInput("Sample Event")
+    rule.onNodeWithText("Title").performTextInput("Sample Event 1")
 
     // Enter text into the Location field
     rule.onNodeWithText("Location").performTextInput("test")
@@ -78,7 +74,7 @@ class CreateEventTest {
     }
 
     // Enter text into the Title field
-    rule.onNodeWithText("Title").performTextInput("Sample Event")
+    rule.onNodeWithText("Title").performTextInput("Sample Event 2")
 
     // Enter text into the Description field
     rule.onNodeWithText("Description").performTextInput("This is a test event.")
@@ -89,7 +85,7 @@ class CreateEventTest {
     rule.onNodeWithTag("DropdownMenu").assertIsDisplayed()
 
     // Enter date
-    rule.onNodeWithText("Date").performTextInput(LocalDate.now().toString())
+    rule.onNodeWithText("Date").performTextInput("invalid date")
     // Enter a price
     rule.onNodeWithText("Price").performTextInput("25.00")
     // Enter a URL
