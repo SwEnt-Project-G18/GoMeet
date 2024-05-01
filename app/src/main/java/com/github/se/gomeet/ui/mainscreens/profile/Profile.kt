@@ -209,7 +209,7 @@ fun Profile(
                     modifier = Modifier.padding(horizontal = 15.dp, vertical = 15.dp)) {
                       // Edit Profile button
                       Button(
-                          onClick = { /*TODO*/},
+                          onClick = { nav.navigateToScreen(Route.EDIT_PROFILE) },
                           modifier = Modifier.height(40.dp).width(135.dp),
                           shape = RoundedCornerShape(10.dp),
                           colors = ButtonDefaults.buttonColors(containerColor = LightGray)) {
