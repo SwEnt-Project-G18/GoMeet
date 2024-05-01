@@ -4,7 +4,6 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performClick
 import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.ui.mainscreens.profile.Profile
 import com.github.se.gomeet.ui.navigation.NavigationActions
@@ -23,7 +22,7 @@ class ProfileTest {
 
     composeTestRule.onNodeWithContentDescription("image description").assertIsDisplayed()
 
-    composeTestRule.onNodeWithText("Edit Profile").performClick()
+    composeTestRule.onNodeWithText("Edit Profile").assertIsDisplayed()
 
     composeTestRule.onNodeWithText("Share Profile").assertIsDisplayed()
   }
