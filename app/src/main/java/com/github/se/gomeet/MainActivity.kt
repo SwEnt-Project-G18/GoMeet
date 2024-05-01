@@ -29,6 +29,7 @@ import com.github.se.gomeet.ui.mainscreens.create.Create
 import com.github.se.gomeet.ui.mainscreens.create.CreateEvent
 import com.github.se.gomeet.ui.mainscreens.events.Events
 import com.github.se.gomeet.ui.mainscreens.events.MyEventInfo
+import com.github.se.gomeet.ui.mainscreens.profile.EditProfile
 import com.github.se.gomeet.ui.mainscreens.profile.Followers
 import com.github.se.gomeet.ui.mainscreens.profile.Following
 import com.github.se.gomeet.ui.mainscreens.profile.Notifications
@@ -152,7 +153,9 @@ class MainActivity : ComponentActivity() {
               Trends(userIdState.value, navAction, UserViewModel(), eventViewModel)
             }
             composable(Route.CREATE) { Create(navAction) }
-
+            composable(Route.PROFILE) {
+              Profile(navAction, userId = userIdState.value, userViewModel)
+            }
             composable(Route.NOTIFICATIONS) { Notifications(navAction) }
 
             composable(Route.PROFILE) {
@@ -163,7 +166,6 @@ class MainActivity : ComponentActivity() {
                 arguments = listOf(navArgument("uid") { type = NavType.StringType })) {
                   OthersProfile(navAction, it.arguments?.getString("uid") ?: "", userViewModel)
                 }
-
             composable(Route.PRIVATE_CREATE) {
               CreateEvent(navAction, EventViewModel(Firebase.auth.currentUser!!.uid), true)
             }
@@ -269,6 +271,7 @@ class MainActivity : ComponentActivity() {
                 }
 
             composable(Route.SETTINGS) { SettingsScreen(navAction) }
+            composable(Route.EDIT_PROFILE) { EditProfile(nav = navAction) }
             composable(
                 route = Route.FOLLOWERS,
                 arguments = listOf(navArgument("uid") { type = NavType.StringType })) {
