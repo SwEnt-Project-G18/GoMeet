@@ -1,5 +1,6 @@
 package com.github.se.gomeet.ui.mainscreens.profile
 
+import android.net.Uri
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -230,7 +231,7 @@ fun OthersProfile(
                       Spacer(Modifier.width(5.dp))
 
                       Button(
-                          onClick = { nav.navigateToScreen(Route.MESSAGE + "/{" + uid + "}") },
+                          onClick = {nav.navigateToScreen(Route.MESSAGE.replace("{id}", Uri.encode(uid))) },
                           modifier = Modifier.height(40.dp).width(180.dp),
                           shape = RoundedCornerShape(10.dp),
                           colors =

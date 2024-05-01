@@ -1,7 +1,9 @@
 package com.github.se.gomeet.endtoend
 
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -10,6 +12,7 @@ import androidx.test.rule.GrantPermissionRule
 import com.github.se.gomeet.MainActivity
 import com.github.se.gomeet.screens.CreateEventScreen
 import com.github.se.gomeet.screens.CreateScreen
+import com.github.se.gomeet.screens.EventsScreen
 import com.github.se.gomeet.screens.LoginScreen
 import com.github.se.gomeet.screens.WelcomeScreenScreen
 import com.github.se.gomeet.viewmodel.EventViewModel
@@ -124,18 +127,25 @@ class EndToEndTest : TestCase() {
         postButton {
           assertIsDisplayed()
           performClick()
+          TimeUnit.SECONDS.sleep(3)
         }
       }
     }
-    composeTestRule.onNodeWithText("Explore").performClick()
+    composeTestRule.onNodeWithText("Events").performClick()
     composeTestRule.waitForIdle()
+    ComposeScreen.onComposeScreen<EventsScreen>(composeTestRule) {
+      composeTestRule.waitUntil(timeoutMillis = 5000) {
+        composeTestRule.onAllNodesWithTag("Card")[0].isDisplayed()
+      }
+      composeTestRule.onAllNodesWithTag("Card")[0].assertIsDisplayed()
+    }
   }
 
   companion object {
 
     private const val email = "user@test.com"
     private const val pwd = "123456"
-    private const val uid = "testuid"
+    private var uid = ""
     private const val username = "testuser"
 
     private lateinit var userVM: UserViewModel
@@ -147,10 +157,22 @@ class EndToEndTest : TestCase() {
       TimeUnit.SECONDS.sleep(3)
       // create a new user
       userVM = UserViewModel()
-      userVM.createUserIfNew(uid, username)
-      Firebase.auth.createUserWithEmailAndPassword(email, pwd)
-      TimeUnit.SECONDS.sleep(2)
-
+      var result = Firebase.auth.createUserWithEmailAndPassword(
+        email,
+        pwd
+      )
+      while (!result.isComplete) {
+        TimeUnit.SECONDS.sleep(1)
+      }
+      uid = result.result.user!!.uid
+      runBlocking { userVM.createUserIfNew(
+        uid,
+        username
+      ) }
+      result = Firebase.auth.signInWithEmailAndPassword(email, pwd)
+      while (!result.isComplete) {
+        TimeUnit.SECONDS.sleep(1)
+      }
       eventVM = EventViewModel(uid)
     }
   }
