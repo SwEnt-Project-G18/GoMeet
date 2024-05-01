@@ -4,6 +4,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -132,8 +133,9 @@ class EndToEndTest : TestCase() {
       }
     }
     composeTestRule.onNodeWithText("Events").performClick()
-    composeTestRule.waitForIdle()
     ComposeScreen.onComposeScreen<EventsScreen>(composeTestRule) {
+      composeTestRule.waitForIdle()
+      composeTestRule.onAllNodesWithText("Events")[1].performClick()
       composeTestRule.waitUntil(timeoutMillis = 5000) {
         composeTestRule.onAllNodesWithTag("Card")[0].isDisplayed()
       }
@@ -157,18 +159,12 @@ class EndToEndTest : TestCase() {
       TimeUnit.SECONDS.sleep(3)
       // create a new user
       userVM = UserViewModel()
-      var result = Firebase.auth.createUserWithEmailAndPassword(
-        email,
-        pwd
-      )
+      var result = Firebase.auth.createUserWithEmailAndPassword(email, pwd)
       while (!result.isComplete) {
         TimeUnit.SECONDS.sleep(1)
       }
       uid = result.result.user!!.uid
-      runBlocking { userVM.createUserIfNew(
-        uid,
-        username
-      ) }
+      runBlocking { userVM.createUserIfNew(uid, username) }
       result = Firebase.auth.signInWithEmailAndPassword(email, pwd)
       while (!result.isComplete) {
         TimeUnit.SECONDS.sleep(1)

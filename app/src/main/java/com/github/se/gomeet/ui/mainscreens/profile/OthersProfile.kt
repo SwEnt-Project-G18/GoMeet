@@ -231,7 +231,9 @@ fun OthersProfile(
                       Spacer(Modifier.width(5.dp))
 
                       Button(
-                          onClick = {nav.navigateToScreen(Route.MESSAGE.replace("{id}", Uri.encode(uid))) },
+                          onClick = {
+                            nav.navigateToScreen(Route.MESSAGE.replace("{id}", Uri.encode(uid)))
+                          },
                           modifier = Modifier.height(40.dp).width(180.dp),
                           shape = RoundedCornerShape(10.dp),
                           colors =
