@@ -116,6 +116,7 @@ class EventsTest {
     @JvmStatic
     @BeforeClass
     fun setup() {
+      TimeUnit.SECONDS.sleep(3)
       // create a new user
       var result = Firebase.auth.createUserWithEmailAndPassword(email, pwd)
       while (!result.isComplete) {

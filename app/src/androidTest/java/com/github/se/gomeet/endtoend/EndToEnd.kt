@@ -144,6 +144,7 @@ class EndToEndTest : TestCase() {
     @JvmStatic
     @BeforeClass
     fun setup() {
+      TimeUnit.SECONDS.sleep(3)
       // create a new user
       userVM = UserViewModel()
       userVM.createUserIfNew(uid, username)
