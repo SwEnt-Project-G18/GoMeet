@@ -28,8 +28,6 @@ class EventsTest {
 
   @After
   fun tearDown() {
-    // clean up the event
-    runBlocking { eventViewModel.getAllEvents()?.forEach { eventViewModel.removeEvent(it.uid) } }
     // clean up the user
     Firebase.auth.currentUser?.delete()
   }
@@ -39,7 +37,7 @@ class EventsTest {
     // Test rendering correctness with events available
     composeTestRule.setContent {
       Events(
-          currentUser = "test",
+          currentUser = uid,
           nav = NavigationActions(rememberNavController()),
           userViewModel = userViewModel,
           eventViewModel = eventViewModel)
@@ -58,7 +56,7 @@ class EventsTest {
     // Test button click handling
     composeTestRule.setContent {
       Events(
-          currentUser = "NEEGn5cbkJZDXaezeGdfd2D4u6b2",
+          currentUser = uid,
           nav = NavigationActions(rememberNavController()),
           userViewModel = userViewModel,
           eventViewModel = eventViewModel)
