@@ -33,8 +33,6 @@ import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.android.gms.maps.model.LatLng
-import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
 import kotlinx.coroutines.launch
 
 @Composable
@@ -59,7 +57,7 @@ fun MyEventInfo(
 
   LaunchedEffect(Unit) {
     coroutineScope.launch { organizer.value = userViewModel.getUser(organizerId) }
-    currentUser.value = userViewModel.getUser(Firebase.auth.currentUser!!.uid)
+    currentUser.value = userViewModel.getCurrentUser()
   }
 
   Log.d("EventInfo", "Organizer is $organizerId")
