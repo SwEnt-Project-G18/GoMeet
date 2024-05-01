@@ -260,7 +260,7 @@ class MainActivity : ComponentActivity() {
                 }
 
             composable(Route.SETTINGS) { SettingsScreen(navAction) }
-              composable(Route.EDIT_PROFILE) { EditProfile(nav = navAction) }
+            composable(Route.EDIT_PROFILE) { EditProfile(nav = navAction) }
           }
         }
       }
