@@ -16,7 +16,9 @@ class ProfileTest {
 
   @Test
   fun profileUiTest() {
-    composeTestRule.setContent { Profile(NavigationActions(rememberNavController())) }
+    composeTestRule.setContent {
+      Profile(NavigationActions(rememberNavController()), userId = "1234")
+    }
 
     composeTestRule.onNodeWithText("My Profile").assertIsDisplayed()
 

@@ -149,7 +149,7 @@ class MainActivity : ComponentActivity() {
               Trends(userIdState.value, navAction, UserViewModel(), EventViewModel())
             }
             composable(Route.CREATE) { Create(navAction) }
-            composable(Route.PROFILE) { Profile(navAction) }
+            composable(Route.PROFILE) { Profile(navAction, userId = userIdState.value) }
             composable(
                 route = Route.OTHERS_PROFILE,
                 arguments = listOf(navArgument("uid") { type = NavType.StringType })) {

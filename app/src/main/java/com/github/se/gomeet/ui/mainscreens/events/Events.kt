@@ -238,7 +238,7 @@ fun Events(
                               }
                           // Reusable widget for displaying event details
                           EventWidget(
-                              userName = user.value!!.username,
+                              userName = event.creator,
                               eventName = event.title,
                               eventId = event.uid,
                               eventDescription = event.description,
@@ -290,7 +290,7 @@ fun Events(
                                 painterResource(id = R.drawable.gomeet_logo)
                               }
                           EventWidget(
-                              userName = user.value!!.username,
+                              userName = event.creator,
                               eventId = event.uid,
                               eventName = event.title,
                               eventDescription = event.description,
@@ -341,7 +341,7 @@ fun Events(
                                 painterResource(id = R.drawable.gomeet_logo)
                               }
                           EventWidget(
-                              userName = user.value!!.username,
+                              userName = event.creator,
                               eventId = event.uid,
                               eventName = event.title,
                               eventDescription = event.description,
