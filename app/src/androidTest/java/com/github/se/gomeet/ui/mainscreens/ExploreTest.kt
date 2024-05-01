@@ -73,7 +73,16 @@ class ExploreTest {
       }
       uid = result.result.user!!.uid
 
-      runBlocking { userViewModel.createUserIfNew(uid, "explore_test_user") }
+      runBlocking {
+        userViewModel.createUserIfNew(
+            uid,
+            "explore_test_user",
+            "testfirstname",
+            "testlastname",
+            email,
+            "testphonenumber",
+            "testcountry")
+      }
 
       // sign in as the new user
       result = Firebase.auth.signInWithEmailAndPassword(email, pwd)

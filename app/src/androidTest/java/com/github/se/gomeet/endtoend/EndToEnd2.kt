@@ -196,8 +196,26 @@ class EndToEndTest2 : TestCase() {
         TimeUnit.SECONDS.sleep(1)
       }
       uid2 = result.result.user!!.uid
-      runBlocking { userVM.createUserIfNew(uid1, username1) }
-      runBlocking { userVM.createUserIfNew(uid2, username2) }
+      runBlocking {
+        userVM.createUserIfNew(
+            uid1,
+            username1,
+            "testfirstname",
+            "testlastname",
+            email1,
+            "testphonenumber",
+            "testcountry")
+      }
+      runBlocking {
+        userVM.createUserIfNew(
+            uid2,
+            username2,
+            "testfirstname",
+            "testlastname",
+            email2,
+            "testphonenumber",
+            "testcountry")
+      }
 
       // the first user is used to create an event
       result = Firebase.auth.signInWithEmailAndPassword(email1, pwd1)

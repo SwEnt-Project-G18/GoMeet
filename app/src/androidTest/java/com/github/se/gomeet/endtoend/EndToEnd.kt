@@ -164,7 +164,10 @@ class EndToEndTest : TestCase() {
         TimeUnit.SECONDS.sleep(1)
       }
       uid = result.result.user!!.uid
-      runBlocking { userVM.createUserIfNew(uid, username) }
+      runBlocking {
+        userVM.createUserIfNew(
+            uid, username, "testfirstname", "testlastname", email, "testphonenumber", "testcountry")
+      }
       result = Firebase.auth.signInWithEmailAndPassword(email, pwd)
       while (!result.isComplete) {
         TimeUnit.SECONDS.sleep(1)

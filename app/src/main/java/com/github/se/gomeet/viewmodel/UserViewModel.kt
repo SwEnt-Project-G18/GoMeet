@@ -25,6 +25,11 @@ class UserViewModel : ViewModel() {
    *
    * @param uid the user id
    * @param username the username
+   * @param firstName the first name
+   * @param lastName the last name
+   * @param email the email
+   * @param phoneNumber the phone number
+   * @param country the country
    */
   fun createUserIfNew(
       uid: String,
