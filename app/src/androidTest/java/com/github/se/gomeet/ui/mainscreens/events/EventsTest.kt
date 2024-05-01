@@ -1,4 +1,4 @@
-package com.github.se.gomeet.ui.mainscreens
+package com.github.se.gomeet.ui.mainscreens.events
 
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
