@@ -94,6 +94,11 @@ class UserRepository(private val db: FirebaseFirestore) {
         "following" to following,
         "followers" to followers,
         "pendingRequests" to pendingRequests,
+        "firstName" to firstName,
+        "lastName" to lastName,
+        "email" to email,
+        "phoneNumber" to phoneNumber,
+        "country" to country,
         "myTickets" to joinedEvents,
         "myEvents" to myEvents,
         "myFavorites" to myFavorites)
@@ -112,6 +117,11 @@ class UserRepository(private val db: FirebaseFirestore) {
         following = this["following"] as List<String>,
         followers = this["followers"] as List<String>,
         pendingRequests = this["pendingRequests"] as List<String>,
+        firstName = this["firstName"] as? String ?: "",
+        lastName = this["lastName"] as? String ?: "",
+        email = this["email"] as? String ?: "",
+        phoneNumber = this["phoneNumber"] as? String ?: "",
+        country = this["country"] as? String ?: "",
         joinedEvents = this["myTickets"] as List<String>,
         myEvents = this["myEvents"] as List<String>,
         myFavorites = this["myFavorites"] as List<String>)

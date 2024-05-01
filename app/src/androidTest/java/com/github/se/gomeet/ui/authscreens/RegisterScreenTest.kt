@@ -10,6 +10,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.R
@@ -58,22 +59,23 @@ class RegisterScreenTest {
 
     rule.onNodeWithText("Email").assertIsDisplayed()
     rule.onNodeWithText("Password").assertIsDisplayed()
-    rule.onNodeWithText("Confirm Password").assertIsDisplayed()
+    rule.onNodeWithText("Confirm Password").performScrollTo().assertIsDisplayed()
 
     rule
         .onNodeWithTag("register_button")
         .assertIsNotEnabled()
         .assertHasClickAction()
+        .performScrollTo()
         .assertIsDisplayed()
 
-    rule.onNodeWithText("Email").performTextInput("signup@test1.com")
-    rule.onNodeWithText("Password").performTextInput("123456")
-    rule.onNodeWithText("Confirm Password").performTextInput("123456")
+    rule.onNodeWithText("Email").performScrollTo().performTextInput("signup@test1.com")
+    rule.onNodeWithText("Password").performScrollTo().performTextInput("123456")
+    rule.onNodeWithText("Confirm Password").performScrollTo().performTextInput("123456")
 
     // Wait for the Compose framework to recompose the UI
     rule.waitForIdle()
 
-    rule.onNodeWithTag("register_button").assertIsEnabled().performClick()
+    rule.onNodeWithTag("register_button").assertIsEnabled().performScrollTo().performClick()
 
     rule.waitForIdle()
 
