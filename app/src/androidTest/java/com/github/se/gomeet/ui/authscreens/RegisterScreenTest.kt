@@ -54,7 +54,8 @@ class RegisterScreenTest {
           ChatClient.Builder(getResourceString(R.string.chat_api_key), LocalContext.current)
               .logLevel(ChatLogLevel.NOTHING) // Set to NOTHING in prod
               .build()
-      RegisterScreen(client,  NavigationActions(rememberNavController()), authViewModel, userViewModel) {}
+      RegisterScreen(
+          client, NavigationActions(rememberNavController()), authViewModel, userViewModel) {}
     }
 
     rule.onNodeWithTag("register_title").assertIsDisplayed()
