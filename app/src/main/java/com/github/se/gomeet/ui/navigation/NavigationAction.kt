@@ -43,12 +43,15 @@ object Route {
   const val PUBLIC_CREATE = "Public Create"
   const val PRIVATE_CREATE = "Private Create"
   const val OTHERS_PROFILE = "OthersProfile/{uid}"
+  const val EDIT_PROFILE = "EditProfile"
   const val ADD_PARTICIPANTS = "Add Participants"
   const val EVENT_INFO =
       "eventInfo/{eventId}/{title}/{date}/{time}/{organizer}/{rating}/{description}/{latitude}/{longitude}"
   const val NOTIFICATIONS = "Notifications"
   const val SETTINGS = "Settings"
   const val MESSAGE = "Message/{id}"
+  const val FOLLOWERS = "Followers/{uid}"
+  const val FOLLOWING = "Following/{uid}"
 }
 
 val CREATE_ITEMS =
@@ -97,7 +100,9 @@ val SECOND_LEVEL_DESTINATION =
         TopLevelDestination(
             route = Route.EVENT_INFO, icon = Icons.Default.Person, textId = Route.EVENT_INFO),
         TopLevelDestination(
-            route = Route.SETTINGS, icon = Icons.Default.Settings, textId = Route.SETTINGS))
+            route = Route.SETTINGS, icon = Icons.Default.Settings, textId = Route.SETTINGS),
+        TopLevelDestination(
+            Route.EDIT_PROFILE, icon = Icons.Default.Person, textId = Route.EDIT_PROFILE))
 
 /**
  * Class that handles navigation in the app.
