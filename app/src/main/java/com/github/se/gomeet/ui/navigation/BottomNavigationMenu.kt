@@ -16,7 +16,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.se.gomeet.ui.theme.Cyan
-import com.github.se.gomeet.ui.theme.NavBarUnselected
 import com.github.se.gomeet.ui.theme.TranslucentCyan
 
 /**
