@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -179,16 +180,18 @@ fun UserInviteWidget(username : String, usertag : String = "usertag" , status : 
         verticalAlignment = Alignment.CenterVertically
     ){
         // Profile picture and name
+        Row(){
         Box(
             modifier = Modifier
                 .size(40.dp)
                 .clip(CircleShape)
                 .background(Color.Gray) // Change the color as needed
         )
+        Spacer(modifier = Modifier.width(5.dp))
         Column {
             Text(text = username, style = TextStyle(fontSize = 16.sp))
             Text(text = "@$usertag", style = TextStyle(fontSize = 12.sp), color = Grey)
-        }
+        }}
 
         // Status text
         Text(
