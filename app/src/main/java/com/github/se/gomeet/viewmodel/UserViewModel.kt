@@ -19,8 +19,8 @@ import kotlinx.coroutines.launch
  * UI and the repository.
  */
 class UserViewModel : ViewModel() {
-  private val db = UserRepository(Firebase.firestore)
   private val currentUser = mutableStateOf<GoMeetUser?>(null)
+  private val userRepository = UserRepository(Firebase.firestore)
 
   /**
    * Create a new user if the user is new.
@@ -60,8 +60,8 @@ class UserViewModel : ViewModel() {
                   joinedEvents = emptyList(),
                   myEvents = emptyList(),
                   myFavorites = emptyList())
-          db.addUser(user)
           currentUser.value = user
+          userRepository.addUser(user)
         } catch (e: Exception) {
           Log.w(ContentValues.TAG, "Error adding user", e)
         }
@@ -79,7 +79,7 @@ class UserViewModel : ViewModel() {
     return try {
       Log.d("UID IS", "User id is $uid")
       val event = CompletableDeferred<GoMeetUser?>()
-      db.getUser(uid) { t -> event.complete(t) }
+      userRepository.getUser(uid) { t -> event.complete(t) }
       event.await()
     } catch (e: Exception) {
       null
@@ -92,12 +92,12 @@ class UserViewModel : ViewModel() {
   }
 
   /**
-   * Edit the user.
+   * Edit the user globally.
    *
    * @param user the user to edit
    */
   fun editUser(user: GoMeetUser) {
-    db.updateUser(user)
+    userRepository.updateUser(user)
   }
 
   /**
@@ -106,7 +106,7 @@ class UserViewModel : ViewModel() {
    * @param uid the user id
    */
   fun deleteUser(uid: String) {
-    db.removeUser(uid)
+    userRepository.removeUser(uid)
   }
 
   /**
