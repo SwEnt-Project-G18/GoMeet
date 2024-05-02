@@ -78,7 +78,7 @@ fun LoginScreen(authViewModel: AuthViewModel, onNavToExplore: () -> Unit) {
             colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.tertiary)
         )
 
-        if (signInState.value.isLoading) {
+        if (signInState.value.isLoading || signInState.value.isSignInSuccessful) {
             LoadingText()
         } else {
 

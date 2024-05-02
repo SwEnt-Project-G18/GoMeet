@@ -30,6 +30,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.user.GoMeetUser
+import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.android.gms.maps.model.LatLng
@@ -95,14 +96,15 @@ fun MyEventInfo(
         // Your bottom bar content
       }) { innerPadding ->
         if (organizer.value == null || currentUser.value == null) {
-          Text(text = "Loading....", Modifier.padding(innerPadding))
+          LoadingText()
         } else {
           Column(
               modifier =
-                  Modifier.padding(innerPadding)
-                      .padding(start = 15.dp, end = 15.dp, top = 0.dp, bottom = 15.dp)
-                      .fillMaxSize()
-                      .verticalScroll(state = rememberScrollState())) {
+              Modifier
+                  .padding(innerPadding)
+                  .padding(start = 15.dp, end = 15.dp, top = 0.dp, bottom = 15.dp)
+                  .fillMaxSize()
+                  .verticalScroll(state = rememberScrollState())) {
                 EventHeader(
                     title = title,
                     organizer = organizer.value!!,

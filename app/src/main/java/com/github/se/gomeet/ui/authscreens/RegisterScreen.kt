@@ -87,7 +87,7 @@ fun RegisterScreen(
 
       Spacer(modifier = Modifier.size(15.dp))
 
-      if (signInState.value.isLoading) {
+      if (signInState.value.isLoading || signInState.value.isSignInSuccessful) {
           LoadingText()
       } else {
 
@@ -224,10 +224,7 @@ fun RegisterScreen(
           ) {
               Text("Create account")
           }
-
-          if (signInState.value.isLoading) {
-              CircularProgressIndicator()
-          }
+      }
 
           if (signInState.value.isSignInSuccessful) {
               val currentUser = Firebase.auth.currentUser
@@ -259,6 +256,5 @@ fun RegisterScreen(
                   .enqueue()
               onNavToExplore()
           }
-      }
   }
 }
