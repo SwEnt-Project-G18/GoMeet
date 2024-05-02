@@ -2,6 +2,7 @@ package com.github.se.gomeet.viewmodel
 
 import android.content.ContentValues
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.model.user.GoMeetUser
@@ -18,6 +19,7 @@ import kotlinx.coroutines.launch
  * UI and the repository.
  */
 class UserViewModel : ViewModel() {
+  private val currentUser = mutableStateOf<GoMeetUser?>(null)
   private val userRepository = UserRepository(Firebase.firestore)
 
   /**
@@ -58,6 +60,7 @@ class UserViewModel : ViewModel() {
                   joinedEvents = emptyList(),
                   myEvents = emptyList(),
                   myFavorites = emptyList())
+          currentUser.value = user
           userRepository.addUser(user)
         } catch (e: Exception) {
           Log.w(ContentValues.TAG, "Error adding user", e)
@@ -81,6 +84,11 @@ class UserViewModel : ViewModel() {
     } catch (e: Exception) {
       null
     }
+  }
+
+  // TODO: fix the following method
+  fun getCurrentUser(): GoMeetUser? {
+    return currentUser.value
   }
 
   /**

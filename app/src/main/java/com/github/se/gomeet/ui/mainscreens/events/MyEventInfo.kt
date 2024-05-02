@@ -27,14 +27,16 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.android.gms.maps.model.LatLng
-import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 
 @Composable
@@ -64,7 +66,6 @@ fun MyEventInfo(
 
   Log.d("EventInfo", "Organizer is $organizerId")
   Scaffold(
-      modifier = Modifier.testTag("EventInfoScreen"),
       topBar = {
         TopAppBar(
             modifier = Modifier.testTag("TopBar"),
@@ -122,4 +123,19 @@ fun MyEventInfo(
               }
         }
       }
+}
+
+@Preview
+@Composable
+fun PreviewEventInfo() {
+  MyEventInfo(
+      nav = NavigationActions(rememberNavController()),
+      title = "Event Title",
+      eventId = "eventid",
+      date = "2024-05-01",
+      organizerId = "organiserid",
+      time = "00:00",
+      description = "Event Description",
+      loc = LatLng(0.0, 0.0),
+      userViewModel = UserViewModel())
 }

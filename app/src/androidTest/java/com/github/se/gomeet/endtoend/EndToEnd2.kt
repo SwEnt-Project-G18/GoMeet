@@ -28,7 +28,7 @@ import io.github.kakaocup.compose.node.element.ComposeScreen
 import java.time.LocalDate
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
-import org.junit.After
+import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
@@ -43,23 +43,6 @@ import org.junit.runner.RunWith
 class EndToEndTest2 : TestCase() {
 
   @get:Rule val composeTestRule = createAndroidComposeRule<MainActivity>()
-
-  @After
-  fun tearDown() {
-    // clean up the event
-    runBlocking { eventVM.getAllEvents()?.forEach { eventVM.removeEvent(it.uid) } }
-
-    // clean up the users
-    Firebase.auth.currentUser?.delete()
-    userVM.deleteUser(uid1)
-    userVM.deleteUser(uid2)
-
-    val result = Firebase.auth.signInWithEmailAndPassword(email1, pwd1)
-    while (!result.isComplete) {
-      TimeUnit.SECONDS.sleep(1)
-    }
-    Firebase.auth.currentUser?.delete()
-  }
 
   @Test
   fun test() = run {
@@ -183,18 +166,13 @@ class EndToEndTest2 : TestCase() {
     @JvmStatic
     @BeforeClass
     fun setup() {
-      TimeUnit.SECONDS.sleep(3)
       // create two new users
       userVM = UserViewModel()
       var result = Firebase.auth.createUserWithEmailAndPassword(email1, pwd1)
-      while (!result.isComplete) {
-        TimeUnit.SECONDS.sleep(1)
-      }
+      while (!result.isComplete) {}
       uid1 = result.result.user!!.uid
       result = Firebase.auth.createUserWithEmailAndPassword(email2, pwd2)
-      while (!result.isComplete) {
-        TimeUnit.SECONDS.sleep(1)
-      }
+      while (!result.isComplete) {}
       uid2 = result.result.user!!.uid
       runBlocking {
         userVM.createUserIfNew(
@@ -210,18 +188,16 @@ class EndToEndTest2 : TestCase() {
         userVM.createUserIfNew(
             uid2,
             username2,
-            "testfirstname",
-            "testlastname",
+            "testfirstname2",
+            "testlastname2",
             email2,
-            "testphonenumber",
-            "testcountry")
+            "testphonenumber2",
+            "testcountry2")
       }
 
       // the first user is used to create an event
       result = Firebase.auth.signInWithEmailAndPassword(email1, pwd1)
-      while (!result.isComplete) {
-        TimeUnit.SECONDS.sleep(1)
-      }
+      while (!result.isComplete) {}
 
       eventVM = EventViewModel(Firebase.auth.currentUser!!.uid)
       runBlocking {
@@ -244,8 +220,27 @@ class EndToEndTest2 : TestCase() {
         Firebase.auth.signOut()
       }
 
+      // Ensure user is logged out before proceeding
+      TimeUnit.SECONDS.sleep(2)
+
       // the second user is used to log in and perform the tests
       eventVM = EventViewModel(uid2)
+    }
+
+    @AfterClass
+    @JvmStatic
+    fun tearDown() {
+      // clean up the event
+      runBlocking { eventVM.getAllEvents()?.forEach { eventVM.removeEvent(it.uid) } }
+
+      // clean up the users
+      Firebase.auth.currentUser?.delete()
+      userVM.deleteUser(uid1)
+      userVM.deleteUser(uid2)
+
+      val result = Firebase.auth.signInWithEmailAndPassword(email1, pwd1)
+      while (!result.isComplete) {}
+      Firebase.auth.currentUser?.delete()
     }
   }
 }

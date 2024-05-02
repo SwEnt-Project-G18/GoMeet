@@ -1,4 +1,4 @@
-package com.github.se.gomeet.authentication
+package com.github.se.gomeet.model.authentication
 
 /**
  * This data class represents the state of the sign in authentication.
