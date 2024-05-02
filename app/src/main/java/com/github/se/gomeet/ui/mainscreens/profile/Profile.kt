@@ -168,7 +168,7 @@ fun Profile(
                       Column(
                           horizontalAlignment =
                               Alignment
-                                  .CenterHorizontally, // Center horizontally within this column
+                                  .CenterHorizontally,
                           modifier = Modifier.padding(0.dp)) {
                             Row(
                                 horizontalArrangement = Arrangement.Start,
