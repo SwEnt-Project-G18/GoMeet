@@ -29,6 +29,9 @@ import com.github.se.gomeet.ui.mainscreens.create.Create
 import com.github.se.gomeet.ui.mainscreens.create.CreateEvent
 import com.github.se.gomeet.ui.mainscreens.events.Events
 import com.github.se.gomeet.ui.mainscreens.events.MyEventInfo
+import com.github.se.gomeet.ui.mainscreens.profile.EditProfile
+import com.github.se.gomeet.ui.mainscreens.profile.Followers
+import com.github.se.gomeet.ui.mainscreens.profile.Following
 import com.github.se.gomeet.ui.mainscreens.profile.Notifications
 import com.github.se.gomeet.ui.mainscreens.profile.OthersProfile
 import com.github.se.gomeet.ui.mainscreens.profile.Profile
@@ -83,9 +86,10 @@ class MainActivity : ComponentActivity() {
       GoMeetTheme {
         SetStatusBarColor(color = MaterialTheme.colorScheme.background)
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-          val userIdState = remember { mutableStateOf<String>("") }
+          val userIdState = remember { mutableStateOf("") }
           val nav = rememberNavController()
           val authViewModel = AuthViewModel()
+          val eventViewModel = EventViewModel()
           val userViewModel = UserViewModel()
           val navAction = NavigationActions(nav)
           NavHost(navController = nav, startDestination = Route.WELCOME) {
@@ -140,25 +144,28 @@ class MainActivity : ComponentActivity() {
                     .navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == Route.CREATE })
               }
             }
-            composable(Route.EXPLORE) { Explore(navAction, EventViewModel()) }
+            composable(Route.EXPLORE) { Explore(navAction, eventViewModel) }
             composable(Route.EVENTS) {
               userIdState.value = Firebase.auth.currentUser!!.uid
-              Events(userIdState.value, navAction, UserViewModel(), EventViewModel())
+              Events(userIdState.value, navAction, UserViewModel(), eventViewModel)
             }
             composable(Route.TRENDS) {
-              Trends(userIdState.value, navAction, UserViewModel(), EventViewModel())
+              Trends(userIdState.value, navAction, UserViewModel(), eventViewModel)
             }
             composable(Route.CREATE) { Create(navAction) }
-
+            composable(Route.PROFILE) {
+              Profile(navAction, userId = userIdState.value, userViewModel)
+            }
             composable(Route.NOTIFICATIONS) { Notifications(navAction) }
 
-            composable(Route.PROFILE) { Profile(navAction, userId = userIdState.value) }
+            composable(Route.PROFILE) {
+              Profile(navAction, userId = userIdState.value, userViewModel)
+            }
             composable(
                 route = Route.OTHERS_PROFILE,
                 arguments = listOf(navArgument("uid") { type = NavType.StringType })) {
-                  OthersProfile(navAction, it.arguments?.getString("uid") ?: "")
+                  OthersProfile(navAction, it.arguments?.getString("uid") ?: "", userViewModel)
                 }
-
             composable(Route.PRIVATE_CREATE) {
               CreateEvent(navAction, EventViewModel(Firebase.auth.currentUser!!.uid), true)
             }
@@ -189,7 +196,7 @@ class MainActivity : ComponentActivity() {
                   val date = entry.arguments?.getString("date") ?: ""
                   val time = entry.arguments?.getString("time") ?: ""
                   val organizer = entry.arguments?.getString("organizer") ?: ""
-                  val rating = entry.arguments?.getDouble("rating") ?: 0.0
+                  val rating = entry.arguments?.getFloat("rating") ?: 0.0
                   val description = entry.arguments?.getString("description") ?: ""
                   val latitude = entry.arguments?.getFloat("latitude") ?: 0.0
                   val longitude = entry.arguments?.getFloat("longitude") ?: 0.0
@@ -202,11 +209,11 @@ class MainActivity : ComponentActivity() {
                       date,
                       time,
                       organizer,
-                      rating,
+                      rating.toDouble(),
                       painterResource(id = R.drawable.chess_demo),
                       description,
                       loc,
-                      UserViewModel())
+                      userViewModel)
                 }
 
             composable(
@@ -264,6 +271,17 @@ class MainActivity : ComponentActivity() {
                 }
 
             composable(Route.SETTINGS) { SettingsScreen(navAction) }
+            composable(Route.EDIT_PROFILE) { EditProfile(nav = navAction) }
+            composable(
+                route = Route.FOLLOWERS,
+                arguments = listOf(navArgument("uid") { type = NavType.StringType })) {
+                  Followers(navAction, it.arguments?.getString("uid") ?: "", userViewModel)
+                }
+            composable(
+                route = Route.FOLLOWING,
+                arguments = listOf(navArgument("uid") { type = NavType.StringType })) {
+                  Following(navAction, it.arguments?.getString("uid") ?: "", userViewModel)
+                }
           }
         }
       }

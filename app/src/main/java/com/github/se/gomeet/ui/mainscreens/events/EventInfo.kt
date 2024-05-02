@@ -45,7 +45,6 @@ import com.github.se.gomeet.R
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
-import com.github.se.gomeet.ui.navigation.SECOND_LEVEL_DESTINATION
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -90,7 +89,11 @@ fun EventHeader(
                       letterSpacing = 0.5.sp))
           Spacer(modifier = Modifier.height(5.dp))
           Text(
-              modifier = Modifier.clickable { nav.navigateTo(SECOND_LEVEL_DESTINATION[0]) },
+              modifier =
+                  Modifier.clickable {
+                        nav.navigateToScreen(Route.OTHERS_PROFILE.replace("{uid}", organizer.uid))
+                      }
+                      .testTag("Username"),
               text = organizer.username,
               style =
                   TextStyle(
