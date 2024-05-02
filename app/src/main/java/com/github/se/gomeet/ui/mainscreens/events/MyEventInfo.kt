@@ -16,7 +16,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
@@ -100,11 +99,10 @@ fun MyEventInfo(
         } else {
           Column(
               modifier =
-              Modifier
-                  .padding(innerPadding)
-                  .padding(start = 15.dp, end = 15.dp, top = 0.dp, bottom = 15.dp)
-                  .fillMaxSize()
-                  .verticalScroll(state = rememberScrollState())) {
+                  Modifier.padding(innerPadding)
+                      .padding(start = 15.dp, end = 15.dp, top = 0.dp, bottom = 15.dp)
+                      .fillMaxSize()
+                      .verticalScroll(state = rememberScrollState())) {
                 EventHeader(
                     title = title,
                     organizer = organizer.value!!,

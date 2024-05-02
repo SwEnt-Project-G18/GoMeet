@@ -15,15 +15,12 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun LoadingText() {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        CircularProgressIndicator(
-            modifier = Modifier.size(60.dp)
-        )
+  Column(
+      modifier = Modifier.fillMaxSize(),
+      verticalArrangement = Arrangement.Center,
+      horizontalAlignment = Alignment.CenterHorizontally) {
+        CircularProgressIndicator(modifier = Modifier.size(60.dp))
         Spacer(modifier = Modifier.height(10.dp))
         Text(text = "Loading...")
-    }
+      }
 }

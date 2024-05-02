@@ -5,12 +5,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -24,7 +22,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -120,16 +117,12 @@ fun Profile(
               style = MaterialTheme.typography.headlineLarge)
 
           IconButton(
-              modifier = Modifier
-                  .align(Alignment.CenterVertically)
-                  .padding(end = 15.dp),
+              modifier = Modifier.align(Alignment.CenterVertically).padding(end = 15.dp),
               onClick = { /* Handles notification icon click */}) {
                 Icon(
                     ImageVector.vectorResource(R.drawable.notifications_icon),
                     contentDescription = "Notifications",
-                    modifier = Modifier
-                        .size(40.dp)
-                        .align(Alignment.CenterVertically),
+                    modifier = Modifier.size(40.dp).align(Alignment.CenterVertically),
                     tint = Grey)
               }
 
@@ -137,18 +130,14 @@ fun Profile(
           // This will push the icon to the right
           Spacer(Modifier.weight(1f))
           IconButton(
-              modifier = Modifier
-                  .align(Alignment.CenterVertically)
-                  .padding(end = 15.dp),
+              modifier = Modifier.align(Alignment.CenterVertically).padding(end = 15.dp),
               onClick = {
                 nav.navigateTo(SECOND_LEVEL_DESTINATION.first { it.route == Route.SETTINGS })
               }) {
                 Icon(
                     imageVector = ImageVector.vectorResource(R.drawable.settings_icon),
                     contentDescription = "Settings",
-                    modifier = Modifier
-                        .size(30.dp)
-                        .align(Alignment.CenterVertically),
+                    modifier = Modifier.size(30.dp).align(Alignment.CenterVertically),
                     tint = Grey)
               }
         }
@@ -157,24 +146,20 @@ fun Profile(
           Column(
               verticalArrangement = Arrangement.SpaceEvenly,
               horizontalAlignment = Alignment.CenterHorizontally,
-              modifier = Modifier
-                  .padding(innerPadding)
-                  .verticalScroll(rememberScrollState(0))) {
+              modifier = Modifier.padding(innerPadding).verticalScroll(rememberScrollState(0))) {
                 Row(
                     horizontalArrangement = Arrangement.Start,
                     verticalAlignment = Alignment.CenterVertically,
                     modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(start = 15.dp, end = 0.dp, top = 0.dp, bottom = 30.dp)) {
+                        Modifier.fillMaxWidth()
+                            .padding(start = 15.dp, end = 0.dp, top = 0.dp, bottom = 30.dp)) {
                       Image(
                           modifier =
-                          Modifier
-                              .padding(start = 0.dp, end = 0.dp, top = 0.dp, bottom = 0.dp)
-                              .width(101.dp)
-                              .height(101.dp)
-                              .clip(CircleShape)
-                              .background(color = MaterialTheme.colorScheme.background),
+                              Modifier.padding(start = 0.dp, end = 0.dp, top = 0.dp, bottom = 0.dp)
+                                  .width(101.dp)
+                                  .height(101.dp)
+                                  .clip(CircleShape)
+                                  .background(color = MaterialTheme.colorScheme.background),
                           painter = painterResource(id = R.drawable.gomeet_logo),
                           contentDescription = "image description",
                           contentScale = ContentScale.None)
@@ -223,9 +208,7 @@ fun Profile(
                       // Edit Profile button
                       Button(
                           onClick = { nav.navigateToScreen(Route.EDIT_PROFILE) },
-                          modifier = Modifier
-                              .height(40.dp)
-                              .width(135.dp),
+                          modifier = Modifier.height(40.dp).width(135.dp),
                           shape = RoundedCornerShape(10.dp),
                           colors = ButtonDefaults.buttonColors(containerColor = LightGray)) {
                             Text(text = "Edit Profile", color = Color.Black)
@@ -235,9 +218,7 @@ fun Profile(
 
                       Button(
                           onClick = { /*TODO*/},
-                          modifier = Modifier
-                              .height(40.dp)
-                              .width(135.dp),
+                          modifier = Modifier.height(40.dp).width(135.dp),
                           shape = RoundedCornerShape(10.dp),
                           colors = ButtonDefaults.buttonColors(containerColor = LightGray)) {
                             Text(text = "Share Profile", color = Color.Black)
@@ -298,10 +279,10 @@ fun Profile(
                           }
                       HorizontalDivider(
                           modifier =
-                          Modifier
-                              // .fillMaxHeight()
-                              .height(40.dp)
-                              .width(2.dp))
+                              Modifier
+                                  // .fillMaxHeight()
+                                  .height(40.dp)
+                                  .width(2.dp))
                       Column(
                           modifier =
                               Modifier.clickable {
@@ -336,10 +317,10 @@ fun Profile(
                           }
                       HorizontalDivider(
                           modifier =
-                          Modifier
-                              // .fillMaxHeight()
-                              .height(40.dp)
-                              .width(2.dp))
+                              Modifier
+                                  // .fillMaxHeight()
+                                  .height(40.dp)
+                                  .width(2.dp))
                       Column(
                           modifier =
                               Modifier.clickable {
@@ -389,14 +370,11 @@ fun Profile(
                             letterSpacing = 0.5.sp,
                         ),
                     modifier =
-                    Modifier
-                        .width(74.dp)
-                        .height(20.dp)
-                        .align(Alignment.Start)
-                        .padding(start = 15.dp))
-                Column(modifier = Modifier
-                    .padding(start = 0.dp, end = 0.dp)
-                    .fillMaxWidth()) {
+                        Modifier.width(74.dp)
+                            .height(20.dp)
+                            .align(Alignment.Start)
+                            .padding(start = 15.dp))
+                Column(modifier = Modifier.padding(start = 0.dp, end = 0.dp).fillMaxWidth()) {
                   Spacer(modifier = Modifier.height(10.dp))
                   LazyRow(
                       verticalAlignment = Alignment.CenterVertically,
@@ -421,7 +399,7 @@ fun Profile(
                 ProfileEventsList("History")
               }
         } else {
-            LoadingText()
+          LoadingText()
         }
       }
 }

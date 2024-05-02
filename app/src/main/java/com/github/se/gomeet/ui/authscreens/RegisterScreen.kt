@@ -7,13 +7,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -73,46 +71,37 @@ fun RegisterScreen(
   Column(
       verticalArrangement = Arrangement.Top,
       horizontalAlignment = Alignment.CenterHorizontally,
-      modifier = Modifier
-          .fillMaxSize()
-          .padding(25.dp)
-          .verticalScroll(ScrollState(0))) {
-      Image(
-          painter = painterResource(id = R.drawable.gomeet_text),
-          contentDescription = "Go Meet",
-          modifier = Modifier.padding(top = 40.dp),
-          alignment = Alignment.Center,
-          colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.tertiary)
-      )
+      modifier = Modifier.fillMaxSize().padding(25.dp).verticalScroll(ScrollState(0))) {
+        Image(
+            painter = painterResource(id = R.drawable.gomeet_text),
+            contentDescription = "Go Meet",
+            modifier = Modifier.padding(top = 40.dp),
+            alignment = Alignment.Center,
+            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.tertiary))
 
-      Spacer(modifier = Modifier.size(15.dp))
+        Spacer(modifier = Modifier.size(15.dp))
 
-      if (signInState.value.isLoading || signInState.value.isSignInSuccessful) {
+        if (signInState.value.isLoading || signInState.value.isSignInSuccessful) {
           LoadingText()
-      } else {
-
+        } else {
 
           Text(
               text = "Create account",
-              modifier = Modifier
-                  .padding(bottom = 16.dp)
-                  .testTag("register_title"),
+              modifier = Modifier.padding(bottom = 16.dp).testTag("register_title"),
               color = DarkCyan,
               fontStyle = FontStyle.Normal,
               fontWeight = FontWeight.SemiBold,
               textAlign = TextAlign.Center,
-              style = MaterialTheme.typography.headlineLarge
-          )
+              style = MaterialTheme.typography.headlineLarge)
 
           Spacer(modifier = Modifier.size(15.dp))
 
           if (isError) {
-              Text(
-                  text = signInState.value.registerError!!,
-                  modifier = Modifier.padding(bottom = 16.dp),
-                  color = Color.Red,
-                  textAlign = TextAlign.Center
-              )
+            Text(
+                text = signInState.value.registerError!!,
+                modifier = Modifier.padding(bottom = 16.dp),
+                color = Color.Red,
+                textAlign = TextAlign.Center)
           }
 
           TextField(
@@ -121,8 +110,7 @@ fun RegisterScreen(
               label = { Text("First Name") },
               singleLine = true,
               modifier = Modifier.fillMaxWidth(),
-              colors = textFieldColors
-          )
+              colors = textFieldColors)
 
           Spacer(modifier = Modifier.size(16.dp))
 
@@ -132,8 +120,7 @@ fun RegisterScreen(
               label = { Text("Last Name") },
               singleLine = true,
               modifier = Modifier.fillMaxWidth(),
-              colors = textFieldColors
-          )
+              colors = textFieldColors)
 
           Spacer(modifier = Modifier.size(16.dp))
 
@@ -143,8 +130,7 @@ fun RegisterScreen(
               label = { Text("Username") },
               singleLine = true,
               modifier = Modifier.fillMaxWidth(),
-              colors = textFieldColors
-          )
+              colors = textFieldColors)
 
           Spacer(modifier = Modifier.size(16.dp))
 
@@ -154,8 +140,7 @@ fun RegisterScreen(
               label = { Text("Phone Number") },
               singleLine = true,
               modifier = Modifier.fillMaxWidth(),
-              colors = textFieldColors
-          )
+              colors = textFieldColors)
 
           Spacer(modifier = Modifier.size(16.dp))
 
@@ -165,8 +150,7 @@ fun RegisterScreen(
               label = { Text("Email") },
               singleLine = true,
               modifier = Modifier.fillMaxWidth(),
-              colors = textFieldColors
-          )
+              colors = textFieldColors)
 
           Spacer(modifier = Modifier.size(16.dp))
 
@@ -176,8 +160,7 @@ fun RegisterScreen(
               label = { Text("Country") },
               singleLine = true,
               modifier = Modifier.fillMaxWidth(),
-              colors = textFieldColors
-          )
+              colors = textFieldColors)
 
           Spacer(modifier = Modifier.size(16.dp))
 
@@ -188,73 +171,66 @@ fun RegisterScreen(
               singleLine = true,
               visualTransformation = PasswordVisualTransformation(),
               modifier = Modifier.fillMaxWidth(),
-              colors = textFieldColors
-          )
+              colors = textFieldColors)
 
           Spacer(modifier = Modifier.size(16.dp))
 
           TextField(
               value = signInState.value.confirmPasswordRegister,
-              onValueChange = { newValue -> authViewModel.onConfirmPasswordRegisterChange(newValue) },
+              onValueChange = { newValue ->
+                authViewModel.onConfirmPasswordRegisterChange(newValue)
+              },
               label = { Text("Confirm Password") },
               visualTransformation = PasswordVisualTransformation(),
               singleLine = true,
               modifier = Modifier.fillMaxWidth(),
-              colors = textFieldColors
-          )
+              colors = textFieldColors)
 
           Spacer(modifier = Modifier.size(50.dp))
 
           Button(
               onClick = { authViewModel.signUpWithEmailPassword(context) },
-              modifier = Modifier
-                  .fillMaxWidth()
-                  .testTag("register_button"),
+              modifier = Modifier.fillMaxWidth().testTag("register_button"),
               colors =
-              ButtonColors(
-                  disabledContainerColor = MaterialTheme.colorScheme.primary,
-                  containerColor = DarkCyan,
-                  disabledContentColor = Color.White,
-                  contentColor = Color.White
-              ),
+                  ButtonColors(
+                      disabledContainerColor = MaterialTheme.colorScheme.primary,
+                      containerColor = DarkCyan,
+                      disabledContentColor = Color.White,
+                      contentColor = Color.White),
               enabled =
-              signInState.value.emailRegister.isNotEmpty() &&
+                  signInState.value.emailRegister.isNotEmpty() &&
                       signInState.value.passwordRegister.isNotEmpty() &&
-                      signInState.value.confirmPasswordRegister.isNotEmpty()
-          ) {
-              Text("Create account")
-          }
-      }
-
-          if (signInState.value.isSignInSuccessful) {
-              val currentUser = Firebase.auth.currentUser
-              if (currentUser != null) {
-                  val uid = currentUser.uid
-                  val email = currentUser.email ?: ""
-                  val firstName = signInState.value.firstNameRegister
-                  val lastName = signInState.value.lastNameRegister
-                  val phoneNumber = signInState.value.phoneNumberRegister
-                  val country = signInState.value.countryRegister
-                  val username = signInState.value.usernameRegister
-
-                  userViewModel.createUserIfNew(
-                      uid, username, firstName, lastName, email, phoneNumber, country
-                  )
+                      signInState.value.confirmPasswordRegister.isNotEmpty()) {
+                Text("Create account")
               }
+        }
 
-              val user =
-                  User(
-                      id = Firebase.auth.currentUser!!.uid,
-                      name = Firebase.auth.currentUser!!.email!!
-                  ) // TODO: currently username = email
-              client
-                  .connectUser(
-                      user = user,
-                      // TODO: Generate Token, see https://getstream.io/tutorials/android-chat/
-                      token = client.devToken(user.id)
-                  )
-                  .enqueue()
-              onNavToExplore()
+        if (signInState.value.isSignInSuccessful) {
+          val currentUser = Firebase.auth.currentUser
+          if (currentUser != null) {
+            val uid = currentUser.uid
+            val email = currentUser.email ?: ""
+            val firstName = signInState.value.firstNameRegister
+            val lastName = signInState.value.lastNameRegister
+            val phoneNumber = signInState.value.phoneNumberRegister
+            val country = signInState.value.countryRegister
+            val username = signInState.value.usernameRegister
+
+            userViewModel.createUserIfNew(
+                uid, username, firstName, lastName, email, phoneNumber, country)
           }
-  }
+
+          val user =
+              User(
+                  id = Firebase.auth.currentUser!!.uid,
+                  name = Firebase.auth.currentUser!!.email!!) // TODO: currently username = email
+          client
+              .connectUser(
+                  user = user,
+                  // TODO: Generate Token, see https://getstream.io/tutorials/android-chat/
+                  token = client.devToken(user.id))
+              .enqueue()
+          onNavToExplore()
+        }
+      }
 }
