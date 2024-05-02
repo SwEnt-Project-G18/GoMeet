@@ -12,8 +12,11 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.R
+import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.AuthViewModel
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -54,7 +57,7 @@ class LoginScreenTest {
           ChatClient.Builder(getResourceString(R.string.chat_api_key), LocalContext.current)
               .logLevel(ChatLogLevel.NOTHING) // Set to NOTHING in prod
               .build()
-      LoginScreen(authViewModel) {}
+      LoginScreen(authViewModel,  NavigationActions(rememberNavController())) {}
     }
 
     // Test the UI elements

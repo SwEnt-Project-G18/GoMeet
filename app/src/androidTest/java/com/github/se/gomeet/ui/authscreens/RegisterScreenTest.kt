@@ -12,8 +12,10 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
+import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.R
+import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.AuthViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
@@ -52,7 +54,7 @@ class RegisterScreenTest {
           ChatClient.Builder(getResourceString(R.string.chat_api_key), LocalContext.current)
               .logLevel(ChatLogLevel.NOTHING) // Set to NOTHING in prod
               .build()
-      RegisterScreen(client, authViewModel, userViewModel) {}
+      RegisterScreen(client,  NavigationActions(rememberNavController()), authViewModel, userViewModel) {}
     }
 
     rule.onNodeWithTag("register_title").assertIsDisplayed()
