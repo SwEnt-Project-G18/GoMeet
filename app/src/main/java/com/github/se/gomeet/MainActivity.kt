@@ -44,6 +44,7 @@ import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.GoMeetTheme
 import com.github.se.gomeet.ui.theme.SetStatusBarColor
 import com.github.se.gomeet.viewmodel.AuthViewModel
+import com.github.se.gomeet.viewmodel.EventInviteViewModel
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.android.gms.maps.MapsInitializer
@@ -92,6 +93,7 @@ class MainActivity : ComponentActivity() {
           val authViewModel = AuthViewModel()
           val eventViewModel = EventViewModel()
           val userViewModel = UserViewModel()
+            val eventInviteViewModel = EventInviteViewModel()
           val navAction = NavigationActions(nav)
           NavHost(navController = nav, startDestination = Route.WELCOME) {
             composable(Route.WELCOME) {
@@ -178,10 +180,10 @@ class MainActivity : ComponentActivity() {
 
             composable(route = Route.MANAGE_INVITES,
                         arguments = listOf(navArgument("eventId") { type = NavType.StringType })
-            ) {entry ->
+            ) { entry ->
                 val eventId = entry.arguments?.getString("eventId") ?: ""
 
-                ManageInvites(eventId, navAction) }
+                ManageInvites(userIdState.value, eventId, navAction, userViewModel, eventViewModel, eventInviteViewModel) }
 
             composable(
                 route = Route.EVENT_INFO,

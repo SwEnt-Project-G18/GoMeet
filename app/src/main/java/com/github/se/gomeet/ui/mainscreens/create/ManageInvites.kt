@@ -1,5 +1,6 @@
 package com.github.se.gomeet.ui.mainscreens.create
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -53,35 +54,48 @@ import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
+import com.github.se.gomeet.ui.theme.NavBarUnselected
+import com.github.se.gomeet.viewmodel.EventInviteViewModel
+import com.github.se.gomeet.viewmodel.EventViewModel
+import com.github.se.gomeet.viewmodel.UserViewModel
 import kotlinx.coroutines.launch
 
+/**
+ * This composable function represents the screen where the user can manage the invitations
+ * for one of his event.
+ */
 @Composable
 fun ManageInvites(currentUser: String,
-                 //currentEvent: String,
-                 nav: NavigationActions,
-                  //userViewModel: UserViewModel,
-                  //eventViewModel: EventViewModel
+                  currentEvent: String,
+                  nav: NavigationActions,
+                  userViewModel: UserViewModel,
+                  eventViewModel: EventViewModel,
+                  eventInviteViewModel: EventInviteViewModel
 ) {
 
     var selectedFilter by remember { mutableStateOf("All") }
-    val userList = remember { mutableListOf<GoMeetUser>() }
+    val followers = remember { mutableListOf<String>() }
     val coroutineScope = rememberCoroutineScope()
-    val query = remember { mutableStateOf("") }
     val user = remember { mutableStateOf<GoMeetUser?>(null) }
     val event = remember { mutableStateOf<Event?>(null) }
 
-/*
+
     LaunchedEffect(Unit) {
         coroutineScope.launch {
             user.value = userViewModel.getUser(currentUser)
             event.value = eventViewModel.getEvent(currentEvent)
-            val friendList = userViewModel.getUserFriends(currentUser)
-            if (friendList.isNotEmpty()) {
-                userList.addAll(friendList)
-            }
+
+            val followers = user.value!!.followers
+//            val friendList = userViewModel.getUserFriends(currentUser)
+//            if (friendList.isNotEmpty()) {
+//                followers.addAll(friendList)
+//            }
         }
     }
-*/
+
+    fun onFilterButtonClick(filterType: String) {
+        selectedFilter = if (selectedFilter == filterType) "All" else filterType
+    }
 
 
     Scaffold(
@@ -123,32 +137,50 @@ fun ManageInvites(currentUser: String,
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                 verticalAlignment = Alignment.Top) {
                 Button(
-                    onClick = { /*TODO*/},
+                    onClick = { onFilterButtonClick("Uninvited") },
                     modifier = Modifier
                         .height(40.dp)
                         .weight(1f),
                     shape = RoundedCornerShape(10.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray)) {
-                    Text(text = "All", color = MaterialTheme.colorScheme.onBackground)
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor =
+                    if (selectedFilter == "Uninvited") DarkCyan else NavBarUnselected,
+                        contentColor =
+                        if (selectedFilter == "Uninvited") Color.White else DarkCyan),
+                    border = BorderStroke(1.dp, DarkCyan)
+                ) {
+                    Text(text = "Uninvited", color = MaterialTheme.colorScheme.onBackground)
                 }
 
                 Button(
-                    onClick = { /*TODO*/},
+                    onClick = { onFilterButtonClick("Invited") },
                     modifier = Modifier
                         .height(40.dp)
                         .weight(1f),
                     shape = RoundedCornerShape(10.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray)) {
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor =
+                        if (selectedFilter == "Invited") DarkCyan else NavBarUnselected,
+                        contentColor =
+                        if (selectedFilter == "Invited") Color.White else DarkCyan),
+                    border = BorderStroke(1.dp, DarkCyan)
+                ) {
                     Text(text = "Invited", color = MaterialTheme.colorScheme.onBackground)
                 }
 
                 Button(
-                    onClick = { /*TODO*/},
+                    onClick = { onFilterButtonClick("Accepted") },
                     modifier = Modifier
                         .height(40.dp)
                         .weight(1f),
                     shape = RoundedCornerShape(10.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray)) {
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor =
+                        if (selectedFilter == "Accepted") DarkCyan else NavBarUnselected,
+                        contentColor =
+                        if (selectedFilter == "Accepted") Color.White else DarkCyan),
+                    border = BorderStroke(1.dp, DarkCyan)
+                ) {
                     Text(text = "Accepted", color = MaterialTheme.colorScheme.onBackground)
                 }
             }
@@ -157,6 +189,21 @@ fun ManageInvites(currentUser: String,
                 display them in the following way using the UserInviteWidget in a for-loop
              */
 
+            // Display the list of followers to manage our invitations based to the selected filter
+            Column(modifier = Modifier.verticalScroll(rememberScrollState()).fillMaxSize()) {
+                if (selectedFilter == "All" || selectedFilter == "Uninvited") {
+                    // Loop through the list of followers that are uninvited to this event
+                }
+
+                if (selectedFilter == "All" || selectedFilter == "Invited") {
+                    // Loop through the list of followers that are invited to this event
+                }
+
+                if (selectedFilter == "All" || selectedFilter == "Accepted") {
+                    // Loop through the list of followers that have accepted the invitation
+                }
+
+            }
 
 
             UserInviteWidget(username = "Test", status = InviteStatus.PENDING)
@@ -198,6 +245,7 @@ fun UserInviteWidget(username : String, status : InviteStatus?) {
         Text(
             text = when(status) {
                 null -> ""
+                InviteStatus.UNINVITED -> ""
                 InviteStatus.PENDING -> "Pending"
                 InviteStatus.ACCEPTED -> "Accepted"
                 InviteStatus.REFUSED -> "Refused"
@@ -205,6 +253,7 @@ fun UserInviteWidget(username : String, status : InviteStatus?) {
             modifier = Modifier.width(70.dp),
             color = when(status) {
                 null -> MaterialTheme.colorScheme.onBackground
+                InviteStatus.UNINVITED -> MaterialTheme.colorScheme.onBackground
                 InviteStatus.PENDING -> MaterialTheme.colorScheme.onBackground
                 InviteStatus.ACCEPTED -> Color.Green
                 InviteStatus.REFUSED -> Color.Red
@@ -223,6 +272,7 @@ fun UserInviteWidget(username : String, status : InviteStatus?) {
                 containerColor =
                 when(status) {
                     null -> DarkCyan
+                    InviteStatus.UNINVITED -> DarkCyan
                     InviteStatus.PENDING -> Color.LightGray
                     InviteStatus.ACCEPTED -> Color.Red
                     InviteStatus.REFUSED -> Color.LightGray
@@ -232,25 +282,29 @@ fun UserInviteWidget(username : String, status : InviteStatus?) {
             Text(
                 text = when(status) {
                     null -> "Invite"
+                    InviteStatus.UNINVITED -> "Invite"
                     InviteStatus.PENDING -> "Cancel"
                     InviteStatus.ACCEPTED -> "Cancel"
                     InviteStatus.REFUSED -> "Invite"
                 },
                 color = when(status) {
                     null -> Color.White
+                    InviteStatus.UNINVITED -> Color.White
                     InviteStatus.PENDING -> Color.DarkGray
                     InviteStatus.ACCEPTED -> Color.White
-                    InviteStatus.REFUSED -> Color.White
+                    InviteStatus.REFUSED -> Color.DarkGray
                 },
                 fontSize = 12.sp)
         }
     }
 }
 
-
+/*
 @Preview
 @Composable
 fun ManageInvitesPreview() {
     ManageInvites("eventId",nav = NavigationActions(rememberNavController()))
 
 }
+
+ */
