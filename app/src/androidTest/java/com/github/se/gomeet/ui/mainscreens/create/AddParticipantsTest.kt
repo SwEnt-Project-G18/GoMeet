@@ -13,7 +13,7 @@ class AddParticipantsTest {
   @get:Rule val composeTestRule = createComposeRule()
 
   @Test
-  fun profileUiTest() {
+  fun uiElementsDisplayed() {
     composeTestRule.setContent { AddParticipants(NavigationActions(rememberNavController())) }
 
     composeTestRule.onNodeWithTag("AddParticipantsScreen").assertIsDisplayed()

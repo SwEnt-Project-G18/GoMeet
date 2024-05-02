@@ -14,7 +14,7 @@ class EditProfileTest {
   @get:Rule val composeTestRule = createComposeRule()
 
   @Test
-  fun profileUiTest() {
+  fun uiElementsDisplayed() {
     composeTestRule.setContent { EditProfile(NavigationActions(rememberNavController())) }
 
     composeTestRule.onNodeWithText("My Profile").assertIsDisplayed()
