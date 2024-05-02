@@ -68,7 +68,7 @@ class UserViewModel : ViewModel() {
 
   suspend fun getUserFriends(uid: String): List<GoMeetUser> {
     val friends = mutableListOf<GoMeetUser>()
-    db.getAllUsers { users ->
+    userRepository.getAllUsers { users ->
         for (user in users) {
           if (user.followers.contains(uid) || user.following.contains(uid)) {
             friends.add(user)
