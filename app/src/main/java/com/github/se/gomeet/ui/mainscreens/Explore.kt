@@ -215,7 +215,7 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
     val halfHeightPx = with(LocalDensity.current) { halfHeightDp.dp.toPx() }
 
     BackdropScaffold(
-        frontLayerBackgroundColor = NavBarUnselected,
+        frontLayerBackgroundColor = Color.White,
         backLayerBackgroundColor = Color.White,
         backLayerContentColor = Color.White,
 
