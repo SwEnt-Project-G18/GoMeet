@@ -105,6 +105,7 @@ fun MyEventInfo(
                       .verticalScroll(state = rememberScrollState())) {
                 EventHeader(
                     title = title,
+                    currentUser = currentUser.value!!,
                     organizer = organizer.value!!,
                     rating = rating,
                     nav = nav,
