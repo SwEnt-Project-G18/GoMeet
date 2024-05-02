@@ -6,8 +6,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -37,6 +39,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
+import com.github.se.gomeet.model.event.nullEvent
 import com.github.se.gomeet.ui.mainscreens.events.EventWidget
 import com.github.se.gomeet.ui.mainscreens.events.GoMeetSearchBar
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
@@ -69,7 +72,7 @@ fun Trends(
     eventViewModel: EventViewModel
 ) {
 
-  val eventList = remember { mutableListOf<Event>() }
+  val eventList = remember { mutableListOf(nullEvent) }
   val coroutineScope = rememberCoroutineScope()
   val query = remember { mutableStateOf("") }
 
@@ -78,6 +81,7 @@ fun Trends(
       val allEvents = eventViewModel.getAllEvents()!!
       if (allEvents.isNotEmpty()) {
         eventList.addAll(allEvents)
+        eventList.remove(nullEvent)
       }
     }
   }
@@ -105,14 +109,22 @@ fun Trends(
         Column(
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(innerPadding)) {
-              Spacer(modifier = Modifier.height(5.dp))
-              GoMeetSearchBar(query, NavBarUnselected, Color.DarkGray)
-              Spacer(modifier = Modifier.height(5.dp))
-              Column(modifier = Modifier.verticalScroll(rememberScrollState()).fillMaxSize()) {
-                Text(
-                    text = "All Events",
-                    style =
+            modifier = Modifier.padding(innerPadding))
+        {
+            Spacer(modifier = Modifier.height(5.dp))
+            GoMeetSearchBar(query, NavBarUnselected, Color.DarkGray)
+            Spacer(modifier = Modifier.height(5.dp))
+
+            if (eventList.contains(nullEvent)) {
+                LoadingText()
+            } else {
+
+                Column(modifier = Modifier
+                    .verticalScroll(rememberScrollState())
+                    .fillMaxSize()) {
+                    Text(
+                        text = "All Events",
+                        style =
                         TextStyle(
                             fontSize = 20.sp,
                             lineHeight = 16.sp,
@@ -122,39 +134,47 @@ fun Trends(
                             textAlign = TextAlign.Center,
                             letterSpacing = 0.5.sp,
                         ),
-                    modifier = Modifier.padding(10.dp).align(Alignment.Start))
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .align(Alignment.Start)
+                    )
 
-                eventList.forEach { event ->
-                  if (event.title.contains(query.value, ignoreCase = true)) {
-                    val painter: Painter =
-                        if (event.images.isNotEmpty()) {
-                          rememberAsyncImagePainter(
-                              ImageRequest.Builder(LocalContext.current)
-                                  .data(data = event.images[0])
-                                  .apply(
-                                      block =
-                                          fun ImageRequest.Builder.() {
-                                            crossfade(true)
-                                            placeholder(R.drawable.gomeet_logo)
-                                          })
-                                  .build())
-                        } else {
-                          painterResource(id = R.drawable.gomeet_logo)
+                    eventList.forEach { event ->
+                        if (event.title.contains(query.value, ignoreCase = true)) {
+                            val painter: Painter =
+                                if (event.images.isNotEmpty()) {
+                                    rememberAsyncImagePainter(
+                                        ImageRequest.Builder(LocalContext.current)
+                                            .data(data = event.images[0])
+                                            .apply(
+                                                block =
+                                                fun ImageRequest.Builder.() {
+                                                    crossfade(true)
+                                                    placeholder(R.drawable.gomeet_logo)
+                                                })
+                                            .build()
+                                    )
+                                } else {
+                                    painterResource(id = R.drawable.gomeet_logo)
+                                }
+
+                            EventWidget(
+                                userName = event.creator,
+                                eventName = event.title,
+                                eventId = event.uid,
+                                eventDescription = event.description,
+                                eventDate =
+                                Date.from(
+                                    event.date.atStartOfDay(ZoneId.systemDefault()).toInstant()
+                                ),
+                                eventPicture = painter,
+                                verified = false,
+                                nav = nav
+                            ) // verification to be done using user details
                         }
-
-                    EventWidget(
-                        userName = event.creator,
-                        eventName = event.title,
-                        eventId = event.uid,
-                        eventDescription = event.description,
-                        eventDate =
-                            Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant()),
-                        eventPicture = painter,
-                        verified = false,
-                        nav = nav) // verification to be done using user details
-                  }
+                    }
                 }
-              }
             }
+        }
       }
 }
