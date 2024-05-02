@@ -39,6 +39,9 @@ class EventInfoTest {
     }
 
     assert(composeTestRule.onNodeWithTag("TopBar").isDisplayed(), { "TopBar not displayed" })
+    composeTestRule.waitUntil(timeoutMillis = 10000) {
+      composeTestRule.onNodeWithTag("EventHeader").isDisplayed()
+    }
     assert(
         composeTestRule.onNodeWithTag("EventHeader").isDisplayed(), { "EventHeader not displayed" })
     assert(
