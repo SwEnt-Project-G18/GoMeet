@@ -22,6 +22,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,15 +53,14 @@ import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
+import kotlinx.coroutines.launch
 
 @Composable
-fun ManageInvites(
-
-//    currentUser: String,
-                 currentEvent: String,
+fun ManageInvites(currentUser: String,
+                 //currentEvent: String,
                  nav: NavigationActions,
-//                 userViewModel: UserViewModel,
-//                 eventViewModel: EventViewModel
+                  //userViewModel: UserViewModel,
+                  //eventViewModel: EventViewModel
 ) {
 
     var selectedFilter by remember { mutableStateOf("All") }
@@ -70,18 +70,18 @@ fun ManageInvites(
     val user = remember { mutableStateOf<GoMeetUser?>(null) }
     val event = remember { mutableStateOf<Event?>(null) }
 
-    // Initial data loading using LaunchedEffect
-//    LaunchedEffect(Unit) {
-//        coroutineScope.launch {
-//            user.value = userViewModel.getUser(currentUser)
-//            event.value = eventViewModel.getEvent(currentEvent)
-//            val friendList = userViewModel.getUserFriends(currentUser)
-//            if (friendList.isNotEmpty()) {
-//                userList.addAll(friendList)
-//            }
-//        }
-//    }
-
+/*
+    LaunchedEffect(Unit) {
+        coroutineScope.launch {
+            user.value = userViewModel.getUser(currentUser)
+            event.value = eventViewModel.getEvent(currentEvent)
+            val friendList = userViewModel.getUserFriends(currentUser)
+            if (friendList.isNotEmpty()) {
+                userList.addAll(friendList)
+            }
+        }
+    }
+*/
 
 
     Scaffold(
@@ -157,6 +157,8 @@ fun ManageInvites(
                 display them in the following way using the UserInviteWidget in a for-loop
              */
 
+
+
             UserInviteWidget(username = "Test", status = InviteStatus.PENDING)
             UserInviteWidget(username = "Test", status = InviteStatus.REFUSED)
             UserInviteWidget(username = "Test", status = InviteStatus.ACCEPTED)
@@ -218,14 +220,14 @@ fun UserInviteWidget(username : String, status : InviteStatus?) {
             contentPadding = PaddingValues(vertical = 2.dp),
             shape = RoundedCornerShape(10.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor =when(status) {
+                containerColor =
+                when(status) {
                     null -> DarkCyan
                     InviteStatus.PENDING -> Color.LightGray
                     InviteStatus.ACCEPTED -> Color.Red
                     InviteStatus.REFUSED -> Color.LightGray
                 }
             ))
-
         {
             Text(
                 text = when(status) {
