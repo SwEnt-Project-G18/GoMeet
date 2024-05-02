@@ -97,7 +97,7 @@ fun RegisterScreen(
           Image(
               painter = painterResource(id = R.drawable.gomeet_text),
               contentDescription = "Go Meet",
-              modifier = Modifier.padding(top = 40.dp),
+              modifier = Modifier.padding(top = 0.dp),
               alignment = Alignment.Center,
               colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.tertiary))
 
