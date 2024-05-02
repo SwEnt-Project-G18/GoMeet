@@ -33,7 +33,7 @@ fun BottomNavigationMenu(
 ) {
   NavigationBar(
       modifier = Modifier.navigationBarsPadding().height(80.dp),
-      containerColor = Color.Transparent,
+      containerColor = Color.White,
       tonalElevation = 0.dp,
   ) {
     tabList.forEach { destination ->

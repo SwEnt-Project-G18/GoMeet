@@ -7,10 +7,30 @@ import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.BackdropScaffold
+import androidx.compose.material.BackdropScaffoldState
+import androidx.compose.material.BackdropValue
+import androidx.compose.material.Card
+import androidx.compose.material.Divider
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.rememberBackdropScaffoldState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -29,13 +49,24 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.ui.mainscreens.events.GoMeetSearchBar
@@ -44,6 +75,8 @@ import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
+import com.github.se.gomeet.ui.theme.NavBarSelected
+import com.github.se.gomeet.ui.theme.NavBarUnselected
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority.PRIORITY_BALANCED_POWER_ACCURACY
@@ -64,6 +97,13 @@ import java.time.LocalDate
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlinx.serialization.json.JsonNull.content
+import java.text.SimpleDateFormat
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 private val defaultPosition = LatLng(46.51912357457158, 6.568023741881372)
 private const val defaultZoom = 16f
@@ -89,7 +129,7 @@ private val isButtonVisible = mutableStateOf(true)
  * @param nav The navigation actions.
  * @param eventViewModel The event view model.
  */
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
   val coroutineScope = rememberCoroutineScope()
@@ -165,51 +205,268 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
       delay(5000) // map is updated every 5s
     }
   }
+  Scaffold(bottomBar = { BottomNavigationFun(nav) }) { innerPadding ->
+    print(innerPadding)
+    val backdropState = rememberBackdropScaffoldState(BackdropValue.Concealed)
+    LaunchedEffect(backdropState) { backdropState.reveal() }
+    val offset by backdropState.offset
+    val value = backdropState.currentValue
+    val halfHeightDp = LocalConfiguration.current.screenHeightDp / 2
+    val halfHeightPx = with(LocalDensity.current) { halfHeightDp.dp.toPx() }
 
-  Scaffold(
-      modifier = Modifier.testTag("ExploreScreen"),
-      floatingActionButton = {
-        if (locationPermitted.value == true && isButtonVisible.value) {
-          FloatingActionButton(
-              onClick = { moveToCurrentLocation.value = CameraAction.ANIMATE },
-              modifier = Modifier.size(45.dp).testTag("CurrentLocationButton"),
-              containerColor = DarkCyan) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.location_icon),
-                    contentDescription = null,
-                    tint = Color.White)
+    BackdropScaffold(
+        frontLayerBackgroundColor = NavBarUnselected,
+        backLayerBackgroundColor = Color.White,
+        backLayerContentColor = Color.White,
+
+        scaffoldState = backdropState,
+        frontLayerScrimColor = Color.Unspecified,
+        peekHeight = 0.dp,
+        headerHeight = halfHeightDp.dp,
+        modifier = Modifier.testTag("ExploreScreen"),
+        appBar = {},
+        frontLayerContent = {
+          Box(
+              modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp)) {
+                val listState = rememberLazyListState()
+                ContentInRow(
+                    backdropState = backdropState,
+                    halfHeightPx = halfHeightPx,
+                    listState = listState,
+                    eventList = eventList
+                )
+                ContentInColumn(
+                    backdropState = backdropState,
+                    halfHeightPx = halfHeightPx,
+                    listState = listState,
+                    eventList = eventList
+                )
               }
+        },
+        backLayerContent = {
+          Scaffold(
+              modifier = Modifier.fillMaxSize().alpha(offset / halfHeightPx),
+              floatingActionButton = {
+                if (locationPermitted.value == true && isButtonVisible.value) {
+                  FloatingActionButton(
+                      onClick = { moveToCurrentLocation.value = CameraAction.ANIMATE },
+                      modifier = Modifier.size(45.dp).testTag("CurrentLocationButton"),
+                      containerColor = DarkCyan) {
+                        Icon(
+                            imageVector = ImageVector.vectorResource(R.drawable.location_icon),
+                            contentDescription = null,
+                            tint = Color.White)
+                      }
+                }
+              },
+              bottomBar = {}) { innerPadding ->
+                if (isMapLoaded) {
+                  moveToCurrentLocation.value = CameraAction.MOVE
+
+                  Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
+                    GoogleMapView(
+                        currentPosition = currentPosition,
+                        events = eventList,
+                        modifier = Modifier.testTag("Map"),
+                        query = query,
+                        locationPermitted = locationPermitted.value!!,
+                        eventViewModel = eventViewModel)
+                  }
+                } else {
+                  Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                  }
+                }
+                GoMeetSearchBar(
+                    query, MaterialTheme.colorScheme.background, MaterialTheme.colorScheme.tertiary)
+              }
+        }) {}
+  }
+}
+
+@Composable
+private fun BottomNavigationFun(nav: NavigationActions) {
+
+  BottomNavigationMenu(
+      onTabSelect = { selectedTab ->
+        if (selectedTab != "Explore") {
+          nav.navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == selectedTab })
         }
       },
-      bottomBar = {
-        BottomNavigationMenu(
-            onTabSelect = { selectedTab ->
-              if (selectedTab != "Explore") {
-                nav.navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == selectedTab })
-              }
-            },
-            tabList = TOP_LEVEL_DESTINATIONS,
-            selectedItem = Route.EXPLORE)
-      }) { innerPadding ->
-        if (isMapLoaded) {
-          moveToCurrentLocation.value = CameraAction.MOVE
+      tabList = TOP_LEVEL_DESTINATIONS,
+      selectedItem = Route.EXPLORE)
+}
 
-          Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
-            GoogleMapView(
-                currentPosition = currentPosition,
-                events = eventList,
-                modifier = Modifier.testTag("Map"),
-                query = query,
-                locationPermitted = locationPermitted.value!!,
-                eventViewModel = eventViewModel)
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+private fun ContentInColumn(
+    backdropState: BackdropScaffoldState,
+    halfHeightPx: Float,
+    listState: LazyListState,
+    eventList: MutableState<List<Event>>
+) {
+  val offset by backdropState.offset
+  val columnAlpha = ((halfHeightPx - offset) / halfHeightPx).coerceIn(0f..1f)
+  val events = eventList.value
+  if (columnAlpha > 0) {
+    Column {
+      TopTitle(forColumn = true, alpha = columnAlpha)
+
+      LazyColumn(modifier = Modifier.alpha(columnAlpha), state = listState) {
+        itemsIndexed(events) { _, event ->
+          Column {
+            Card(
+                elevation = 4.dp,
+                modifier =
+                    Modifier.size(width = 360.dp, height = 200.dp).padding(8.dp).clickable {}) {
+                val painter: Painter =
+                    if (event.images.isNotEmpty()) {
+                        rememberAsyncImagePainter(
+                            ImageRequest.Builder(LocalContext.current)
+                                .data(data = event.images[0])
+                                .apply(
+                                    block =
+                                    fun ImageRequest.Builder.() {
+                                        crossfade(true)
+                                        placeholder(R.drawable.gomeet_logo)
+                                    })
+                                .build())
+                    } else {
+                        painterResource(id = R.drawable.gomeet_logo)
+                    }
+                  Image(
+                      painter = painter,
+                      contentDescription = "",
+                      modifier = Modifier.fillMaxSize(),
+                      alignment = Alignment.Center,
+                      contentScale = ContentScale.Crop)
+                }
+            Spacer(Modifier.height(8.dp))
+            Text(text = event.title + " - " + EventDateToString(Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant())), modifier = Modifier.padding(start = 8.dp))
+            Text(
+                text = event.description, modifier = Modifier.padding(start = 12.dp, top = 8.dp))
           }
-        } else {
-          Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            CircularProgressIndicator()
+          Divider(modifier = Modifier.padding(top = 16.dp, bottom = 16.dp))
+        }
+      }
+    }
+  }
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun ContentInRow(
+    backdropState: BackdropScaffoldState,
+    halfHeightPx: Float,
+    listState: LazyListState,
+    eventList: MutableState<List<Event>>
+) {
+
+  val offset by backdropState.offset
+  val rowAlpha = (offset / halfHeightPx).coerceIn(0f..1f)
+    val events = eventList.value
+  if (rowAlpha > 0) {
+    Column {
+      TopTitle(forColumn = false, alpha = rowAlpha)
+      LazyRow(modifier = Modifier.alpha(rowAlpha), state = listState) {
+        itemsIndexed(events) { _, event ->
+          Column {
+            Card(
+                elevation = 4.dp,
+                modifier =
+                    Modifier.size(width = 280.dp, height = 200.dp).padding(8.dp).clickable {}) {
+                val painter: Painter =
+                    if (event.images.isNotEmpty()) {
+                        rememberAsyncImagePainter(
+                            ImageRequest.Builder(LocalContext.current)
+                                .data(data = event.images[0])
+                                .apply(
+                                    block =
+                                    fun ImageRequest.Builder.() {
+                                        crossfade(true)
+                                        placeholder(R.drawable.gomeet_logo)
+                                    })
+                                .build())
+                    } else {
+                        painterResource(id = R.drawable.gomeet_logo)
+                    }
+                  Image(
+                      painter = painter,
+                      contentDescription = "",
+                      modifier = Modifier.fillMaxSize(),
+                      alignment = Alignment.Center,
+                      contentScale = ContentScale.Crop)
+                }
+            Spacer(Modifier.height(8.dp))
+              Text(text = event.title + " - " + EventDateToString(Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant())), modifier = Modifier.padding(start = 8.dp))
+            Text(
+                text = event.description, modifier = Modifier.padding(start = 12.dp, top = 8.dp))
           }
         }
-        GoMeetSearchBar(
-            query, MaterialTheme.colorScheme.background, MaterialTheme.colorScheme.tertiary)
+      }
+    }
+  }
+}
+
+@Composable
+fun EventDateToString(eventDate: Date): String {
+    val configuration = LocalConfiguration.current
+    val screenWidth = configuration.screenWidthDp.dp
+    val density = LocalDensity.current
+
+    val smallTextSize = with(density) { screenWidth.toPx() / 85 }
+    val bigTextSize = with(density) { screenWidth.toPx() / 60 }
+
+    val currentDate = Calendar.getInstance()
+    val startOfWeek = currentDate.clone() as Calendar
+    startOfWeek.set(Calendar.DAY_OF_WEEK, startOfWeek.firstDayOfWeek)
+    val endOfWeek = startOfWeek.clone() as Calendar
+    endOfWeek.add(Calendar.DAY_OF_WEEK, 6)
+
+    val eventCalendar = Calendar.getInstance().apply { time = eventDate }
+
+    val isThisWeek = eventCalendar.after(currentDate) && eventCalendar.before(endOfWeek)
+    val isToday =
+        currentDate.get(Calendar.YEAR) == eventCalendar.get(Calendar.YEAR) &&
+                currentDate.get(Calendar.DAY_OF_YEAR) == eventCalendar.get(Calendar.DAY_OF_YEAR)
+
+    val dayFormat =
+        if (isThisWeek) {
+            SimpleDateFormat("EEEE", Locale.getDefault())
+        } else {
+            SimpleDateFormat("dd/MM/yy", Locale.getDefault())
+        }
+
+    val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+
+    val dayString =
+        if (isToday) {
+            "Today"
+        } else {
+            dayFormat.format(eventDate)
+        }
+    val timeString = timeFormat.format(eventDate)
+    return "$dayString at $timeString"
+}
+@Composable
+private fun TopTitle(forColumn: Boolean, alpha: Float) {
+  Column(
+      modifier =
+          Modifier.padding(
+                  top = if (forColumn) 34.dp else 12.dp) // status bar 24dp in material guidance
+              .alpha(alpha = alpha)) {
+        Box(modifier = Modifier.fillMaxWidth()) {
+          Box(
+              modifier =
+                  Modifier.size(width = 48.dp, height = 3.dp)
+                      .clip(shape = RoundedCornerShape(12.dp))
+                      .background(color = Color.LightGray)
+                      .align(alignment = Alignment.Center))
+        }
+        Text(
+            modifier = Modifier.padding(top = 16.dp, bottom = 8.dp, start = 4.dp),
+            text = "Trending Around You",
+        )
       }
 }
 
