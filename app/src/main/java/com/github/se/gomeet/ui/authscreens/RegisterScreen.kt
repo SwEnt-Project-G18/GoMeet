@@ -227,9 +227,9 @@ fun RegisterScreen(
                   Text("Create account")
                 }
           }
-              if (signInState.value.isLoading) {
-                CircularProgressIndicator()
-              }
+          if (signInState.value.isLoading) {
+            CircularProgressIndicator()
+          }
 
           if (signInState.value.isSignInSuccessful) {
             val currentUser = Firebase.auth.currentUser
