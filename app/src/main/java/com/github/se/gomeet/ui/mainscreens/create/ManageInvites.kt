@@ -1,12 +1,11 @@
 package com.github.se.gomeet.ui.mainscreens.create
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -32,7 +31,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
@@ -42,6 +43,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
+import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.InviteStatus
 import com.github.se.gomeet.model.user.GoMeetUser
@@ -50,7 +52,6 @@ import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
-import com.github.se.gomeet.ui.theme.Grey
 
 @Composable
 fun ManageInvites(
@@ -128,7 +129,17 @@ fun ManageInvites(
                         .weight(1f),
                     shape = RoundedCornerShape(10.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray)) {
-                    Text(text = "Pending", color = MaterialTheme.colorScheme.onBackground)
+                    Text(text = "All", color = MaterialTheme.colorScheme.onBackground)
+                }
+
+                Button(
+                    onClick = { /*TODO*/},
+                    modifier = Modifier
+                        .height(40.dp)
+                        .weight(1f),
+                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray)) {
+                    Text(text = "Invited", color = MaterialTheme.colorScheme.onBackground)
                 }
 
                 Button(
@@ -139,16 +150,6 @@ fun ManageInvites(
                     shape = RoundedCornerShape(10.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray)) {
                     Text(text = "Accepted", color = MaterialTheme.colorScheme.onBackground)
-                }
-
-                Button(
-                    onClick = { /*TODO*/},
-                    modifier = Modifier
-                        .height(40.dp)
-                        .weight(1f),
-                    shape = RoundedCornerShape(10.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray)) {
-                    Text(text = "Refused", color = MaterialTheme.colorScheme.onBackground)
                 }
             }
 
@@ -168,28 +169,26 @@ fun ManageInvites(
 
 
 @Composable
-fun UserInviteWidget(username : String, usertag : String = "usertag" , status : InviteStatus?) {
+fun UserInviteWidget(username : String, status : InviteStatus?) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 15.dp)
+            .padding(start = 15.dp, end = 15.dp)
             .height(50.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ){
-        // Profile picture and name
-        Row(){
-        Box(
-            modifier = Modifier
+        Image(
+            modifier =
+            Modifier
                 .size(40.dp)
                 .clip(CircleShape)
-                .background(Color.Gray) // Change the color as needed
-        )
-        Spacer(modifier = Modifier.width(5.dp))
-        Column {
-            Text(text = username, style = TextStyle(fontSize = 16.sp))
-            Text(text = "@$usertag", style = TextStyle(fontSize = 12.sp), color = Grey)
-        }}
+                .background(color = MaterialTheme.colorScheme.background),
+            painter = painterResource(id = R.drawable.gomeet_logo),
+            contentDescription = "profile picture",
+            contentScale = ContentScale.None)
+
+        Text(text = username, color = MaterialTheme.colorScheme.onBackground)
 
         // Status text
         Text(
@@ -248,7 +247,7 @@ fun UserInviteWidget(username : String, usertag : String = "usertag" , status : 
 
 @Preview
 @Composable
-fun EventInvitesPreview() {
+fun ManageInvitesPreview() {
     ManageInvites("eventId",nav = NavigationActions(rememberNavController()))
 
 }
