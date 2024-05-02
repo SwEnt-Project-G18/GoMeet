@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -77,39 +78,39 @@ fun EventHeader(
     date: String,
     time: String
 ) {
-  Row(
-      modifier = Modifier.fillMaxWidth().testTag("EventHeader"),
-      verticalAlignment = Alignment.CenterVertically,
-      horizontalArrangement = Arrangement.SpaceBetween) {
+    Row(
+        modifier = Modifier.fillMaxWidth().testTag("EventHeader"),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween) {
         Column {
-          Text(
-              text = title,
-              style =
-                  TextStyle(
-                      fontSize = 24.sp,
-                      fontWeight = FontWeight.Bold,
-                      color = DarkCyan,
-                      letterSpacing = 0.5.sp))
-          Spacer(modifier = Modifier.height(5.dp))
-          Text(
-              modifier =
-                  Modifier.clickable {
-                        nav.navigateToScreen(Route.OTHERS_PROFILE.replace("{uid}", organizer.uid))
-                      }
-                      .testTag("Username"),
-              text = organizer.username,
-              style =
-                  TextStyle(
-                      fontSize = 16.sp,
-                      fontWeight = FontWeight.ExtraBold,
-                      color = Color.Gray,
-                      fontFamily = FontFamily(Font(R.font.roboto)),
-                      letterSpacing = 0.5.sp))
-          // Add other details like rating here
+            Text(
+                text = title,
+                style =
+                TextStyle(
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = DarkCyan,
+                    letterSpacing = 0.5.sp))
+            Spacer(modifier = Modifier.height(5.dp))
+            Text(
+                modifier =
+                Modifier.clickable {
+                    nav.navigateToScreen(Route.OTHERS_PROFILE.replace("{uid}", organizer.uid))
+                }
+                    .testTag("Username"),
+                text = organizer.username,
+                style =
+                TextStyle(
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = Color.Gray,
+                    fontFamily = FontFamily(Font(R.font.roboto)),
+                    letterSpacing = 0.5.sp))
+            // Add other details like rating here
         }
         // Icon for settings or more options, assuming using Material Icons
         EventDateTime(day = date, time = time)
-      }
+    }
 }
 
 /**
@@ -120,28 +121,28 @@ fun EventHeader(
  */
 @Composable
 fun EventDateTime(day: String, time: String) {
-  Log.d(day, "This is the day")
-  Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(end = 15.dp)) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-      Text(
-          text = day,
-          style =
-              TextStyle(
-                  fontSize = 24.sp,
-                  color = MaterialTheme.colorScheme.onBackground,
-                  fontWeight = FontWeight.SemiBold,
-                  textAlign = TextAlign.Center))
-      Text(
-          text = time,
-          style =
-              TextStyle(
-                  fontSize = 16.sp,
-                  color = MaterialTheme.colorScheme.onBackground,
-                  textAlign = TextAlign.Center))
+    Log.d(day, "This is the day")
+    Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(end = 15.dp)) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                text = day,
+                style =
+                TextStyle(
+                    fontSize = 24.sp,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    fontWeight = FontWeight.SemiBold,
+                    textAlign = TextAlign.Center))
+            Text(
+                text = time,
+                style =
+                TextStyle(
+                    fontSize = 16.sp,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    textAlign = TextAlign.Center))
+        }
     }
-  }
 }
 
 /**
@@ -151,17 +152,17 @@ fun EventDateTime(day: String, time: String) {
  */
 @Composable
 fun EventImage(painter: Painter) {
-  Column(modifier = Modifier.fillMaxWidth().testTag("EventImage")) {
-    Image(
-        painter = painter,
-        contentScale = ContentScale.Crop,
-        contentDescription = "Event Image",
-        modifier =
+    Column(modifier = Modifier.fillMaxWidth().testTag("EventImage")) {
+        Image(
+            painter = painter,
+            contentScale = ContentScale.Crop,
+            contentDescription = "Event Image",
+            modifier =
             Modifier.aspectRatio(3f / 1.75f)
                 // Specify the height you want for the image
 
                 .clip(RoundedCornerShape(20.dp)))
-  }
+    }
 }
 
 /**
@@ -171,16 +172,16 @@ fun EventImage(painter: Painter) {
  */
 @Composable
 fun EventDescription(text: String) {
-  Text(
-      text = text,
-      style =
-          TextStyle(
-              fontSize = 13.sp,
-              color = MaterialTheme.colorScheme.onBackground,
-              fontFamily = FontFamily(Font(R.font.roboto)),
-              fontWeight = FontWeight.SemiBold,
-              letterSpacing = 0.5.sp),
-      modifier = Modifier.testTag("EventDescription"))
+    Text(
+        text = text,
+        style =
+        TextStyle(
+            fontSize = 13.sp,
+            color = MaterialTheme.colorScheme.onBackground,
+            fontFamily = FontFamily(Font(R.font.roboto)),
+            fontWeight = FontWeight.SemiBold,
+            letterSpacing = 0.5.sp),
+        modifier = Modifier.testTag("EventDescription"))
 }
 
 /**
@@ -204,78 +205,94 @@ fun EventButtons(
     nav: NavigationActions
 ) {
 
-  val isFavorite = remember { mutableStateOf(currentUser.myFavorites.contains(eventId)) }
-  val isJoined = remember { mutableStateOf(currentUser.myEvents.contains(eventId)) }
-  Row(
-      modifier = Modifier.fillMaxWidth().testTag("EventButton"),
-      horizontalArrangement = Arrangement.SpaceBetween) {
+    val isFavorite = remember { mutableStateOf(currentUser.myFavorites.contains(eventId)) }
+    val isJoined = remember { mutableStateOf(currentUser.myEvents.contains(eventId)) }
+    Row(
+        modifier = Modifier.fillMaxWidth().testTag("EventButton"),
+        horizontalArrangement = Arrangement.SpaceBetween) {
         TextButton(
             onClick = {
-              if (organizer.uid.contentEquals(Firebase.auth.currentUser!!.uid)) {
-                // TODO: GO TO EDIT EVENT PARAMETERS SCREEN
-              } else {
-                if (!isJoined.value) {
-                  currentUser.myEvents = currentUser.myEvents.plus(eventId)
+                if (organizer.uid.contentEquals(Firebase.auth.currentUser!!.uid)) {
+                    // TODO: GO TO EDIT EVENT PARAMETERS SCREEN
                 } else {
-                  currentUser.myEvents = currentUser.myEvents.minus(eventId)
+                    if (!isJoined.value) {
+                        currentUser.myEvents = currentUser.myEvents.plus(eventId)
+                    } else {
+                        currentUser.myEvents = currentUser.myEvents.minus(eventId)
+                    }
+                    userViewModel.editUser(currentUser)
+                    isJoined.value = !isJoined.value
                 }
-                userViewModel.editUser(currentUser)
-                isJoined.value = !isJoined.value
-              }
             },
             shape = RoundedCornerShape(20.dp),
             modifier = Modifier.weight(1f),
             colors =
+            ButtonDefaults.textButtonColors(
+                containerColor = Color(0xFFECEFF1), contentColor = Color.Black)) {
+            if (organizer.uid.contentEquals(Firebase.auth.currentUser!!.uid)) {
+                Text("Edit My Event")
+            } else {
+                if (isJoined.value) {
+                    Text("LeaveEvent")
+                } else {
+                    Text("JoinEvent")
+                }
+            }
+        }
+        if (organizer.uid.contentEquals(Firebase.auth.currentUser!!.uid)) {
+            Spacer(modifier = Modifier.width(5.dp))
+            TextButton(
+                onClick = {
+                    nav.navigateToScreen(Route.MANAGE_INVITES.replace("{eventId}", eventId))
+                },
+                shape = RoundedCornerShape(20.dp),
+                modifier = Modifier.weight(1f),
+                colors =
                 ButtonDefaults.textButtonColors(
                     containerColor = Color(0xFFECEFF1), contentColor = Color.Black)) {
-              if (organizer.uid.contentEquals(Firebase.auth.currentUser!!.uid)) {
-                Text("Edit My Event")
-              } else {
-                if (isJoined.value) {
-                  Text("LeaveEvent")
-                } else {
-                  Text("JoinEvent")
-                }
-              }
+                Text("Add Participants")
+
             }
+        }
+
         if (organizer.uid != com.google.firebase.Firebase.auth.currentUser!!.uid) {
-          IconButton(
-              onClick = {
-                nav.navigateToScreen(Route.MESSAGE.replace("{id}", Uri.encode(organizer.uid)))
-              }) {
+            IconButton(
+                onClick = {
+                    nav.navigateToScreen(Route.MESSAGE.replace("{id}", Uri.encode(organizer.uid)))
+                }) {
                 Icon(
                     imageVector =
-                        ImageVector.vectorResource(id = R.drawable.baseline_chat_bubble_outline_24),
+                    ImageVector.vectorResource(id = R.drawable.baseline_chat_bubble_outline_24),
                     contentDescription = "Chat",
                     modifier = Modifier.size(24.dp),
                     tint = MaterialTheme.colorScheme.onBackground)
-              }
+            }
         }
         IconButton(
             onClick = {
-              if (!isFavorite.value) {
-                currentUser.myFavorites = currentUser.myFavorites.plus(eventId)
-              } else {
-                currentUser.myFavorites = currentUser.myFavorites.minus(eventId)
-              }
-              userViewModel.editUser(currentUser)
-              isFavorite.value = !isFavorite.value
+                if (!isFavorite.value) {
+                    currentUser.myFavorites = currentUser.myFavorites.plus(eventId)
+                } else {
+                    currentUser.myFavorites = currentUser.myFavorites.minus(eventId)
+                }
+                userViewModel.editUser(currentUser)
+                isFavorite.value = !isFavorite.value
             }) {
-              if (!isFavorite.value) {
+            if (!isFavorite.value) {
                 Icon(
                     imageVector = ImageVector.vectorResource(id = R.drawable.heart),
                     contentDescription = "Add to Favorites",
                     modifier = Modifier.size(30.dp),
                     tint = DarkCyan)
-              } else {
+            } else {
                 Icon(
                     imageVector = ImageVector.vectorResource(id = R.drawable.redheart),
                     contentDescription = "Remove from favorites",
                     modifier = Modifier.size(30.dp),
                     tint = DarkCyan)
-              }
             }
-      }
+        }
+    }
 }
 
 /**
@@ -289,31 +306,31 @@ fun MapViewComposable(
     loc: LatLng,
     zoomLevel: Float = 15f // Default zoom level for close-up of location
 ) {
-  val cameraPositionState = rememberCameraPositionState {
-    position = CameraPosition.fromLatLngZoom(loc, zoomLevel)
-  }
+    val cameraPositionState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(loc, zoomLevel)
+    }
 
-  val markerState = rememberMarkerState(position = loc)
+    val markerState = rememberMarkerState(position = loc)
 
-  // Set up the GoogleMap composable
-  GoogleMap(
-      modifier =
-          Modifier.testTag("MapView").fillMaxWidth().height(200.dp).clip(RoundedCornerShape(20.dp)),
-      cameraPositionState = cameraPositionState) {
+    // Set up the GoogleMap composable
+    GoogleMap(
+        modifier =
+        Modifier.testTag("MapView").fillMaxWidth().height(200.dp).clip(RoundedCornerShape(20.dp)),
+        cameraPositionState = cameraPositionState) {
         Marker(
             state = markerState,
             title = "Marker in Location",
             snippet = "This is the selected location")
-      }
+    }
 
-  // Initialize the map position once and avoid resetting on recomposition
-  DisposableEffect(loc) {
-    cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(loc, zoomLevel))
-    onDispose {}
-  }
+    // Initialize the map position once and avoid resetting on recomposition
+    DisposableEffect(loc) {
+        cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(loc, zoomLevel))
+        onDispose {}
+    }
 
-  DisposableEffect(loc) {
-    markerState.position = loc
-    onDispose {}
-  }
+    DisposableEffect(loc) {
+        markerState.position = loc
+        onDispose {}
+    }
 }

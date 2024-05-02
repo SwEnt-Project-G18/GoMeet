@@ -32,6 +32,7 @@ import com.github.se.gomeet.ui.mainscreens.events.MyEventInfo
 import com.github.se.gomeet.ui.mainscreens.profile.EditProfile
 import com.github.se.gomeet.ui.mainscreens.profile.Followers
 import com.github.se.gomeet.ui.mainscreens.profile.Following
+import com.github.se.gomeet.ui.mainscreens.profile.ManageInvites
 import com.github.se.gomeet.ui.mainscreens.profile.Notifications
 import com.github.se.gomeet.ui.mainscreens.profile.OthersProfile
 import com.github.se.gomeet.ui.mainscreens.profile.Profile
@@ -173,6 +174,15 @@ class MainActivity : ComponentActivity() {
               CreateEvent(navAction, EventViewModel(Firebase.auth.currentUser!!.uid), false)
             }
             composable(Route.ADD_PARTICIPANTS) { AddParticipants(navAction) }
+
+
+            composable(route = Route.MANAGE_INVITES,
+                        arguments = listOf(navArgument("eventId") { type = NavType.StringType })
+            ) {entry ->
+                val eventId = entry.arguments?.getString("eventId") ?: ""
+
+                ManageInvites(eventId, navAction) }
+
             composable(
                 route = Route.EVENT_INFO,
                 arguments =

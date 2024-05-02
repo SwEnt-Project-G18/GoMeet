@@ -45,6 +45,7 @@ object Route {
   const val OTHERS_PROFILE = "OthersProfile/{uid}"
   const val EDIT_PROFILE = "EditProfile"
   const val ADD_PARTICIPANTS = "Add Participants"
+  const val MANAGE_INVITES = "ManageInvites/{eventId}"
   const val EVENT_INFO =
       "eventInfo/{eventId}/{title}/{date}/{time}/{organizer}/{rating}/{description}/{latitude}/{longitude}"
   const val NOTIFICATIONS = "Notifications"
@@ -65,6 +66,8 @@ val CREATE_ITEMS =
             icon = Icons.Default.AccountCircle,
             textId = Route.PRIVATE_CREATE),
     )
+
+
 
 val LOGIN_ITEMS =
     listOf(
@@ -97,6 +100,10 @@ val SECOND_LEVEL_DESTINATION =
             route = Route.ADD_PARTICIPANTS,
             icon = Icons.Default.Person,
             textId = Route.ADD_PARTICIPANTS),
+        TopLevelDestination(
+            route = Route.MANAGE_INVITES,
+            icon = Icons.Default.Person,
+            textId = Route.MANAGE_INVITES),
         TopLevelDestination(
             route = Route.EVENT_INFO, icon = Icons.Default.Person, textId = Route.EVENT_INFO),
         TopLevelDestination(
