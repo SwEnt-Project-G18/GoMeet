@@ -22,6 +22,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,16 +39,31 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.R
+import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
+import com.github.se.gomeet.viewmodel.UserViewModel
+import com.google.firebase.auth.auth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 @Composable
-fun EditProfile(
-    nav: NavigationActions, /* userViewModel: UserViewModel */
-) {
+fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel = UserViewModel()) {
+  val currentUser = remember { mutableStateOf<GoMeetUser?>(null) }
+  val firstName = remember { mutableStateOf("") }
+  val lastName = remember { mutableStateOf("") }
+  val email = remember { mutableStateOf("") }
+  val username = remember { mutableStateOf("") }
+  val phoneNumber = remember { mutableStateOf("") }
+  val country = remember { mutableStateOf("") }
+
+  LaunchedEffect(Unit) {
+    currentUser.value = userViewModel.getUser(com.google.firebase.Firebase.auth.currentUser!!.uid)
+  }
+
   val textFieldColors =
       TextFieldDefaults.colors(
           focusedTextColor = DarkCyan,
@@ -79,7 +97,14 @@ fun EditProfile(
                   modifier =
                       Modifier.padding(start = 15.dp, top = 15.dp, end = 15.dp, bottom = 0.dp)
                           .clickable {
-                            // Update the userViewModel with the new user data
+                            userViewModel.editUser(
+                                currentUser.value!!.copy(
+                                    firstName = firstName.value,
+                                    lastName = lastName.value,
+                                    email = email.value,
+                                    username = username.value,
+                                    phoneNumber = phoneNumber.value,
+                                    country = country.value))
                             nav.navigateToScreen(Route.PROFILE)
                           },
                   color = MaterialTheme.colorScheme.onBackground,
@@ -119,8 +144,8 @@ fun EditProfile(
               Spacer(modifier = Modifier.size(16.dp))
 
               TextField(
-                  value = "",
-                  onValueChange = {},
+                  value = firstName.value,
+                  onValueChange = { newValue -> firstName.value = newValue },
                   label = { Text("First Name") },
                   singleLine = true,
                   modifier = Modifier.fillMaxWidth(),
@@ -129,8 +154,8 @@ fun EditProfile(
               Spacer(modifier = Modifier.size(16.dp))
 
               TextField(
-                  value = "",
-                  onValueChange = {},
+                  value = lastName.value,
+                  onValueChange = { newValue -> lastName.value = newValue },
                   label = { Text("Last Name") },
                   singleLine = true,
                   modifier = Modifier.fillMaxWidth(),
@@ -139,8 +164,8 @@ fun EditProfile(
               Spacer(modifier = Modifier.size(16.dp))
 
               TextField(
-                  value = "",
-                  onValueChange = {},
+                  value = email.value,
+                  onValueChange = { newValue -> email.value = newValue },
                   label = { Text("Email Address") },
                   singleLine = true,
                   modifier = Modifier.fillMaxWidth(),
@@ -149,8 +174,8 @@ fun EditProfile(
               Spacer(modifier = Modifier.size(16.dp))
 
               TextField(
-                  value = "",
-                  onValueChange = {},
+                  value = username.value,
+                  onValueChange = { newValue -> username.value = newValue },
                   label = { Text("Username") },
                   singleLine = true,
                   modifier = Modifier.fillMaxWidth(),
@@ -159,8 +184,8 @@ fun EditProfile(
               Spacer(modifier = Modifier.size(16.dp))
 
               TextField(
-                  value = "",
-                  onValueChange = {},
+                  value = phoneNumber.value,
+                  onValueChange = { newValue -> phoneNumber.value = newValue },
                   label = { Text("Phone Number") },
                   singleLine = true,
                   modifier = Modifier.fillMaxWidth(),
@@ -169,8 +194,8 @@ fun EditProfile(
               Spacer(modifier = Modifier.size(16.dp))
 
               TextField(
-                  value = "",
-                  onValueChange = {},
+                  value = country.value,
+                  onValueChange = { newValue -> country.value = newValue },
                   label = { Text("Country") },
                   singleLine = true,
                   modifier = Modifier.fillMaxWidth(),
