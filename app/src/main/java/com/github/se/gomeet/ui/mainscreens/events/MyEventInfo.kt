@@ -66,7 +66,6 @@ fun MyEventInfo(
 
   Log.d("EventInfo", "Organizer is $organizerId")
   Scaffold(
-      modifier = Modifier.testTag("EventInfoScreen"),
       topBar = {
         TopAppBar(
             modifier = Modifier.testTag("TopBar"),

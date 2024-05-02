@@ -12,6 +12,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.tasks.await
 import java.util.concurrent.TimeUnit
 import org.junit.AfterClass
 import org.junit.BeforeClass
@@ -40,8 +41,7 @@ class EventInfoTest {
     }
 
     assert(composeTestRule.onNodeWithTag("TopBar").isDisplayed(), { "TopBar not displayed" })
-      // The following assert only passes when the test is run alone (not in a connectedCheck), for now we'll ignore it
-//    assert(composeTestRule.onNodeWithTag("EventHeader").isDisplayed(), { "EventHeader not displayed" })
+    assert(composeTestRule.onNodeWithTag("EventHeader").isDisplayed(), { "EventHeader not displayed" })
     assert(composeTestRule.onNodeWithTag("EventImage").isDisplayed(), { "EventImage not displayed" })
     assert(composeTestRule
         .onNodeWithTag("EventDescription")
@@ -70,9 +70,10 @@ class EventInfoTest {
     @JvmStatic
     fun setUp() {
       Firebase.auth.createUserWithEmailAndPassword(usr, pwd)
+        TimeUnit.SECONDS.sleep(2)
       Firebase.auth.signInWithEmailAndPassword(usr, pwd)
+        TimeUnit.SECONDS.sleep(2)
       // Set up the user view model
-      TimeUnit.SECONDS.sleep(2)
       // Order is important here, since createUserIfNew sets current user to created user (so we
       // need to create the current user last)
         currentUserId = Firebase.auth.currentUser!!.uid
