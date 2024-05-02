@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -16,7 +17,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Text
+import androidx.compose.material3.Text
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -90,13 +91,13 @@ fun ManageInvites(
                     nav.navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == selectedTab })
                 },
                 tabList = TOP_LEVEL_DESTINATIONS,
-                selectedItem = Route.PROFILE)
+                selectedItem = Route.EVENTS)
         },
         topBar = {
             Row {
                 Text(
                     text = "Manage Invites",
-                    modifier = Modifier.padding(horizontal = 15.dp, vertical = 15.dp),
+                    modifier = Modifier.padding(start = 15.dp, top = 15.dp, end = 15.dp, bottom = 15.dp),
                     color = DarkCyan,
                     fontStyle = FontStyle.Normal,
                     fontWeight = FontWeight.SemiBold,
@@ -107,31 +108,27 @@ fun ManageInvites(
             }
         }) { innerPadding ->
         Column(
-            verticalArrangement = Arrangement.SpaceEvenly,
+            verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .padding(innerPadding)
-                .verticalScroll(rememberScrollState(0))) {
-
+                .verticalScroll(rememberScrollState(0))
+                .fillMaxSize()) {
 
             Row(
-
-                //Set row width to fill the screen
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 15.dp),
+                    .padding(start = 15.dp, end = 15.dp, bottom = 15.dp),
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                 verticalAlignment = Alignment.Top) {
-                // Edit Profile button
                 Button(
                     onClick = { /*TODO*/},
                     modifier = Modifier
                         .height(40.dp)
                         .weight(1f),
                     shape = RoundedCornerShape(10.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFECEFF1))) {
-                    //center text in button
-                    Text(text = "All", color = Color.Black)
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray)) {
+                    Text(text = "Pending", color = MaterialTheme.colorScheme.onBackground)
                 }
 
                 Button(
@@ -140,8 +137,8 @@ fun ManageInvites(
                         .height(40.dp)
                         .weight(1f),
                     shape = RoundedCornerShape(10.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEEEFF1))) {
-                    Text(text = "Pending", color = Color.Black)
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray)) {
+                    Text(text = "Accepted", color = MaterialTheme.colorScheme.onBackground)
                 }
 
                 Button(
@@ -150,18 +147,19 @@ fun ManageInvites(
                         .height(40.dp)
                         .weight(1f),
                     shape = RoundedCornerShape(10.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFECEFF1))) {
-                    Text(text = "Accepted", color = Color.Black)
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray)) {
+                    Text(text = "Refused", color = MaterialTheme.colorScheme.onBackground)
                 }
             }
+
+            /* TODO: for every followers this user has, retrieve them and stock them in a list and
+                display them in the following way using the UserInviteWidget in a for-loop
+             */
+
             UserInviteWidget(username = "Test", status = InviteStatus.PENDING)
             UserInviteWidget(username = "Test", status = InviteStatus.REFUSED)
             UserInviteWidget(username = "Test", status = InviteStatus.ACCEPTED)
             UserInviteWidget(username = "Test", status = null)
-
-
-
-
         }
     }
 }
