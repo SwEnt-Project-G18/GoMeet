@@ -88,11 +88,8 @@ fun ManageInvites(currentUser: String,
             event.value = eventViewModel.getEvent(currentEvent)
             eventInviteUsers.value = eventInviteViewModel.getUsersInvitedToEvent(event.value!!.uid)
 
+            while(user.value == null || event.value == null || eventInviteUsers.value == null) {}
             val followers = user.value!!.followers
-//            val friendList = userViewModel.getUserFriends(currentUser)
-//            if (friendList.isNotEmpty()) {
-//                followers.addAll(friendList)
-//            }
             if (followers.isNotEmpty()) {
                 followers.forEach {
                     followersList.add(it)

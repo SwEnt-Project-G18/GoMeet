@@ -103,6 +103,7 @@ fun AddWidget (userId: String, invited: Boolean, remove: () -> Unit, add: ()->Un
             }else {
                 add()
             }
+            invt.value = !invt.value
         }) {
             if (invt.value) {
                 Text(text = "Invited")
