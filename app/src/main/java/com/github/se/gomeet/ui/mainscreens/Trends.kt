@@ -39,7 +39,6 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
-import com.github.se.gomeet.model.event.nullEvent
 import com.github.se.gomeet.ui.mainscreens.events.EventWidget
 import com.github.se.gomeet.ui.mainscreens.events.GoMeetSearchBar
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
@@ -72,17 +71,18 @@ fun Trends(
     eventViewModel: EventViewModel
 ) {
 
-  val eventList = remember { mutableListOf(nullEvent) }
+  val eventList = remember { mutableListOf<Event>() }
   val coroutineScope = rememberCoroutineScope()
   val query = remember { mutableStateOf("") }
+    var eventsLoaded = remember{ mutableStateOf(false) }
 
   LaunchedEffect(Unit) {
     coroutineScope.launch {
       val allEvents = eventViewModel.getAllEvents()!!
       if (allEvents.isNotEmpty()) {
         eventList.addAll(allEvents)
-        eventList.remove(nullEvent)
       }
+        eventsLoaded.value = true
     }
   }
 
@@ -115,7 +115,7 @@ fun Trends(
             GoMeetSearchBar(query, NavBarUnselected, Color.DarkGray)
             Spacer(modifier = Modifier.height(5.dp))
 
-            if (eventList.contains(nullEvent)) {
+            if (!eventsLoaded.value) {
                 LoadingText()
             } else {
 

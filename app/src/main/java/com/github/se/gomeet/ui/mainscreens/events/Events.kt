@@ -68,7 +68,6 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
-import com.github.se.gomeet.model.event.nullEvent
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
@@ -106,10 +105,11 @@ fun Events(
 
   // State management for event filters and list
   var selectedFilter by remember { mutableStateOf("All") }
-  val eventList = remember { mutableListOf(nullEvent) }
+  val eventList = remember { mutableListOf<Event>() }
   val coroutineScope = rememberCoroutineScope()
   val query = remember { mutableStateOf("") }
   val user = remember { mutableStateOf<GoMeetUser?>(null) }
+    var eventsLoaded = remember { mutableStateOf(false) }
 
   // Initial data loading using LaunchedEffect
   LaunchedEffect(Unit) {
@@ -123,8 +123,8 @@ fun Events(
           }
       if (allEvents.isNotEmpty()) {
         eventList.addAll(allEvents)
-        eventList.remove(nullEvent)
       }
+        eventsLoaded.value = true
     }
   }
 
@@ -212,7 +212,7 @@ fun Events(
                 )
             }
 
-            if (eventList.contains(nullEvent)) {
+            if (!eventsLoaded.value) {
                 LoadingText()
             } else {
 
