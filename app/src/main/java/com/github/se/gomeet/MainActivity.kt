@@ -210,7 +210,7 @@ class MainActivity : ComponentActivity() {
                       time,
                       organizer,
                       rating.toDouble(),
-                      painterResource(id = R.drawable.chess_demo),
+                      painterResource(id = R.drawable.gomeet_logo),
                       description,
                       loc,
                       userViewModel)
