@@ -117,10 +117,8 @@ fun MyEventInfo(
                 EventButtons(currentUser.value!!, organizer.value!!, eventId, userViewModel, nav)
                 Spacer(modifier = Modifier.height(20.dp))
 
-              var imageUrl by remember { mutableStateOf<String?>(null) }
-              LaunchedEffect(eventId) {
-                  imageUrl = EventViewModel().getEventImageUrl(eventId)
-              }
+                var imageUrl by remember { mutableStateOf<String?>(null) }
+                LaunchedEffect(eventId) { imageUrl = EventViewModel().getEventImageUrl(eventId) }
                 EventImage(imageUrl = imageUrl)
                 Spacer(modifier = Modifier.height(20.dp))
                 EventDescription(text = description)

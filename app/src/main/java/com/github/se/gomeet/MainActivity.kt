@@ -139,7 +139,7 @@ class MainActivity : ComponentActivity() {
               }
             }
             composable(Route.REGISTER) {
-              RegisterScreen(client,NavigationActions(nav), authViewModel, userViewModel) {
+              RegisterScreen(client, NavigationActions(nav), authViewModel, userViewModel) {
                 NavigationActions(nav)
                     .navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == Route.CREATE })
               }

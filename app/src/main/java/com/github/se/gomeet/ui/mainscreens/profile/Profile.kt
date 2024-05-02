@@ -166,9 +166,7 @@ fun Profile(
                           contentDescription = "image description",
                           contentScale = ContentScale.None)
                       Column(
-                          horizontalAlignment =
-                              Alignment
-                                  .CenterHorizontally,
+                          horizontalAlignment = Alignment.CenterHorizontally,
                           modifier = Modifier.padding(0.dp)) {
                             Row(
                                 horizontalArrangement = Arrangement.Start,

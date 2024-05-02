@@ -154,20 +154,19 @@ class UserViewModel : ViewModel() {
     }
   }
 
-    /**
-     * Get the username of a user.
-     *
-     * @param uid The uid of the user.
-     * @return The username of the user.
-     */
-    suspend fun getUsername(uid: String): String? {
-        return try {
-            val user = getUser(uid)
-            user?.username
-        } catch (e: Exception) {
-            Log.e("GetUserError", "Error retrieving user: ${e.message}")
-            null
-        }
+  /**
+   * Get the username of a user.
+   *
+   * @param uid The uid of the user.
+   * @return The username of the user.
+   */
+  suspend fun getUsername(uid: String): String? {
+    return try {
+      val user = getUser(uid)
+      user?.username
+    } catch (e: Exception) {
+      Log.e("GetUserError", "Error retrieving user: ${e.message}")
+      null
     }
-
+  }
 }

@@ -460,7 +460,6 @@ fun EventWidget(
                   modifier = Modifier.weight(4f).padding(15.dp),
                   horizontalAlignment = Alignment.Start, // Align text horizontally to center
                   verticalArrangement = Arrangement.Center) {
-
                     Text(
                         text = eventName,
                         style =
@@ -477,26 +476,25 @@ fun EventWidget(
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center) {
-
-                        var username by remember { mutableStateOf<String?>("Loading...") }
-                        LaunchedEffect(userName) {
+                          var username by remember { mutableStateOf<String?>("Loading...") }
+                          LaunchedEffect(userName) {
                             username = UserViewModel().getUsername(userName)
-                        }
+                          }
 
-                        username?.let {
+                          username?.let {
                             Text(
                                 it,
                                 style =
-                                TextStyle(
-                                    fontSize = smallTextSize.sp,
-                                    lineHeight = 24.sp,
-                                    fontFamily = FontFamily(Font(R.font.roboto)),
-                                    fontWeight = FontWeight(700),
-                                    color = MaterialTheme.colorScheme.onBackground,
-                                    letterSpacing = 0.15.sp,
-                                ),
+                                    TextStyle(
+                                        fontSize = smallTextSize.sp,
+                                        lineHeight = 24.sp,
+                                        fontFamily = FontFamily(Font(R.font.roboto)),
+                                        fontWeight = FontWeight(700),
+                                        color = MaterialTheme.colorScheme.onBackground,
+                                        letterSpacing = 0.15.sp,
+                                    ),
                                 modifier = Modifier.padding(top = 5.dp).testTag("UserName"))
-                        }
+                          }
                           if (verified) {
                             Box(
                                 contentAlignment = Alignment.Center,

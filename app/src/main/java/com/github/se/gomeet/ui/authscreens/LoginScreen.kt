@@ -9,6 +9,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.TopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.CircularProgressIndicator
@@ -18,14 +21,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material.TopAppBar
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
@@ -35,9 +34,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import com.github.se.gomeet.R
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.theme.DarkCyan
@@ -54,140 +51,127 @@ import io.getstream.chat.android.models.User
  * @param onNavToExplore The navigation function to navigate to the Explore Screen.
  */
 @Composable
-fun LoginScreen(authViewModel: AuthViewModel, nav: NavigationActions, onNavToExplore: () -> Unit,) {
-    val signInState = authViewModel.signInState.collectAsState()
-    val isError = signInState.value.signInError != null
-    val context = LocalContext.current
-    val textFieldColors =
-        TextFieldDefaults.colors(
-            focusedTextColor = DarkCyan,
-            unfocusedTextColor = DarkCyan,
-            unfocusedContainerColor = Color.Transparent,
-            focusedContainerColor = Color.Transparent,
-            cursorColor = DarkCyan,
-            focusedLabelColor = MaterialTheme.colorScheme.tertiary,
-            focusedIndicatorColor = MaterialTheme.colorScheme.tertiary
-        )
+fun LoginScreen(
+    authViewModel: AuthViewModel,
+    nav: NavigationActions,
+    onNavToExplore: () -> Unit,
+) {
+  val signInState = authViewModel.signInState.collectAsState()
+  val isError = signInState.value.signInError != null
+  val context = LocalContext.current
+  val textFieldColors =
+      TextFieldDefaults.colors(
+          focusedTextColor = DarkCyan,
+          unfocusedTextColor = DarkCyan,
+          unfocusedContainerColor = Color.Transparent,
+          focusedContainerColor = Color.Transparent,
+          cursorColor = DarkCyan,
+          focusedLabelColor = MaterialTheme.colorScheme.tertiary,
+          focusedIndicatorColor = MaterialTheme.colorScheme.tertiary)
 
-    Column(modifier = Modifier.fillMaxSize()) {
+  Column(modifier = Modifier.fillMaxSize()) {
+    TopAppBar(
+        modifier = Modifier.testTag("TopBar"),
+        backgroundColor = MaterialTheme.colorScheme.background,
+        elevation = 0.dp,
+        title = {},
+        navigationIcon = {
+          IconButton(onClick = { nav.goBack() }) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = "Back",
+                tint = MaterialTheme.colorScheme.onBackground)
+          }
+        })
 
-        TopAppBar(
-            modifier = Modifier.testTag("TopBar"),
-            backgroundColor = MaterialTheme.colorScheme.background,
-            elevation = 0.dp,
-            title = {
-            },
-            navigationIcon = {
-                IconButton(onClick = { nav.goBack() }) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back",
-                        tint = MaterialTheme.colorScheme.onBackground
-                    )
-                }
-            })
+    Column(
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxSize().padding(25.dp).testTag("LoginScreen")) {
+          Image(
+              painter = painterResource(id = R.drawable.gomeet_text),
+              contentDescription = "GoMeet",
+              modifier = Modifier.padding(top = 40.dp),
+              alignment = Alignment.Center,
+              colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.tertiary))
 
-        Column(
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(25.dp)
-                .testTag("LoginScreen")
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.gomeet_text),
-                contentDescription = "GoMeet",
-                modifier = Modifier.padding(top = 40.dp),
-                alignment = Alignment.Center,
-                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.tertiary)
-            )
+          Spacer(modifier = Modifier.size(40.dp))
 
-            Spacer(modifier = Modifier.size(40.dp))
+          Text(
+              text = "Login",
+              modifier = Modifier.padding(bottom = 16.dp),
+              color = DarkCyan,
+              fontStyle = FontStyle.Normal,
+              fontWeight = FontWeight.SemiBold,
+              textAlign = TextAlign.Center,
+              style = MaterialTheme.typography.headlineLarge)
 
+          Spacer(modifier = Modifier.size(110.dp))
+
+          if (isError) {
             Text(
-                text = "Login",
+                text = signInState.value.signInError!!,
                 modifier = Modifier.padding(bottom = 16.dp),
-                color = DarkCyan,
-                fontStyle = FontStyle.Normal,
-                fontWeight = FontWeight.SemiBold,
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.headlineLarge
-            )
+                color = Color.Red,
+                textAlign = TextAlign.Center)
+          }
 
-            Spacer(modifier = Modifier.size(110.dp))
+          TextField(
+              value = signInState.value.email,
+              singleLine = true,
+              onValueChange = { newValue -> authViewModel.onEmailChange(newValue) },
+              modifier = Modifier.fillMaxWidth().testTag("EmailField"),
+              label = { Text("Email") },
+              isError = isError,
+              colors = textFieldColors)
 
-            if (isError) {
-                Text(
-                    text = signInState.value.signInError!!,
-                    modifier = Modifier.padding(bottom = 16.dp),
-                    color = Color.Red,
-                    textAlign = TextAlign.Center
-                )
-            }
+          Spacer(modifier = Modifier.size(16.dp))
 
-            TextField(
-                value = signInState.value.email,
-                singleLine = true,
-                onValueChange = { newValue -> authViewModel.onEmailChange(newValue) },
-                modifier = Modifier.fillMaxWidth().testTag("EmailField"),
-                label = { Text("Email") },
-                isError = isError,
-                colors = textFieldColors
-            )
+          TextField(
+              value = signInState.value.password,
+              singleLine = true,
+              onValueChange = { newValue -> authViewModel.onPasswordChange(newValue) },
+              modifier = Modifier.fillMaxWidth().testTag("LogInField"),
+              label = { Text("Password") },
+              isError = isError,
+              colors = textFieldColors,
+              visualTransformation = PasswordVisualTransformation())
 
-            Spacer(modifier = Modifier.size(16.dp))
+          Spacer(modifier = Modifier.size(50.dp))
 
-            TextField(
-                value = signInState.value.password,
-                singleLine = true,
-                onValueChange = { newValue -> authViewModel.onPasswordChange(newValue) },
-                modifier = Modifier.fillMaxWidth().testTag("LogInField"),
-                label = { Text("Password") },
-                isError = isError,
-                colors = textFieldColors,
-                visualTransformation = PasswordVisualTransformation()
-            )
-
-            Spacer(modifier = Modifier.size(50.dp))
-
-            Button(
-                onClick = { authViewModel.signInWithEmailPassword(context) },
-                modifier = Modifier.fillMaxWidth().testTag("LogInButton"),
-                colors =
-                ButtonColors(
-                    disabledContainerColor = MaterialTheme.colorScheme.primary,
-                    containerColor = DarkCyan,
-                    disabledContentColor = Color.White,
-                    contentColor = Color.White
-                ),
-                enabled =
-                signInState.value.email.isNotEmpty() && signInState.value.password.isNotEmpty()
-            ) {
+          Button(
+              onClick = { authViewModel.signInWithEmailPassword(context) },
+              modifier = Modifier.fillMaxWidth().testTag("LogInButton"),
+              colors =
+                  ButtonColors(
+                      disabledContainerColor = MaterialTheme.colorScheme.primary,
+                      containerColor = DarkCyan,
+                      disabledContentColor = Color.White,
+                      contentColor = Color.White),
+              enabled =
+                  signInState.value.email.isNotEmpty() && signInState.value.password.isNotEmpty()) {
                 Text("Log in")
-            }
+              }
 
-            if (signInState.value.isLoading) {
-                CircularProgressIndicator()
-            }
+          if (signInState.value.isLoading) {
+            CircularProgressIndicator()
+          }
 
-            if (signInState.value.isSignInSuccessful) {
-                val user =
-                    User(
-                        id = Firebase.auth.currentUser!!.uid,
-                        name = Firebase.auth.currentUser!!.email!!
-                    ) // TODO: Add Profile Picture to User
-                val client = ChatClient.instance()
-                client.connectUser(user = user, token = client.devToken(user.id))
-                    .enqueue { result ->
-                        if (result.isSuccess) {
-                            onNavToExplore()
-                        } else {
-                            // Handle connection failure
-                            Log.e("ChatClient", "Failed to connect user: ${user.id}")
-                        }
-                    }
+          if (signInState.value.isSignInSuccessful) {
+            val user =
+                User(
+                    id = Firebase.auth.currentUser!!.uid,
+                    name = Firebase.auth.currentUser!!.email!!) // TODO: Add Profile Picture to User
+            val client = ChatClient.instance()
+            client.connectUser(user = user, token = client.devToken(user.id)).enqueue { result ->
+              if (result.isSuccess) {
+                onNavToExplore()
+              } else {
+                // Handle connection failure
+                Log.e("ChatClient", "Failed to connect user: ${user.id}")
+              }
             }
+          }
         }
-    }
+  }
 }

@@ -62,217 +62,197 @@ fun RegisterScreen(
     userViewModel: UserViewModel,
     onNavToExplore: () -> Unit
 ) {
-    val signInState = authViewModel.signInState.collectAsState()
-    val isError = signInState.value.registerError != null
-    val context = LocalContext.current
-    val textFieldColors =
-        TextFieldDefaults.colors(
-            focusedTextColor = DarkCyan,
-            unfocusedTextColor = DarkCyan,
-            unfocusedContainerColor = Color.Transparent,
-            focusedContainerColor = Color.Transparent,
-            cursorColor = DarkCyan,
-            focusedLabelColor = MaterialTheme.colorScheme.tertiary,
-            focusedIndicatorColor = MaterialTheme.colorScheme.tertiary
-        )
+  val signInState = authViewModel.signInState.collectAsState()
+  val isError = signInState.value.registerError != null
+  val context = LocalContext.current
+  val textFieldColors =
+      TextFieldDefaults.colors(
+          focusedTextColor = DarkCyan,
+          unfocusedTextColor = DarkCyan,
+          unfocusedContainerColor = Color.Transparent,
+          focusedContainerColor = Color.Transparent,
+          cursorColor = DarkCyan,
+          focusedLabelColor = MaterialTheme.colorScheme.tertiary,
+          focusedIndicatorColor = MaterialTheme.colorScheme.tertiary)
 
+  Column(modifier = Modifier.fillMaxSize()) {
+    TopAppBar(
+        modifier = Modifier.testTag("TopBar"),
+        backgroundColor = MaterialTheme.colorScheme.background,
+        elevation = 0.dp,
+        title = {},
+        navigationIcon = {
+          IconButton(onClick = { nav.goBack() }) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = "Back",
+                tint = MaterialTheme.colorScheme.onBackground)
+          }
+        })
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxSize().padding(25.dp).verticalScroll(ScrollState(0))) {
+          Image(
+              painter = painterResource(id = R.drawable.gomeet_text),
+              contentDescription = "Go Meet",
+              modifier = Modifier.padding(top = 40.dp),
+              alignment = Alignment.Center,
+              colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.tertiary))
 
-        TopAppBar(
-            modifier = Modifier.testTag("TopBar"),
-            backgroundColor = MaterialTheme.colorScheme.background,
-            elevation = 0.dp,
-            title = {
-            },
-            navigationIcon = {
-                IconButton(onClick = { nav.goBack() }) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back",
-                        tint = MaterialTheme.colorScheme.onBackground
-                    )
-                }
-            })
+          Spacer(modifier = Modifier.size(15.dp))
 
-        Column(
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxSize().padding(25.dp).verticalScroll(ScrollState(0))
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.gomeet_text),
-                contentDescription = "Go Meet",
-                modifier = Modifier.padding(top = 40.dp),
-                alignment = Alignment.Center,
-                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.tertiary)
-            )
+          Text(
+              text = "Create account",
+              modifier = Modifier.padding(bottom = 16.dp).testTag("register_title"),
+              color = DarkCyan,
+              fontStyle = FontStyle.Normal,
+              fontWeight = FontWeight.SemiBold,
+              textAlign = TextAlign.Center,
+              style = MaterialTheme.typography.headlineLarge)
 
-            Spacer(modifier = Modifier.size(15.dp))
+          Spacer(modifier = Modifier.size(15.dp))
 
+          if (isError) {
             Text(
-                text = "Create account",
-                modifier = Modifier.padding(bottom = 16.dp).testTag("register_title"),
-                color = DarkCyan,
-                fontStyle = FontStyle.Normal,
-                fontWeight = FontWeight.SemiBold,
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.headlineLarge
-            )
+                text = signInState.value.registerError!!,
+                modifier = Modifier.padding(bottom = 16.dp),
+                color = Color.Red,
+                textAlign = TextAlign.Center)
+          }
 
-            Spacer(modifier = Modifier.size(15.dp))
+          TextField(
+              value = signInState.value.firstNameRegister,
+              onValueChange = { newValue -> authViewModel.onFirstNameRegisterChange(newValue) },
+              label = { Text("First Name") },
+              singleLine = true,
+              modifier = Modifier.fillMaxWidth(),
+              colors = textFieldColors)
 
-            if (isError) {
-                Text(
-                    text = signInState.value.registerError!!,
-                    modifier = Modifier.padding(bottom = 16.dp),
-                    color = Color.Red,
-                    textAlign = TextAlign.Center
-                )
-            }
+          Spacer(modifier = Modifier.size(16.dp))
 
-            TextField(
-                value = signInState.value.firstNameRegister,
-                onValueChange = { newValue -> authViewModel.onFirstNameRegisterChange(newValue) },
-                label = { Text("First Name") },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
-                colors = textFieldColors
-            )
+          TextField(
+              value = signInState.value.lastNameRegister,
+              onValueChange = { newValue -> authViewModel.onLastNameRegisterChange(newValue) },
+              label = { Text("Last Name") },
+              singleLine = true,
+              modifier = Modifier.fillMaxWidth(),
+              colors = textFieldColors)
 
-            Spacer(modifier = Modifier.size(16.dp))
+          Spacer(modifier = Modifier.size(16.dp))
 
-            TextField(
-                value = signInState.value.lastNameRegister,
-                onValueChange = { newValue -> authViewModel.onLastNameRegisterChange(newValue) },
-                label = { Text("Last Name") },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
-                colors = textFieldColors
-            )
+          TextField(
+              value = signInState.value.usernameRegister,
+              onValueChange = { newValue -> authViewModel.onUsernameRegisterChange(newValue) },
+              label = { Text("Username") },
+              singleLine = true,
+              modifier = Modifier.fillMaxWidth(),
+              colors = textFieldColors)
 
-            Spacer(modifier = Modifier.size(16.dp))
+          Spacer(modifier = Modifier.size(16.dp))
 
-            TextField(
-                value = signInState.value.usernameRegister,
-                onValueChange = { newValue -> authViewModel.onUsernameRegisterChange(newValue) },
-                label = { Text("Username") },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
-                colors = textFieldColors
-            )
+          TextField(
+              value = signInState.value.phoneNumberRegister,
+              onValueChange = { newValue -> authViewModel.onPhoneNumberRegisterChange(newValue) },
+              label = { Text("Phone Number") },
+              singleLine = true,
+              modifier = Modifier.fillMaxWidth(),
+              colors = textFieldColors)
 
-            Spacer(modifier = Modifier.size(16.dp))
+          Spacer(modifier = Modifier.size(16.dp))
 
-            TextField(
-                value = signInState.value.phoneNumberRegister,
-                onValueChange = { newValue -> authViewModel.onPhoneNumberRegisterChange(newValue) },
-                label = { Text("Phone Number") },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
-                colors = textFieldColors
-            )
+          TextField(
+              value = signInState.value.emailRegister,
+              onValueChange = { newValue -> authViewModel.onEmailRegisterChange(newValue) },
+              label = { Text("Email") },
+              singleLine = true,
+              modifier = Modifier.fillMaxWidth(),
+              colors = textFieldColors)
 
-            Spacer(modifier = Modifier.size(16.dp))
+          Spacer(modifier = Modifier.size(16.dp))
 
-            TextField(
-                value = signInState.value.emailRegister,
-                onValueChange = { newValue -> authViewModel.onEmailRegisterChange(newValue) },
-                label = { Text("Email") },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
-                colors = textFieldColors
-            )
+          TextField(
+              value = signInState.value.countryRegister,
+              onValueChange = { newValue -> authViewModel.onCountryRegisterChange(newValue) },
+              label = { Text("Country") },
+              singleLine = true,
+              modifier = Modifier.fillMaxWidth(),
+              colors = textFieldColors)
 
-            Spacer(modifier = Modifier.size(16.dp))
+          Spacer(modifier = Modifier.size(16.dp))
 
-            TextField(
-                value = signInState.value.countryRegister,
-                onValueChange = { newValue -> authViewModel.onCountryRegisterChange(newValue) },
-                label = { Text("Country") },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
-                colors = textFieldColors
-            )
+          TextField(
+              value = signInState.value.passwordRegister,
+              onValueChange = { newValue -> authViewModel.onPasswordRegisterChange(newValue) },
+              label = { Text("Password") },
+              singleLine = true,
+              visualTransformation = PasswordVisualTransformation(),
+              modifier = Modifier.fillMaxWidth(),
+              colors = textFieldColors)
 
-            Spacer(modifier = Modifier.size(16.dp))
+          Spacer(modifier = Modifier.size(16.dp))
 
-            TextField(
-                value = signInState.value.passwordRegister,
-                onValueChange = { newValue -> authViewModel.onPasswordRegisterChange(newValue) },
-                label = { Text("Password") },
-                singleLine = true,
-                visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier.fillMaxWidth(),
-                colors = textFieldColors
-            )
+          TextField(
+              value = signInState.value.confirmPasswordRegister,
+              onValueChange = { newValue ->
+                authViewModel.onConfirmPasswordRegisterChange(newValue)
+              },
+              label = { Text("Confirm Password") },
+              visualTransformation = PasswordVisualTransformation(),
+              singleLine = true,
+              modifier = Modifier.fillMaxWidth(),
+              colors = textFieldColors)
 
-            Spacer(modifier = Modifier.size(16.dp))
+          Spacer(modifier = Modifier.size(50.dp))
 
-            TextField(
-                value = signInState.value.confirmPasswordRegister,
-                onValueChange = { newValue -> authViewModel.onConfirmPasswordRegisterChange(newValue) },
-                label = { Text("Confirm Password") },
-                visualTransformation = PasswordVisualTransformation(),
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
-                colors = textFieldColors
-            )
-
-            Spacer(modifier = Modifier.size(50.dp))
-
-            Button(
-                onClick = { authViewModel.signUpWithEmailPassword(context) },
-                modifier = Modifier.fillMaxWidth().testTag("register_button"),
-                colors =
-                ButtonColors(
-                    disabledContainerColor = MaterialTheme.colorScheme.primary,
-                    containerColor = DarkCyan,
-                    disabledContentColor = Color.White,
-                    contentColor = Color.White
-                ),
-                enabled =
-                signInState.value.emailRegister.isNotEmpty() &&
-                        signInState.value.passwordRegister.isNotEmpty() &&
-                        signInState.value.confirmPasswordRegister.isNotEmpty()
-            ) {
+          Button(
+              onClick = { authViewModel.signUpWithEmailPassword(context) },
+              modifier = Modifier.fillMaxWidth().testTag("register_button"),
+              colors =
+                  ButtonColors(
+                      disabledContainerColor = MaterialTheme.colorScheme.primary,
+                      containerColor = DarkCyan,
+                      disabledContentColor = Color.White,
+                      contentColor = Color.White),
+              enabled =
+                  signInState.value.emailRegister.isNotEmpty() &&
+                      signInState.value.passwordRegister.isNotEmpty() &&
+                      signInState.value.confirmPasswordRegister.isNotEmpty()) {
                 Text("Create account")
+              }
+
+          if (signInState.value.isLoading) {
+            CircularProgressIndicator()
+          }
+
+          if (signInState.value.isSignInSuccessful) {
+            val currentUser = Firebase.auth.currentUser
+            if (currentUser != null) {
+              val uid = currentUser.uid
+              val email = currentUser.email ?: ""
+              val firstName = signInState.value.firstNameRegister
+              val lastName = signInState.value.lastNameRegister
+              val phoneNumber = signInState.value.phoneNumberRegister
+              val country = signInState.value.countryRegister
+              val username = signInState.value.usernameRegister
+
+              userViewModel.createUserIfNew(
+                  uid, username, firstName, lastName, email, phoneNumber, country)
             }
 
-            if (signInState.value.isLoading) {
-                CircularProgressIndicator()
-            }
-
-            if (signInState.value.isSignInSuccessful) {
-                val currentUser = Firebase.auth.currentUser
-                if (currentUser != null) {
-                    val uid = currentUser.uid
-                    val email = currentUser.email ?: ""
-                    val firstName = signInState.value.firstNameRegister
-                    val lastName = signInState.value.lastNameRegister
-                    val phoneNumber = signInState.value.phoneNumberRegister
-                    val country = signInState.value.countryRegister
-                    val username = signInState.value.usernameRegister
-
-                    userViewModel.createUserIfNew(
-                        uid, username, firstName, lastName, email, phoneNumber, country
-                    )
-                }
-
-                val user =
-                    User(
-                        id = Firebase.auth.currentUser!!.uid,
-                        name = Firebase.auth.currentUser!!.email!!
-                    ) // TODO: currently username = email
-                client
-                    .connectUser(
-                        user = user,
-                        // TODO: Generate Token, see https://getstream.io/tutorials/android-chat/
-                        token = client.devToken(user.id)
-                    )
-                    .enqueue()
-                onNavToExplore()
-            }
+            val user =
+                User(
+                    id = Firebase.auth.currentUser!!.uid,
+                    name = Firebase.auth.currentUser!!.email!!) // TODO: currently username = email
+            client
+                .connectUser(
+                    user = user,
+                    // TODO: Generate Token, see https://getstream.io/tutorials/android-chat/
+                    token = client.devToken(user.id))
+                .enqueue()
+            onNavToExplore()
+          }
         }
-    }
+  }
 }

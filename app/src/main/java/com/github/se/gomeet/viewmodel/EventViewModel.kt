@@ -151,42 +151,40 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
     }
   }
 
-
-    /**
-     * Get the image URL of an event's image.
-     *
-     * @param eventId the ID of the event
-     * @return the image URL of the event
-     */
-    suspend fun getEventImageUrl(eventId: String): String? {
-        val db = FirebaseFirestore.getInstance()
-        return try {
-            val event = CompletableDeferred<String?>()
-            db.collection("events").document(eventId).get().addOnSuccessListener { documentSnapshot ->
-                if (documentSnapshot.exists()) {
-                    val imagesList = documentSnapshot.get("images") as? List<*>
-                    if (!imagesList.isNullOrEmpty()) {
-                        event.complete(imagesList.firstOrNull()?.toString())
-                    } else {
-                        event.complete(null)
-                    }
-                } else {
-                    event.complete(null)
-                }
-            }.addOnFailureListener {
-                event.completeExceptionally(it)
+  /**
+   * Get the image URL of an event's image.
+   *
+   * @param eventId the ID of the event
+   * @return the image URL of the event
+   */
+  suspend fun getEventImageUrl(eventId: String): String? {
+    val db = FirebaseFirestore.getInstance()
+    return try {
+      val event = CompletableDeferred<String?>()
+      db.collection("events")
+          .document(eventId)
+          .get()
+          .addOnSuccessListener { documentSnapshot ->
+            if (documentSnapshot.exists()) {
+              val imagesList = documentSnapshot.get("images") as? List<*>
+              if (!imagesList.isNullOrEmpty()) {
+                event.complete(imagesList.firstOrNull()?.toString())
+              } else {
+                event.complete(null)
+              }
+            } else {
+              event.complete(null)
             }
-            event.await()
-        } catch (e: Exception) {
-            Log.e("Firebase", "Error fetching event image: ${e.localizedMessage}")
-            null
-        }
+          }
+          .addOnFailureListener { event.completeExceptionally(it) }
+      event.await()
+    } catch (e: Exception) {
+      Log.e("Firebase", "Error fetching event image: ${e.localizedMessage}")
+      null
     }
+  }
 
-
-
-
-    /**
+  /**
    * Upload an image to Firebase Storage and get the download URL.
    *
    * @param imageUri the URI of the image to upload
