@@ -445,9 +445,9 @@ fun EventWidget(
                     time = timeString,
                     description = eventDescription,
                     organizer = userName,
-                    loc = LatLng(46.5191, 6.5668), // replace with actual location
-                    rating = 0.0 // replace with actual rating
-                    // add image
+                    loc = LatLng(46.5191, 6.5668), // TODO: replace with actual location
+                    rating = 0.0 // TODO: replace with actual rating
+                    // TODO: add image
                     )
               },
       colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),

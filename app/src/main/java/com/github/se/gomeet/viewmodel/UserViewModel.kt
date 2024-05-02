@@ -86,6 +86,7 @@ class UserViewModel : ViewModel() {
     }
   }
 
+  // TODO: fix the following method
   fun getCurrentUser(): GoMeetUser? {
     return currentUser.value
   }

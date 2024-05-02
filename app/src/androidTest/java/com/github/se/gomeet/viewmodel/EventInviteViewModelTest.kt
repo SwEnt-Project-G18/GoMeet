@@ -4,8 +4,5 @@ import org.junit.Test
 
 class EventInviteViewModelTest {
 
-    @Test
-    fun test() {
-
-    }
+  @Test fun test() {}
 }

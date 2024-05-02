@@ -50,6 +50,9 @@ import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.firebase.auth.auth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
@@ -208,7 +211,7 @@ fun EventButtons(
       horizontalArrangement = Arrangement.SpaceBetween) {
         TextButton(
             onClick = {
-              if (organizer.uid.contentEquals(userViewModel.getCurrentUser()!!.uid)) {
+              if (organizer.uid.contentEquals(Firebase.auth.currentUser!!.uid)) {
                 // TODO: GO TO EDIT EVENT PARAMETERS SCREEN
               } else {
                 if (!isJoined.value) {
@@ -225,7 +228,7 @@ fun EventButtons(
             colors =
                 ButtonDefaults.textButtonColors(
                     containerColor = Color(0xFFECEFF1), contentColor = Color.Black)) {
-              if (organizer.uid.contentEquals(userViewModel.getCurrentUser()!!.uid)) {
+              if (organizer.uid.contentEquals(Firebase.auth.currentUser!!.uid)) {
                 Text("Edit My Event")
               } else {
                 if (isJoined.value) {
@@ -235,7 +238,7 @@ fun EventButtons(
                 }
               }
             }
-        if (organizer.uid != userViewModel.getCurrentUser()!!.uid) {
+        if (organizer.uid != com.google.firebase.Firebase.auth.currentUser!!.uid) {
           IconButton(
               onClick = {
                 nav.navigateToScreen(Route.MESSAGE.replace("{id}", Uri.encode(organizer.uid)))
