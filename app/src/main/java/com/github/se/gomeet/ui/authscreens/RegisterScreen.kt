@@ -226,7 +226,7 @@ fun RegisterScreen(
                         signInState.value.confirmPasswordRegister.isNotEmpty()) {
                   Text("Create account")
                 }
-          } add
+          }
               if (signInState.value.isLoading) {
                 CircularProgressIndicator()
               }
