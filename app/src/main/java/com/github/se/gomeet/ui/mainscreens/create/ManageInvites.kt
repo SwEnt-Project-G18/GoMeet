@@ -1,4 +1,4 @@
-package com.github.se.gomeet.ui.mainscreens.profile
+package com.github.se.gomeet.ui.mainscreens.create
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

@@ -32,7 +32,7 @@ import com.github.se.gomeet.ui.mainscreens.events.MyEventInfo
 import com.github.se.gomeet.ui.mainscreens.profile.EditProfile
 import com.github.se.gomeet.ui.mainscreens.profile.Followers
 import com.github.se.gomeet.ui.mainscreens.profile.Following
-import com.github.se.gomeet.ui.mainscreens.profile.ManageInvites
+import com.github.se.gomeet.ui.mainscreens.create.ManageInvites
 import com.github.se.gomeet.ui.mainscreens.profile.Notifications
 import com.github.se.gomeet.ui.mainscreens.profile.OthersProfile
 import com.github.se.gomeet.ui.mainscreens.profile.Profile
