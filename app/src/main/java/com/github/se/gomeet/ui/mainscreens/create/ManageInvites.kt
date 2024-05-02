@@ -178,6 +178,7 @@ fun UserInviteWidget(username : String, status : InviteStatus?) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ){
+        // Profile picture
         Image(
             modifier =
             Modifier
@@ -188,27 +189,27 @@ fun UserInviteWidget(username : String, status : InviteStatus?) {
             contentDescription = "profile picture",
             contentScale = ContentScale.None)
 
+        // Username text
         Text(text = username, color = MaterialTheme.colorScheme.onBackground)
 
         // Status text
         Text(
             text = when(status) {
-                null -> "Invite"
+                null -> ""
                 InviteStatus.PENDING -> "Pending"
                 InviteStatus.ACCEPTED -> "Accepted"
                 InviteStatus.REFUSED -> "Refused"
             },
             modifier = Modifier.width(70.dp),
-            style = TextStyle(fontSize = 12.sp),
             color = when(status) {
-                null -> Color.White
-                InviteStatus.PENDING -> Color.Gray
+                null -> MaterialTheme.colorScheme.onBackground
+                InviteStatus.PENDING -> MaterialTheme.colorScheme.onBackground
                 InviteStatus.ACCEPTED -> Color.Green
                 InviteStatus.REFUSED -> Color.Red
             }
         )
 
-        // Button
+        // Button to invite or cancel invitation
         Button(
             onClick = {/*TODO*/},
             modifier = Modifier
