@@ -73,13 +73,8 @@ fun AddParticipants(nav: NavigationActions, userId: String, userViewModel : User
           modifier = Modifier
               .padding(innerPadding)
               .fillMaxSize()) {
-          followers.forEach{
-              AddWidget(userId = it, invited.contains(it)){
-                  if (invited.contains(it)) {
-                      invited.remove(it)
-                  } else {
-                      invited.add(it)
-                  }
+          followers.forEach{user ->
+              AddWidget(userId = user, invited = false, remove = { invited.remove(user) }, add = { invited.add(user) })
               }
           }
           OutlinedButton(onClick = {
@@ -92,25 +87,27 @@ fun AddParticipants(nav: NavigationActions, userId: String, userViewModel : User
               Text(text = "Finish")
           }
       }
-    }
 }
 
 
 @Composable
-fun AddWidget (userId: String, invited: Boolean, callback: () -> Unit){
+fun AddWidget (userId: String, invited: Boolean, remove: () -> Unit, add: ()->Unit){
     val invt = remember {
         mutableStateOf<Boolean>(invited)
     }
     Row{
         Text(text = userId)
         OutlinedButton(onClick = {
-            invt.value = !invt.value
-            callback()
+            if(invt.value){
+                remove()
+            }else {
+                add()
+            }
         }) {
-            if (invited) {
+            if (invt.value) {
                 Text(text = "Invited")
             } else {
-                Text(text = "Invite")
+                Text(text = "Send Invite")
             }
         }
     }
