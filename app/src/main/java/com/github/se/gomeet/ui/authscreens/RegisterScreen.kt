@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -32,6 +31,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.github.se.gomeet.R
+import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.viewmodel.AuthViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
@@ -81,125 +81,128 @@ fun RegisterScreen(
 
         Spacer(modifier = Modifier.size(15.dp))
 
-        Text(
-            text = "Create account",
-            modifier = Modifier.padding(bottom = 16.dp).testTag("register_title"),
-            color = DarkCyan,
-            fontStyle = FontStyle.Normal,
-            fontWeight = FontWeight.SemiBold,
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.headlineLarge)
+        if (signInState.value.isLoading || signInState.value.isSignInSuccessful) {
+          LoadingText()
+        } else {
 
-        Spacer(modifier = Modifier.size(15.dp))
-
-        if (isError) {
           Text(
-              text = signInState.value.registerError!!,
-              modifier = Modifier.padding(bottom = 16.dp),
-              color = Color.Red,
-              textAlign = TextAlign.Center)
-        }
+              text = "Create account",
+              modifier = Modifier.padding(bottom = 16.dp).testTag("register_title"),
+              color = DarkCyan,
+              fontStyle = FontStyle.Normal,
+              fontWeight = FontWeight.SemiBold,
+              textAlign = TextAlign.Center,
+              style = MaterialTheme.typography.headlineLarge)
 
-        TextField(
-            value = signInState.value.firstNameRegister,
-            onValueChange = { newValue -> authViewModel.onFirstNameRegisterChange(newValue) },
-            label = { Text("First Name") },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-            colors = textFieldColors)
+          Spacer(modifier = Modifier.size(15.dp))
 
-        Spacer(modifier = Modifier.size(16.dp))
+          if (isError) {
+            Text(
+                text = signInState.value.registerError!!,
+                modifier = Modifier.padding(bottom = 16.dp),
+                color = Color.Red,
+                textAlign = TextAlign.Center)
+          }
 
-        TextField(
-            value = signInState.value.lastNameRegister,
-            onValueChange = { newValue -> authViewModel.onLastNameRegisterChange(newValue) },
-            label = { Text("Last Name") },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-            colors = textFieldColors)
+          TextField(
+              value = signInState.value.firstNameRegister,
+              onValueChange = { newValue -> authViewModel.onFirstNameRegisterChange(newValue) },
+              label = { Text("First Name") },
+              singleLine = true,
+              modifier = Modifier.fillMaxWidth(),
+              colors = textFieldColors)
 
-        Spacer(modifier = Modifier.size(16.dp))
+          Spacer(modifier = Modifier.size(16.dp))
 
-        TextField(
-            value = signInState.value.usernameRegister,
-            onValueChange = { newValue -> authViewModel.onUsernameRegisterChange(newValue) },
-            label = { Text("Username") },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-            colors = textFieldColors)
+          TextField(
+              value = signInState.value.lastNameRegister,
+              onValueChange = { newValue -> authViewModel.onLastNameRegisterChange(newValue) },
+              label = { Text("Last Name") },
+              singleLine = true,
+              modifier = Modifier.fillMaxWidth(),
+              colors = textFieldColors)
 
-        Spacer(modifier = Modifier.size(16.dp))
+          Spacer(modifier = Modifier.size(16.dp))
 
-        TextField(
-            value = signInState.value.phoneNumberRegister,
-            onValueChange = { newValue -> authViewModel.onPhoneNumberRegisterChange(newValue) },
-            label = { Text("Phone Number") },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-            colors = textFieldColors)
+          TextField(
+              value = signInState.value.usernameRegister,
+              onValueChange = { newValue -> authViewModel.onUsernameRegisterChange(newValue) },
+              label = { Text("Username") },
+              singleLine = true,
+              modifier = Modifier.fillMaxWidth(),
+              colors = textFieldColors)
 
-        Spacer(modifier = Modifier.size(16.dp))
+          Spacer(modifier = Modifier.size(16.dp))
 
-        TextField(
-            value = signInState.value.emailRegister,
-            onValueChange = { newValue -> authViewModel.onEmailRegisterChange(newValue) },
-            label = { Text("Email") },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-            colors = textFieldColors)
+          TextField(
+              value = signInState.value.phoneNumberRegister,
+              onValueChange = { newValue -> authViewModel.onPhoneNumberRegisterChange(newValue) },
+              label = { Text("Phone Number") },
+              singleLine = true,
+              modifier = Modifier.fillMaxWidth(),
+              colors = textFieldColors)
 
-        Spacer(modifier = Modifier.size(16.dp))
+          Spacer(modifier = Modifier.size(16.dp))
 
-        TextField(
-            value = signInState.value.countryRegister,
-            onValueChange = { newValue -> authViewModel.onCountryRegisterChange(newValue) },
-            label = { Text("Country") },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-            colors = textFieldColors)
+          TextField(
+              value = signInState.value.emailRegister,
+              onValueChange = { newValue -> authViewModel.onEmailRegisterChange(newValue) },
+              label = { Text("Email") },
+              singleLine = true,
+              modifier = Modifier.fillMaxWidth(),
+              colors = textFieldColors)
 
-        Spacer(modifier = Modifier.size(16.dp))
+          Spacer(modifier = Modifier.size(16.dp))
 
-        TextField(
-            value = signInState.value.passwordRegister,
-            onValueChange = { newValue -> authViewModel.onPasswordRegisterChange(newValue) },
-            label = { Text("Password") },
-            singleLine = true,
-            visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier.fillMaxWidth(),
-            colors = textFieldColors)
+          TextField(
+              value = signInState.value.countryRegister,
+              onValueChange = { newValue -> authViewModel.onCountryRegisterChange(newValue) },
+              label = { Text("Country") },
+              singleLine = true,
+              modifier = Modifier.fillMaxWidth(),
+              colors = textFieldColors)
 
-        Spacer(modifier = Modifier.size(16.dp))
+          Spacer(modifier = Modifier.size(16.dp))
 
-        TextField(
-            value = signInState.value.confirmPasswordRegister,
-            onValueChange = { newValue -> authViewModel.onConfirmPasswordRegisterChange(newValue) },
-            label = { Text("Confirm Password") },
-            visualTransformation = PasswordVisualTransformation(),
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-            colors = textFieldColors)
+          TextField(
+              value = signInState.value.passwordRegister,
+              onValueChange = { newValue -> authViewModel.onPasswordRegisterChange(newValue) },
+              label = { Text("Password") },
+              singleLine = true,
+              visualTransformation = PasswordVisualTransformation(),
+              modifier = Modifier.fillMaxWidth(),
+              colors = textFieldColors)
 
-        Spacer(modifier = Modifier.size(50.dp))
+          Spacer(modifier = Modifier.size(16.dp))
 
-        Button(
-            onClick = { authViewModel.signUpWithEmailPassword(context) },
-            modifier = Modifier.fillMaxWidth().testTag("register_button"),
-            colors =
-                ButtonColors(
-                    disabledContainerColor = MaterialTheme.colorScheme.primary,
-                    containerColor = DarkCyan,
-                    disabledContentColor = Color.White,
-                    contentColor = Color.White),
-            enabled =
-                signInState.value.emailRegister.isNotEmpty() &&
-                    signInState.value.passwordRegister.isNotEmpty() &&
-                    signInState.value.confirmPasswordRegister.isNotEmpty()) {
-              Text("Create account")
-            }
+          TextField(
+              value = signInState.value.confirmPasswordRegister,
+              onValueChange = { newValue ->
+                authViewModel.onConfirmPasswordRegisterChange(newValue)
+              },
+              label = { Text("Confirm Password") },
+              visualTransformation = PasswordVisualTransformation(),
+              singleLine = true,
+              modifier = Modifier.fillMaxWidth(),
+              colors = textFieldColors)
 
-        if (signInState.value.isLoading) {
-          CircularProgressIndicator()
+          Spacer(modifier = Modifier.size(50.dp))
+
+          Button(
+              onClick = { authViewModel.signUpWithEmailPassword(context) },
+              modifier = Modifier.fillMaxWidth().testTag("register_button"),
+              colors =
+                  ButtonColors(
+                      disabledContainerColor = MaterialTheme.colorScheme.primary,
+                      containerColor = DarkCyan,
+                      disabledContentColor = Color.White,
+                      contentColor = Color.White),
+              enabled =
+                  signInState.value.emailRegister.isNotEmpty() &&
+                      signInState.value.passwordRegister.isNotEmpty() &&
+                      signInState.value.confirmPasswordRegister.isNotEmpty()) {
+                Text("Create account")
+              }
         }
 
         if (signInState.value.isSignInSuccessful) {

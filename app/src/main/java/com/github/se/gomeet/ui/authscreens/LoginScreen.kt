@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -32,6 +31,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.se.gomeet.R
+import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.viewmodel.AuthViewModel
 import com.google.firebase.auth.ktx.auth
@@ -71,84 +71,85 @@ fun LoginScreen(authViewModel: AuthViewModel, onNavToExplore: () -> Unit) {
             alignment = Alignment.Center,
             colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.tertiary))
 
-        Spacer(modifier = Modifier.size(40.dp))
+        if (signInState.value.isLoading || signInState.value.isSignInSuccessful) {
+          LoadingText()
+        } else {
 
-        Text(
-            text = "Login",
-            modifier = Modifier.padding(bottom = 16.dp),
-            color = DarkCyan,
-            fontStyle = FontStyle.Normal,
-            fontWeight = FontWeight.SemiBold,
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.headlineLarge)
+          Spacer(modifier = Modifier.size(40.dp))
 
-        Spacer(modifier = Modifier.size(110.dp))
-
-        if (isError) {
           Text(
-              text = signInState.value.signInError!!,
+              text = "Login",
               modifier = Modifier.padding(bottom = 16.dp),
-              color = Color.Red,
-              textAlign = TextAlign.Center)
-        }
+              color = DarkCyan,
+              fontStyle = FontStyle.Normal,
+              fontWeight = FontWeight.SemiBold,
+              textAlign = TextAlign.Center,
+              style = MaterialTheme.typography.headlineLarge)
 
-        TextField(
-            value = signInState.value.email,
-            singleLine = true,
-            onValueChange = { newValue -> authViewModel.onEmailChange(newValue) },
-            modifier = Modifier.fillMaxWidth().testTag("EmailField"),
-            label = { Text("Email") },
-            isError = isError,
-            colors = textFieldColors)
+          Spacer(modifier = Modifier.size(110.dp))
 
-        Spacer(modifier = Modifier.size(16.dp))
-
-        TextField(
-            value = signInState.value.password,
-            singleLine = true,
-            onValueChange = { newValue -> authViewModel.onPasswordChange(newValue) },
-            modifier = Modifier.fillMaxWidth().testTag("LogInField"),
-            label = { Text("Password") },
-            isError = isError,
-            colors = textFieldColors,
-            visualTransformation = PasswordVisualTransformation())
-
-        Spacer(modifier = Modifier.size(50.dp))
-
-        Button(
-            onClick = { authViewModel.signInWithEmailPassword(context) },
-            modifier = Modifier.fillMaxWidth().testTag("LogInButton"),
-            colors =
-                ButtonColors(
-                    disabledContainerColor = MaterialTheme.colorScheme.primary,
-                    containerColor = DarkCyan,
-                    disabledContentColor = Color.White,
-                    contentColor = Color.White),
-            enabled =
-                signInState.value.email.isNotEmpty() && signInState.value.password.isNotEmpty()) {
-              Text("Log in")
-            }
-
-        if (signInState.value.isLoading) {
-          CircularProgressIndicator()
-        }
-
-        if (signInState.value.isSignInSuccessful) {
-          val user =
-              User(
-                  id = Firebase.auth.currentUser!!.uid,
-                  name = Firebase.auth.currentUser!!.email!!) // TODO: Add Profile Picture to User
-          val client = ChatClient.instance()
-          client.connectUser(user = user, token = client.devToken(user.id)).enqueue { result ->
-            if (result.isSuccess) {
-              onNavToExplore()
-            } else {
-              // Handle connection failure
-              Log.e("ChatClient", "Failed to connect user: ${user.id}")
-            }
+          if (isError) {
+            Text(
+                text = signInState.value.signInError!!,
+                modifier = Modifier.padding(bottom = 16.dp),
+                color = Color.Red,
+                textAlign = TextAlign.Center)
           }
+
+          TextField(
+              value = signInState.value.email,
+              singleLine = true,
+              onValueChange = { newValue -> authViewModel.onEmailChange(newValue) },
+              modifier = Modifier.fillMaxWidth().testTag("EmailField"),
+              label = { Text("Email") },
+              isError = isError,
+              colors = textFieldColors)
+
+          Spacer(modifier = Modifier.size(16.dp))
+
+          TextField(
+              value = signInState.value.password,
+              singleLine = true,
+              onValueChange = { newValue -> authViewModel.onPasswordChange(newValue) },
+              modifier = Modifier.fillMaxWidth().testTag("LogInField"),
+              label = { Text("Password") },
+              isError = isError,
+              colors = textFieldColors,
+              visualTransformation = PasswordVisualTransformation())
+
+          Spacer(modifier = Modifier.size(50.dp))
+
+          Button(
+              onClick = { authViewModel.signInWithEmailPassword(context) },
+              modifier = Modifier.fillMaxWidth().testTag("LogInButton"),
+              colors =
+                  ButtonColors(
+                      disabledContainerColor = MaterialTheme.colorScheme.primary,
+                      containerColor = DarkCyan,
+                      disabledContentColor = Color.White,
+                      contentColor = Color.White),
+              enabled =
+                  signInState.value.email.isNotEmpty() && signInState.value.password.isNotEmpty()) {
+                Text("Log in")
+              }
         }
       }
+
+  if (signInState.value.isSignInSuccessful) {
+    val user =
+        User(
+            id = Firebase.auth.currentUser!!.uid,
+            name = Firebase.auth.currentUser!!.email!!) // TODO: Add Profile Picture to User
+    val client = ChatClient.instance()
+    client.connectUser(user = user, token = client.devToken(user.id)).enqueue { result ->
+      if (result.isSuccess) {
+        onNavToExplore()
+      } else {
+        // Handle connection failure
+        Log.e("ChatClient", "Failed to connect user: ${user.id}")
+      }
+    }
+  }
 }
 
 @Preview
