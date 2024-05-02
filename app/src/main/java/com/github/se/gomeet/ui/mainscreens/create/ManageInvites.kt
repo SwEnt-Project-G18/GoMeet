@@ -74,7 +74,7 @@ fun ManageInvites(currentUser: String,
 ) {
 
     var selectedFilter by remember { mutableStateOf("All") }
-    val followers = remember { mutableListOf<String>() }
+    val followersList = remember { mutableListOf<String>() }
     val coroutineScope = rememberCoroutineScope()
     val user = remember { mutableStateOf<GoMeetUser?>(null) }
     val event = remember { mutableStateOf<Event?>(null) }
@@ -90,6 +90,11 @@ fun ManageInvites(currentUser: String,
 //            if (friendList.isNotEmpty()) {
 //                followers.addAll(friendList)
 //            }
+            if (followers.isNotEmpty()) {
+                followers.forEach() {
+                    followersList.add(it)
+                }
+            }
         }
     }
 
@@ -193,6 +198,9 @@ fun ManageInvites(currentUser: String,
             Column(modifier = Modifier.verticalScroll(rememberScrollState()).fillMaxSize()) {
                 if (selectedFilter == "All" || selectedFilter == "Uninvited") {
                     // Loop through the list of followers that are uninvited to this event
+                    followersList.forEach {
+                        UserInviteWidget(username = it, status = InviteStatus.UNINVITED)
+                    }
                 }
 
                 if (selectedFilter == "All" || selectedFilter == "Invited") {
