@@ -11,6 +11,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -33,7 +34,7 @@ fun BottomNavigationMenu(
 ) {
   NavigationBar(
       modifier = Modifier.navigationBarsPadding().height(80.dp),
-      containerColor = NavBarUnselected,
+      containerColor = Color.Transparent,
       tonalElevation = 0.dp,
   ) {
     tabList.forEach { destination ->
