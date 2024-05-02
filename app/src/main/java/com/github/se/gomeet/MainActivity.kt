@@ -155,7 +155,9 @@ class MainActivity : ComponentActivity() {
             composable(Route.TRENDS) {
               Trends(userIdState.value, navAction, UserViewModel(), eventViewModel)
             }
-            composable(Route.CREATE) { Create(navAction) }
+            composable(Route.CREATE) {
+                userIdState.value = Firebase.auth.currentUser!!.uid
+                Create(navAction) }
             composable(Route.PROFILE) {
               Profile(navAction, userId = userIdState.value, userViewModel)
             }

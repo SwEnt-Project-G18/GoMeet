@@ -269,8 +269,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                 Button(
                     modifier = Modifier.fillMaxWidth().padding(start = 7.dp, end = 7.dp),
                     onClick = {
-                      nav.navigateTo(
-                          SECOND_LEVEL_DESTINATION.first { it.route == Route.ADD_PARTICIPANTS.replace("{eventId}", uid) })
+                      nav.navigateToScreen(Route.ADD_PARTICIPANTS.replace("{eventId}", uid))
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Grey),
                     shape = RoundedCornerShape(10.dp)) {

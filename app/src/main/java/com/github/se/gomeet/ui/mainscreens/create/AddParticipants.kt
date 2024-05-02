@@ -46,7 +46,7 @@ fun AddParticipants(nav: NavigationActions, userId: String, userViewModel : User
     LaunchedEffect(Unit) {
         coroutineScope.launch {
             currentUser.value = userViewModel.getUser(userId)
-
+            while (currentUser.value == null){}
             val fwers = currentUser.value!!.followers
 
             if (fwers.isNotEmpty()) {
