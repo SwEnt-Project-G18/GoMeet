@@ -18,9 +18,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.painter.Painter
@@ -33,6 +35,7 @@ import com.github.se.gomeet.R
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.navigation.NavigationActions
+import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.ktx.auth
@@ -48,7 +51,7 @@ fun MyEventInfo(
     time: String = "",
     organizerId: String,
     rating: Double = 0.0,
-    image: Painter = painterResource(id = R.drawable.chess_demo),
+    image: Painter = painterResource(id = R.drawable.gomeet_logo),
     description: String = "",
     loc: LatLng = LatLng(0.0, 0.0),
     userViewModel: UserViewModel
@@ -115,7 +118,10 @@ fun MyEventInfo(
                 Spacer(modifier = Modifier.height(20.dp))
                 EventButtons(currentUser.value!!, organizer.value!!, eventId, userViewModel, nav)
                 Spacer(modifier = Modifier.height(20.dp))
-                EventImage(painter = image)
+
+                var imageUrl by remember { mutableStateOf<String?>(null) }
+                LaunchedEffect(eventId) { imageUrl = EventViewModel().getEventImageUrl(eventId) }
+                EventImage(imageUrl = imageUrl)
                 Spacer(modifier = Modifier.height(20.dp))
                 EventDescription(text = description)
                 Spacer(modifier = Modifier.height(20.dp))

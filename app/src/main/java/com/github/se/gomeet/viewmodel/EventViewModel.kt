@@ -16,6 +16,7 @@ import com.github.se.gomeet.model.event.location.Location
 import com.github.se.gomeet.model.repository.EventRepository
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
@@ -146,6 +147,39 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
       db.getEvent(uid) { t -> event.complete(t) }
       event.await()
     } catch (e: Exception) {
+      null
+    }
+  }
+
+  /**
+   * Get the image URL of an event's image.
+   *
+   * @param eventId the ID of the event
+   * @return the image URL of the event
+   */
+  suspend fun getEventImageUrl(eventId: String): String? {
+    val db = FirebaseFirestore.getInstance()
+    return try {
+      val event = CompletableDeferred<String?>()
+      db.collection("events")
+          .document(eventId)
+          .get()
+          .addOnSuccessListener { documentSnapshot ->
+            if (documentSnapshot.exists()) {
+              val imagesList = documentSnapshot.get("images") as? List<*>
+              if (!imagesList.isNullOrEmpty()) {
+                event.complete(imagesList.firstOrNull()?.toString())
+              } else {
+                event.complete(null)
+              }
+            } else {
+              event.complete(null)
+            }
+          }
+          .addOnFailureListener { event.completeExceptionally(it) }
+      event.await()
+    } catch (e: Exception) {
+      Log.e("Firebase", "Error fetching event image: ${e.localizedMessage}")
       null
     }
   }

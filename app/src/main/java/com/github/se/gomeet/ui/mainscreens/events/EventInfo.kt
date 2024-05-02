@@ -23,16 +23,19 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -41,6 +44,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.navigation.NavigationActions
@@ -155,17 +160,27 @@ fun EventDateTime(day: String, time: String) {
  * @param painter Painter object for the image
  */
 @Composable
-fun EventImage(painter: Painter) {
+fun EventImage(imageUrl: String?) {
+  val defaultImagePainter = painterResource(id = R.drawable.gomeet_logo)
+  val imagePainter =
+      if (imageUrl != null) {
+        rememberAsyncImagePainter(
+            ImageRequest.Builder(LocalContext.current)
+                .data(data = imageUrl)
+                .apply(
+                    block =
+                        fun ImageRequest.Builder.() {
+                          placeholder(R.drawable.gomeet_logo)
+                        })
+                .build())
+      } else defaultImagePainter
+
   Column(modifier = Modifier.fillMaxWidth().testTag("EventImage")) {
     Image(
-        painter = painter,
-        contentScale = ContentScale.Crop,
+        painter = imagePainter,
         contentDescription = "Event Image",
-        modifier =
-            Modifier.aspectRatio(3f / 1.75f)
-                // Specify the height you want for the image
-
-                .clip(RoundedCornerShape(20.dp)))
+        contentScale = ContentScale.Crop,
+        modifier = Modifier.aspectRatio(3f / 1.75f).clip(RoundedCornerShape(20.dp)))
   }
 }
 

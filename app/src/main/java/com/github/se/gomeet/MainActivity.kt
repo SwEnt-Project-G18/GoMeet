@@ -133,13 +133,13 @@ class MainActivity : ComponentActivity() {
                   })
             }
             composable(Route.LOGIN) {
-              LoginScreen(authViewModel) {
+              LoginScreen(authViewModel = authViewModel, nav = NavigationActions(nav)) {
                 NavigationActions(nav)
                     .navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == Route.CREATE })
               }
             }
             composable(Route.REGISTER) {
-              RegisterScreen(client, authViewModel, userViewModel) {
+              RegisterScreen(client, NavigationActions(nav), authViewModel, userViewModel) {
                 NavigationActions(nav)
                     .navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == Route.CREATE })
               }
@@ -210,7 +210,7 @@ class MainActivity : ComponentActivity() {
                       time,
                       organizer,
                       rating.toDouble(),
-                      painterResource(id = R.drawable.chess_demo),
+                      painterResource(id = R.drawable.gomeet_logo),
                       description,
                       loc,
                       userViewModel)
