@@ -122,9 +122,9 @@ fun Profile(
               modifier = Modifier.align(Alignment.CenterVertically).padding(end = 15.dp),
               onClick = { /* Handles notification icon click */}) {
                 Icon(
-                    ImageVector.vectorResource(R.drawable.notifications_icon),
+                    ImageVector.vectorResource(R.drawable.mail),
                     contentDescription = "Notifications",
-                    modifier = Modifier.size(40.dp).align(Alignment.CenterVertically),
+                    modifier = Modifier.size(30.dp).align(Alignment.CenterVertically),
                     tint = Grey)
               }
 
@@ -175,7 +175,7 @@ fun Profile(
                                 verticalAlignment = Alignment.CenterVertically,
                                 modifier = Modifier.padding(start = 30.dp)) {
                                   Text(
-                                      currentUser?.username ?: "username",
+                                      (currentUser?.firstName + " " + currentUser?.lastName),
                                       textAlign = TextAlign.Center,
                                       style =
                                           TextStyle(
@@ -189,7 +189,7 @@ fun Profile(
                                           ))
                                 }
                             Text(
-                                text = "@usertag",
+                                text = ("@" + currentUser?.username),
                                 style =
                                     TextStyle(
                                         fontSize = 15.sp,
