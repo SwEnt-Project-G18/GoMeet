@@ -32,6 +32,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.se.gomeet.R
+import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.viewmodel.AuthViewModel
 import com.google.firebase.auth.ktx.auth
@@ -47,29 +48,39 @@ import io.getstream.chat.android.models.User
  */
 @Composable
 fun LoginScreen(authViewModel: AuthViewModel, onNavToExplore: () -> Unit) {
-  val signInState = authViewModel.signInState.collectAsState()
-  val isError = signInState.value.signInError != null
-  val context = LocalContext.current
-  val textFieldColors =
-      TextFieldDefaults.colors(
-          focusedTextColor = DarkCyan,
-          unfocusedTextColor = DarkCyan,
-          unfocusedContainerColor = Color.Transparent,
-          focusedContainerColor = Color.Transparent,
-          cursorColor = DarkCyan,
-          focusedLabelColor = MaterialTheme.colorScheme.tertiary,
-          focusedIndicatorColor = MaterialTheme.colorScheme.tertiary)
+    val signInState = authViewModel.signInState.collectAsState()
+    val isError = signInState.value.signInError != null
+    val context = LocalContext.current
+    val textFieldColors =
+        TextFieldDefaults.colors(
+            focusedTextColor = DarkCyan,
+            unfocusedTextColor = DarkCyan,
+            unfocusedContainerColor = Color.Transparent,
+            focusedContainerColor = Color.Transparent,
+            cursorColor = DarkCyan,
+            focusedLabelColor = MaterialTheme.colorScheme.tertiary,
+            focusedIndicatorColor = MaterialTheme.colorScheme.tertiary
+        )
 
-  Column(
-      verticalArrangement = Arrangement.Top,
-      horizontalAlignment = Alignment.CenterHorizontally,
-      modifier = Modifier.fillMaxSize().padding(25.dp).testTag("LoginScreen")) {
+    Column(
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(25.dp)
+            .testTag("LoginScreen")
+    ) {
         Image(
             painter = painterResource(id = R.drawable.gomeet_text),
             contentDescription = "GoMeet",
             modifier = Modifier.padding(top = 40.dp),
             alignment = Alignment.Center,
-            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.tertiary))
+            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.tertiary)
+        )
+
+        if (signInState.value.isLoading) {
+            LoadingText()
+        } else {
 
         Spacer(modifier = Modifier.size(40.dp))
 
@@ -80,26 +91,31 @@ fun LoginScreen(authViewModel: AuthViewModel, onNavToExplore: () -> Unit) {
             fontStyle = FontStyle.Normal,
             fontWeight = FontWeight.SemiBold,
             textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.headlineLarge)
+            style = MaterialTheme.typography.headlineLarge
+        )
 
         Spacer(modifier = Modifier.size(110.dp))
 
         if (isError) {
-          Text(
-              text = signInState.value.signInError!!,
-              modifier = Modifier.padding(bottom = 16.dp),
-              color = Color.Red,
-              textAlign = TextAlign.Center)
+            Text(
+                text = signInState.value.signInError!!,
+                modifier = Modifier.padding(bottom = 16.dp),
+                color = Color.Red,
+                textAlign = TextAlign.Center
+            )
         }
 
         TextField(
             value = signInState.value.email,
             singleLine = true,
             onValueChange = { newValue -> authViewModel.onEmailChange(newValue) },
-            modifier = Modifier.fillMaxWidth().testTag("EmailField"),
+            modifier = Modifier
+                .fillMaxWidth()
+                .testTag("EmailField"),
             label = { Text("Email") },
             isError = isError,
-            colors = textFieldColors)
+            colors = textFieldColors
+        )
 
         Spacer(modifier = Modifier.size(16.dp))
 
@@ -107,31 +123,36 @@ fun LoginScreen(authViewModel: AuthViewModel, onNavToExplore: () -> Unit) {
             value = signInState.value.password,
             singleLine = true,
             onValueChange = { newValue -> authViewModel.onPasswordChange(newValue) },
-            modifier = Modifier.fillMaxWidth().testTag("LogInField"),
+            modifier = Modifier
+                .fillMaxWidth()
+                .testTag("LogInField"),
             label = { Text("Password") },
             isError = isError,
             colors = textFieldColors,
-            visualTransformation = PasswordVisualTransformation())
+            visualTransformation = PasswordVisualTransformation()
+        )
 
         Spacer(modifier = Modifier.size(50.dp))
 
         Button(
             onClick = { authViewModel.signInWithEmailPassword(context) },
-            modifier = Modifier.fillMaxWidth().testTag("LogInButton"),
+            modifier = Modifier
+                .fillMaxWidth()
+                .testTag("LogInButton"),
             colors =
-                ButtonColors(
-                    disabledContainerColor = MaterialTheme.colorScheme.primary,
-                    containerColor = DarkCyan,
-                    disabledContentColor = Color.White,
-                    contentColor = Color.White),
+            ButtonColors(
+                disabledContainerColor = MaterialTheme.colorScheme.primary,
+                containerColor = DarkCyan,
+                disabledContentColor = Color.White,
+                contentColor = Color.White
+            ),
             enabled =
-                signInState.value.email.isNotEmpty() && signInState.value.password.isNotEmpty()) {
-              Text("Log in")
-            }
-
-        if (signInState.value.isLoading) {
-          CircularProgressIndicator()
+            signInState.value.email.isNotEmpty() && signInState.value.password.isNotEmpty()
+        ) {
+            Text("Log in")
         }
+    }
+}
 
         if (signInState.value.isSignInSuccessful) {
           val user =
@@ -149,7 +170,6 @@ fun LoginScreen(authViewModel: AuthViewModel, onNavToExplore: () -> Unit) {
           }
         }
       }
-}
 
 @Preview
 @Composable
