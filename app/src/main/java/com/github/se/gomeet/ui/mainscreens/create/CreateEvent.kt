@@ -90,7 +90,8 @@ private const val NUMBER_OF_SUGGESTIONS = 3
 fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivate: Boolean) {
 
   val db = EventRepository(Firebase.firestore)
-  val titleState = remember { mutableStateOf("") }
+  val uid = db.getNewId()
+    val titleState = remember { mutableStateOf("") }
   val descriptionState = remember { mutableStateOf("") }
   val locationState = remember { mutableStateOf("") }
   val textDate = remember { mutableStateOf("") }
@@ -269,7 +270,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                     modifier = Modifier.fillMaxWidth().padding(start = 7.dp, end = 7.dp),
                     onClick = {
                       nav.navigateTo(
-                          SECOND_LEVEL_DESTINATION.first { it.route == Route.ADD_PARTICIPANTS })
+                          SECOND_LEVEL_DESTINATION.first { it.route == Route.ADD_PARTICIPANTS.replace("{eventId}", uid) })
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Grey),
                     shape = RoundedCornerShape(10.dp)) {
@@ -325,7 +326,6 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
 
               OutlinedButton(
                   onClick = {
-                    val uid = db.getNewId()
                     if (titleState.value.isNotEmpty() && !dateFormatError && dateState != null) {
                       if (selectedLocation.value == null) {
                         eventViewModel.location(locationState.value, 1) { locations ->

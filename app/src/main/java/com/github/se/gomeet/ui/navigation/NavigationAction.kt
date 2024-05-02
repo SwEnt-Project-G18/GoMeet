@@ -44,7 +44,7 @@ object Route {
   const val PRIVATE_CREATE = "Private Create"
   const val OTHERS_PROFILE = "OthersProfile/{uid}"
   const val EDIT_PROFILE = "EditProfile"
-  const val ADD_PARTICIPANTS = "Add Participants"
+  const val ADD_PARTICIPANTS = "Add Participants/{eventId}"
   const val MANAGE_INVITES = "ManageInvites/{eventId}"
   const val EVENT_INFO =
       "eventInfo/{eventId}/{title}/{date}/{time}/{organizer}/{rating}/{description}/{latitude}/{longitude}"
@@ -183,7 +183,6 @@ class NavigationActions(val navController: NavHostController) {
     navController.popBackStack()
   }
 }
-
 /**
  * Gets the icon for the given route.
  *

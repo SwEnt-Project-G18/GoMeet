@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
+import com.github.se.gomeet.model.event.EventInviteUsers
 import com.github.se.gomeet.model.event.InviteStatus
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
@@ -78,12 +79,14 @@ fun ManageInvites(currentUser: String,
     val coroutineScope = rememberCoroutineScope()
     val user = remember { mutableStateOf<GoMeetUser?>(null) }
     val event = remember { mutableStateOf<Event?>(null) }
+    val eventInviteUsers  = remember { mutableStateOf<EventInviteUsers?>(null) }
 
 
     LaunchedEffect(Unit) {
         coroutineScope.launch {
             user.value = userViewModel.getUser(currentUser)
             event.value = eventViewModel.getEvent(currentEvent)
+            eventInviteUsers.value = eventInviteViewModel.getUsersInvitedToEvent(event.value!!.uid)
 
             val followers = user.value!!.followers
 //            val friendList = userViewModel.getUserFriends(currentUser)
@@ -91,7 +94,7 @@ fun ManageInvites(currentUser: String,
 //                followers.addAll(friendList)
 //            }
             if (followers.isNotEmpty()) {
-                followers.forEach() {
+                followers.forEach {
                     followersList.add(it)
                 }
             }
@@ -132,92 +135,20 @@ fun ManageInvites(currentUser: String,
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .padding(innerPadding)
-                .verticalScroll(rememberScrollState(0))
                 .fillMaxSize()) {
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 15.dp, end = 15.dp, bottom = 15.dp),
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                verticalAlignment = Alignment.Top) {
-                Button(
-                    onClick = { onFilterButtonClick("Uninvited") },
-                    modifier = Modifier
-                        .height(40.dp)
-                        .weight(1f),
-                    shape = RoundedCornerShape(10.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor =
-                    if (selectedFilter == "Uninvited") DarkCyan else NavBarUnselected,
-                        contentColor =
-                        if (selectedFilter == "Uninvited") Color.White else DarkCyan),
-                    border = BorderStroke(1.dp, DarkCyan)
-                ) {
-                    Text(text = "Uninvited", color = MaterialTheme.colorScheme.onBackground)
-                }
-
-                Button(
-                    onClick = { onFilterButtonClick("Invited") },
-                    modifier = Modifier
-                        .height(40.dp)
-                        .weight(1f),
-                    shape = RoundedCornerShape(10.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor =
-                        if (selectedFilter == "Invited") DarkCyan else NavBarUnselected,
-                        contentColor =
-                        if (selectedFilter == "Invited") Color.White else DarkCyan),
-                    border = BorderStroke(1.dp, DarkCyan)
-                ) {
-                    Text(text = "Invited", color = MaterialTheme.colorScheme.onBackground)
-                }
-
-                Button(
-                    onClick = { onFilterButtonClick("Accepted") },
-                    modifier = Modifier
-                        .height(40.dp)
-                        .weight(1f),
-                    shape = RoundedCornerShape(10.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor =
-                        if (selectedFilter == "Accepted") DarkCyan else NavBarUnselected,
-                        contentColor =
-                        if (selectedFilter == "Accepted") Color.White else DarkCyan),
-                    border = BorderStroke(1.dp, DarkCyan)
-                ) {
-                    Text(text = "Accepted", color = MaterialTheme.colorScheme.onBackground)
-                }
-            }
 
             /* TODO: for every followers this user has, retrieve them and stock them in a list and
                 display them in the following way using the UserInviteWidget in a for-loop
              */
 
             // Display the list of followers to manage our invitations based to the selected filter
-            Column(modifier = Modifier.verticalScroll(rememberScrollState()).fillMaxSize()) {
-                if (selectedFilter == "All" || selectedFilter == "Uninvited") {
-                    // Loop through the list of followers that are uninvited to this event
-                    followersList.forEach {
-                        UserInviteWidget(username = it, status = InviteStatus.UNINVITED)
+            Column(modifier = Modifier
+                .verticalScroll(rememberScrollState())
+                .fillMaxSize()) {
+                    eventInviteUsers.value!!.usersInvited.forEach {user ->
+                        UserInviteWidget(username = user.first, status = user.second)
                     }
-                }
-
-                if (selectedFilter == "All" || selectedFilter == "Invited") {
-                    // Loop through the list of followers that are invited to this event
-                }
-
-                if (selectedFilter == "All" || selectedFilter == "Accepted") {
-                    // Loop through the list of followers that have accepted the invitation
-                }
-
             }
-
-
-            UserInviteWidget(username = "Test", status = InviteStatus.PENDING)
-            UserInviteWidget(username = "Test", status = InviteStatus.REFUSED)
-            UserInviteWidget(username = "Test", status = InviteStatus.ACCEPTED)
-            UserInviteWidget(username = "Test", status = null)
         }
     }
 }
@@ -253,7 +184,6 @@ fun UserInviteWidget(username : String, status : InviteStatus?) {
         Text(
             text = when(status) {
                 null -> ""
-                InviteStatus.UNINVITED -> ""
                 InviteStatus.PENDING -> "Pending"
                 InviteStatus.ACCEPTED -> "Accepted"
                 InviteStatus.REFUSED -> "Refused"
@@ -261,7 +191,6 @@ fun UserInviteWidget(username : String, status : InviteStatus?) {
             modifier = Modifier.width(70.dp),
             color = when(status) {
                 null -> MaterialTheme.colorScheme.onBackground
-                InviteStatus.UNINVITED -> MaterialTheme.colorScheme.onBackground
                 InviteStatus.PENDING -> MaterialTheme.colorScheme.onBackground
                 InviteStatus.ACCEPTED -> Color.Green
                 InviteStatus.REFUSED -> Color.Red
@@ -280,7 +209,6 @@ fun UserInviteWidget(username : String, status : InviteStatus?) {
                 containerColor =
                 when(status) {
                     null -> DarkCyan
-                    InviteStatus.UNINVITED -> DarkCyan
                     InviteStatus.PENDING -> Color.LightGray
                     InviteStatus.ACCEPTED -> Color.Red
                     InviteStatus.REFUSED -> Color.LightGray
@@ -290,14 +218,12 @@ fun UserInviteWidget(username : String, status : InviteStatus?) {
             Text(
                 text = when(status) {
                     null -> "Invite"
-                    InviteStatus.UNINVITED -> "Invite"
                     InviteStatus.PENDING -> "Cancel"
                     InviteStatus.ACCEPTED -> "Cancel"
                     InviteStatus.REFUSED -> "Invite"
                 },
                 color = when(status) {
                     null -> Color.White
-                    InviteStatus.UNINVITED -> Color.White
                     InviteStatus.PENDING -> Color.DarkGray
                     InviteStatus.ACCEPTED -> Color.White
                     InviteStatus.REFUSED -> Color.DarkGray

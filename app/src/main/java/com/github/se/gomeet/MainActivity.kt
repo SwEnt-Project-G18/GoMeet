@@ -175,8 +175,15 @@ class MainActivity : ComponentActivity() {
             composable(Route.PUBLIC_CREATE) {
               CreateEvent(navAction, EventViewModel(Firebase.auth.currentUser!!.uid), false)
             }
-            composable(Route.ADD_PARTICIPANTS) { AddParticipants(navAction) }
 
+            composable(route = Route.ADD_PARTICIPANTS,
+                arguments = listOf(navArgument("eventId") { type = NavType.StringType })) {entry ->
+                    val eventId = entry.arguments?.getString("eventId") ?: ""
+                    AddParticipants(nav = navAction,
+                        userId = userIdState.value,
+                        userViewModel = userViewModel,
+                        eventId = eventId,
+                        eventInviteViewModel = eventInviteViewModel) }
 
             composable(route = Route.MANAGE_INVITES,
                         arguments = listOf(navArgument("eventId") { type = NavType.StringType })
