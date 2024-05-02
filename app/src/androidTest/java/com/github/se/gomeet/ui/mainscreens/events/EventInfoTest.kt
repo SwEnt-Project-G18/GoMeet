@@ -1,6 +1,5 @@
 package com.github.se.gomeet.ui.mainscreens.events
 
-import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -11,9 +10,8 @@ import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.tasks.await
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.runBlocking
 import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.junit.Rule
@@ -41,12 +39,18 @@ class EventInfoTest {
     }
 
     assert(composeTestRule.onNodeWithTag("TopBar").isDisplayed(), { "TopBar not displayed" })
-    assert(composeTestRule.onNodeWithTag("EventHeader").isDisplayed(), { "EventHeader not displayed" })
-    assert(composeTestRule.onNodeWithTag("EventImage").isDisplayed(), { "EventImage not displayed" })
-    assert(composeTestRule
-        .onNodeWithTag("EventDescription")
-        .assertTextContains(eventDescription).isDisplayed(), { "EventDescription not displayed" })
-    assert(composeTestRule.onNodeWithTag("EventButton").isDisplayed(), { "EventButton not displayed"})
+    assert(
+        composeTestRule.onNodeWithTag("EventHeader").isDisplayed(), { "EventHeader not displayed" })
+    assert(
+        composeTestRule.onNodeWithTag("EventImage").isDisplayed(), { "EventImage not displayed" })
+    assert(
+        composeTestRule
+            .onNodeWithTag("EventDescription")
+            .assertTextContains(eventDescription)
+            .isDisplayed(),
+        { "EventDescription not displayed" })
+    assert(
+        composeTestRule.onNodeWithTag("EventButton").isDisplayed(), { "EventButton not displayed" })
     assert(composeTestRule.onNodeWithTag("MapView").isDisplayed(), { "MapView not displayed" })
   }
 
@@ -70,15 +74,17 @@ class EventInfoTest {
     @JvmStatic
     fun setUp() {
       Firebase.auth.createUserWithEmailAndPassword(usr, pwd)
-        TimeUnit.SECONDS.sleep(2)
+      TimeUnit.SECONDS.sleep(2)
       Firebase.auth.signInWithEmailAndPassword(usr, pwd)
-        TimeUnit.SECONDS.sleep(2)
+      TimeUnit.SECONDS.sleep(2)
       // Set up the user view model
       // Order is important here, since createUserIfNew sets current user to created user (so we
       // need to create the current user last)
-        currentUserId = Firebase.auth.currentUser!!.uid
-      runBlocking{ userViewModel.createUserIfNew(organiserId, "testorganiser", "test", "name",
-          "test@email.com", "0123", "Afghanistan") }
+      currentUserId = Firebase.auth.currentUser!!.uid
+      runBlocking {
+        userViewModel.createUserIfNew(
+            organiserId, "testorganiser", "test", "name", "test@email.com", "0123", "Afghanistan")
+      }
       userViewModel.createUserIfNew(currentUserId, "a", "b", "c", usr, "4567", "Angola")
       TimeUnit.SECONDS.sleep(2)
     }
@@ -87,7 +93,7 @@ class EventInfoTest {
     @JvmStatic
     fun tearDown() {
       // Clean up the user view model
-        Firebase.auth.currentUser!!.delete()
+      Firebase.auth.currentUser!!.delete()
 
       userViewModel.deleteUser(organiserId)
       userViewModel.deleteUser(currentUserId)

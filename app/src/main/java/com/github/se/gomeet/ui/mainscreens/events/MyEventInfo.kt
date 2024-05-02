@@ -124,8 +124,6 @@ fun MyEventInfo(
       }
 }
 
-
-
 @Preview
 @Composable
 fun PreviewEventInfo() {

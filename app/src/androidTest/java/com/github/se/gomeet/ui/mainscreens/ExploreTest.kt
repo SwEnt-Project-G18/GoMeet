@@ -18,7 +18,6 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
-import org.junit.After
 import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.junit.Rule
@@ -95,6 +94,5 @@ class ExploreTest {
       userViewModel.deleteUser(uid)
       Firebase.auth.currentUser?.delete()
     }
-
   }
 }
