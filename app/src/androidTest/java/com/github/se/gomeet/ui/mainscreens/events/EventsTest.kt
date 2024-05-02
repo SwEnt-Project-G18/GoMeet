@@ -1,46 +1,31 @@
 package com.github.se.gomeet.ui.mainscreens.events
 
-import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onAllNodesWithText
-import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performClick
 import androidx.navigation.compose.rememberNavController
-import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.se.gomeet.model.event.location.Location
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
-import java.util.concurrent.TimeUnit
+import java.time.LocalDate
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import org.junit.After
-import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
 
-@RunWith(AndroidJUnit4::class)
 class EventsTest {
 
   @get:Rule val composeTestRule = createComposeRule()
-
-  @After
-  fun tearDown() {
-    // clean up the user
-    Firebase.auth.currentUser?.delete()
-  }
 
   @Test
   fun eventsScreen_RenderingCorrectness() {
     // Test rendering correctness with events available
     composeTestRule.setContent {
       Events(
-          currentUser = uid,
+          currentUser = "test",
           nav = NavigationActions(rememberNavController()),
-          userViewModel = userViewModel,
-          eventViewModel = eventViewModel)
+          userViewModel = UserViewModel(),
+          eventViewModel = EventViewModel())
     }
 
     composeTestRule.onNode(hasText("My events")).assertIsDisplayed()
@@ -56,10 +41,10 @@ class EventsTest {
     // Test button click handling
     composeTestRule.setContent {
       Events(
-          currentUser = uid,
+          currentUser = "NEEGn5cbkJZDXaezeGdfd2D4u6b2",
           nav = NavigationActions(rememberNavController()),
-          userViewModel = userViewModel,
-          eventViewModel = eventViewModel)
+          userViewModel = UserViewModel(),
+          eventViewModel = EventViewModel())
     }
 
     composeTestRule.onNodeWithText("JoinedEvents").performClick()
@@ -67,45 +52,36 @@ class EventsTest {
     composeTestRule.onNodeWithText("My events").performClick()
   }
 
-  companion object {
+  @Test
+  fun eventsScreen_AsyncBehavior() {
+    // Test asynchronous behavior of fetching events
+    val eventViewModel = EventViewModel()
+    runBlocking(Dispatchers.IO) {
+      // Add a mock event to the view model
+      eventViewModel.createEvent(
+          title = "Test Event",
+          description = "Test description",
+          location = Location(46.5190557, 6.5555216, "EPFL Campus"), // Provide a valid location
+          date = LocalDate.now(), // Provide a valid date
+          price = 10.0,
+          url = "",
+          participants = emptyList(),
+          visibleToIfPrivate = emptyList(),
+          maxParticipants = 0,
+          public = true,
+          tags = emptyList(),
+          images = emptyList(),
+          imageUri = null,
+          userViewModel = UserViewModel(),
+          uid = "")
+    }
 
-    private lateinit var eventViewModel: EventViewModel
-    private lateinit var userViewModel: UserViewModel
-
-    private const val email = "user@eventstest.com"
-    private const val pwd = "123456"
-    private var uid = ""
-
-    @JvmStatic
-    @BeforeClass
-    fun setup() {
-      TimeUnit.SECONDS.sleep(3)
-      userViewModel = UserViewModel()
-      // create a new user
-      var result = Firebase.auth.createUserWithEmailAndPassword(email, pwd)
-      while (!result.isComplete) {
-        TimeUnit.SECONDS.sleep(1)
-      }
-      uid = result.result.user!!.uid
-
-      runBlocking {
-        userViewModel.createUserIfNew(
-            uid,
-            "events_test_user",
-            "testfirstname",
-            "testlastname",
-            email,
-            "testphonenumber",
-            "testcountry")
-      }
-
-      // sign in as the new user
-      result = Firebase.auth.signInWithEmailAndPassword(email, pwd)
-      while (!result.isComplete) {
-        TimeUnit.SECONDS.sleep(1)
-      }
-
-      eventViewModel = EventViewModel(uid)
+    composeTestRule.setContent {
+      Events(
+          currentUser = "NEEGn5cbkJZDXaezeGdfd2D4u6b2",
+          nav = NavigationActions(rememberNavController()),
+          userViewModel = UserViewModel(),
+          eventViewModel = EventViewModel())
     }
   }
 }

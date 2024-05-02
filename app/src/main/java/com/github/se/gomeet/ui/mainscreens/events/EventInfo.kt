@@ -76,6 +76,7 @@ import com.google.maps.android.compose.rememberMarkerState
 @Composable
 fun EventHeader(
     title: String,
+    currentUser: GoMeetUser,
     organizer: GoMeetUser,
     rating: Double,
     nav: NavigationActions,
@@ -99,7 +100,11 @@ fun EventHeader(
           Text(
               modifier =
                   Modifier.clickable {
-                        nav.navigateToScreen(Route.OTHERS_PROFILE.replace("{uid}", organizer.uid))
+                        if (organizer.uid == currentUser.uid) {
+                          nav.navigateToScreen(Route.PROFILE)
+                        } else {
+                          nav.navigateToScreen(Route.OTHERS_PROFILE.replace("{uid}", organizer.uid))
+                        }
                       }
                       .testTag("Username"),
               text = organizer.username,

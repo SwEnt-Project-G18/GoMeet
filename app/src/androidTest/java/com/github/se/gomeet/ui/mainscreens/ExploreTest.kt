@@ -18,7 +18,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
-import org.junit.After
+import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
@@ -29,12 +29,6 @@ class ExploreTest {
   @get:Rule val rule = createAndroidComposeRule<ComponentActivity>()
   @get:Rule
   var permissionRule = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
-
-  @After
-  fun tearDown() {
-    // clean up the user
-    Firebase.auth.currentUser?.delete()
-  }
 
   @Test
   fun uiElementsDisplayed() {
@@ -91,6 +85,14 @@ class ExploreTest {
       }
 
       eventViewModel = EventViewModel(uid)
+    }
+
+    @AfterClass
+    @JvmStatic
+    fun tearDown() {
+      // clean up the user
+      userViewModel.deleteUser(uid)
+      Firebase.auth.currentUser?.delete()
     }
   }
 }

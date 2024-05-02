@@ -69,6 +69,7 @@ import coil.request.ImageRequest
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.user.GoMeetUser
+import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
@@ -108,6 +109,7 @@ fun Events(
   val coroutineScope = rememberCoroutineScope()
   val query = remember { mutableStateOf("") }
   val user = remember { mutableStateOf<GoMeetUser?>(null) }
+  var eventsLoaded = remember { mutableStateOf(false) }
 
   // Initial data loading using LaunchedEffect
   LaunchedEffect(Unit) {
@@ -122,6 +124,7 @@ fun Events(
       if (allEvents.isNotEmpty()) {
         eventList.addAll(allEvents)
       }
+      eventsLoaded.value = true
     }
   }
 
@@ -198,161 +201,173 @@ fun Events(
                                     if (selectedFilter == "MyEvents") Color.White else DarkCyan),
                         border = BorderStroke(1.dp, DarkCyan))
                   }
-              // Display events based on the selected filter
-              Column(modifier = Modifier.verticalScroll(rememberScrollState()).fillMaxSize()) {
-                // Display joined events if 'All' or 'Joined' is selected
-                if (selectedFilter == "All" || selectedFilter == "Joined") {
-                  Text(
-                      text = "Joined Events",
-                      style =
-                          TextStyle(
-                              fontSize = 20.sp,
-                              lineHeight = 16.sp,
-                              fontFamily = FontFamily(Font(R.font.roboto)),
-                              fontWeight = FontWeight(1000),
-                              color = DarkCyan,
-                              textAlign = TextAlign.Center,
-                              letterSpacing = 0.5.sp,
-                          ),
-                      modifier = Modifier.padding(10.dp).align(Alignment.Start))
 
-                  // Loop through and display events that match the joined events criteria
-                  eventList
-                      .filter { e -> user.value!!.myEvents.contains(e.uid) }
-                      .forEach { event ->
-                        if (event.title.contains(query.value, ignoreCase = true)) {
-                          val painter: Painter =
-                              if (event.images.isNotEmpty()) {
-                                rememberAsyncImagePainter(
-                                    ImageRequest.Builder(LocalContext.current)
-                                        .data(data = event.images[0])
-                                        .apply(
-                                            block =
-                                                fun ImageRequest.Builder.() {
-                                                  crossfade(true)
-                                                  placeholder(R.drawable.gomeet_logo)
-                                                })
-                                        .build())
-                              } else {
-                                painterResource(id = R.drawable.gomeet_logo)
-                              }
-                          // Reusable widget for displaying event details
-                          EventWidget(
-                              userName = event.creator,
-                              eventName = event.title,
-                              eventId = event.uid,
-                              eventDescription = event.description,
-                              eventDate =
-                                  Date.from(
-                                      event.date.atStartOfDay(ZoneId.systemDefault()).toInstant()),
-                              eventPicture = painter,
-                              verified = false,
-                              nav = nav) // verification to be done using user details
+              if (!eventsLoaded.value) {
+                LoadingText()
+              } else {
+
+                // Display events based on the selected filter
+                Column(modifier = Modifier.verticalScroll(rememberScrollState()).fillMaxSize()) {
+                  // Display joined events if 'All' or 'Joined' is selected
+                  if (selectedFilter == "All" || selectedFilter == "Joined") {
+                    Text(
+                        text = "Joined Events",
+                        style =
+                            TextStyle(
+                                fontSize = 20.sp,
+                                lineHeight = 16.sp,
+                                fontFamily = FontFamily(Font(R.font.roboto)),
+                                fontWeight = FontWeight(1000),
+                                color = DarkCyan,
+                                textAlign = TextAlign.Center,
+                                letterSpacing = 0.5.sp,
+                            ),
+                        modifier = Modifier.padding(10.dp).align(Alignment.Start))
+
+                    // Loop through and display events that match the joined events criteria
+                    eventList
+                        .filter { e -> user.value!!.myEvents.contains(e.uid) }
+                        .forEach { event ->
+                          if (event.title.contains(query.value, ignoreCase = true)) {
+                            val painter: Painter =
+                                if (event.images.isNotEmpty()) {
+                                  rememberAsyncImagePainter(
+                                      ImageRequest.Builder(LocalContext.current)
+                                          .data(data = event.images[0])
+                                          .apply(
+                                              block =
+                                                  fun ImageRequest.Builder.() {
+                                                    crossfade(true)
+                                                    placeholder(R.drawable.gomeet_logo)
+                                                  })
+                                          .build())
+                                } else {
+                                  painterResource(id = R.drawable.gomeet_logo)
+                                }
+                            // Reusable widget for displaying event details
+                            EventWidget(
+                                userName = event.creator,
+                                eventName = event.title,
+                                eventId = event.uid,
+                                eventDescription = event.description,
+                                eventDate =
+                                    Date.from(
+                                        event.date
+                                            .atStartOfDay(ZoneId.systemDefault())
+                                            .toInstant()),
+                                eventPicture = painter,
+                                verified = false,
+                                nav = nav) // verification to be done using user details
+                          }
                         }
-                      }
-                }
+                  }
 
-                // Display favourite events if 'All' or 'Favourites' is selected
-                if (selectedFilter == "All" || selectedFilter == "Favourites") {
+                  // Display favourite events if 'All' or 'Favourites' is selected
+                  if (selectedFilter == "All" || selectedFilter == "Favourites") {
 
-                  Text(
-                      text = "Favourites",
-                      style =
-                          TextStyle(
-                              fontSize = 20.sp,
-                              lineHeight = 16.sp,
-                              fontFamily = FontFamily(Font(R.font.roboto)),
-                              fontWeight = FontWeight(1000),
-                              color = DarkCyan,
-                              textAlign = TextAlign.Center,
-                              letterSpacing = 0.5.sp,
-                          ),
-                      modifier = Modifier.padding(10.dp).align(Alignment.Start))
+                    Text(
+                        text = "Favourites",
+                        style =
+                            TextStyle(
+                                fontSize = 20.sp,
+                                lineHeight = 16.sp,
+                                fontFamily = FontFamily(Font(R.font.roboto)),
+                                fontWeight = FontWeight(1000),
+                                color = DarkCyan,
+                                textAlign = TextAlign.Center,
+                                letterSpacing = 0.5.sp,
+                            ),
+                        modifier = Modifier.padding(10.dp).align(Alignment.Start))
 
-                  // Loop through and display events are marked favourites by the currentUser
-                  eventList
-                      .filter { e -> user.value!!.myFavorites.contains(e.uid) }
-                      .forEach { event ->
-                        if (event.title.contains(query.value, ignoreCase = true)) {
-                          val painter: Painter =
-                              if (event.images.isNotEmpty()) {
-                                rememberAsyncImagePainter(
-                                    ImageRequest.Builder(LocalContext.current)
-                                        .data(data = event.images[0])
-                                        .apply(
-                                            block =
-                                                fun ImageRequest.Builder.() {
-                                                  crossfade(true)
-                                                  placeholder(R.drawable.gomeet_logo)
-                                                })
-                                        .build())
-                              } else {
-                                painterResource(id = R.drawable.gomeet_logo)
-                              }
-                          EventWidget(
-                              userName = event.creator,
-                              eventId = event.uid,
-                              eventName = event.title,
-                              eventDescription = event.description,
-                              eventDate =
-                                  Date.from(
-                                      event.date.atStartOfDay(ZoneId.systemDefault()).toInstant()),
-                              eventPicture = painter,
-                              verified = false,
-                              nav = nav)
+                    // Loop through and display events are marked favourites by the currentUser
+                    eventList
+                        .filter { e -> user.value!!.myFavorites.contains(e.uid) }
+                        .forEach { event ->
+                          if (event.title.contains(query.value, ignoreCase = true)) {
+                            val painter: Painter =
+                                if (event.images.isNotEmpty()) {
+                                  rememberAsyncImagePainter(
+                                      ImageRequest.Builder(LocalContext.current)
+                                          .data(data = event.images[0])
+                                          .apply(
+                                              block =
+                                                  fun ImageRequest.Builder.() {
+                                                    crossfade(true)
+                                                    placeholder(R.drawable.gomeet_logo)
+                                                  })
+                                          .build())
+                                } else {
+                                  painterResource(id = R.drawable.gomeet_logo)
+                                }
+                            EventWidget(
+                                userName = event.creator,
+                                eventId = event.uid,
+                                eventName = event.title,
+                                eventDescription = event.description,
+                                eventDate =
+                                    Date.from(
+                                        event.date
+                                            .atStartOfDay(ZoneId.systemDefault())
+                                            .toInstant()),
+                                eventPicture = painter,
+                                verified = false,
+                                nav = nav)
+                          }
                         }
-                      }
-                }
+                  }
 
-                // Display user's own events if 'All' or 'MyEvents' is selected
-                if (selectedFilter == "All" || selectedFilter == "MyEvents") {
-                  Text(
-                      text = "My Events",
-                      style =
-                          TextStyle(
-                              fontSize = 20.sp,
-                              lineHeight = 16.sp,
-                              fontFamily = FontFamily(Font(R.font.roboto)),
-                              fontWeight = FontWeight(1000),
-                              color = DarkCyan,
-                              textAlign = TextAlign.Center,
-                              letterSpacing = 0.5.sp,
-                          ),
-                      modifier = Modifier.padding(10.dp).align(Alignment.Start))
+                  // Display user's own events if 'All' or 'MyEvents' is selected
+                  if (selectedFilter == "All" || selectedFilter == "MyEvents") {
+                    Text(
+                        text = "My Events",
+                        style =
+                            TextStyle(
+                                fontSize = 20.sp,
+                                lineHeight = 16.sp,
+                                fontFamily = FontFamily(Font(R.font.roboto)),
+                                fontWeight = FontWeight(1000),
+                                color = DarkCyan,
+                                textAlign = TextAlign.Center,
+                                letterSpacing = 0.5.sp,
+                            ),
+                        modifier = Modifier.padding(10.dp).align(Alignment.Start))
 
-                  // Loop through and display events created by currentUser
-                  eventList
-                      .filter { e -> e.creator == user.value!!.uid }
-                      .forEach { event ->
-                        if (event.title.contains(query.value, ignoreCase = true)) {
-                          val painter: Painter =
-                              if (event.images.isNotEmpty()) {
-                                rememberAsyncImagePainter(
-                                    ImageRequest.Builder(LocalContext.current)
-                                        .data(data = event.images[0])
-                                        .apply(
-                                            block =
-                                                fun ImageRequest.Builder.() {
-                                                  crossfade(true)
-                                                  placeholder(R.drawable.gomeet_logo)
-                                                })
-                                        .build())
-                              } else {
-                                painterResource(id = R.drawable.gomeet_logo)
-                              }
-                          EventWidget(
-                              userName = event.creator,
-                              eventId = event.uid,
-                              eventName = event.title,
-                              eventDescription = event.description,
-                              eventDate =
-                                  Date.from(
-                                      event.date.atStartOfDay(ZoneId.systemDefault()).toInstant()),
-                              eventPicture = painter,
-                              verified = false,
-                              nav = nav)
+                    // Loop through and display events created by currentUser
+                    eventList
+                        .filter { e -> e.creator == user.value!!.uid }
+                        .forEach { event ->
+                          if (event.title.contains(query.value, ignoreCase = true)) {
+                            val painter: Painter =
+                                if (event.images.isNotEmpty()) {
+                                  rememberAsyncImagePainter(
+                                      ImageRequest.Builder(LocalContext.current)
+                                          .data(data = event.images[0])
+                                          .apply(
+                                              block =
+                                                  fun ImageRequest.Builder.() {
+                                                    crossfade(true)
+                                                    placeholder(R.drawable.gomeet_logo)
+                                                  })
+                                          .build())
+                                } else {
+                                  painterResource(id = R.drawable.gomeet_logo)
+                                }
+                            EventWidget(
+                                userName = event.creator,
+                                eventId = event.uid,
+                                eventName = event.title,
+                                eventDescription = event.description,
+                                eventDate =
+                                    Date.from(
+                                        event.date
+                                            .atStartOfDay(ZoneId.systemDefault())
+                                            .toInstant()),
+                                eventPicture = painter,
+                                verified = false,
+                                nav = nav)
+                          }
                         }
-                      }
+                  }
                 }
               }
             }
@@ -445,9 +460,9 @@ fun EventWidget(
                     time = timeString,
                     description = eventDescription,
                     organizer = userName,
-                    loc = LatLng(46.5191, 6.5668), // replace with actual location
-                    rating = 0.0 // replace with actual rating
-                    // add image
+                    loc = LatLng(46.5191, 6.5668), // TODO: replace with actual location
+                    rating = 0.0 // TODO: replace with actual rating
+                    // TODO: add image
                     )
               },
       colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),

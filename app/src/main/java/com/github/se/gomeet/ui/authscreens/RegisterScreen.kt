@@ -38,6 +38,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.github.se.gomeet.R
 import com.github.se.gomeet.ui.navigation.NavigationActions
+import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.viewmodel.AuthViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
@@ -103,6 +104,10 @@ fun RegisterScreen(
 
           Spacer(modifier = Modifier.size(15.dp))
 
+        if (signInState.value.isLoading || signInState.value.isSignInSuccessful) {
+          LoadingText()
+        } else {
+
           Text(
               text = "Create account",
               modifier = Modifier.padding(bottom = 16.dp).testTag("register_title"),
@@ -159,6 +164,69 @@ fun RegisterScreen(
               singleLine = true,
               modifier = Modifier.fillMaxWidth(),
               colors = textFieldColors)
+
+          Spacer(modifier = Modifier.size(16.dp))
+
+          TextField(
+              value = signInState.value.emailRegister,
+              onValueChange = { newValue -> authViewModel.onEmailRegisterChange(newValue) },
+              label = { Text("Email") },
+              singleLine = true,
+              modifier = Modifier.fillMaxWidth(),
+              colors = textFieldColors)
+
+          Spacer(modifier = Modifier.size(16.dp))
+
+          TextField(
+              value = signInState.value.countryRegister,
+              onValueChange = { newValue -> authViewModel.onCountryRegisterChange(newValue) },
+              label = { Text("Country") },
+              singleLine = true,
+              modifier = Modifier.fillMaxWidth(),
+              colors = textFieldColors)
+
+          Spacer(modifier = Modifier.size(16.dp))
+
+          TextField(
+              value = signInState.value.passwordRegister,
+              onValueChange = { newValue -> authViewModel.onPasswordRegisterChange(newValue) },
+              label = { Text("Password") },
+              singleLine = true,
+              visualTransformation = PasswordVisualTransformation(),
+              modifier = Modifier.fillMaxWidth(),
+              colors = textFieldColors)
+
+          Spacer(modifier = Modifier.size(16.dp))
+
+          TextField(
+              value = signInState.value.confirmPasswordRegister,
+              onValueChange = { newValue ->
+                authViewModel.onConfirmPasswordRegisterChange(newValue)
+              },
+              label = { Text("Confirm Password") },
+              visualTransformation = PasswordVisualTransformation(),
+              singleLine = true,
+              modifier = Modifier.fillMaxWidth(),
+              colors = textFieldColors)
+
+          Spacer(modifier = Modifier.size(50.dp))
+
+          Button(
+              onClick = { authViewModel.signUpWithEmailPassword(context) },
+              modifier = Modifier.fillMaxWidth().testTag("register_button"),
+              colors =
+                  ButtonColors(
+                      disabledContainerColor = MaterialTheme.colorScheme.primary,
+                      containerColor = DarkCyan,
+                      disabledContentColor = Color.White,
+                      contentColor = Color.White),
+              enabled =
+                  signInState.value.emailRegister.isNotEmpty() &&
+                      signInState.value.passwordRegister.isNotEmpty() &&
+                      signInState.value.confirmPasswordRegister.isNotEmpty()) {
+                Text("Create account")
+              }
+        }
 
           Spacer(modifier = Modifier.size(16.dp))
 
