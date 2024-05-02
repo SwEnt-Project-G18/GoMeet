@@ -61,10 +61,8 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
-import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.github.se.gomeet.R
@@ -75,8 +73,6 @@ import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
-import com.github.se.gomeet.ui.theme.NavBarSelected
-import com.github.se.gomeet.ui.theme.NavBarUnselected
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority.PRIORITY_BALANCED_POWER_ACCURACY
@@ -93,17 +89,16 @@ import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.MarkerInfoWindowContent
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
+import java.text.SimpleDateFormat
 import java.time.LocalDate
+import java.time.ZoneId
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.json.JsonNull.content
-import java.text.SimpleDateFormat
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.util.Calendar
-import java.util.Date
-import java.util.Locale
 
 private val defaultPosition = LatLng(46.51912357457158, 6.568023741881372)
 private const val defaultZoom = 16f
@@ -218,7 +213,6 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
         frontLayerBackgroundColor = Color.White,
         backLayerBackgroundColor = Color.White,
         backLayerContentColor = Color.White,
-
         scaffoldState = backdropState,
         frontLayerScrimColor = Color.Unspecified,
         peekHeight = 0.dp,
@@ -226,22 +220,19 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
         modifier = Modifier.testTag("ExploreScreen"),
         appBar = {},
         frontLayerContent = {
-          Box(
-              modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp)) {
-                val listState = rememberLazyListState()
-                ContentInRow(
-                    backdropState = backdropState,
-                    halfHeightPx = halfHeightPx,
-                    listState = listState,
-                    eventList = eventList
-                )
-                ContentInColumn(
-                    backdropState = backdropState,
-                    halfHeightPx = halfHeightPx,
-                    listState = listState,
-                    eventList = eventList
-                )
-              }
+          Box(modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp)) {
+            val listState = rememberLazyListState()
+            ContentInRow(
+                backdropState = backdropState,
+                halfHeightPx = halfHeightPx,
+                listState = listState,
+                eventList = eventList)
+            ContentInColumn(
+                backdropState = backdropState,
+                halfHeightPx = halfHeightPx,
+                listState = listState,
+                eventList = eventList)
+          }
         },
         backLayerContent = {
           Scaffold(
@@ -319,21 +310,21 @@ private fun ContentInColumn(
                 elevation = 4.dp,
                 modifier =
                     Modifier.size(width = 360.dp, height = 200.dp).padding(8.dp).clickable {}) {
-                val painter: Painter =
-                    if (event.images.isNotEmpty()) {
+                  val painter: Painter =
+                      if (event.images.isNotEmpty()) {
                         rememberAsyncImagePainter(
                             ImageRequest.Builder(LocalContext.current)
                                 .data(data = event.images[0])
                                 .apply(
                                     block =
-                                    fun ImageRequest.Builder.() {
-                                        crossfade(true)
-                                        placeholder(R.drawable.gomeet_logo)
-                                    })
+                                        fun ImageRequest.Builder.() {
+                                          crossfade(true)
+                                          placeholder(R.drawable.gomeet_logo)
+                                        })
                                 .build())
-                    } else {
+                      } else {
                         painterResource(id = R.drawable.gomeet_logo)
-                    }
+                      }
                   Image(
                       painter = painter,
                       contentDescription = "",
@@ -342,9 +333,14 @@ private fun ContentInColumn(
                       contentScale = ContentScale.Crop)
                 }
             Spacer(Modifier.height(8.dp))
-            Text(text = event.title + " - " + EventDateToString(Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant())), modifier = Modifier.padding(start = 8.dp))
             Text(
-                text = event.description, modifier = Modifier.padding(start = 12.dp, top = 8.dp))
+                text =
+                    event.title +
+                        " - " +
+                        EventDateToString(
+                            Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant())),
+                modifier = Modifier.padding(start = 8.dp))
+            Text(text = event.description, modifier = Modifier.padding(start = 12.dp, top = 8.dp))
           }
           Divider(modifier = Modifier.padding(top = 16.dp, bottom = 16.dp))
         }
@@ -364,7 +360,7 @@ fun ContentInRow(
 
   val offset by backdropState.offset
   val rowAlpha = (offset / halfHeightPx).coerceIn(0f..1f)
-    val events = eventList.value
+  val events = eventList.value
   if (rowAlpha > 0) {
     Column {
       TopTitle(forColumn = false, alpha = rowAlpha)
@@ -375,21 +371,21 @@ fun ContentInRow(
                 elevation = 4.dp,
                 modifier =
                     Modifier.size(width = 280.dp, height = 200.dp).padding(8.dp).clickable {}) {
-                val painter: Painter =
-                    if (event.images.isNotEmpty()) {
+                  val painter: Painter =
+                      if (event.images.isNotEmpty()) {
                         rememberAsyncImagePainter(
                             ImageRequest.Builder(LocalContext.current)
                                 .data(data = event.images[0])
                                 .apply(
                                     block =
-                                    fun ImageRequest.Builder.() {
-                                        crossfade(true)
-                                        placeholder(R.drawable.gomeet_logo)
-                                    })
+                                        fun ImageRequest.Builder.() {
+                                          crossfade(true)
+                                          placeholder(R.drawable.gomeet_logo)
+                                        })
                                 .build())
-                    } else {
+                      } else {
                         painterResource(id = R.drawable.gomeet_logo)
-                    }
+                      }
                   Image(
                       painter = painter,
                       contentDescription = "",
@@ -398,9 +394,14 @@ fun ContentInRow(
                       contentScale = ContentScale.Crop)
                 }
             Spacer(Modifier.height(8.dp))
-              Text(text = event.title + " - " + EventDateToString(Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant())), modifier = Modifier.padding(start = 8.dp))
             Text(
-                text = event.description, modifier = Modifier.padding(start = 12.dp, top = 8.dp))
+                text =
+                    event.title +
+                        " - " +
+                        EventDateToString(
+                            Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant())),
+                modifier = Modifier.padding(start = 8.dp))
+            Text(text = event.description, modifier = Modifier.padding(start = 12.dp, top = 8.dp))
           }
         }
       }
@@ -410,44 +411,45 @@ fun ContentInRow(
 
 @Composable
 fun EventDateToString(eventDate: Date): String {
-    val configuration = LocalConfiguration.current
-    val screenWidth = configuration.screenWidthDp.dp
-    val density = LocalDensity.current
+  val configuration = LocalConfiguration.current
+  val screenWidth = configuration.screenWidthDp.dp
+  val density = LocalDensity.current
 
-    val smallTextSize = with(density) { screenWidth.toPx() / 85 }
-    val bigTextSize = with(density) { screenWidth.toPx() / 60 }
+  val smallTextSize = with(density) { screenWidth.toPx() / 85 }
+  val bigTextSize = with(density) { screenWidth.toPx() / 60 }
 
-    val currentDate = Calendar.getInstance()
-    val startOfWeek = currentDate.clone() as Calendar
-    startOfWeek.set(Calendar.DAY_OF_WEEK, startOfWeek.firstDayOfWeek)
-    val endOfWeek = startOfWeek.clone() as Calendar
-    endOfWeek.add(Calendar.DAY_OF_WEEK, 6)
+  val currentDate = Calendar.getInstance()
+  val startOfWeek = currentDate.clone() as Calendar
+  startOfWeek.set(Calendar.DAY_OF_WEEK, startOfWeek.firstDayOfWeek)
+  val endOfWeek = startOfWeek.clone() as Calendar
+  endOfWeek.add(Calendar.DAY_OF_WEEK, 6)
 
-    val eventCalendar = Calendar.getInstance().apply { time = eventDate }
+  val eventCalendar = Calendar.getInstance().apply { time = eventDate }
 
-    val isThisWeek = eventCalendar.after(currentDate) && eventCalendar.before(endOfWeek)
-    val isToday =
-        currentDate.get(Calendar.YEAR) == eventCalendar.get(Calendar.YEAR) &&
-                currentDate.get(Calendar.DAY_OF_YEAR) == eventCalendar.get(Calendar.DAY_OF_YEAR)
+  val isThisWeek = eventCalendar.after(currentDate) && eventCalendar.before(endOfWeek)
+  val isToday =
+      currentDate.get(Calendar.YEAR) == eventCalendar.get(Calendar.YEAR) &&
+          currentDate.get(Calendar.DAY_OF_YEAR) == eventCalendar.get(Calendar.DAY_OF_YEAR)
 
-    val dayFormat =
-        if (isThisWeek) {
-            SimpleDateFormat("EEEE", Locale.getDefault())
-        } else {
-            SimpleDateFormat("dd/MM/yy", Locale.getDefault())
-        }
+  val dayFormat =
+      if (isThisWeek) {
+        SimpleDateFormat("EEEE", Locale.getDefault())
+      } else {
+        SimpleDateFormat("dd/MM/yy", Locale.getDefault())
+      }
 
-    val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+  val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
 
-    val dayString =
-        if (isToday) {
-            "Today"
-        } else {
-            dayFormat.format(eventDate)
-        }
-    val timeString = timeFormat.format(eventDate)
-    return "$dayString at $timeString"
+  val dayString =
+      if (isToday) {
+        "Today"
+      } else {
+        dayFormat.format(eventDate)
+      }
+  val timeString = timeFormat.format(eventDate)
+  return "$dayString at $timeString"
 }
+
 @Composable
 private fun TopTitle(forColumn: Boolean, alpha: Float) {
   Column(
