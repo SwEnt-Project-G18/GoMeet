@@ -1,6 +1,5 @@
 package com.github.se.gomeet.viewmodel
 
-import android.util.Log
 import com.github.se.gomeet.model.event.EventInviteUsers
 import com.github.se.gomeet.model.event.InviteStatus
 import com.github.se.gomeet.model.repository.InvitesRepository
