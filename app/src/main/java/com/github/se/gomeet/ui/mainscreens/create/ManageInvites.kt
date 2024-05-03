@@ -89,7 +89,6 @@ fun ManageInvites(
 
       while (user.value == null || event.value == null) {
         TimeUnit.SECONDS.sleep(1)
-        Log.e("QWEqwe", "wqeqweq")
       }
       val followers = user.value!!.followers
       if (followers.isNotEmpty()) {
