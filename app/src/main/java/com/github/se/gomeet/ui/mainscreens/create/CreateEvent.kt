@@ -384,9 +384,11 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                   },
                   shape = RoundedCornerShape(10.dp),
                   border = BorderStroke(1.dp, Color.Gray),
-                  enabled = true,
+                  enabled = fieldsAreFull(titleState.value, descriptionState.value, locationState.value,
+                      textDate.value, priceText, url.value),
                   colors =
-                      ButtonDefaults.outlinedButtonColors(containerColor = Color(0xFFECEFF1))) {
+                      ButtonDefaults.outlinedButtonColors(containerColor = Color(0xFFECEFF1)),
+                  ) {
                     Text(
                         text = "Post",
                         style =
@@ -492,4 +494,11 @@ fun LocationField(
           }
         }
       }
+}
+
+
+
+
+private fun fieldsAreFull(title: String, desc: String, loc: String, date: String, price: String, url: String): Boolean {
+  return title.isNotEmpty() && desc.isNotEmpty() && loc.isNotEmpty() && date.isNotEmpty() && price.isNotEmpty() && url.isNotEmpty()
 }
