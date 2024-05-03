@@ -384,22 +384,29 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                   },
                   shape = RoundedCornerShape(10.dp),
                   border = BorderStroke(1.dp, Color.Gray),
-                  enabled = true,
-                  colors =
-                      ButtonDefaults.outlinedButtonColors(containerColor = Color(0xFFECEFF1))) {
-                    Text(
-                        text = "Post",
-                        style =
-                            TextStyle(
-                                fontSize = 14.sp,
-                                lineHeight = 16.sp,
-                                fontFamily = FontFamily(Font(R.font.roboto)),
-                                fontWeight = FontWeight(1000),
-                                color = Color(0xFF000000),
-                                textAlign = TextAlign.Center,
-                                letterSpacing = 0.5.sp,
-                            ))
-                  }
+                  enabled =
+                      fieldsAreFull(
+                          titleState.value,
+                          descriptionState.value,
+                          locationState.value,
+                          textDate.value,
+                          priceText,
+                          url.value),
+                  colors = ButtonDefaults.outlinedButtonColors(containerColor = Color(0xFFECEFF1)),
+              ) {
+                Text(
+                    text = "Post",
+                    style =
+                        TextStyle(
+                            fontSize = 14.sp,
+                            lineHeight = 16.sp,
+                            fontFamily = FontFamily(Font(R.font.roboto)),
+                            fontWeight = FontWeight(1000),
+                            color = Color(0xFF000000),
+                            textAlign = TextAlign.Center,
+                            letterSpacing = 0.5.sp,
+                        ))
+              }
 
               if (dateFormatError) {
                 Spacer(modifier = Modifier.height(8.dp))
@@ -492,4 +499,20 @@ fun LocationField(
           }
         }
       }
+}
+
+private fun fieldsAreFull(
+    title: String,
+    desc: String,
+    loc: String,
+    date: String,
+    price: String,
+    url: String
+): Boolean {
+  return title.isNotEmpty() &&
+      desc.isNotEmpty() &&
+      loc.isNotEmpty() &&
+      date.isNotEmpty() &&
+      price.isNotEmpty() &&
+      url.isNotEmpty()
 }
