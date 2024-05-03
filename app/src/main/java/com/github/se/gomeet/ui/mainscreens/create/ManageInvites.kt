@@ -147,7 +147,7 @@ fun ManageInvites(
                                 contentColor =
                                     if (selectedFilter == "Uninvited") Color.White else DarkCyan),
                         border = BorderStroke(1.dp, DarkCyan)) {
-                          Text(text = "Uninvited", color = MaterialTheme.colorScheme.onBackground)
+                          Text(text = "Uninvited", color = Color.Black)
                         }
 
                     Button(
@@ -161,7 +161,7 @@ fun ManageInvites(
                                 contentColor =
                                     if (selectedFilter == "Invited") Color.White else DarkCyan),
                         border = BorderStroke(1.dp, DarkCyan)) {
-                          Text(text = "Invited", color = MaterialTheme.colorScheme.onBackground)
+                          Text(text = "Invited", color = Color.Black)
                         }
 
                     Button(
@@ -176,7 +176,7 @@ fun ManageInvites(
                                 contentColor =
                                     if (selectedFilter == "Accepted") Color.White else DarkCyan),
                         border = BorderStroke(1.dp, DarkCyan)) {
-                          Text(text = "Accepted", color = MaterialTheme.colorScheme.onBackground)
+                          Text(text = "Accepted", color = Color.Black)
                         }
                   }
 
