@@ -134,6 +134,61 @@ fun ManageInvites(currentUser: String,
                 .padding(innerPadding)
                 .fillMaxSize()) {
 
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 15.dp, end = 15.dp, bottom = 15.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalAlignment = Alignment.Top) {
+                Button(
+                    onClick = { onFilterButtonClick("Uninvited") },
+                    modifier = Modifier
+                        .height(40.dp)
+                        .weight(1f),
+                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor =
+                        if (selectedFilter == "Uninvited") DarkCyan else NavBarUnselected,
+                        contentColor =
+                        if (selectedFilter == "Uninvited") Color.White else DarkCyan),
+                    border = BorderStroke(1.dp, DarkCyan)
+                ) {
+                    Text(text = "Uninvited", color = MaterialTheme.colorScheme.onBackground)
+                }
+
+                Button(
+                    onClick = { onFilterButtonClick("Invited") },
+                    modifier = Modifier
+                        .height(40.dp)
+                        .weight(1f),
+                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor =
+                        if (selectedFilter == "Invited") DarkCyan else NavBarUnselected,
+                        contentColor =
+                        if (selectedFilter == "Invited") Color.White else DarkCyan),
+                    border = BorderStroke(1.dp, DarkCyan)
+                ) {
+                    Text(text = "Invited", color = MaterialTheme.colorScheme.onBackground)
+                }
+
+                Button(
+                    onClick = { onFilterButtonClick("Accepted") },
+                    modifier = Modifier
+                        .height(40.dp)
+                        .weight(1f),
+                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor =
+                        if (selectedFilter == "Accepted") DarkCyan else NavBarUnselected,
+                        contentColor =
+                        if (selectedFilter == "Accepted") Color.White else DarkCyan),
+                    border = BorderStroke(1.dp, DarkCyan)
+                ) {
+                    Text(text = "Accepted", color = MaterialTheme.colorScheme.onBackground)
+                }
+            }
+
             /* TODO: for every followers this user has, retrieve them and stock them in a list and
                 display them in the following way using the UserInviteWidget in a for-loop
              */
