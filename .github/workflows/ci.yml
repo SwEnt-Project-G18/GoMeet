@@ -82,7 +82,7 @@ jobs:
           firebase emulators:start --only firestore,auth,storage --project=dummy-project-id &
 
       - name: Assemble and Lint
-        run: ./gradlew assembleDebug lint --parallel --build-cache
+        run: ./gradlew assemble lint --parallel --build-cache
 
       - name: Run tests
         run: ./gradlew check --parallel --build-cache
