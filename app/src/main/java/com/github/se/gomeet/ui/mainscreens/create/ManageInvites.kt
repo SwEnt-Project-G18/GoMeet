@@ -1,6 +1,5 @@
 package com.github.se.gomeet.ui.mainscreens.create
 
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -75,7 +74,7 @@ fun ManageInvites(
 ) {
 
   var selectedFilter by remember { mutableStateOf("All") }
-  val followersList = remember { mutableListOf<String>() }
+  val followersList = remember { mutableListOf<GoMeetUser>() }
   val coroutineScope = rememberCoroutineScope()
   val user = remember { mutableStateOf<GoMeetUser?>(null) }
   val event = remember { mutableStateOf<Event?>(null) }
@@ -92,7 +91,10 @@ fun ManageInvites(
       }
       val followers = user.value!!.followers
       if (followers.isNotEmpty()) {
-        followers.forEach { followersList.add(it) }
+        followers.forEach {
+          val followerUser = userViewModel.getUser(it)
+          followersList.add(followerUser!!)
+        }
       }
     }
   }
@@ -181,13 +183,21 @@ fun ManageInvites(
               /* TODO: for every followers this user has, retrieve them and stock them in a list and
                  display them in the following way using the UserInviteWidget in a for-loop
               */
+              followersList.forEach {
+                UserInviteWidget(it.username, it.uid, currentEvent, null, eventInviteViewModel)
+              }
 
               // Display the list of followers to manage our invitations based to the selected
               // filter
               Column(modifier = Modifier.verticalScroll(rememberScrollState()).fillMaxSize()) {
                 if (eventInviteUsers.value != null) {
-                  eventInviteUsers.value!!.usersInvited.forEach { user ->
-                    UserInviteWidget(username = user.first, status = user.second)
+                  eventInviteUsers.value!!.usersInvited.forEach {
+                    UserInviteWidget(
+                        it.first,
+                        user.value!!.uid,
+                        currentEvent,
+                        status = it.second,
+                        eventInviteViewModel)
                   }
                 }
               }
@@ -196,7 +206,13 @@ fun ManageInvites(
 }
 
 @Composable
-fun UserInviteWidget(username: String, status: InviteStatus?) {
+fun UserInviteWidget(
+    username: String,
+    userUid: String,
+    eventUid: String,
+    status: InviteStatus?,
+    eventInviteViewModel: EventInviteViewModel
+) {
   Row(
       modifier = Modifier.fillMaxWidth().padding(start = 15.dp, end = 15.dp).height(50.dp),
       horizontalArrangement = Arrangement.SpaceBetween,
@@ -234,7 +250,7 @@ fun UserInviteWidget(username: String, status: InviteStatus?) {
 
         // Button to invite or cancel invitation
         Button(
-            onClick = { /*TODO*/},
+            onClick = { eventInviteViewModel.sendInviteToUser(userUid, eventUid) },
             modifier = Modifier.height(26.dp).width(82.dp),
             contentPadding = PaddingValues(vertical = 2.dp),
             shape = RoundedCornerShape(10.dp),
