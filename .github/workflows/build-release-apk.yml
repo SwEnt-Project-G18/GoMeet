@@ -52,9 +52,10 @@ jobs:
 
 
       - name: Sign APK
+        id: sign_app
         uses: r0adkll/sign-android-release@v1
         with:
-            releaseDirectory: app/build/outputs/apk/release
+            releaseDirectory: app/build/outputs/apk/release/app-release-unsigned.apk
             signingKeyBase64: ${{ secrets.KEYSTORE }}
             alias: ${{ secrets.ALIAS }}
             keyStorePassword: ${{ secrets.KEYSTORE_PASSWORD }}
@@ -62,7 +63,7 @@ jobs:
 
 
       - name: Verify signed APK
-        run: jarsigner -verify -verbose -certs app/build/outputs/apk/release/app-release-unsigned.apk
+        run: jarsigner -verify -verbose -certs ${{steps.sign_app.outputs.signedReleaseFile}}
 
       - name: List output directory
         run: ls -R ./app/build/outputs/
@@ -73,6 +74,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./app/build/outputs/apk/release/app-release-unsigned.apk
-          asset_name: app-release-unsigned.apk
+          asset_path: ${{steps.sign_app.outputs.signedReleaseFile}}
+          asset_name: app-release-signed.apk
           asset_content_type: application/vnd.android.package-archive
