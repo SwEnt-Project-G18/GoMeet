@@ -72,6 +72,7 @@ fun Trends(
   val eventList = remember { mutableListOf<Event>() }
   val coroutineScope = rememberCoroutineScope()
   val query = remember { mutableStateOf("") }
+  var eventsLoaded = remember { mutableStateOf(false) }
 
   LaunchedEffect(Unit) {
     coroutineScope.launch {
@@ -79,6 +80,7 @@ fun Trends(
       if (allEvents.isNotEmpty()) {
         eventList.addAll(allEvents)
       }
+      eventsLoaded.value = true
     }
   }
 
@@ -109,49 +111,56 @@ fun Trends(
               Spacer(modifier = Modifier.height(5.dp))
               GoMeetSearchBar(query, NavBarUnselected, Color.DarkGray)
               Spacer(modifier = Modifier.height(5.dp))
-              Column(modifier = Modifier.verticalScroll(rememberScrollState()).fillMaxSize()) {
-                Text(
-                    text = "All Events",
-                    style =
-                        TextStyle(
-                            fontSize = 20.sp,
-                            lineHeight = 16.sp,
-                            fontFamily = FontFamily(Font(R.font.roboto)),
-                            fontWeight = FontWeight(1000),
-                            color = DarkCyan,
-                            textAlign = TextAlign.Center,
-                            letterSpacing = 0.5.sp,
-                        ),
-                    modifier = Modifier.padding(10.dp).align(Alignment.Start))
 
-                eventList.forEach { event ->
-                  if (event.title.contains(query.value, ignoreCase = true)) {
-                    val painter: Painter =
-                        if (event.images.isNotEmpty()) {
-                          rememberAsyncImagePainter(
-                              ImageRequest.Builder(LocalContext.current)
-                                  .data(data = event.images[0])
-                                  .apply(
-                                      block =
-                                          fun ImageRequest.Builder.() {
-                                            crossfade(true)
-                                            placeholder(R.drawable.gomeet_logo)
-                                          })
-                                  .build())
-                        } else {
-                          painterResource(id = R.drawable.gomeet_logo)
-                        }
+              if (!eventsLoaded.value) {
+                LoadingText()
+              } else {
 
-                    EventWidget(
-                        userName = event.creator,
-                        eventName = event.title,
-                        eventId = event.uid,
-                        eventDescription = event.description,
-                        eventDate =
-                            Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant()),
-                        eventPicture = painter,
-                        verified = false,
-                        nav = nav) // verification to be done using user details
+                Column(modifier = Modifier.verticalScroll(rememberScrollState()).fillMaxSize()) {
+                  Text(
+                      text = "All Events",
+                      style =
+                          TextStyle(
+                              fontSize = 20.sp,
+                              lineHeight = 16.sp,
+                              fontFamily = FontFamily(Font(R.font.roboto)),
+                              fontWeight = FontWeight(1000),
+                              color = DarkCyan,
+                              textAlign = TextAlign.Center,
+                              letterSpacing = 0.5.sp,
+                          ),
+                      modifier = Modifier.padding(10.dp).align(Alignment.Start))
+
+                  eventList.forEach { event ->
+                    if (event.title.contains(query.value, ignoreCase = true)) {
+                      val painter: Painter =
+                          if (event.images.isNotEmpty()) {
+                            rememberAsyncImagePainter(
+                                ImageRequest.Builder(LocalContext.current)
+                                    .data(data = event.images[0])
+                                    .apply(
+                                        block =
+                                            fun ImageRequest.Builder.() {
+                                              crossfade(true)
+                                              placeholder(R.drawable.gomeet_logo)
+                                            })
+                                    .build())
+                          } else {
+                            painterResource(id = R.drawable.gomeet_logo)
+                          }
+
+                      EventWidget(
+                          userName = event.creator,
+                          eventName = event.title,
+                          eventId = event.uid,
+                          eventDescription = event.description,
+                          eventDate =
+                              Date.from(
+                                  event.date.atStartOfDay(ZoneId.systemDefault()).toInstant()),
+                          eventPicture = painter,
+                          verified = false,
+                          nav = nav) // verification to be done using user details
+                    }
                   }
                 }
               }

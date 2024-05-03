@@ -5,12 +5,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -24,7 +22,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -59,6 +56,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.user.GoMeetUser
+import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
@@ -122,9 +120,9 @@ fun Profile(
               modifier = Modifier.align(Alignment.CenterVertically).padding(end = 15.dp),
               onClick = { /* Handles notification icon click */}) {
                 Icon(
-                    ImageVector.vectorResource(R.drawable.notifications_icon),
+                    ImageVector.vectorResource(R.drawable.mail),
                     contentDescription = "Notifications",
-                    modifier = Modifier.size(40.dp).align(Alignment.CenterVertically),
+                    modifier = Modifier.size(30.dp).align(Alignment.CenterVertically),
                     tint = Grey)
               }
 
@@ -166,16 +164,14 @@ fun Profile(
                           contentDescription = "image description",
                           contentScale = ContentScale.None)
                       Column(
-                          horizontalAlignment =
-                              Alignment
-                                  .CenterHorizontally, // Center horizontally within this column
+                          horizontalAlignment = Alignment.CenterHorizontally,
                           modifier = Modifier.padding(0.dp)) {
                             Row(
                                 horizontalArrangement = Arrangement.Start,
                                 verticalAlignment = Alignment.CenterVertically,
                                 modifier = Modifier.padding(start = 30.dp)) {
                                   Text(
-                                      currentUser?.username ?: "username",
+                                      (currentUser?.firstName + " " + currentUser?.lastName),
                                       textAlign = TextAlign.Center,
                                       style =
                                           TextStyle(
@@ -189,7 +185,7 @@ fun Profile(
                                           ))
                                 }
                             Text(
-                                text = "@usertag",
+                                text = ("@" + currentUser?.username),
                                 style =
                                     TextStyle(
                                         fontSize = 15.sp,
@@ -401,9 +397,7 @@ fun Profile(
                 ProfileEventsList("History")
               }
         } else {
-          Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            CircularProgressIndicator()
-          }
+          LoadingText()
         }
       }
 }

@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -24,16 +23,19 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -42,6 +44,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.navigation.NavigationActions
@@ -72,45 +76,50 @@ import com.google.maps.android.compose.rememberMarkerState
 @Composable
 fun EventHeader(
     title: String,
+    currentUser: GoMeetUser,
     organizer: GoMeetUser,
     rating: Double,
     nav: NavigationActions,
     date: String,
     time: String
 ) {
-    Row(
-        modifier = Modifier.fillMaxWidth().testTag("EventHeader"),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween) {
+  Row(
+      modifier = Modifier.fillMaxWidth().testTag("EventHeader"),
+      verticalAlignment = Alignment.CenterVertically,
+      horizontalArrangement = Arrangement.SpaceBetween) {
         Column {
-            Text(
-                text = title,
-                style =
-                TextStyle(
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = DarkCyan,
-                    letterSpacing = 0.5.sp))
-            Spacer(modifier = Modifier.height(5.dp))
-            Text(
-                modifier =
-                Modifier.clickable {
-                    nav.navigateToScreen(Route.OTHERS_PROFILE.replace("{uid}", organizer.uid))
-                }
-                    .testTag("Username"),
-                text = organizer.username,
-                style =
-                TextStyle(
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = Color.Gray,
-                    fontFamily = FontFamily(Font(R.font.roboto)),
-                    letterSpacing = 0.5.sp))
-            // Add other details like rating here
+          Text(
+              text = title,
+              style =
+                  TextStyle(
+                      fontSize = 24.sp,
+                      fontWeight = FontWeight.Bold,
+                      color = DarkCyan,
+                      letterSpacing = 0.5.sp))
+          Spacer(modifier = Modifier.height(5.dp))
+          Text(
+              modifier =
+                  Modifier.clickable {
+                        if (organizer.uid == currentUser.uid) {
+                          nav.navigateToScreen(Route.PROFILE)
+                        } else {
+                          nav.navigateToScreen(Route.OTHERS_PROFILE.replace("{uid}", organizer.uid))
+                        }
+                      }
+                      .testTag("Username"),
+              text = organizer.username,
+              style =
+                  TextStyle(
+                      fontSize = 16.sp,
+                      fontWeight = FontWeight.ExtraBold,
+                      color = Color.Gray,
+                      fontFamily = FontFamily(Font(R.font.roboto)),
+                      letterSpacing = 0.5.sp))
+          // Add other details like rating here
         }
         // Icon for settings or more options, assuming using Material Icons
         EventDateTime(day = date, time = time)
-    }
+      }
 }
 
 /**
@@ -121,28 +130,28 @@ fun EventHeader(
  */
 @Composable
 fun EventDateTime(day: String, time: String) {
-    Log.d(day, "This is the day")
-    Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(end = 15.dp)) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Text(
-                text = day,
-                style =
-                TextStyle(
-                    fontSize = 24.sp,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    fontWeight = FontWeight.SemiBold,
-                    textAlign = TextAlign.Center))
-            Text(
-                text = time,
-                style =
-                TextStyle(
-                    fontSize = 16.sp,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    textAlign = TextAlign.Center))
-        }
+  Log.d(day, "This is the day")
+  Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(end = 15.dp)) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+      Text(
+          text = day,
+          style =
+              TextStyle(
+                  fontSize = 24.sp,
+                  color = MaterialTheme.colorScheme.onBackground,
+                  fontWeight = FontWeight.SemiBold,
+                  textAlign = TextAlign.Center))
+      Text(
+          text = time,
+          style =
+              TextStyle(
+                  fontSize = 16.sp,
+                  color = MaterialTheme.colorScheme.onBackground,
+                  textAlign = TextAlign.Center))
     }
+  }
 }
 
 /**
@@ -151,18 +160,28 @@ fun EventDateTime(day: String, time: String) {
  * @param painter Painter object for the image
  */
 @Composable
-fun EventImage(painter: Painter) {
-    Column(modifier = Modifier.fillMaxWidth().testTag("EventImage")) {
-        Image(
-            painter = painter,
-            contentScale = ContentScale.Crop,
-            contentDescription = "Event Image",
-            modifier =
-            Modifier.aspectRatio(3f / 1.75f)
-                // Specify the height you want for the image
+fun EventImage(imageUrl: String?) {
+  val defaultImagePainter = painterResource(id = R.drawable.gomeet_logo)
+  val imagePainter =
+      if (imageUrl != null) {
+        rememberAsyncImagePainter(
+            ImageRequest.Builder(LocalContext.current)
+                .data(data = imageUrl)
+                .apply(
+                    block =
+                        fun ImageRequest.Builder.() {
+                          placeholder(R.drawable.gomeet_logo)
+                        })
+                .build())
+      } else defaultImagePainter
 
-                .clip(RoundedCornerShape(20.dp)))
-    }
+  Column(modifier = Modifier.fillMaxWidth().testTag("EventImage")) {
+    Image(
+        painter = imagePainter,
+        contentDescription = "Event Image",
+        contentScale = ContentScale.Crop,
+        modifier = Modifier.aspectRatio(3f / 1.75f).clip(RoundedCornerShape(20.dp)))
+  }
 }
 
 /**
@@ -172,16 +191,16 @@ fun EventImage(painter: Painter) {
  */
 @Composable
 fun EventDescription(text: String) {
-    Text(
-        text = text,
-        style =
-        TextStyle(
-            fontSize = 13.sp,
-            color = MaterialTheme.colorScheme.onBackground,
-            fontFamily = FontFamily(Font(R.font.roboto)),
-            fontWeight = FontWeight.SemiBold,
-            letterSpacing = 0.5.sp),
-        modifier = Modifier.testTag("EventDescription"))
+  Text(
+      text = text,
+      style =
+          TextStyle(
+              fontSize = 13.sp,
+              color = MaterialTheme.colorScheme.onBackground,
+              fontFamily = FontFamily(Font(R.font.roboto)),
+              fontWeight = FontWeight.SemiBold,
+              letterSpacing = 0.5.sp),
+      modifier = Modifier.testTag("EventDescription"))
 }
 
 /**
@@ -205,94 +224,78 @@ fun EventButtons(
     nav: NavigationActions
 ) {
 
-    val isFavorite = remember { mutableStateOf(currentUser.myFavorites.contains(eventId)) }
-    val isJoined = remember { mutableStateOf(currentUser.myEvents.contains(eventId)) }
-    Row(
-        modifier = Modifier.fillMaxWidth().testTag("EventButton"),
-        horizontalArrangement = Arrangement.SpaceBetween) {
+  val isFavorite = remember { mutableStateOf(currentUser.myFavorites.contains(eventId)) }
+  val isJoined = remember { mutableStateOf(currentUser.myEvents.contains(eventId)) }
+  Row(
+      modifier = Modifier.fillMaxWidth().testTag("EventButton"),
+      horizontalArrangement = Arrangement.SpaceBetween) {
         TextButton(
             onClick = {
-                if (organizer.uid.contentEquals(Firebase.auth.currentUser!!.uid)) {
-                    // TODO: GO TO EDIT EVENT PARAMETERS SCREEN
+              if (organizer.uid.contentEquals(Firebase.auth.currentUser!!.uid)) {
+                // TODO: GO TO EDIT EVENT PARAMETERS SCREEN
+              } else {
+                if (!isJoined.value) {
+                  currentUser.myEvents = currentUser.myEvents.plus(eventId)
                 } else {
-                    if (!isJoined.value) {
-                        currentUser.myEvents = currentUser.myEvents.plus(eventId)
-                    } else {
-                        currentUser.myEvents = currentUser.myEvents.minus(eventId)
-                    }
-                    userViewModel.editUser(currentUser)
-                    isJoined.value = !isJoined.value
+                  currentUser.myEvents = currentUser.myEvents.minus(eventId)
                 }
+                userViewModel.editUser(currentUser)
+                isJoined.value = !isJoined.value
+              }
             },
             shape = RoundedCornerShape(20.dp),
             modifier = Modifier.weight(1f),
             colors =
-            ButtonDefaults.textButtonColors(
-                containerColor = Color(0xFFECEFF1), contentColor = Color.Black)) {
-            if (organizer.uid.contentEquals(Firebase.auth.currentUser!!.uid)) {
-                Text("Edit My Event")
-            } else {
-                if (isJoined.value) {
-                    Text("LeaveEvent")
-                } else {
-                    Text("JoinEvent")
-                }
-            }
-        }
-        if (organizer.uid.contentEquals(Firebase.auth.currentUser!!.uid)) {
-            Spacer(modifier = Modifier.width(5.dp))
-            TextButton(
-                onClick = {
-                    nav.navigateToScreen(Route.MANAGE_INVITES.replace("{eventId}", eventId))
-                },
-                shape = RoundedCornerShape(20.dp),
-                modifier = Modifier.weight(1f),
-                colors =
                 ButtonDefaults.textButtonColors(
                     containerColor = Color(0xFFECEFF1), contentColor = Color.Black)) {
-                Text("Add Participants")
-
+              if (organizer.uid.contentEquals(Firebase.auth.currentUser!!.uid)) {
+                Text("Edit My Event")
+              } else {
+                if (isJoined.value) {
+                  Text("LeaveEvent")
+                } else {
+                  Text("JoinEvent")
+                }
+              }
             }
-        }
-
         if (organizer.uid != com.google.firebase.Firebase.auth.currentUser!!.uid) {
-            IconButton(
-                onClick = {
-                    nav.navigateToScreen(Route.MESSAGE.replace("{id}", Uri.encode(organizer.uid)))
-                }) {
+          IconButton(
+              onClick = {
+                nav.navigateToScreen(Route.MESSAGE.replace("{id}", Uri.encode(organizer.uid)))
+              }) {
                 Icon(
                     imageVector =
-                    ImageVector.vectorResource(id = R.drawable.baseline_chat_bubble_outline_24),
+                        ImageVector.vectorResource(id = R.drawable.baseline_chat_bubble_outline_24),
                     contentDescription = "Chat",
                     modifier = Modifier.size(24.dp),
                     tint = MaterialTheme.colorScheme.onBackground)
-            }
+              }
         }
         IconButton(
             onClick = {
-                if (!isFavorite.value) {
-                    currentUser.myFavorites = currentUser.myFavorites.plus(eventId)
-                } else {
-                    currentUser.myFavorites = currentUser.myFavorites.minus(eventId)
-                }
-                userViewModel.editUser(currentUser)
-                isFavorite.value = !isFavorite.value
+              if (!isFavorite.value) {
+                currentUser.myFavorites = currentUser.myFavorites.plus(eventId)
+              } else {
+                currentUser.myFavorites = currentUser.myFavorites.minus(eventId)
+              }
+              userViewModel.editUser(currentUser)
+              isFavorite.value = !isFavorite.value
             }) {
-            if (!isFavorite.value) {
+              if (!isFavorite.value) {
                 Icon(
                     imageVector = ImageVector.vectorResource(id = R.drawable.heart),
                     contentDescription = "Add to Favorites",
                     modifier = Modifier.size(30.dp),
                     tint = DarkCyan)
-            } else {
+              } else {
                 Icon(
                     imageVector = ImageVector.vectorResource(id = R.drawable.redheart),
                     contentDescription = "Remove from favorites",
                     modifier = Modifier.size(30.dp),
                     tint = DarkCyan)
+              }
             }
-        }
-    }
+      }
 }
 
 /**
@@ -306,31 +309,31 @@ fun MapViewComposable(
     loc: LatLng,
     zoomLevel: Float = 15f // Default zoom level for close-up of location
 ) {
-    val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(loc, zoomLevel)
-    }
+  val cameraPositionState = rememberCameraPositionState {
+    position = CameraPosition.fromLatLngZoom(loc, zoomLevel)
+  }
 
-    val markerState = rememberMarkerState(position = loc)
+  val markerState = rememberMarkerState(position = loc)
 
-    // Set up the GoogleMap composable
-    GoogleMap(
-        modifier =
-        Modifier.testTag("MapView").fillMaxWidth().height(200.dp).clip(RoundedCornerShape(20.dp)),
-        cameraPositionState = cameraPositionState) {
+  // Set up the GoogleMap composable
+  GoogleMap(
+      modifier =
+          Modifier.testTag("MapView").fillMaxWidth().height(200.dp).clip(RoundedCornerShape(20.dp)),
+      cameraPositionState = cameraPositionState) {
         Marker(
             state = markerState,
             title = "Marker in Location",
             snippet = "This is the selected location")
-    }
+      }
 
-    // Initialize the map position once and avoid resetting on recomposition
-    DisposableEffect(loc) {
-        cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(loc, zoomLevel))
-        onDispose {}
-    }
+  // Initialize the map position once and avoid resetting on recomposition
+  DisposableEffect(loc) {
+    cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(loc, zoomLevel))
+    onDispose {}
+  }
 
-    DisposableEffect(loc) {
-        markerState.position = loc
-        onDispose {}
-    }
+  DisposableEffect(loc) {
+    markerState.position = loc
+    onDispose {}
+  }
 }
