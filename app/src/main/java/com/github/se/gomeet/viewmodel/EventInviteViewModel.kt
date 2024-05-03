@@ -2,7 +2,6 @@ package com.github.se.gomeet.viewmodel
 
 import com.github.se.gomeet.model.event.EventInviteUsers
 import com.github.se.gomeet.model.event.InviteStatus
-import com.github.se.gomeet.model.event.UserInvitedToEvents
 import com.github.se.gomeet.model.repository.InvitesRepository
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -23,11 +22,11 @@ class EventInviteViewModel {
    * @param eventId the id of the event
    * @return the users invited to the event
    */
-  suspend fun getUsersInvitedToEvent(eventId: String): UserInvitedToEvents? {
+  suspend fun getUsersInvitedToEvent(eventId: String): EventInviteUsers? {
     return try {
-      val userInvitedToEvents = CompletableDeferred<UserInvitedToEvents?>()
-      repository.getEventInvites(eventId) { t -> userInvitedToEvents.complete(t) }
-      userInvitedToEvents.await()
+      val eventInviteUsers = CompletableDeferred<EventInviteUsers?>()
+      repository.getUserInvites(eventId) { t -> eventInviteUsers.complete(t) }
+      eventInviteUsers.await()
     } catch (e: Exception) {
       null
     }
@@ -95,5 +94,9 @@ class EventInviteViewModel {
    */
   fun removeInvite(userId: String, eventId: String) {
     repository.removeInvite(eventId, userId)
+  }
+
+  fun addEventInviteUsers(e: EventInviteUsers) {
+    e.usersInvited.forEach { repository.sendInvite(e.event, it.first) }
   }
 }

@@ -62,7 +62,6 @@ import com.github.se.gomeet.model.repository.EventRepository
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
-import com.github.se.gomeet.ui.navigation.SECOND_LEVEL_DESTINATION
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.ui.theme.Grey
@@ -90,6 +89,7 @@ private const val NUMBER_OF_SUGGESTIONS = 3
 fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivate: Boolean) {
 
   val db = EventRepository(Firebase.firestore)
+  val uid = db.getNewId()
   val titleState = remember { mutableStateOf("") }
   val descriptionState = remember { mutableStateOf("") }
   val locationState = remember { mutableStateOf("") }
@@ -268,8 +268,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                 Button(
                     modifier = Modifier.fillMaxWidth().padding(start = 7.dp, end = 7.dp),
                     onClick = {
-                      nav.navigateTo(
-                          SECOND_LEVEL_DESTINATION.first { it.route == Route.ADD_PARTICIPANTS })
+                      nav.navigateToScreen(Route.ADD_PARTICIPANTS.replace("{eventId}", uid))
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Grey),
                     shape = RoundedCornerShape(10.dp)) {
@@ -325,7 +324,6 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
 
               OutlinedButton(
                   onClick = {
-                    val uid = db.getNewId()
                     if (titleState.value.isNotEmpty() && !dateFormatError && dateState != null) {
                       if (selectedLocation.value == null) {
                         eventViewModel.location(locationState.value, 1) { locations ->

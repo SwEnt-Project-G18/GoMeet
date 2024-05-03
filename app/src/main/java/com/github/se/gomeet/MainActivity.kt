@@ -27,6 +27,7 @@ import com.github.se.gomeet.ui.mainscreens.Trends
 import com.github.se.gomeet.ui.mainscreens.create.AddParticipants
 import com.github.se.gomeet.ui.mainscreens.create.Create
 import com.github.se.gomeet.ui.mainscreens.create.CreateEvent
+import com.github.se.gomeet.ui.mainscreens.create.ManageInvites
 import com.github.se.gomeet.ui.mainscreens.events.Events
 import com.github.se.gomeet.ui.mainscreens.events.MyEventInfo
 import com.github.se.gomeet.ui.mainscreens.profile.EditProfile
@@ -43,6 +44,7 @@ import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.GoMeetTheme
 import com.github.se.gomeet.ui.theme.SetStatusBarColor
 import com.github.se.gomeet.viewmodel.AuthViewModel
+import com.github.se.gomeet.viewmodel.EventInviteViewModel
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.android.gms.maps.MapsInitializer
@@ -91,6 +93,7 @@ class MainActivity : ComponentActivity() {
           val authViewModel = AuthViewModel()
           val eventViewModel = EventViewModel()
           val userViewModel = UserViewModel()
+          val eventInviteViewModel = EventInviteViewModel()
           val navAction = NavigationActions(nav)
           NavHost(navController = nav, startDestination = Route.WELCOME) {
             composable(Route.WELCOME) {
@@ -152,7 +155,10 @@ class MainActivity : ComponentActivity() {
             composable(Route.TRENDS) {
               Trends(userIdState.value, navAction, UserViewModel(), eventViewModel)
             }
-            composable(Route.CREATE) { Create(navAction) }
+            composable(Route.CREATE) {
+              userIdState.value = Firebase.auth.currentUser!!.uid
+              Create(navAction)
+            }
             composable(Route.PROFILE) {
               Profile(navAction, userId = userIdState.value, userViewModel)
             }
@@ -172,7 +178,33 @@ class MainActivity : ComponentActivity() {
             composable(Route.PUBLIC_CREATE) {
               CreateEvent(navAction, EventViewModel(Firebase.auth.currentUser!!.uid), false)
             }
-            composable(Route.ADD_PARTICIPANTS) { AddParticipants(navAction) }
+
+            composable(
+                route = Route.ADD_PARTICIPANTS,
+                arguments = listOf(navArgument("eventId") { type = NavType.StringType })) { entry ->
+                  val eventId = entry.arguments?.getString("eventId") ?: ""
+                  AddParticipants(
+                      nav = navAction,
+                      userId = userIdState.value,
+                      userViewModel = userViewModel,
+                      eventId = eventId,
+                      eventInviteViewModel = eventInviteViewModel)
+                }
+
+            composable(
+                route = Route.MANAGE_INVITES,
+                arguments = listOf(navArgument("eventId") { type = NavType.StringType })) { entry ->
+                  val eventId = entry.arguments?.getString("eventId") ?: ""
+
+                  ManageInvites(
+                      userIdState.value,
+                      eventId,
+                      navAction,
+                      userViewModel,
+                      eventViewModel,
+                      eventInviteViewModel)
+                }
+
             composable(
                 route = Route.EVENT_INFO,
                 arguments =

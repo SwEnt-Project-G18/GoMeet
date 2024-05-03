@@ -69,6 +69,18 @@ class UserViewModel : ViewModel() {
     }
   }
 
+  suspend fun getFollowers(uid: String): List<GoMeetUser> {
+    val followers = mutableListOf<GoMeetUser>()
+    userRepository.getAllUsers { users ->
+      for (user in users) {
+        if (user.uid != uid && user.following.contains(uid)) {
+          followers.add(user)
+        }
+      }
+    }
+    return followers
+  }
+
   /**
    * Get the user with its id.
    *

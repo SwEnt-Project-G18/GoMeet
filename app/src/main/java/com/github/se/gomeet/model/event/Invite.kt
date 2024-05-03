@@ -31,7 +31,7 @@ data class UserInvitedToEvents(
 enum class InviteStatus {
   ACCEPTED,
   PENDING,
-  REFUSED
+  REFUSED,
 }
 
 data class Invite(val eventId: String, val userId: String, val status: InviteStatus)
