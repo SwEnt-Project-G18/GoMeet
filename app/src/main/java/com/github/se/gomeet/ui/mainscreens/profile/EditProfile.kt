@@ -47,8 +47,6 @@ import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.auth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 
 @Composable
 fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel = UserViewModel()) {
@@ -62,6 +60,12 @@ fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel = UserViewM
 
   LaunchedEffect(Unit) {
     currentUser.value = userViewModel.getUser(com.google.firebase.Firebase.auth.currentUser!!.uid)
+    firstName.value = currentUser.value!!.firstName
+    lastName.value = currentUser.value!!.lastName
+    email.value = currentUser.value!!.email
+    username.value = currentUser.value!!.username
+    phoneNumber.value = currentUser.value!!.phoneNumber
+    country.value = currentUser.value!!.country
   }
 
   val textFieldColors =
@@ -145,7 +149,11 @@ fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel = UserViewM
 
               TextField(
                   value = firstName.value,
-                  onValueChange = { newValue -> firstName.value = newValue },
+                  onValueChange = { newValue ->
+                    if (newValue.isNotBlank() && newValue.isNotEmpty()) {
+                      firstName.value = newValue
+                    }
+                  },
                   label = { Text("First Name") },
                   singleLine = true,
                   modifier = Modifier.fillMaxWidth(),
@@ -155,7 +163,11 @@ fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel = UserViewM
 
               TextField(
                   value = lastName.value,
-                  onValueChange = { newValue -> lastName.value = newValue },
+                  onValueChange = { newValue ->
+                    if (newValue.isNotBlank() && newValue.isNotEmpty()) {
+                      lastName.value = newValue
+                    }
+                  },
                   label = { Text("Last Name") },
                   singleLine = true,
                   modifier = Modifier.fillMaxWidth(),
@@ -165,7 +177,11 @@ fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel = UserViewM
 
               TextField(
                   value = email.value,
-                  onValueChange = { newValue -> email.value = newValue },
+                  onValueChange = { newValue ->
+                    if (newValue.isNotBlank() && newValue.isNotEmpty()) {
+                      email.value = newValue
+                    }
+                  },
                   label = { Text("Email Address") },
                   singleLine = true,
                   modifier = Modifier.fillMaxWidth(),
@@ -175,7 +191,11 @@ fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel = UserViewM
 
               TextField(
                   value = username.value,
-                  onValueChange = { newValue -> username.value = newValue },
+                  onValueChange = { newValue ->
+                    if (newValue.isNotBlank() && newValue.isNotEmpty()) {
+                      username.value = newValue
+                    }
+                  },
                   label = { Text("Username") },
                   singleLine = true,
                   modifier = Modifier.fillMaxWidth(),
@@ -185,7 +205,11 @@ fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel = UserViewM
 
               TextField(
                   value = phoneNumber.value,
-                  onValueChange = { newValue -> phoneNumber.value = newValue },
+                  onValueChange = { newValue ->
+                    if (newValue.isNotBlank() && newValue.isNotEmpty()) {
+                      phoneNumber.value = newValue
+                    }
+                  },
                   label = { Text("Phone Number") },
                   singleLine = true,
                   modifier = Modifier.fillMaxWidth(),
@@ -195,7 +219,11 @@ fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel = UserViewM
 
               TextField(
                   value = country.value,
-                  onValueChange = { newValue -> country.value = newValue },
+                  onValueChange = { newValue ->
+                    if (newValue.isNotBlank() && newValue.isNotEmpty()) {
+                      country.value = newValue
+                    }
+                  },
                   label = { Text("Country") },
                   singleLine = true,
                   modifier = Modifier.fillMaxWidth(),
