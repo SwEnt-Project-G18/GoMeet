@@ -124,7 +124,8 @@ fun Notifications(nav: NavigationActions) {
               Row(
                   verticalAlignment = Alignment.CenterVertically,
                   horizontalArrangement = Arrangement.Start,
-                  modifier = Modifier.testTag("Back").clickable { nav.navigateToScreen(Route.PROFILE) }) {
+                  modifier =
+                      Modifier.testTag("Back").clickable { nav.navigateToScreen(Route.PROFILE) }) {
                     Icon(
                         painter = painterResource(id = R.drawable.arrow_back_24px),
                         contentDescription = "image description",

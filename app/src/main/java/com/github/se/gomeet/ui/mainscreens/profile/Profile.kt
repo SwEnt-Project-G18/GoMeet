@@ -118,7 +118,7 @@ fun Profile(
 
           IconButton(
               modifier = Modifier.align(Alignment.CenterVertically).padding(end = 15.dp),
-              onClick = { nav.navigateToScreen(Route.NOTIFICATIONS)}) {
+              onClick = { nav.navigateToScreen(Route.NOTIFICATIONS) }) {
                 Icon(
                     ImageVector.vectorResource(R.drawable.mail),
                     contentDescription = "Notifications",
