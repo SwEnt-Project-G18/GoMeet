@@ -2,7 +2,6 @@ package com.github.se.gomeet.viewmodel
 
 import com.github.se.gomeet.model.event.EventInviteUsers
 import com.github.se.gomeet.model.event.InviteStatus
-import com.github.se.gomeet.model.event.UserInvitedToEvents
 import com.github.se.gomeet.model.repository.InvitesRepository
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -97,9 +96,7 @@ class EventInviteViewModel {
     repository.removeInvite(eventId, userId)
   }
 
-  fun addEventInviteUsers(e: EventInviteUsers){
-    e.usersInvited.forEach {
-      repository.sendInvite(e.event, it.first)
-    }
+  fun addEventInviteUsers(e: EventInviteUsers) {
+    e.usersInvited.forEach { repository.sendInvite(e.event, it.first) }
   }
 }

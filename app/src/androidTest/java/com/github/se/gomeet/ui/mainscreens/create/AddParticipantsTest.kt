@@ -16,7 +16,14 @@ class AddParticipantsTest {
 
   @Test
   fun uiElementsDisplayed() {
-    composeTestRule.setContent { AddParticipants(NavigationActions(rememberNavController()), "testuser", UserViewModel(), "testevent", EventInviteViewModel()) }
+    composeTestRule.setContent {
+      AddParticipants(
+          NavigationActions(rememberNavController()),
+          "testuser",
+          UserViewModel(),
+          "testevent",
+          EventInviteViewModel())
+    }
 
     composeTestRule.onNodeWithTag("AddParticipantsScreen").assertIsDisplayed()
   }

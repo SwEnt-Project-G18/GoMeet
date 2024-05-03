@@ -33,29 +33,32 @@ import kotlinx.coroutines.launch
  * @param nav The navigation actions.
  */
 @Composable
-fun AddParticipants(nav: NavigationActions, userId: String, userViewModel : UserViewModel, eventId: String, eventInviteViewModel: EventInviteViewModel) {
-
+fun AddParticipants(
+    nav: NavigationActions,
+    userId: String,
+    userViewModel: UserViewModel,
+    eventId: String,
+    eventInviteViewModel: EventInviteViewModel
+) {
 
   /* TODO: Code the UI of the AddParticipants screen when the logic of
   the invites will be done and the UI of this screen discussed with the team */
-    val coroutineScope = rememberCoroutineScope()
-    val currentUser = remember { mutableStateOf<GoMeetUser?>(null) }
-    val followers = remember{ mutableListOf<String>() }
-    val invited = remember { mutableListOf<String>()}
+  val coroutineScope = rememberCoroutineScope()
+  val currentUser = remember { mutableStateOf<GoMeetUser?>(null) }
+  val followers = remember { mutableListOf<String>() }
+  val invited = remember { mutableListOf<String>() }
 
-    LaunchedEffect(Unit) {
-        coroutineScope.launch {
-            currentUser.value = userViewModel.getUser(userId)
-            while (currentUser.value == null){}
-            val fwers = currentUser.value!!.followers
+  LaunchedEffect(Unit) {
+    coroutineScope.launch {
+      currentUser.value = userViewModel.getUser(userId)
+      while (currentUser.value == null) {}
+      val fwers = currentUser.value!!.followers
 
-            if (fwers.isNotEmpty()) {
-                fwers.forEach {
-                    followers.add(it)
-                }
-            }
+      if (fwers.isNotEmpty()) {
+        fwers.forEach { followers.add(it) }
+      }
     }
-    }
+  }
 
   Scaffold(
       modifier = Modifier.testTag("AddParticipantsScreen"),
@@ -67,49 +70,49 @@ fun AddParticipants(nav: NavigationActions, userId: String, userViewModel : User
             tabList = TOP_LEVEL_DESTINATIONS,
             selectedItem = Route.CREATE)
       }) { innerPadding ->
-      Column(
-          verticalArrangement = Arrangement.Top,
-          horizontalAlignment = Alignment.CenterHorizontally,
-          modifier = Modifier
-              .padding(innerPadding)
-              .fillMaxSize()) {
-          followers.forEach{user ->
-              AddWidget(userId = user, invited = false, remove = { invited.remove(user) }, add = { invited.add(user) })
+        Column(
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(innerPadding).fillMaxSize()) {
+              followers.forEach { user ->
+                AddWidget(
+                    userId = user,
+                    invited = false,
+                    remove = { invited.remove(user) },
+                    add = { invited.add(user) })
               }
-          }
-          OutlinedButton(onClick = {
+            }
+        OutlinedButton(
+            onClick = {
               eventInviteViewModel.addEventInviteUsers(
-                  EventInviteUsers(eventId,
-                      invited.map { Pair(it, InviteStatus.PENDING) }.toMutableList()
-                  ))
+                  EventInviteUsers(
+                      eventId, invited.map { Pair(it, InviteStatus.PENDING) }.toMutableList()))
               nav.goBack()
-          }) {
+            }) {
               Text(text = "Finish")
-          }
+            }
       }
 }
 
-
 @Composable
-fun AddWidget (userId: String, invited: Boolean, remove: () -> Unit, add: ()->Unit){
-    val invt = remember {
-        mutableStateOf<Boolean>(invited)
-    }
-    Row{
-        Text(text = userId)
-        OutlinedButton(onClick = {
-            if(invt.value){
-                remove()
-            }else {
-                add()
-            }
-            invt.value = !invt.value
+fun AddWidget(userId: String, invited: Boolean, remove: () -> Unit, add: () -> Unit) {
+  val invt = remember { mutableStateOf<Boolean>(invited) }
+  Row {
+    Text(text = userId)
+    OutlinedButton(
+        onClick = {
+          if (invt.value) {
+            remove()
+          } else {
+            add()
+          }
+          invt.value = !invt.value
         }) {
-            if (invt.value) {
-                Text(text = "Invited")
-            } else {
-                Text(text = "Send Invite")
-            }
+          if (invt.value) {
+            Text(text = "Invited")
+          } else {
+            Text(text = "Send Invite")
+          }
         }
-    }
+  }
 }

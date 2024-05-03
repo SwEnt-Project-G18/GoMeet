@@ -67,8 +67,6 @@ val CREATE_ITEMS =
             textId = Route.PRIVATE_CREATE),
     )
 
-
-
 val LOGIN_ITEMS =
     listOf(
         TopLevelDestination(

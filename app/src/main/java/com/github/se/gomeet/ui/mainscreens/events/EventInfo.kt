@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -258,6 +259,20 @@ fun EventButtons(
                 }
               }
             }
+        if (organizer.uid.contentEquals(Firebase.auth.currentUser!!.uid)) {
+          Spacer(modifier = Modifier.width(5.dp))
+          TextButton(
+              onClick = {
+                nav.navigateToScreen(Route.MANAGE_INVITES.replace("{eventId}", eventId))
+              },
+              shape = RoundedCornerShape(20.dp),
+              modifier = Modifier.weight(1f),
+              colors =
+                  ButtonDefaults.textButtonColors(
+                      containerColor = Color(0xFFECEFF1), contentColor = Color.Black)) {
+                Text("Add Participants")
+              }
+        }
         if (organizer.uid != com.google.firebase.Firebase.auth.currentUser!!.uid) {
           IconButton(
               onClick = {

@@ -375,10 +375,9 @@ fun Events(
 }
 
 /**
- * A composable function that displays detailed information about an event in a card layout.
- * This widget is designed to present event details including the name, description, date, and an
- * image if available. The card is interactive and can be tapped to navigate to further event
- * details.
+ * A composable function that displays detailed information about an event in a card layout. This
+ * widget is designed to present event details including the name, description, date, and an image
+ * if available. The card is interactive and can be tapped to navigate to further event details.
  *
  * @param userName The name of the event creator.
  * @param eventId The unique identifier for the event.
