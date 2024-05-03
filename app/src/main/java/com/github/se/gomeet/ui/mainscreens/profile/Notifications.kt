@@ -2,6 +2,7 @@ package com.github.se.gomeet.ui.mainscreens.profile
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -123,7 +124,7 @@ fun Notifications(nav: NavigationActions) {
               Row(
                   verticalAlignment = Alignment.CenterVertically,
                   horizontalArrangement = Arrangement.Start,
-                  modifier = Modifier.testTag("Back")) {
+                  modifier = Modifier.testTag("Back").clickable { nav.navigateToScreen(Route.PROFILE) }) {
                     Icon(
                         painter = painterResource(id = R.drawable.arrow_back_24px),
                         contentDescription = "image description",
