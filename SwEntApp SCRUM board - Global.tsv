@@ -1,0 +1,96 @@
+Title	URL	Status	Task Type	Nature	Epic	Assignees	Sprint	Length Estimate (hours)
+Setup Firebase		Done in "Sprint#1"	Backend	Sprint Task		koma2323	Sprint 1	
+Setup Google Authentication	https://github.com/SwEnt-Project-G18/SwEntApp/issues/4	Done in "Sprint#1"	Backend	Sprint Task		koma2323	Sprint 1	
+Setup Figma		Done in "Sprint#1"	Figma	Sprint Task		vladdancau	Sprint 1	
+Create UI on Figma (v1)		Done in "Sprint#1"	Figma			albertfares, vladdancau		
+As a user, I want to be able to sign in on the app in different ways so I can use my own account.		Done in “Sprint #2”	Frontend	User Story				
+Setup CI		Done in “Sprint #2”	Backend	Sprint Task		Antoine444, chorfiyoussef, DanThePol, vladdancau	Sprint 1	
+Code the WelcomeScreen from Figma in Kotlin		Done in “Sprint #2”	Frontend	Sprint Task		Antoine444, DanThePol	Sprint 2	
+Start creating map screen		Done in “Sprint #2”	Frontend			chorfiyoussef, koma2323, vladdancau	Sprint 2	
+Code the LoginScreen from Figma in Kotlin		Done in “Sprint #2”	Frontend	Sprint Task		Antoine444, DanThePol	Sprint 2	
+Code the CreateAccountScreen from Figma in Kotlin (RegisterScreen in Kotlin)		Done in “Sprint #2”	Frontend	Sprint Task		Antoine444, DanThePol	Sprint 2	
+Code the Navigations		Done in “Sprint #2”	Frontend	Sprint Task		chorfiyoussef	Sprint 2	
+Finish the Figma or at least the CreateEvent userflow		Done in “Sprint #2”	Figma			albertfares, eloibressaud, vladdancau	Sprint 2	
+Setup the SCRUM board		Done in "Sprint#1"	Backend	Sprint Task		Antoine444	Sprint 1	
+As a user, I want to be able to see the list of events so I can know what events I can join		Done in “Sprint #3”	Frontend	User Story			Sprint 4	
+As a user, I want to be able to see the future events on a map so I can see more clearly the events I can join.		Done in “Sprint #3”	Frontend	User Story	As a GoMeetSocial app user, I want to be able to load the events on a map, so that I can learn about interresting event			
+As a user, I want to see available events displayed on an interactive map.		Done in “Sprint #2”	Frontend	User Story		DanThePol, koma2323		
+As a user, I want to be able to create new events so I can meet new people.		Done in “Sprint #3”	Frontend	User Story	As a GoMeetSocial app user, I want to be able to create an event, so that other app user can learn about it			
+As a user, I want to have a friendlist, so I can easily contact my friends and add/remove people		Done in “Sprint #5”	Frontend	User Story	As a GoMeetSocial app user, I want to be able to customize my social network so I can personalize my events and message people in private		Sprint 5	
+Design UI to show Pending event invites		Done in “Sprint #5”	Figma	Sprint Task		vladdancau	Sprint 5	1.5
+Add documentation		Done in “Sprint #5”	Backend	Sprint Task		Antoine444	Sprint 5	2
+UI Profile settings		Done in “Sprint #5”	Frontend	Sprint Task		Antoine444	Sprint 5	4
+Change the markers on the map		Done in “Sprint #5”	Frontend	Sprint Task		albertfares	Sprint 5	6
+Link the invite status display to the firebase invite State database.		Done in “Sprint #5”	Backend	Sprint Task		Antoine444, chorfiyoussef	Sprint 4	4
+As a user, I want to be able to message the creator of an event so I can ask him more information.		Done in “Sprint #5”	Frontend	User Story	As a GoMeetSocial app user, I want to be able to customize my social network so I can personalize my events and message people in private	chorfiyoussef	Sprint 5	
+Implement the messaging UI		Done in “Sprint #5”	Frontend	Sprint Task		chorfiyoussef	Sprint 5	1
+Implement the messaging logic		Done in “Sprint #5”	Backend	Sprint Task		chorfiyoussef	Sprint 5	8
+Search bar on map		Done in “Sprint #5”	Frontend	Sprint Task		vladdancau	Sprint 5	3
+Update current location on map		Done in “Sprint #5”	Backend	Sprint Task		koma2323	Sprint 5	8
+Create the ViewModel for the Manage Invite to Event screen		Done in “Sprint #5”	Backend	Sprint Task		Antoine444, chorfiyoussef, DanThePol, eloibressaud	Sprint 4	3
+Search bar for events		Done in “Sprint #5”	Frontend	Sprint Task		koma2323	Sprint 5	3
+Implement UI for events		Done in “Sprint #5”	Frontend	Sprint Task		albertfares	Sprint 5	5
+UI for profile of another user		Done in “Sprint #5”	Frontend	Sprint Task		albertfares	Sprint 5	5
+M2 Moodle team submission		Done in “Sprint #6”				albertfares, Antoine444, chorfiyoussef, DanThePol, eloibressaud, koma2323, vladdancau	Sprint 6	
+Create the video for the M2 delivery		Done in “Sprint #6”				albertfares, Antoine444, chorfiyoussef, DanThePol, eloibressaud, koma2323, vladdancau	Sprint 6	
+Create an M2 release branch		Done in “Sprint #6”				albertfares, Antoine444, chorfiyoussef, DanThePol, eloibressaud, koma2323, vladdancau	Sprint 6	
+Figma M2		Done in “Sprint #6”	Figma				Sprint 6	
+Create the UI and start the logic for the ManageInvites screen from the EventInfo screen		Done in “Sprint #6”	Frontend	Sprint Task		Antoine444, chorfiyoussef, eloibressaud, koma2323	Sprint 6	8
+As a user, I want to be able to see the list of events I'm invited to so I can easily access events that directly concern me		Done in “Sprint #6”	Frontend	User Story	As a GoMeetSocial app user, I want to be able to customize my social network so I can personalize my events and message people in private			
+Update the architecture diagram		Done in “Sprint #6”		Sprint Task		Antoine444, chorfiyoussef	Sprint 6	2
+Implement the "edit profile" logic		Done in “Sprint #6”	Backend	Sprint Task		albertfares, Antoine444	Sprint 6	3
+Slider & enhancements on the map		Done in “Sprint #6”	Frontend	Sprint Task		vladdancau	Sprint 6	8
+As a user, I want to be able to register for an event so I can participate in an event and meet new friends.		Done in “Sprint #6”	Frontend	User Story	As a GoMeetSocial app user, I want to join other events so I can do interesting stuffs	chorfiyoussef		
+Implement the "edit profile" UI		Done in “Sprint #6”	Frontend	Sprint Task		albertfares, Antoine444	Sprint 6	4
+Allow a User to follow another User		Done in “Sprint #6”		User Story		koma2323	Sprint 6	8
+Improve Sign In to have a more complete Profile		Done in “Sprint #6”		Sprint Task		albertfares, Antoine444	Sprint 6	6
+User join a public event, and update it's list of event		Done in “Sprint #6”		User Story		chorfiyoussef	Sprint 6	12
+User can add an event to its favorite		Done in “Sprint #6”		Sprint Task		chorfiyoussef	Sprint 6	2
+Add Tests for Sprint 4/5		Done in “Sprint #6”	Backend	Sprint Task		DanThePol, koma2323	Sprint 6	12
+Add loading screens when needed		Done in “Sprint #6”	Frontend	Sprint Task		DanThePol	Sprint 6	2
+Add location suggestions (when choosing location in Create Event screen)		Done in “Sprint #5”	Frontend	Sprint Task		koma2323	Sprint 5	4
+Add Firebase Emulator Suite to the project and mock Firebase in the tests		Done in “Sprint #5”	Backend	Sprint Task		DanThePol	Sprint 5	20
+Update the Private Event UI to update the list of participants		Done in “Sprint #4”	Frontend	Sprint Task		Antoine444	Sprint 4	3
+Implement the UI flow to respond to invites		Done in “Sprint #4”	Frontend	Sprint Task		vladdancau	Sprint 4	4
+Add tests for User UI and User ViewModel		Done in “Sprint #4”	Backend	Sprint Task		koma2323	Sprint 5	3
+Add some tests for the login UI		Done in “Sprint #3”	Backend	Sprint Task		Antoine444, DanThePol	Sprint 3	
+Create the class that will handle the database with FireStore		Done in “Sprint #3”	Backend	Sprint Task		chorfiyoussef, eloibressaud	Sprint 3	
+Create the ViewModel for the public events		Done in “Sprint #3”	Backend	Sprint Task		chorfiyoussef	Sprint 3	
+Create the UI for the CreateEventScreen		Done in “Sprint #3”	Backend	Sprint Task		albertfares, Antoine444	Sprint 3	
+S3 UI profile	https://github.com/SwEnt-Project-G18/SwEntApp/pull/23	Done in “Sprint #3”				vladdancau		
+Fix the issue where the BottomNavBar isn't updating well	https://github.com/SwEnt-Project-G18/SwEntApp/issues/19	Done in “Sprint #3”	Frontend	Sprint Task		albertfares	Sprint 3	
+Create the UI for the ProfileScreen		Done in “Sprint #3”				vladdancau		
+Add an image to an event		Done in “Sprint #3”	Backend	Sprint Task		albertfares	Sprint 3	
+Fixed UI issues (Darkmode and colors)		Done in “Sprint #3”		Sprint Task		albertfares	Sprint 3	
+Create the View Model for the friend list		Done in “Sprint #4”	Backend	Sprint Task		koma2323, vladdancau	Sprint 4	3
+Link the Event List to the database to correctly show Events created by a user		Done in “Sprint #4”	Backend	Sprint Task		DanThePol, vladdancau	Sprint 4	6
+Create the FireBase connection for the users friend list		Done in “Sprint #4”	Backend	Sprint Task		eloibressaud, koma2323	Sprint 4	5
+As a user, I want to be able accept or refuse invitations to an event so I can manage my invitations		Sprint Backlog	Frontend	User Story	As a GoMeetSocial app user, I want to be able to customize my social network so I can personalize my events and message people in private		Sprint 7	
+As a private event organizer, I want to see which of my invitees plan on coming so it is easier for me to organize the event		Sprint Backlog	Frontend	User Story	As a GoMeetSocial app user, I want to be able to customize my social network so I can personalize my events and message people in private		Sprint 7	
+As a user, I want to be able to have an itinerary of a potential event I'm interested in so I can plan on how to get there		Sprint Backlog	Frontend	User Story	As a GoMeetSocial app user, I want to seamlessly discover and navigate to events so that I can efficiently plan my attendance and access event information directly from the map interface.		Sprint 8	
+Design UI to Manage Friends Invites to an Event		Done in “Sprint #4”	Figma	Sprint Task		albertfares	Sprint 4	1.5
+Implement the filtering logic in Events		Done in “Sprint #4”	Backend	Sprint Task		albertfares	Sprint 4	4
+Event screen UI enhancements		Done in “Sprint #4”	Frontend	Sprint Task		albertfares	Sprint 4	2
+Design the UI for the friend list		Done in “Sprint #4”	Figma	Sprint Task		albertfares, vladdancau	Sprint 4	1.5
+Create the UI for the friend list		Done in “Sprint #4”	Frontend	Sprint Task		albertfares	Sprint 4	3
+Profile screen UI enhencements		Done in “Sprint #4”				albertfares		
+Implement a user flow allowing a user to access the invitee list of one of their event		Done in “Sprint #4”	Frontend	Sprint Task		albertfares		4
+S4 EndToEndTest and CI improvement		Done in “Sprint #4”	Backend	Sprint Task		chorfiyoussef, koma2323	Sprint 4	10
+Profile Settings Logic (Device Permissions / Help / About)		In Development	Backend	Sprint Task		eloibressaud	Sprint 7	10
+A user searcbar (look up for Users)		In Development	Frontend	Sprint Task		koma2323, vladdancau	Sprint 7	2
+Add a profile picture		In Development	Frontend	Sprint Task		albertfares	Sprint 7	3
+Events History in my Profile		In Development	Backend	Sprint Task		koma2323	Sprint 7	5
+Code Refactoring for M1/2		In Development	Backend	Sprint Task		Antoine444, DanThePol	Sprint 7	12
+Guided RegisterScreen		In Development	Frontend	Sprint Task		chorfiyoussef	Sprint 7	5
+Advanced filtering events		In Development	Backend	Sprint Task		vladdancau	Sprint 7	10
+Implement a message channel list		In Development	Frontend	Sprint Task		chorfiyoussef	Sprint 7	4
+Cache Firebase for for offlline use and performance		In Development	Backend	Sprint Task		Antoine444	Sprint 7	5
+Move MyEvents From Events to Profile		In Development	Frontend	Sprint Task		chorfiyoussef	Sprint 7	1
+Implement the logic to add real participants to an event (meaning the participants field of an event isn't empty anymore)		In Development	Backend	Sprint Task		Antoine444, eloibressaud	Sprint 7	
+UI Trends		In Development	Frontend	Sprint Task		albertfares	Sprint 7	7
+Algorithm for Trends Screen		In Development	Backend	Sprint Task		DanThePol, vladdancau	Sprint 7	7
+As a user, I want to be able to access to informations of an event from the map so that I can navigate easily between the two screens		Product Backlog	Frontend	User Story	As a GoMeetSocial app user, I want to seamlessly discover and navigate to events so that I can efficiently plan my attendance and access event information directly from the map interface.			
+As a user, I want to be able to message any user I follow and not the organizer of an event so I can chat with my friends		Product Backlog	Backend	User Story	As a GoMeetSocial app user, I want to be able to communicate and interact socially within the app so that I can maintain privacy while engaging with my friends and not necessarily the event organizers.			
+As a user, I would like to upload and update my profile picture so that I can personalize my profile and make it more recognizable to other users.		Product Backlog	Backend	User Story	As a GoMeetSocial app user, I want comprehensive control over my profile and settings to tailor my experience and manage my privacy within the app.			
+As a user, I would like to customize my profile information and settings, including my name, contact details, and preferences, so that I can control how I present myself to others and manage how I interact with the app.		Product Backlog	Backend	User Story	As a GoMeetSocial app user, I want comprehensive control over my profile and settings to tailor my experience and manage my privacy within the app.			
+As a user, I want to be able to see public events from official and verified organizations so I can join them later		Product Backlog	Frontend	User Story	As a GoMeetSocial app user, I want to discover events organized by verified entities to ensure the authenticity and reliability of the events I choose to join.			
