@@ -1,5 +1,6 @@
 package com.github.se.gomeet.ui.mainscreens.create
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -56,6 +57,7 @@ import com.github.se.gomeet.ui.theme.NavBarUnselected
 import com.github.se.gomeet.viewmodel.EventInviteViewModel
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.launch
 
 /**
@@ -85,7 +87,10 @@ fun ManageInvites(
       event.value = eventViewModel.getEvent(currentEvent)
       eventInviteUsers.value = eventInviteViewModel.getUsersInvitedToEvent(event.value!!.uid)
 
-      while (user.value == null || event.value == null || eventInviteUsers.value == null) {}
+      while (user.value == null || event.value == null) {
+        TimeUnit.SECONDS.sleep(1)
+        Log.e("QWEqwe", "wqeqweq")
+      }
       val followers = user.value!!.followers
       if (followers.isNotEmpty()) {
         followers.forEach { followersList.add(it) }
