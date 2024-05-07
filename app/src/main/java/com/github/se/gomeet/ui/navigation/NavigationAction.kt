@@ -50,6 +50,8 @@ object Route {
       "eventInfo/{eventId}/{title}/{date}/{time}/{organizer}/{rating}/{description}/{latitude}/{longitude}"
   const val NOTIFICATIONS = "Notifications"
   const val SETTINGS = "Settings"
+  const val ABOUT = "About"
+  const val PERMISSIONS = "Permissions"
   const val MESSAGE = "Message/{id}"
   const val FOLLOWERS = "Followers/{uid}"
   const val FOLLOWING = "Following/{uid}"
@@ -108,6 +110,17 @@ val SECOND_LEVEL_DESTINATION =
             route = Route.SETTINGS, icon = Icons.Default.Settings, textId = Route.SETTINGS),
         TopLevelDestination(
             Route.EDIT_PROFILE, icon = Icons.Default.Person, textId = Route.EDIT_PROFILE))
+
+val SETTINGS =
+    listOf(
+        TopLevelDestination(
+            route = Route.SETTINGS, icon = Icons.Default.Settings, textId = Route.SETTINGS),
+        TopLevelDestination(
+            route = Route.ABOUT, icon = Icons.Default.Settings, textId = Route.ABOUT),
+        TopLevelDestination(
+            route = Route.PERMISSIONS, icon = Icons.Default.Settings, textId = Route.PERMISSIONS)
+
+)
 
 /**
  * Class that handles navigation in the app.

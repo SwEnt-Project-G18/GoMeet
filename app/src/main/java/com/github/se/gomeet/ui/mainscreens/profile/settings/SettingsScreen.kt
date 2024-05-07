@@ -1,5 +1,6 @@
-package com.github.se.gomeet.ui.mainscreens.profile
+package com.github.se.gomeet.ui.mainscreens.profile.settings
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -105,7 +106,7 @@ fun SettingsScreen(
               SettingsSubtitle("Your app and media", Modifier.padding(15.dp).align(Alignment.Start))
 
               SettingsComposable(R.drawable.folder, "Suggested content")
-              SettingsComposable(R.drawable.mobile_friendly, "Device permissions")
+              SettingsComposable(R.drawable.mobile_friendly, "Device permissions",true, {nav.navigateToScreen(Route.PERMISSIONS)})
               SettingsComposable(R.drawable.check_icon, "Accessibility")
               SettingsComposable(R.drawable.language, "Language")
 
@@ -113,7 +114,7 @@ fun SettingsScreen(
                   "More info and support", Modifier.padding(15.dp).align(Alignment.Start))
 
               SettingsComposable(R.drawable.baseline_chat_bubble_outline_24, "Help")
-              SettingsComposable(R.drawable.gomeet_icon, "About")
+              SettingsComposable(R.drawable.gomeet_icon, "About",true, {nav.navigateToScreen(Route.ABOUT)})
 
               Text(
                   text = "Log out",
@@ -145,9 +146,10 @@ fun SettingsScreen(
  * @param text The text for the item.
  */
 @Composable
-fun SettingsComposable(icon: Int, text: String) {
+fun SettingsComposable(icon: Int, text: String, clickable : Boolean = false, onClick: () -> Unit = {}){
   Row(
-      modifier = Modifier.padding(start = 15.dp),
+      modifier = Modifier.padding(start = 15.dp)
+          .let { if (clickable) it.clickable(onClick = onClick) else it }, // Add the clickable modifier here if clickable is true
       horizontalArrangement = Arrangement.Start,
       verticalAlignment = Alignment.CenterVertically) {
         Icon(
