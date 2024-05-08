@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -69,8 +70,6 @@ import com.github.se.gomeet.ui.theme.LightGray
 import com.github.se.gomeet.ui.theme.NavBarUnselected
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 
 /**
@@ -90,7 +89,9 @@ fun Profile(
   val coroutineScope = rememberCoroutineScope()
   var isProfileLoaded by remember { mutableStateOf(false) }
     var currentUser by remember { mutableStateOf<GoMeetUser?>(null) }
-    val eventList = remember { mutableListOf<Event>() }
+    val myEventList = remember { mutableListOf<Event>() }
+    val myHistoryList = remember { mutableListOf<Event>() }
+
 
 
 
@@ -101,7 +102,7 @@ fun Profile(
             eventViewModel.getAllEvents()!!.filter { e ->
                 currentUser!!.myEvents.contains(e.uid)}
         if (allEvents.isNotEmpty()) {
-            eventList.addAll(allEvents)
+            myEventList.addAll(allEvents)
         }
       isProfileLoaded = true
     }
@@ -129,12 +130,16 @@ fun Profile(
               style = MaterialTheme.typography.headlineLarge)
 
           IconButton(
-              modifier = Modifier.align(Alignment.CenterVertically).padding(end = 15.dp),
+              modifier = Modifier
+                  .align(Alignment.CenterVertically)
+                  .padding(end = 15.dp),
               onClick = { nav.navigateToScreen(Route.NOTIFICATIONS) }) {
                 Icon(
                     ImageVector.vectorResource(R.drawable.mail),
                     contentDescription = "Notifications",
-                    modifier = Modifier.size(30.dp).align(Alignment.CenterVertically),
+                    modifier = Modifier
+                        .size(30.dp)
+                        .align(Alignment.CenterVertically),
                     tint = Grey)
               }
 
@@ -142,14 +147,18 @@ fun Profile(
           // This will push the icon to the right
           Spacer(Modifier.weight(1f))
           IconButton(
-              modifier = Modifier.align(Alignment.CenterVertically).padding(end = 15.dp),
+              modifier = Modifier
+                  .align(Alignment.CenterVertically)
+                  .padding(end = 15.dp),
               onClick = {
                 nav.navigateTo(SECOND_LEVEL_DESTINATION.first { it.route == Route.SETTINGS })
               }) {
                 Icon(
                     imageVector = ImageVector.vectorResource(R.drawable.settings_icon),
                     contentDescription = "Settings",
-                    modifier = Modifier.size(30.dp).align(Alignment.CenterVertically),
+                    modifier = Modifier
+                        .size(30.dp)
+                        .align(Alignment.CenterVertically),
                     tint = Grey)
               }
         }
@@ -158,20 +167,24 @@ fun Profile(
           Column(
               verticalArrangement = Arrangement.SpaceEvenly,
               horizontalAlignment = Alignment.CenterHorizontally,
-              modifier = Modifier.padding(innerPadding).verticalScroll(rememberScrollState(0))) {
+              modifier = Modifier
+                  .padding(innerPadding)
+                  .verticalScroll(rememberScrollState(0))) {
                 Row(
                     horizontalArrangement = Arrangement.Start,
                     verticalAlignment = Alignment.CenterVertically,
                     modifier =
-                        Modifier.fillMaxWidth()
-                            .padding(start = 15.dp, end = 0.dp, top = 0.dp, bottom = 30.dp)) {
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(start = 15.dp, end = 0.dp, top = 0.dp, bottom = 30.dp)) {
                       Image(
                           modifier =
-                              Modifier.padding(start = 0.dp, end = 0.dp, top = 0.dp, bottom = 0.dp)
-                                  .width(101.dp)
-                                  .height(101.dp)
-                                  .clip(CircleShape)
-                                  .background(color = MaterialTheme.colorScheme.background),
+                          Modifier
+                              .padding(start = 0.dp, end = 0.dp, top = 0.dp, bottom = 0.dp)
+                              .width(101.dp)
+                              .height(101.dp)
+                              .clip(CircleShape)
+                              .background(color = MaterialTheme.colorScheme.background),
                           painter = painterResource(id = R.drawable.gomeet_logo),
                           contentDescription = "image description",
                           contentScale = ContentScale.None)
@@ -218,7 +231,9 @@ fun Profile(
                       // Edit Profile button
                       Button(
                           onClick = { nav.navigateToScreen(Route.EDIT_PROFILE) },
-                          modifier = Modifier.height(40.dp).width(135.dp),
+                          modifier = Modifier
+                              .height(40.dp)
+                              .width(135.dp),
                           shape = RoundedCornerShape(10.dp),
                           colors = ButtonDefaults.buttonColors(containerColor = LightGray)) {
                             Text(text = "Edit Profile", color = Color.Black)
@@ -228,7 +243,9 @@ fun Profile(
 
                       Button(
                           onClick = { /*TODO*/},
-                          modifier = Modifier.height(40.dp).width(135.dp),
+                          modifier = Modifier
+                              .height(40.dp)
+                              .width(135.dp),
                           shape = RoundedCornerShape(10.dp),
                           colors = ButtonDefaults.buttonColors(containerColor = LightGray)) {
                             Text(text = "Share Profile", color = Color.Black)
@@ -289,14 +306,14 @@ fun Profile(
                           }
                       HorizontalDivider(
                           modifier =
-                              Modifier
-                                  // .fillMaxHeight()
-                                  .height(40.dp)
-                                  .width(2.dp))
+                          Modifier
+                              // .fillMaxHeight()
+                              .height(40.dp)
+                              .width(2.dp))
                       Column(
                           modifier =
                               Modifier.clickable {
-                                nav.navigateToScreen(Route.FOLLOWERS.replace("{uid}", uid))
+                                nav.navigateToScreen(Route.FOLLOWERS.replace("{uid}", userId))
                               }) {
                             Text(
                                 text = currentUser?.followers?.size.toString(),
@@ -327,15 +344,15 @@ fun Profile(
                           }
                       HorizontalDivider(
                           modifier =
-                              Modifier
-                                  // .fillMaxHeight()
-                                  .height(40.dp)
-                                  .width(2.dp))
+                          Modifier
+                              // .fillMaxHeight()
+                              .height(40.dp)
+                              .width(2.dp))
                       Column(
                           modifier =
                               Modifier.clickable {
                                 nav.navigateToScreen(
-                                    Route.FOLLOWING.replace("{uid}", uid)
+                                    Route.FOLLOWING.replace("{uid}", userId)
                                         .replace("{isOwnList}", "true"))
                               }) {
                             Text(
@@ -380,11 +397,14 @@ fun Profile(
                             letterSpacing = 0.5.sp,
                         ),
                     modifier =
-                        Modifier.width(74.dp)
-                            .height(20.dp)
-                            .align(Alignment.Start)
-                            .padding(start = 15.dp))
-                Column(modifier = Modifier.padding(start = 0.dp, end = 0.dp).fillMaxWidth()) {
+                    Modifier
+                        .width(74.dp)
+                        .height(20.dp)
+                        .align(Alignment.Start)
+                        .padding(start = 15.dp))
+                Column(modifier = Modifier
+                    .padding(start = 0.dp, end = 0.dp)
+                    .fillMaxWidth()) {
                   Spacer(modifier = Modifier.height(10.dp))
                   LazyRow(
                       verticalAlignment = Alignment.CenterVertically,
@@ -404,9 +424,9 @@ fun Profile(
                       }
                 }
                 Spacer(modifier = Modifier.height(10.dp))
-                ProfileEventsList("My Events")
+                ProfileEventsList("My Events", rememberLazyListState(), myEventList)
                 Spacer(modifier = Modifier.height(10.dp))
-                ProfileEventsList("History")
+                ProfileEventsList("History", rememberLazyListState(), myHistoryList)
               }
         } else {
           LoadingText()
