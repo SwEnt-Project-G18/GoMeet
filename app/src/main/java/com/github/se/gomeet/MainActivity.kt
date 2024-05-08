@@ -85,17 +85,6 @@ class MainActivity : ComponentActivity() {
             .logLevel(ChatLogLevel.ALL) // Set to NOTHING in prod
             .build()
 
-    val factory by lazy {
-      MessagesViewModelFactory(
-          context = this,
-          chatClient = ChatClient.instance(),
-          channelId = "messaging:123",
-          enforceUniqueReactions = true,
-          messageLimit = 30)
-    }
-
-    val listViewModel: MessageListViewModel by viewModels { factory }
-
     setContent {
       val clientInitialisationState by client.clientState.initializationState.collectAsState()
 
