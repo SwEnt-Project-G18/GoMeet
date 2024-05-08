@@ -170,7 +170,11 @@ class MainActivity : ComponentActivity() {
             composable(
                 route = Route.OTHERS_PROFILE,
                 arguments = listOf(navArgument("uid") { type = NavType.StringType })) {
-                  OthersProfile(navAction, it.arguments?.getString("uid") ?: "", userViewModel, eventViewModel)
+                  OthersProfile(
+                      navAction,
+                      it.arguments?.getString("uid") ?: "",
+                      userViewModel,
+                      eventViewModel)
                 }
             composable(Route.PRIVATE_CREATE) {
               CreateEvent(navAction, EventViewModel(Firebase.auth.currentUser!!.uid), true)

@@ -168,7 +168,7 @@ fun Events(
                   modifier = Modifier.heightIn(min = 56.dp).fillMaxWidth()) {
                     Button(
                         onClick = { onFilterButtonClick("Joined") },
-                        content = { Text("Joined Events") },
+                        content = { Text("JoinedEvents") },
                         colors =
                             ButtonDefaults.buttonColors(
                                 containerColor =
@@ -388,7 +388,6 @@ fun Events(
  * @param verified A boolean indicating whether the event or the creator is verified. This could
  *   influence the visual representation.
  * @param nav NavigationActions object to handle navigation events such as tapping on the event
-
  */
 @Composable
 fun EventWidget(

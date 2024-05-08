@@ -101,7 +101,6 @@ fun OthersProfile(
   val myEventList = remember { mutableListOf<Event>() }
   val myHistoryList = remember { mutableListOf<Event>() }
 
-
   LaunchedEffect(Unit) {
     coroutineScope.launch {
       user = userViewModel.getUser(uid)
@@ -109,12 +108,11 @@ fun OthersProfile(
       isFollowing = user?.followers?.contains(currentUser) ?: false
       followerCount = user?.followers?.size ?: 0
 
-        val allEvents =
-            eventViewModel.getAllEvents()!!.filter { e ->
-                user!!.myEvents.contains(e.uid)}
-        if (allEvents.isNotEmpty()) {
-            myEventList.addAll(allEvents)
-        }
+      val allEvents =
+          eventViewModel.getAllEvents()!!.filter { e -> user!!.myEvents.contains(e.uid) }
+      if (allEvents.isNotEmpty()) {
+        myEventList.addAll(allEvents)
+      }
     }
   }
 
@@ -133,9 +131,7 @@ fun OthersProfile(
             title = {},
             backgroundColor = MaterialTheme.colorScheme.background,
             elevation = 0.dp,
-            modifier = Modifier
-                .height(50.dp)
-                .testTag("TopBar"),
+            modifier = Modifier.height(50.dp).testTag("TopBar"),
             actions = {
               // Settings Icon
               IconButton(onClick = { /* Handle settings icon click */}) {
@@ -153,25 +149,21 @@ fun OthersProfile(
           Column(
               verticalArrangement = Arrangement.SpaceEvenly,
               horizontalAlignment = Alignment.CenterHorizontally,
-              modifier = Modifier
-                  .padding(innerPadding)
-                  .verticalScroll(rememberScrollState(0))) {
+              modifier = Modifier.padding(innerPadding).verticalScroll(rememberScrollState(0))) {
                 Row(
                     horizontalArrangement = Arrangement.Start,
                     verticalAlignment = Alignment.CenterVertically,
                     modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(start = 15.dp, end = 0.dp, top = 0.dp, bottom = 30.dp)
-                        .testTag("UserInfo")) {
+                        Modifier.fillMaxWidth()
+                            .padding(start = 15.dp, end = 0.dp, top = 0.dp, bottom = 30.dp)
+                            .testTag("UserInfo")) {
                       Image(
                           modifier =
-                          Modifier
-                              .padding(start = 0.dp, end = 0.dp, top = 0.dp, bottom = 0.dp)
-                              .width(101.dp)
-                              .height(101.dp)
-                              .clip(CircleShape)
-                              .background(color = MaterialTheme.colorScheme.background),
+                              Modifier.padding(start = 0.dp, end = 0.dp, top = 0.dp, bottom = 0.dp)
+                                  .width(101.dp)
+                                  .height(101.dp)
+                                  .clip(CircleShape)
+                                  .background(color = MaterialTheme.colorScheme.background),
                           painter = painterResource(id = R.drawable.gomeet_logo),
                           contentDescription = "image description",
                           contentScale = ContentScale.None)
@@ -226,9 +218,7 @@ fun OthersProfile(
                               followerCount -= 1
                               userViewModel.unfollow(uid)
                             },
-                            modifier = Modifier
-                                .height(40.dp)
-                                .width(180.dp),
+                            modifier = Modifier.height(40.dp).width(180.dp),
                             shape = RoundedCornerShape(10.dp),
                             colors =
                                 ButtonDefaults.buttonColors(containerColor = Color(0xFFECEFF1))) {
@@ -241,9 +231,7 @@ fun OthersProfile(
                               followerCount += 1
                               userViewModel.follow(uid)
                             },
-                            modifier = Modifier
-                                .height(40.dp)
-                                .width(180.dp),
+                            modifier = Modifier.height(40.dp).width(180.dp),
                             shape = RoundedCornerShape(10.dp),
                             colors =
                                 ButtonDefaults.buttonColors(containerColor = Color(0xFFECEFF1))) {
@@ -257,9 +245,7 @@ fun OthersProfile(
                           onClick = {
                             nav.navigateToScreen(Route.MESSAGE.replace("{id}", Uri.encode(uid)))
                           },
-                          modifier = Modifier
-                              .height(40.dp)
-                              .width(180.dp),
+                          modifier = Modifier.height(40.dp).width(180.dp),
                           shape = RoundedCornerShape(10.dp),
                           colors =
                               ButtonDefaults.buttonColors(containerColor = Color(0xFFECEFF1))) {
@@ -273,9 +259,7 @@ fun OthersProfile(
                 Row(
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag("MoreUserInfo")) {
+                    modifier = Modifier.fillMaxWidth().testTag("MoreUserInfo")) {
                       Column(
                           modifier =
                               Modifier.clickable {
@@ -310,10 +294,10 @@ fun OthersProfile(
                           }
                       HorizontalDivider(
                           modifier =
-                          Modifier
-                              // .fillMaxHeight()
-                              .height(40.dp)
-                              .width(2.dp))
+                              Modifier
+                                  // .fillMaxHeight()
+                                  .height(40.dp)
+                                  .width(2.dp))
                       Column(
                           modifier =
                               Modifier.clickable {
@@ -348,10 +332,10 @@ fun OthersProfile(
                           }
                       HorizontalDivider(
                           modifier =
-                          Modifier
-                              // .fillMaxHeight()
-                              .height(40.dp)
-                              .width(2.dp))
+                              Modifier
+                                  // .fillMaxHeight()
+                                  .height(40.dp)
+                                  .width(2.dp))
                       Column(
                           modifier =
                               Modifier.clickable {
@@ -401,17 +385,15 @@ fun OthersProfile(
                             letterSpacing = 0.5.sp,
                         ),
                     modifier =
-                    Modifier
-                        .width(74.dp)
-                        .height(21.dp)
-                        .align(Alignment.Start)
-                        .padding(start = 15.dp))
+                        Modifier.width(74.dp)
+                            .height(21.dp)
+                            .align(Alignment.Start)
+                            .padding(start = 15.dp))
                 Column(
                     modifier =
-                    Modifier
-                        .padding(start = 0.dp, end = 0.dp)
-                        .fillMaxWidth()
-                        .testTag("TagList")) {
+                        Modifier.padding(start = 0.dp, end = 0.dp)
+                            .fillMaxWidth()
+                            .testTag("TagList")) {
                       Spacer(modifier = Modifier.height(10.dp))
                       LazyRow(
                           verticalAlignment = Alignment.CenterVertically,
@@ -450,9 +432,7 @@ fun MoreActionsButton() {
     Icon(
         imageVector = Icons.Default.MoreVert,
         contentDescription = "More",
-        modifier = Modifier
-            .size(24.dp)
-            .rotate(90f), // Rotates the icon by 90 degrees
+        modifier = Modifier.size(24.dp).rotate(90f), // Rotates the icon by 90 degrees
         tint = DarkCyan)
   }
 
@@ -475,5 +455,6 @@ fun MoreActionsButton() {
 @Preview
 @Composable
 fun OthersProfilePreview() {
-  OthersProfile(nav = NavigationActions(rememberNavController()), "", UserViewModel(), EventViewModel())
+  OthersProfile(
+      nav = NavigationActions(rememberNavController()), "", UserViewModel(), EventViewModel())
 }
