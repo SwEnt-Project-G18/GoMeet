@@ -10,6 +10,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.ui.navigation.NavigationActions
+import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import org.junit.Rule
 import org.junit.Test
@@ -25,7 +26,7 @@ class OthersProfileTest {
 
     rule.setContent {
       navController = rememberNavController()
-      OthersProfile(NavigationActions(navController), "", UserViewModel())
+      OthersProfile(NavigationActions(navController), "", UserViewModel(), EventViewModel())
     }
 
     rule.onNodeWithTag("TopBar").assertIsDisplayed()

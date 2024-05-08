@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -55,6 +56,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.R
+import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
@@ -66,13 +68,9 @@ import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.ui.theme.Grey
 import com.github.se.gomeet.ui.theme.LightGray
 import com.github.se.gomeet.ui.theme.NavBarUnselected
+import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
-
-private val uid = Firebase.auth.currentUser?.uid ?: ""
-private var currentUser: GoMeetUser? = null
 
 /**
  * Profile screen composable
@@ -84,13 +82,24 @@ private var currentUser: GoMeetUser? = null
 fun Profile(
     nav: NavigationActions,
     userId: String,
-    userViewModel: UserViewModel
+    userViewModel: UserViewModel,
+    eventViewModel: EventViewModel
 ) { // TODO Add parameters to the function
+
   val coroutineScope = rememberCoroutineScope()
   var isProfileLoaded by remember { mutableStateOf(false) }
+  var currentUser by remember { mutableStateOf<GoMeetUser?>(null) }
+  val myEventList = remember { mutableListOf<Event>() }
+  val myHistoryList = remember { mutableListOf<Event>() }
+
   LaunchedEffect(Unit) {
     coroutineScope.launch {
-      currentUser = userViewModel.getUser(uid)
+      currentUser = userViewModel.getUser(userId)
+      val allEvents =
+          eventViewModel.getAllEvents()!!.filter { e -> currentUser!!.myEvents.contains(e.uid) }
+      if (allEvents.isNotEmpty()) {
+        myEventList.addAll(allEvents)
+      }
       isProfileLoaded = true
     }
   }
@@ -284,7 +293,7 @@ fun Profile(
                       Column(
                           modifier =
                               Modifier.clickable {
-                                nav.navigateToScreen(Route.FOLLOWERS.replace("{uid}", uid))
+                                nav.navigateToScreen(Route.FOLLOWERS.replace("{uid}", userId))
                               }) {
                             Text(
                                 text = currentUser?.followers?.size.toString(),
@@ -323,7 +332,7 @@ fun Profile(
                           modifier =
                               Modifier.clickable {
                                 nav.navigateToScreen(
-                                    Route.FOLLOWING.replace("{uid}", uid)
+                                    Route.FOLLOWING.replace("{uid}", userId)
                                         .replace("{isOwnList}", "true"))
                               }) {
                             Text(
@@ -392,9 +401,9 @@ fun Profile(
                       }
                 }
                 Spacer(modifier = Modifier.height(10.dp))
-                ProfileEventsList("My Events")
+                ProfileEventsList("My Events", rememberLazyListState(), myEventList)
                 Spacer(modifier = Modifier.height(10.dp))
-                ProfileEventsList("History")
+                ProfileEventsList("History", rememberLazyListState(), myHistoryList)
               }
         } else {
           LoadingText()
@@ -405,5 +414,6 @@ fun Profile(
 @Preview
 @Composable
 fun ProfilePreview() {
-  Profile(nav = NavigationActions(rememberNavController()), "John", UserViewModel())
+  Profile(
+      nav = NavigationActions(rememberNavController()), "John", UserViewModel(), EventViewModel())
 }

@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -61,6 +62,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.R
+import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
@@ -69,6 +71,7 @@ import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.ui.theme.NavBarUnselected
+import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -88,18 +91,28 @@ private var currentUser = Firebase.auth.currentUser?.uid ?: ""
 fun OthersProfile(
     nav: NavigationActions,
     uid: String,
-    userViewModel: UserViewModel
+    userViewModel: UserViewModel,
+    eventViewModel: EventViewModel
 ) { // TODO Add parameters to the function
   var isFollowing by remember { mutableStateOf(false) }
   var followerCount by remember { mutableIntStateOf(0) }
   val coroutineScope = rememberCoroutineScope()
   var isProfileLoaded by remember { mutableStateOf(false) }
+  val myEventList = remember { mutableListOf<Event>() }
+  val myHistoryList = remember { mutableListOf<Event>() }
+
   LaunchedEffect(Unit) {
     coroutineScope.launch {
       user = userViewModel.getUser(uid)
       isProfileLoaded = true
       isFollowing = user?.followers?.contains(currentUser) ?: false
       followerCount = user?.followers?.size ?: 0
+
+      val allEvents =
+          eventViewModel.getAllEvents()!!.filter { e -> user!!.myEvents.contains(e.uid) }
+      if (allEvents.isNotEmpty()) {
+        myEventList.addAll(allEvents)
+      }
     }
   }
 
@@ -400,9 +413,9 @@ fun OthersProfile(
                           }
                     }
                 Spacer(modifier = Modifier.height(10.dp))
-                ProfileEventsList("My Events")
+                ProfileEventsList("My Events", rememberLazyListState(), myEventList)
                 Spacer(modifier = Modifier.height(10.dp))
-                ProfileEventsList("History")
+                ProfileEventsList("History", rememberLazyListState(), myHistoryList)
               }
         } else {
           LoadingText()
@@ -442,5 +455,6 @@ fun MoreActionsButton() {
 @Preview
 @Composable
 fun OthersProfilePreview() {
-  OthersProfile(nav = NavigationActions(rememberNavController()), "", UserViewModel())
+  OthersProfile(
+      nav = NavigationActions(rememberNavController()), "", UserViewModel(), EventViewModel())
 }
