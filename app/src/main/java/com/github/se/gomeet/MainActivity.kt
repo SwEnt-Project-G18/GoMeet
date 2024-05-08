@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -53,8 +54,10 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import io.getstream.chat.android.client.ChatClient
 import io.getstream.chat.android.client.logger.ChatLogLevel
+import io.getstream.chat.android.compose.ui.channels.ChannelsScreen
 import io.getstream.chat.android.compose.ui.messages.MessagesScreen
 import io.getstream.chat.android.compose.ui.theme.ChatTheme
+import io.getstream.chat.android.compose.viewmodel.messages.MessageListViewModel
 import io.getstream.chat.android.compose.viewmodel.messages.MessagesViewModelFactory
 import io.getstream.chat.android.models.InitializationState
 import io.getstream.chat.android.models.User
@@ -81,6 +84,17 @@ class MainActivity : ComponentActivity() {
             .withPlugins(offlinePluginFactory, statePluginFactory)
             .logLevel(ChatLogLevel.ALL) // Set to NOTHING in prod
             .build()
+
+    val factory by lazy {
+      MessagesViewModelFactory(
+          context = this,
+          chatClient = ChatClient.instance(),
+          channelId = "messaging:123",
+          enforceUniqueReactions = true,
+          messageLimit = 30)
+    }
+
+    val listViewModel: MessageListViewModel by viewModels { factory }
 
     setContent {
       val clientInitialisationState by client.clientState.initializationState.collectAsState()
@@ -317,6 +331,29 @@ class MainActivity : ComponentActivity() {
                 route = Route.FOLLOWING,
                 arguments = listOf(navArgument("uid") { type = NavType.StringType })) {
                   Following(navAction, it.arguments?.getString("uid") ?: "", userViewModel)
+                }
+            composable(Route.MESSAGE_CHANNELS) {
+              ChatTheme {
+                ChannelsScreen(
+                    onItemClick = { c ->
+                      NavigationActions(nav).navigateToScreen(Route.CHANNEL.replace("{id}", c.id))
+                    })
+              }
+            }
+            composable(
+                route = Route.CHANNEL,
+                arguments = listOf(navArgument("id") { type = NavType.StringType })) {
+                  val id = it.arguments?.getString("id") ?: ""
+                  ChatTheme {
+                    Log.d("id is", id)
+                    MessagesScreen(
+                        viewModelFactory =
+                            MessagesViewModelFactory(
+                                context = applicationContext,
+                                channelId = "messaging:${id}",
+                                messageLimit = 30),
+                        onBackPressed = { NavigationActions(nav).goBack() })
+                  }
                 }
           }
         }

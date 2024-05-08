@@ -269,7 +269,10 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
                   }
                 }
                 GoMeetSearchBar(
-                    query, MaterialTheme.colorScheme.background, MaterialTheme.colorScheme.tertiary)
+                    nav,
+                    query,
+                    MaterialTheme.colorScheme.background,
+                    MaterialTheme.colorScheme.tertiary)
               }
         }) {}
   }
