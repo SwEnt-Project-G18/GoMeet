@@ -168,7 +168,7 @@ fun Events(
                   modifier = Modifier.heightIn(min = 56.dp).fillMaxWidth()) {
                     Button(
                         onClick = { onFilterButtonClick("Joined") },
-                        content = { Text("JoinedEvents") },
+                        content = { Text("Joined Events") },
                         colors =
                             ButtonDefaults.buttonColors(
                                 containerColor =
@@ -388,14 +388,7 @@ fun Events(
  * @param verified A boolean indicating whether the event or the creator is verified. This could
  *   influence the visual representation.
  * @param nav NavigationActions object to handle navigation events such as tapping on the event
- *   card. ======= Composable function to display an event widget.
- * @param userName Name of the user who created the event
- * @param eventName Name of the event
- * @param eventDate Date and time of the event
- * @param eventPicture Image of the event
- * @param verified Boolean value indicating if the user is verified
- * @param nav NavigationActions object to handle navigation >>>>>>>
- *   origin/main:app/src/main/java/com/github/se/gomeet/ui/mainscreens/Events.kt
+
  */
 @Composable
 fun EventWidget(
