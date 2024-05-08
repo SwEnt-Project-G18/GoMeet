@@ -303,7 +303,7 @@ class MainActivity : ComponentActivity() {
                 }
 
             composable(Route.SETTINGS) { SettingsScreen(navAction) }
-            composable(Route.EDIT_PROFILE) { EditProfile(nav = navAction) }
+            composable(Route.EDIT_PROFILE) { EditProfile(nav = navAction, userViewModel) }
             composable(
                 route = Route.FOLLOWERS,
                 arguments = listOf(navArgument("uid") { type = NavType.StringType })) {

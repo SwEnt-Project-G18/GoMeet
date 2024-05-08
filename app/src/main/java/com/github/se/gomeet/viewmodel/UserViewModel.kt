@@ -1,9 +1,11 @@
 package com.github.se.gomeet.viewmodel
 
 import android.content.ContentValues
+import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.google.firebase.auth.ktx.auth
@@ -79,6 +81,18 @@ class UserViewModel : ViewModel() {
       }
     }
     return followers
+  }
+
+
+  fun uploadImageAndGetUrl(userId: String, imageUri: Uri, onSuccess: (String) -> Unit, onError: (Exception) -> Unit) {
+    viewModelScope.launch {
+      try {
+        val imageUrl = userRepository.uploadUserProfileImageAndGetUrl(userId, imageUri)
+        onSuccess(imageUrl)
+      } catch (e: Exception) {
+        onError(e)
+      }
+    }
   }
 
   /**

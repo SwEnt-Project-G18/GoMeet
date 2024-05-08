@@ -1,5 +1,10 @@
 package com.github.se.gomeet.ui.mainscreens.profile
 
+import android.graphics.BitmapFactory
+import android.net.Uri
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -23,13 +28,18 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
@@ -37,6 +47,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.user.GoMeetUser
@@ -47,6 +58,10 @@ import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.auth
+import java.io.InputStream
+import androidx.lifecycle.viewModelScope
+import com.github.se.gomeet.model.repository.UserRepository
+
 
 @Composable
 fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel = UserViewModel()) {
@@ -78,6 +93,28 @@ fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel = UserViewM
           focusedLabelColor = MaterialTheme.colorScheme.tertiary,
           focusedIndicatorColor = MaterialTheme.colorScheme.tertiary)
 
+
+    var imageUri by remember { mutableStateOf<android.net.Uri?>(null) }
+    var imageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
+    val imagePickerLauncher =
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) {
+                uri: android.net.Uri? ->
+            imageUri = uri
+            uri?.let { uriNonNull ->
+                val inputStream: InputStream? =
+                    try {
+                        nav.navController.context.contentResolver.openInputStream(uriNonNull)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        null
+                    }
+                inputStream?.let {
+                    val bitmap = BitmapFactory.decodeStream(it)
+                    imageBitmap = bitmap.asImageBitmap()
+                }
+            }
+        }
+
   Scaffold(
       topBar = {
         Row(
@@ -96,28 +133,46 @@ fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel = UserViewM
 
               Spacer(modifier = Modifier.weight(1f))
 
-              Text(
-                  text = "Done",
-                  modifier =
-                      Modifier.padding(start = 15.dp, top = 15.dp, end = 15.dp, bottom = 0.dp)
-                          .clickable {
-                            userViewModel.editUser(
-                                currentUser.value!!.copy(
-                                    firstName = firstName.value,
-                                    lastName = lastName.value,
-                                    email = email.value,
-                                    username = username.value,
-                                    phoneNumber = phoneNumber.value,
-                                    country = country.value))
-                            nav.navigateToScreen(Route.PROFILE)
-                          },
-                  color = MaterialTheme.colorScheme.onBackground,
-                  fontStyle = FontStyle.Normal,
-                  fontWeight = FontWeight.Normal,
-                  fontFamily = FontFamily.Default,
-                  textAlign = TextAlign.Start,
-                  style = MaterialTheme.typography.bodyLarge)
-            }
+            // Image picker and image URI handling...
+            Text(
+                text = "Done",
+                modifier = Modifier
+                    .padding(start = 15.dp, top = 15.dp, end = 15.dp, bottom = 0.dp)
+                    .clickable {
+                        if (imageUri != null) {
+                            userViewModel.uploadImageAndGetUrl(
+                                userId = currentUser.value!!.uid,
+                                imageUri = imageUri!!,
+                                onSuccess = { imageUrl ->
+                                    val updatedUser =  currentUser.value!!.copy(
+                                        firstName = firstName.value,
+                                        lastName = lastName.value,
+                                        email = email.value,
+                                        username = username.value,
+                                        phoneNumber = phoneNumber.value,
+                                        country = country.value,
+                                        profilePicture = imageUrl)
+                                    userViewModel.editUser(updatedUser)
+                                    nav.goBack()
+                                },
+                                onError = { exception ->
+                                    Log.e("ProfileUpdate", "Failed to upload new image: ${exception.message}")
+                                }
+                            )
+                        }
+                        else {
+                            Log.e("ProfileUpdate", "No image selected")
+                        }
+                    },
+                color = MaterialTheme.colorScheme.onBackground,
+                fontStyle = FontStyle.Normal,
+                fontWeight = FontWeight.Normal,
+                fontFamily = FontFamily.Default,
+                textAlign = TextAlign.Start,
+                style = MaterialTheme.typography.bodyLarge
+            )
+
+        }
       },
       bottomBar = {
         BottomNavigationMenu(
@@ -137,7 +192,7 @@ fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel = UserViewM
                   modifier =
                       Modifier.padding(start = 15.dp, end = 15.dp, top = 30.dp, bottom = 15.dp)
                           .width(101.dp)
-                          .height(101.dp)
+                          .height(101.dp).clickable { imagePickerLauncher.launch("image/*") }
                           .clip(CircleShape)
                           .background(color = MaterialTheme.colorScheme.background)
                           .align(Alignment.CenterHorizontally),
@@ -247,8 +302,4 @@ fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel = UserViewM
       })
 }
 
-@Preview
-@Composable
-fun EditProfilePreview() {
-  EditProfile(nav = NavigationActions(rememberNavController()))
-}
+
