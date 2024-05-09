@@ -5,6 +5,10 @@ import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.location.Location
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.MetadataChanges
+import com.google.firebase.firestore.firestoreSettings
+import com.google.firebase.firestore.memoryCacheSettings
+import com.google.firebase.firestore.persistentCacheSettings
 import java.time.LocalDate
 
 /**
@@ -19,6 +23,17 @@ class EventRepository(private val db: FirebaseFirestore) {
 
   /** This function initializes the repository by starting to listen for events */
   init {
+      val settings = firestoreSettings {
+          // Use memory cache
+          setLocalCacheSettings(memoryCacheSettings {})
+          // Use persistent disk cache (default)
+          setLocalCacheSettings(persistentCacheSettings {
+              // Set size to 100 MB
+              setSizeBytes(1024 * 1024 * 100)
+          })
+      }
+      db.firestoreSettings = settings
+
     startListeningForEvents()
   }
 
@@ -199,7 +214,7 @@ class EventRepository(private val db: FirebaseFirestore) {
    * the database accordingly to what this function listens to
    */
   private fun startListeningForEvents() {
-    db.collection("events").addSnapshotListener { snapshot, e ->
+    db.collection("events").addSnapshotListener(MetadataChanges.INCLUDE) { snapshot, e ->
       if (e != null) {
         // Handle error
         Log.w("EventRepository", "Listen failed.", e)
@@ -222,6 +237,14 @@ class EventRepository(private val db: FirebaseFirestore) {
             localEventsList.removeIf { it == event }
           }
         }
+
+          val source = if (snapshot.metadata.isFromCache) {
+              "local cache"
+          } else {
+              "server"
+          }
+
+          Log.d(TAG, "Data fetched from $source")
       }
     }
   }

@@ -3,6 +3,9 @@ package com.github.se.gomeet.model.repository
 import android.util.Log
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.firestoreSettings
+import com.google.firebase.firestore.memoryCacheSettings
+import com.google.firebase.firestore.persistentCacheSettings
 
 /**
  * Class that connects to the Firebase Firestore database to get, add, update and remove users.
@@ -17,6 +20,19 @@ class UserRepository(private val db: FirebaseFirestore) {
     private const val TAG = "FirebaseConnection"
     private const val USERS_COLLECTION = "users"
   }
+
+    init {
+        val settings = firestoreSettings {
+            // Use memory cache
+            setLocalCacheSettings(memoryCacheSettings {})
+            // Use persistent disk cache (default)
+            setLocalCacheSettings(persistentCacheSettings {
+                // Set size to 100 MB
+                setSizeBytes(1024 * 1024 * 100)
+            })
+        }
+        db.firestoreSettings = settings
+    }
 
   /**
    * This function retrieves all users from the database
