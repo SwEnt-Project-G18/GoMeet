@@ -8,8 +8,10 @@ import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.MetadataChanges
 import com.google.firebase.firestore.firestoreSettings
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.memoryCacheSettings
 import com.google.firebase.firestore.persistentCacheSettings
+import com.google.firebase.ktx.Firebase
 
 /**
  * This class represents the repository for the invites. A repository is a class that communicates
@@ -22,16 +24,23 @@ class InvitesRepository(private val db: FirebaseFirestore) {
 
   /** This function initializes the repository by starting to listen for invites */
   init {
-      val settings = firestoreSettings {
-          // Use memory cache
-          setLocalCacheSettings(memoryCacheSettings {})
-          // Use persistent disk cache (default)
-          setLocalCacheSettings(persistentCacheSettings {
-              // Set size to 100 MB
-              setSizeBytes(1024 * 1024 * 100)
+    val settings = firestoreSettings {
+      // Use memory cache
+      setLocalCacheSettings(memoryCacheSettings {})
+      // Use persistent disk cache (default)
+      setLocalCacheSettings(
+          persistentCacheSettings {
+            // Set size to 100 MB
+            setSizeBytes(1024 * 1024 * 100)
           })
-      }
-      db.firestoreSettings = settings
+    }
+    db.firestoreSettings = settings
+
+    // Enable indexing for persistent cache
+    Firebase.firestore.persistentCacheIndexManager?.apply {
+      // Indexing is disabled by default
+      enableIndexAutoCreation()
+    } ?: println("indexManager is null")
 
     startListeningForInvites()
   }
@@ -298,13 +307,14 @@ class InvitesRepository(private val db: FirebaseFirestore) {
             localInvitedTo.removeIf { it == userInvitedToEvents }
           }
         }
-          val source = if (snapshot.metadata.isFromCache) {
+        val source =
+            if (snapshot.metadata.isFromCache) {
               "local cache"
-          } else {
+            } else {
               "server"
-          }
+            }
 
-            Log.d(TAG, "Data fetched from $source")
+        Log.d(TAG, "Data fetched from $source")
       }
     }
   }
