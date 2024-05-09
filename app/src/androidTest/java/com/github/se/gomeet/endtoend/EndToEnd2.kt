@@ -205,7 +205,7 @@ class EndToEndTest2 : TestCase() {
             "title",
             "description",
             Location(0.0, 0.0, "location"),
-            LocalDate.now(),
+            LocalDate.of(2025, 3, 30),
             0.0,
             "url",
             emptyList(),
