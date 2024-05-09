@@ -49,6 +49,7 @@ class UserViewModelTest {
             emptyList(),
             emptyList(),
             emptyList(),
+            emptyList(),
             emptyList())
 
     userViewModel.editUser(newUser)
