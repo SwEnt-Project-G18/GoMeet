@@ -133,7 +133,6 @@ fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel = UserViewM
 
               Spacer(modifier = Modifier.weight(1f))
 
-            // Image picker and image URI handling...
             Text(
                 text = "Done",
                 modifier = Modifier
@@ -188,17 +187,23 @@ fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel = UserViewM
                 Modifier.padding(innerPadding).verticalScroll(rememberScrollState(0)).fillMaxSize(),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally) {
-              Image(
-                  modifier =
-                      Modifier.padding(start = 15.dp, end = 15.dp, top = 30.dp, bottom = 15.dp)
-                          .width(101.dp)
-                          .height(101.dp).clickable { imagePickerLauncher.launch("image/*") }
-                          .clip(CircleShape)
-                          .background(color = MaterialTheme.colorScheme.background)
-                          .align(Alignment.CenterHorizontally),
-                  painter = painterResource(id = R.drawable.gomeet_logo),
-                  contentDescription = "image description",
-                  contentScale = ContentScale.None)
+            Image(
+                modifier = Modifier
+                    .padding(start = 15.dp, end = 15.dp, top = 30.dp, bottom = 15.dp)
+                    .width(101.dp)
+                    .height(101.dp)
+                    .clickable { imagePickerLauncher.launch("image/*") }
+                    .clip(CircleShape)
+                    .background(color = MaterialTheme.colorScheme.background)
+                    .align(Alignment.CenterHorizontally),
+                painter = if (imageBitmap != null) {
+                    androidx.compose.ui.graphics.painter.BitmapPainter(imageBitmap!!)
+                } else {
+                    painterResource(id = R.drawable.gomeet_logo)
+                },
+                contentDescription = "Profile picture",
+                contentScale = ContentScale.Crop // Adjust to fit the image properly
+            )
 
               Spacer(modifier = Modifier.size(16.dp))
 
