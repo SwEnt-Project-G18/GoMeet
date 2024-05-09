@@ -40,9 +40,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Popup
 import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.R
-import com.github.se.gomeet.model.EditTags
+import com.github.se.gomeet.model.TagsSelector
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
@@ -65,7 +66,7 @@ fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel = UserViewM
   val country = remember { mutableStateOf("") }
   val tags = remember { mutableStateOf(emptyList<String>()) }
   var isLoaded by remember { mutableStateOf(false) }
-  var showPopup = remember { mutableStateOf(false) }
+  val showPopup = remember { mutableStateOf(false) }
 
   LaunchedEffect(Unit) {
     currentUser.value = userViewModel.getUser(com.google.firebase.Firebase.auth.currentUser!!.uid)
@@ -265,11 +266,15 @@ fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel = UserViewM
           LoadingText()
         }
         if (showPopup.value) {
-          EditTags(tags = tags, showPopup = showPopup) {
-            currentUser.value!!.tags = tags.value
-            userViewModel.editUser(currentUser.value!!)
-            showPopup.value = false
-          }
+          Popup(
+              alignment = Alignment.Center,
+              onDismissRequest = { showPopup.value = !showPopup.value }) {
+                TagsSelector("Edit tags", tags) {
+                  currentUser.value!!.tags = tags.value
+                  userViewModel.editUser(currentUser.value!!)
+                  showPopup.value = false
+                }
+              }
         }
       })
 }

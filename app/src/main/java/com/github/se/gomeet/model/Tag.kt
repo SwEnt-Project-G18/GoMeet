@@ -39,7 +39,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Popup
 import com.github.se.gomeet.ui.theme.DarkCyan
 
 // TODO: change this to actual tags
@@ -76,94 +75,95 @@ enum class Tag {
   tag30
 }
 
+/**
+ * Composable function to display a popup menu that allows the user to choose tags.
+ *
+ * @param title: The title of the popup window.
+ * @param tags: A list of tags, this list will be updated by this function when the user clicks on a
+ *   tag.
+ * @param onSave: the code to execute when the Save button is pressed.
+ */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun EditTags(
-    tags: MutableState<List<String>>,
-    showPopup: MutableState<Boolean>,
-    onSave: () -> Unit
-) {
-  Popup(alignment = Alignment.Center, onDismissRequest = { showPopup.value = !showPopup.value }) {
-    Box(
-        modifier =
-            Modifier.background(MaterialTheme.colorScheme.background)
-                .width((LocalConfiguration.current.screenWidthDp - 60).dp)
-                .height((LocalConfiguration.current.screenHeightDp - 200).dp)
-                .padding()
-                .shadow(1.dp)) {
-          Column(modifier = Modifier.fillMaxSize()) {
-            Row(
-                modifier =
-                    Modifier.fillMaxWidth()
-                        .wrapContentHeight()
-                        .padding(top = 15.dp, start = 15.dp, end = 15.dp, bottom = 15.dp)) {
-                  Text(
-                      "Edit tags",
-                      color = DarkCyan,
-                      fontWeight = FontWeight.SemiBold,
-                      style = MaterialTheme.typography.titleLarge)
-                }
-            FlowRow(
-                modifier =
-                    Modifier.fillMaxSize()
-                        .verticalScroll(rememberScrollState())
-                        .weight(1f, fill = false)
-                        .padding(start = 15.dp)) {
-                  for (tag in Tag.entries) {
-                    if (tags.value.contains(tag.name)) {
-                      Button(
-                          onClick = { tags.value = tags.value.minus(tag.name) },
-                          modifier = Modifier.padding(end = 15.dp, bottom = 5.dp).wrapContentSize(),
-                          colors =
-                              ButtonDefaults.buttonColors(
-                                  containerColor = DarkCyan, contentColor = Color.White),
-                          contentPadding = PaddingValues(start = 15.dp, end = 10.dp)) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween) {
-                                  Text(tag.name, modifier = Modifier.padding(end = 10.dp))
-                                  Icon(
-                                      Icons.Default.Check,
-                                      contentDescription = null,
-                                      modifier = Modifier.size(20.dp))
-                                }
-                          }
-                    } else {
-                      OutlinedButton(
-                          onClick = { tags.value = tags.value.plus(tag.name) },
-                          modifier = Modifier.padding(end = 15.dp, bottom = 5.dp).wrapContentSize(),
-                          border = BorderStroke(1.dp, MaterialTheme.colorScheme.onBackground),
-                          contentPadding = PaddingValues(start = 15.dp, end = 10.dp),
-                          colors =
-                              ButtonColors(
-                                  contentColor = MaterialTheme.colorScheme.onBackground,
-                                  containerColor = Color.Transparent,
-                                  disabledContainerColor = Color.Transparent,
-                                  disabledContentColor = MaterialTheme.colorScheme.onBackground)) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween) {
-                                  Text(tag.name, modifier = Modifier.padding(end = 10.dp))
-                                  Icon(
-                                      Icons.Default.Add,
-                                      contentDescription = null,
-                                      modifier = Modifier.size(20.dp))
-                                }
-                          }
-                    }
+fun TagsSelector(title: String, tags: MutableState<List<String>>, onSave: () -> Unit) {
+  Box(
+      modifier =
+          Modifier.background(MaterialTheme.colorScheme.background)
+              .width((LocalConfiguration.current.screenWidthDp - 60).dp)
+              .height((LocalConfiguration.current.screenHeightDp - 200).dp)
+              .padding()
+              .shadow(1.dp)) {
+        Column(modifier = Modifier.fillMaxSize()) {
+          Row(
+              modifier =
+                  Modifier.fillMaxWidth()
+                      .wrapContentHeight()
+                      .padding(top = 15.dp, start = 15.dp, end = 15.dp, bottom = 15.dp)) {
+                Text(
+                    title,
+                    color = DarkCyan,
+                    fontWeight = FontWeight.SemiBold,
+                    style = MaterialTheme.typography.titleLarge)
+              }
+          FlowRow(
+              modifier =
+                  Modifier.fillMaxSize()
+                      .verticalScroll(rememberScrollState())
+                      .weight(1f, fill = false)
+                      .padding(start = 15.dp)) {
+                for (tag in Tag.entries) {
+                  if (tags.value.contains(tag.name)) {
+                    Button(
+                        onClick = { tags.value = tags.value.minus(tag.name) },
+                        modifier = Modifier.padding(end = 15.dp, bottom = 5.dp).wrapContentSize(),
+                        colors =
+                            ButtonDefaults.buttonColors(
+                                containerColor = DarkCyan, contentColor = Color.White),
+                        contentPadding = PaddingValues(start = 15.dp, end = 10.dp)) {
+                          Row(
+                              verticalAlignment = Alignment.CenterVertically,
+                              horizontalArrangement = Arrangement.SpaceBetween) {
+                                Text(tag.name, modifier = Modifier.padding(end = 10.dp))
+                                Icon(
+                                    Icons.Default.Check,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(20.dp))
+                              }
+                        }
+                  } else {
+                    OutlinedButton(
+                        onClick = { tags.value = tags.value.plus(tag.name) },
+                        modifier = Modifier.padding(end = 15.dp, bottom = 5.dp).wrapContentSize(),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.onBackground),
+                        contentPadding = PaddingValues(start = 15.dp, end = 10.dp),
+                        colors =
+                            ButtonColors(
+                                contentColor = MaterialTheme.colorScheme.onBackground,
+                                containerColor = Color.Transparent,
+                                disabledContainerColor = Color.Transparent,
+                                disabledContentColor = MaterialTheme.colorScheme.onBackground)) {
+                          Row(
+                              verticalAlignment = Alignment.CenterVertically,
+                              horizontalArrangement = Arrangement.SpaceBetween) {
+                                Text(tag.name, modifier = Modifier.padding(end = 10.dp))
+                                Icon(
+                                    Icons.Default.Add,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(20.dp))
+                              }
+                        }
                   }
                 }
-            Row(
-                modifier =
-                    Modifier.fillMaxWidth().padding(top = 15.dp, end = 15.dp, bottom = 15.dp),
-                horizontalArrangement = Arrangement.End) {
-                  Text(
-                      "Save",
-                      fontWeight = FontWeight.SemiBold,
-                      color = DarkCyan,
-                      modifier = Modifier.clickable { onSave() })
-                }
-          }
+              }
+          Row(
+              modifier = Modifier.fillMaxWidth().padding(top = 15.dp, end = 15.dp, bottom = 15.dp),
+              horizontalArrangement = Arrangement.End) {
+                Text(
+                    "Save",
+                    fontWeight = FontWeight.SemiBold,
+                    color = DarkCyan,
+                    modifier = Modifier.clickable { onSave() })
+              }
         }
-  }
+      }
 }

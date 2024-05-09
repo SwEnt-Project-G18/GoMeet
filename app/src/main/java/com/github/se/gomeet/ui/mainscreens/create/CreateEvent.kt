@@ -56,7 +56,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.Popup
 import com.github.se.gomeet.R
+import com.github.se.gomeet.model.TagsSelector
 import com.github.se.gomeet.model.event.location.Location
 import com.github.se.gomeet.model.repository.EventRepository
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
@@ -127,6 +129,9 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
       }
 
   val selectedLocation: MutableState<Location?> = remember { mutableStateOf(null) }
+  val tags = remember { mutableStateOf(emptyList<String>()) }
+  var showPopup = remember { mutableStateOf(false) }
+  var tagsButtonText by remember { mutableStateOf("Add tags") }
 
   Scaffold(
       topBar = {
@@ -264,6 +269,16 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
 
               Spacer(modifier = Modifier.height(16.dp))
 
+              Button(
+                  modifier = Modifier.fillMaxWidth().padding(start = 7.dp, end = 7.dp),
+                  onClick = { showPopup.value = true },
+                  colors = ButtonDefaults.buttonColors(containerColor = Grey),
+                  shape = RoundedCornerShape(10.dp)) {
+                    Text(text = tagsButtonText, color = Color.White)
+                  }
+
+              Spacer(modifier = Modifier.height(8.dp))
+
               if (isPrivate) {
                 Button(
                     modifier = Modifier.fillMaxWidth().padding(start = 7.dp, end = 7.dp),
@@ -274,6 +289,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                     shape = RoundedCornerShape(10.dp)) {
                       Text(text = "Add Participants", color = Color.White)
                     }
+                Spacer(modifier = Modifier.height(8.dp))
               }
 
               Button(
@@ -360,7 +376,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                             listOf(),
                             0,
                             !isPrivateEvent.value,
-                            listOf(),
+                            tags.value,
                             listOf(),
                             imageUri,
                             UserViewModel(),
@@ -411,6 +427,18 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                 Text("Error: Date Format Error", color = Color.Red)
               }
             }
+        if (showPopup.value) {
+          Popup(
+              alignment = Alignment.Center,
+              onDismissRequest = { showPopup.value = !showPopup.value }) {
+                TagsSelector(tagsButtonText, tags) {
+                  showPopup.value = false
+                  if (tags.value.isNotEmpty()) {
+                    tagsButtonText = "Edit tags"
+                  }
+                }
+              }
+        }
       }
 }
 
