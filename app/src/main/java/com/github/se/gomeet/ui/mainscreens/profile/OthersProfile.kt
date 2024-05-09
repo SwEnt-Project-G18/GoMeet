@@ -75,6 +75,7 @@ import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import java.time.LocalDate
 import kotlinx.coroutines.launch
 
 private var user: GoMeetUser? = null
@@ -104,15 +105,19 @@ fun OthersProfile(
   LaunchedEffect(Unit) {
     coroutineScope.launch {
       user = userViewModel.getUser(uid)
-      isProfileLoaded = true
       isFollowing = user?.followers?.contains(currentUser) ?: false
       followerCount = user?.followers?.size ?: 0
 
       val allEvents =
           eventViewModel.getAllEvents()!!.filter { e -> user!!.myEvents.contains(e.uid) }
-      if (allEvents.isNotEmpty()) {
-        myEventList.addAll(allEvents)
+      allEvents.forEach {
+        if (it.date.isAfter(LocalDate.now())) {
+          myEventList.add(it)
+        } else {
+          myHistoryList.add(it)
+        }
       }
+      isProfileLoaded = true
     }
   }
 
@@ -339,9 +344,7 @@ fun OthersProfile(
                       Column(
                           modifier =
                               Modifier.clickable {
-                                nav.navigateToScreen(
-                                    Route.FOLLOWING.replace("{uid}", uid)
-                                        .replace("{isOwnList}", "false"))
+                                nav.navigateToScreen(Route.FOLLOWING.replace("{uid}", uid))
                               }) {
                             Text(
                                 text = user?.following?.size.toString(),
@@ -413,9 +416,17 @@ fun OthersProfile(
                           }
                     }
                 Spacer(modifier = Modifier.height(10.dp))
-                ProfileEventsList("My Events", rememberLazyListState(), myEventList)
+                ProfileEventsList(
+                    "My Events",
+                    rememberLazyListState(),
+                    myEventList,
+                    NavigationActions(rememberNavController()))
                 Spacer(modifier = Modifier.height(10.dp))
-                ProfileEventsList("History", rememberLazyListState(), myHistoryList)
+                ProfileEventsList(
+                    "History",
+                    rememberLazyListState(),
+                    myHistoryList,
+                    NavigationActions(rememberNavController()))
               }
         } else {
           LoadingText()

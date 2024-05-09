@@ -47,6 +47,7 @@ import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.ui.theme.NavBarUnselected
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
+import java.time.LocalDate
 import java.time.ZoneId
 import java.util.Date
 import kotlinx.coroutines.launch
@@ -76,7 +77,7 @@ fun Trends(
 
   LaunchedEffect(Unit) {
     coroutineScope.launch {
-      val allEvents = eventViewModel.getAllEvents()!!
+      val allEvents = eventViewModel.getAllEvents()!!.filter { it.date.isAfter(LocalDate.now()) }
       if (allEvents.isNotEmpty()) {
         eventList.addAll(allEvents)
       }

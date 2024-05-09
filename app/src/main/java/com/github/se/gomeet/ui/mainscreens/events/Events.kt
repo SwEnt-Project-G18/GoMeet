@@ -80,6 +80,7 @@ import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.android.gms.maps.model.LatLng
 import java.text.SimpleDateFormat
+import java.time.LocalDate
 import java.time.ZoneId
 import java.util.Calendar
 import java.util.Date
@@ -117,9 +118,9 @@ fun Events(
       user.value = userViewModel.getUser(currentUser)
       val allEvents =
           eventViewModel.getAllEvents()!!.filter { e ->
-            user.value!!.myEvents.contains(e.uid) ||
+            (user.value!!.myEvents.contains(e.uid) ||
                 user.value!!.myFavorites.contains(e.uid) ||
-                user.value!!.joinedEvents.contains(e.uid)
+                user.value!!.joinedEvents.contains(e.uid)) && e.date.isAfter(LocalDate.now())
           }
       if (allEvents.isNotEmpty()) {
         eventList.addAll(allEvents)

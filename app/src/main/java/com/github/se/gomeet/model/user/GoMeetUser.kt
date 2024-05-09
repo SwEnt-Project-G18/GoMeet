@@ -13,6 +13,9 @@ package com.github.se.gomeet.model.user
  * @param following The list of users that the user is following
  * @param followers The list of users that are following the user
  * @param pendingRequests The list of requests that the user has not accepted or refused yet
+ * @param joinedEvents The list of events that the user joined
+ * @param myEvents The list of events that were created by the user
+ * @param myFavorites The list of events that the user added to favorites
  */
 data class GoMeetUser(
     val uid: String,
