@@ -288,7 +288,7 @@ fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel = UserViewM
                 modifier =
                     Modifier.background(MaterialTheme.colorScheme.background)
                         .width((LocalConfiguration.current.screenWidthDp - 60).dp)
-                        .height((LocalConfiguration.current.screenHeightDp - 300).dp)
+                        .height((LocalConfiguration.current.screenHeightDp - 200).dp)
                         .padding()
                         .shadow(2.dp)) {
                   Column(modifier = Modifier.fillMaxSize()) {
@@ -339,7 +339,7 @@ fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel = UserViewM
                                       Modifier.padding(end = 15.dp, bottom = 5.dp)
                                           .wrapContentSize(),
                                   border =
-                                      BorderStroke(2.dp, MaterialTheme.colorScheme.onBackground),
+                                      BorderStroke(1.dp, MaterialTheme.colorScheme.onBackground),
                                   contentPadding = PaddingValues(start = 15.dp, end = 10.dp),
                                   colors =
                                       ButtonColors(
