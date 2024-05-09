@@ -14,10 +14,13 @@ import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.viewmodel.SearchUserViewModel
 
 @Composable
@@ -27,41 +30,34 @@ fun SearchModule() {
   val persons by viewModel.persons.collectAsState()
   val isSearching by viewModel.isSearching.collectAsState()
 
-  Column(
-    modifier = Modifier
-      .fillMaxSize()
-      .padding(16.dp)
-  ) {
+  Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
     TextField(
-      value = searchText,
-      onValueChange = viewModel::onSearchTextChange,
-      modifier = Modifier.fillMaxWidth(),
-      placeholder = { Text(text = "Search") }
-    )
+        value = searchText,
+        onValueChange = viewModel::onSearchTextChange,
+        modifier = Modifier.fillMaxWidth(),
+        placeholder = { Text(text = "Search") })
     Spacer(modifier = Modifier.height(16.dp))
-    if(isSearching) {
+    if (isSearching) {
       Box(modifier = Modifier.fillMaxSize()) {
-        CircularProgressIndicator(
-          modifier = Modifier.align(Alignment.Center)
-        )
+        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
       }
     } else {
-      LazyColumn(
-        modifier = Modifier
-          .fillMaxWidth()
-          .weight(1f)
-      ) {
-        items(persons) { person ->
-          Text(
-            text = "${person.firstName} ${person.lastName}",
-            modifier = Modifier
-              .fillMaxWidth()
-              .padding(vertical = 16.dp)
-          )
-        }
+      LazyColumn(modifier = Modifier.fillMaxWidth().weight(1f)) {
+        item { persons?.forEach { person -> SearchModuleSnippet(person) } }
       }
     }
   }
 }
 
+@Composable
+fun SearchModuleSnippet(person: GoMeetUser) {
+  Text(
+      text = "${person.firstName} ${person.lastName}",
+      modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp))
+}
 
+@Preview
+@Composable
+fun PreviewSearchModule() {
+  SearchModule()
+}
