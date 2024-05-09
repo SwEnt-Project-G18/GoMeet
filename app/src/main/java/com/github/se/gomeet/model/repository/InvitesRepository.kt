@@ -24,24 +24,6 @@ class InvitesRepository(private val db: FirebaseFirestore) {
 
   /** This function initializes the repository by starting to listen for invites */
   init {
-    val settings = firestoreSettings {
-      // Use memory cache
-      setLocalCacheSettings(memoryCacheSettings {})
-      // Use persistent disk cache (default)
-      setLocalCacheSettings(
-          persistentCacheSettings {
-            // Set size to 100 MB
-            setSizeBytes(1024 * 1024 * 100)
-          })
-    }
-    db.firestoreSettings = settings
-
-    // Enable indexing for persistent cache
-    Firebase.firestore.persistentCacheIndexManager?.apply {
-      // Indexing is disabled by default
-      enableIndexAutoCreation()
-    } ?: println("indexManager is null")
-
     startListeningForInvites()
   }
 

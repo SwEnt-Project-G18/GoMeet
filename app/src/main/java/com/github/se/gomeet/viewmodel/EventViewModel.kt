@@ -45,8 +45,8 @@ import org.json.JSONArray
  *
  * @param creatorId the id of the creator of the event
  */
-class EventViewModel(private val creatorId: String? = null) : ViewModel() {
-  private val db = EventRepository(Firebase.firestore)
+class EventViewModel(private val creatorId: String? = null, eventRepository: EventRepository) : ViewModel() {
+  private val repository = eventRepository
   private val _bitmapDescriptors = mutableStateMapOf<String, BitmapDescriptor>()
   val bitmapDescriptors: MutableMap<String, BitmapDescriptor> = _bitmapDescriptors
 
@@ -144,7 +144,7 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
   suspend fun getEvent(uid: String): Event? {
     return try {
       val event = CompletableDeferred<Event?>()
-      db.getEvent(uid) { t -> event.complete(t) }
+      repository.getEvent(uid) { t -> event.complete(t) }
       event.await()
     } catch (e: Exception) {
       null
@@ -200,7 +200,7 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
   suspend fun getAllEvents(): List<Event>? {
     return try {
       val event = CompletableDeferred<List<Event>?>()
-      db.getAllEvents { t -> event.complete(t) }
+      repository.getAllEvents { t -> event.complete(t) }
       event.await()
     } catch (e: Exception) {
       null
@@ -264,7 +264,7 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
                 tags,
                 updatedImages)
 
-        db.addEvent(event)
+        repository.addEvent(event)
         joinEvent(event, creatorId)
         userViewModel.joinEvent(event.uid, creatorId)
       } catch (e: Exception) {
@@ -279,7 +279,7 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
    * @param event the event to edit
    */
   fun editEvent(event: Event) {
-    db.updateEvent(event)
+    repository.updateEvent(event)
   }
 
   /**
@@ -288,11 +288,11 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
    * @param uid the UID of the event to remove
    */
   fun removeEvent(uid: String) {
-    db.removeEvent(uid)
+    repository.removeEvent(uid)
   }
 
   fun joinEvent(event: Event, userId: String) {
-    db.updateEvent(event.copy(participants = event.participants.plus(userId)))
+    repository.updateEvent(event.copy(participants = event.participants.plus(userId)))
   }
 
   /**

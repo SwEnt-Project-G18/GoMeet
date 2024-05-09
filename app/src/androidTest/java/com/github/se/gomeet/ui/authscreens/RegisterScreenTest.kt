@@ -15,10 +15,12 @@ import androidx.compose.ui.test.performTextInput
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.R
+import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.AuthViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import io.getstream.chat.android.client.ChatClient
 import io.getstream.chat.android.client.logger.ChatLogLevel
@@ -47,7 +49,7 @@ class RegisterScreenTest {
   @Test
   fun testRegisterScreen() = runTest {
     authViewModel = AuthViewModel()
-    userViewModel = UserViewModel()
+    userViewModel = UserViewModel(UserRepository(Firebase.firestore))
 
     rule.setContent {
       val client =

@@ -11,6 +11,8 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.MainActivity
 import com.github.se.gomeet.model.event.location.Location
+import com.github.se.gomeet.model.repository.EventRepository
+import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.screens.EventInfoScreen
 import com.github.se.gomeet.screens.FollowersScreen
 import com.github.se.gomeet.screens.FollowingScreen
@@ -22,6 +24,7 @@ import com.github.se.gomeet.screens.WelcomeScreenScreen
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen
@@ -167,7 +170,7 @@ class EndToEndTest2 : TestCase() {
     @BeforeClass
     fun setup() {
       // create two new users
-      userVM = UserViewModel()
+      userVM = UserViewModel(UserRepository(Firebase.firestore))
       var result = Firebase.auth.createUserWithEmailAndPassword(email1, pwd1)
       while (!result.isComplete) {}
       uid1 = result.result.user!!.uid
@@ -199,7 +202,7 @@ class EndToEndTest2 : TestCase() {
       result = Firebase.auth.signInWithEmailAndPassword(email1, pwd1)
       while (!result.isComplete) {}
 
-      eventVM = EventViewModel(Firebase.auth.currentUser!!.uid)
+      eventVM = EventViewModel(Firebase.auth.currentUser!!.uid, EventRepository(Firebase.firestore))
       runBlocking {
         eventVM.createEvent(
             "title",
@@ -224,7 +227,7 @@ class EndToEndTest2 : TestCase() {
       TimeUnit.SECONDS.sleep(2)
 
       // the second user is used to log in and perform the tests
-      eventVM = EventViewModel(uid2)
+      eventVM = EventViewModel(uid2, EventRepository(Firebase.firestore))
     }
 
     @AfterClass

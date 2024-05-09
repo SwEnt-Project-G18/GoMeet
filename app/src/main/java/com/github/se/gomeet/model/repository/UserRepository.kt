@@ -23,50 +23,6 @@ class UserRepository(private val db: FirebaseFirestore) {
     private const val USERS_COLLECTION = "users"
   }
 
-  init {
-    val settings = firestoreSettings {
-      // Use memory cache
-      setLocalCacheSettings(memoryCacheSettings {})
-      // Use persistent disk cache (default)
-      setLocalCacheSettings(
-          persistentCacheSettings {
-            // Set size to 100 MB
-            setSizeBytes(1024 * 1024 * 100)
-          })
-    }
-
-    // Enable indexing for persistent cache
-    Firebase.firestore.persistentCacheIndexManager?.apply {
-      // Indexing is disabled by default
-      enableIndexAutoCreation()
-    } ?: println("indexManager is null")
-
-    db.firestoreSettings = settings
-  }
-
-  /**
-   * This function retrieves all users from the database
-   *
-   * @param callback The callback function to be called when the users are retrieved
-   */
-  fun getAllUsers(callback: (List<GoMeetUser>) -> Unit) {
-    db.collection(USERS_COLLECTION)
-        .get()
-        .addOnSuccessListener { querySnapshot ->
-          val userList = mutableListOf<GoMeetUser>()
-          for (document in querySnapshot.documents) {
-            val user = document.data?.fromMap(document.id)
-            if (user != null) {
-              userList.add(user)
-            }
-          }
-        }
-        .addOnFailureListener { exception ->
-          Log.d(TAG, "Error getting documents: ", exception)
-          callback(emptyList())
-        }
-  }
-
   /**
    * Get the user with its id.
    *
