@@ -119,7 +119,7 @@ fun RegisterScreen(
                 callback = { username, email ->
                     nextState()
                     authViewModel.onUsernameRegisterChange(username)
-                    authViewModel.onEmailRegisterChange(username)
+                    authViewModel.onEmailRegisterChange(email)
                 },
                 userViewModel = UserViewModel(),
                 textFieldColors = textFieldColors
