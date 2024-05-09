@@ -27,6 +27,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBarDefaults
@@ -160,7 +161,7 @@ fun Events(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(innerPadding)) {
               Spacer(modifier = Modifier.height(5.dp))
-              GoMeetSearchBar(query, NavBarUnselected, Color.DarkGray)
+              GoMeetSearchBar(nav, query, NavBarUnselected, Color.DarkGray)
               Spacer(modifier = Modifier.height(5.dp))
               Row(
                   verticalAlignment = Alignment.CenterVertically,
@@ -551,7 +552,12 @@ fun EventWidget(
  */
 @ExperimentalMaterial3Api
 @Composable
-fun GoMeetSearchBar(query: MutableState<String>, backgroundColor: Color, contentColor: Color) {
+fun GoMeetSearchBar(
+    nav: NavigationActions,
+    query: MutableState<String>,
+    backgroundColor: Color,
+    contentColor: Color
+) {
   val customTextSelectionColors =
       TextSelectionColors(handleColor = DarkCyan, backgroundColor = DarkCyan.copy(alpha = 0.4f))
   CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
@@ -562,10 +568,12 @@ fun GoMeetSearchBar(query: MutableState<String>, backgroundColor: Color, content
         modifier = Modifier.fillMaxWidth().padding(start = 5.dp, end = 5.dp),
         placeholder = { Text("Search", color = contentColor) },
         leadingIcon = {
-          Icon(
-              ImageVector.vectorResource(R.drawable.gomeet_icon),
-              contentDescription = null,
-              tint = contentColor)
+          IconButton(onClick = { nav.navigateToScreen(Route.MESSAGE_CHANNELS) }) {
+            Icon(
+                ImageVector.vectorResource(R.drawable.gomeet_icon),
+                contentDescription = null,
+                tint = contentColor)
+          }
         },
         trailingIcon = {
           Icon(

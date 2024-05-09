@@ -14,11 +14,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -109,7 +107,7 @@ fun Trends(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(innerPadding)) {
               Spacer(modifier = Modifier.height(5.dp))
-              GoMeetSearchBar(query, NavBarUnselected, Color.DarkGray)
+              GoMeetSearchBar(nav, query, NavBarUnselected, Color.DarkGray)
               Spacer(modifier = Modifier.height(5.dp))
 
               if (!eventsLoaded.value) {
