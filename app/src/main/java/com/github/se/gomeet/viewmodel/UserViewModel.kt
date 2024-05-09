@@ -59,7 +59,8 @@ class UserViewModel : ViewModel() {
                   country = country,
                   joinedEvents = emptyList(),
                   myEvents = emptyList(),
-                  myFavorites = emptyList())
+                  myFavorites = emptyList(),
+                  tags = emptyList())
           currentUser.value = user
           userRepository.addUser(user)
         } catch (e: Exception) {

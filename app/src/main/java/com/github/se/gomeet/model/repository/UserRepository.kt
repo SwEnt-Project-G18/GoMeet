@@ -124,7 +124,8 @@ class UserRepository(private val db: FirebaseFirestore) {
         "country" to country,
         "myTickets" to joinedEvents,
         "myEvents" to myEvents,
-        "myFavorites" to myFavorites)
+        "myFavorites" to myFavorites,
+        "tags" to tags)
   }
 
   /**
@@ -147,6 +148,7 @@ class UserRepository(private val db: FirebaseFirestore) {
         country = this["country"] as? String ?: "",
         joinedEvents = this["myTickets"] as List<String>,
         myEvents = this["myEvents"] as List<String>,
-        myFavorites = this["myFavorites"] as List<String>)
+        myFavorites = this["myFavorites"] as List<String>,
+        tags = this["tags"] as List<String>)
   }
 }
