@@ -26,7 +26,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
@@ -290,20 +289,18 @@ fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel = UserViewM
                         .width((LocalConfiguration.current.screenWidthDp - 60).dp)
                         .height((LocalConfiguration.current.screenHeightDp - 200).dp)
                         .padding()
-                        .shadow(2.dp)) {
+                        .shadow(1.dp)) {
                   Column(modifier = Modifier.fillMaxSize()) {
                     Row(
                         modifier =
                             Modifier.fillMaxWidth()
                                 .wrapContentHeight()
                                 .padding(top = 15.dp, start = 15.dp, end = 15.dp, bottom = 15.dp)) {
-                          Icon(
-                              Icons.Default.Clear,
-                              contentDescription = null,
-                              tint = MaterialTheme.colorScheme.onBackground,
-                              modifier =
-                                  Modifier.padding(end = 20.dp).clickable { showPopup = false })
-                          Text("Edit tags")
+                          Text(
+                              "Edit tags",
+                              color = DarkCyan,
+                              fontWeight = FontWeight.SemiBold,
+                              style = MaterialTheme.typography.titleLarge)
                         }
                     FlowRow(
                         modifier =
@@ -368,6 +365,7 @@ fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel = UserViewM
                         horizontalArrangement = Arrangement.End) {
                           Text(
                               "Save",
+                              fontWeight = FontWeight.SemiBold,
                               color = DarkCyan,
                               modifier =
                                   Modifier.clickable {
