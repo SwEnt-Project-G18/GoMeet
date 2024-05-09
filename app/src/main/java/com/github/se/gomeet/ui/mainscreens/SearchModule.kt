@@ -14,21 +14,22 @@ import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.se.gomeet.model.user.GoMeetUser
-import com.github.se.gomeet.viewmodel.SearchUserViewModel
+import com.github.se.gomeet.viewmodel.SearchViewModel
 
 @Composable
 fun SearchModule() {
-  val viewModel = viewModel<SearchUserViewModel>()
+  val viewModel = viewModel<SearchViewModel>()
   val searchText by viewModel.searchText.collectAsState()
-  val persons by viewModel.persons.collectAsState()
+  val persons by viewModel.searchQuery.collectAsState()
   val isSearching by viewModel.isSearching.collectAsState()
+
+    println("### Persons: ${persons.toString()}")
 
   Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
     TextField(
