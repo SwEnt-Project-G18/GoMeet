@@ -322,8 +322,14 @@ class MainActivity : ComponentActivity() {
             composable(Route.MESSAGE_CHANNELS) {
               ChatTheme {
                 ChannelsScreen(
+                    onBackPressed = { navAction.goBack() },
+                    onHeaderAvatarClick = { navAction.navigateToScreen(Route.PROFILE) },
+                    onHeaderActionClick = {
+                      navAction.navigateToScreen(
+                          Route.FOLLOWING.replace("{uid}", userIdState.value))
+                    },
                     onItemClick = { c ->
-                      NavigationActions(nav).navigateToScreen(Route.CHANNEL.replace("{id}", c.id))
+                      navAction.navigateToScreen(Route.CHANNEL.replace("{id}", c.id))
                     })
               }
             }
