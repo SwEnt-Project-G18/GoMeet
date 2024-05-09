@@ -159,6 +159,7 @@ fun Trends(
                               Date.from(
                                   event.date.atStartOfDay(ZoneId.systemDefault()).toInstant()),
                           eventPicture = painter,
+                          eventLocation = event.location,
                           verified = false,
                           nav = nav) // verification to be done using user details
                     }
