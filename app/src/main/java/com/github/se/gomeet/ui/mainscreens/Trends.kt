@@ -14,11 +14,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -47,6 +45,7 @@ import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.ui.theme.NavBarUnselected
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
+import java.time.LocalDate
 import java.time.ZoneId
 import java.util.Date
 import kotlinx.coroutines.launch
@@ -76,7 +75,7 @@ fun Trends(
 
   LaunchedEffect(Unit) {
     coroutineScope.launch {
-      val allEvents = eventViewModel.getAllEvents()!!
+      val allEvents = eventViewModel.getAllEvents()!!.filter { it.date.isAfter(LocalDate.now()) }
       if (allEvents.isNotEmpty()) {
         eventList.addAll(allEvents)
       }
@@ -109,7 +108,7 @@ fun Trends(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(innerPadding)) {
               Spacer(modifier = Modifier.height(5.dp))
-              GoMeetSearchBar(query, NavBarUnselected, Color.DarkGray)
+              GoMeetSearchBar(nav, query, NavBarUnselected, Color.DarkGray)
               Spacer(modifier = Modifier.height(5.dp))
 
               if (!eventsLoaded.value) {
@@ -158,6 +157,7 @@ fun Trends(
                               Date.from(
                                   event.date.atStartOfDay(ZoneId.systemDefault()).toInstant()),
                           eventPicture = painter,
+                          eventLocation = event.location,
                           verified = false,
                           nav = nav) // verification to be done using user details
                     }
