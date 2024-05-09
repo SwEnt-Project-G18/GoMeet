@@ -83,8 +83,12 @@ class UserViewModel : ViewModel() {
     return followers
   }
 
-
-  fun uploadImageAndGetUrl(userId: String, imageUri: Uri, onSuccess: (String) -> Unit, onError: (Exception) -> Unit) {
+  fun uploadImageAndGetUrl(
+      userId: String,
+      imageUri: Uri,
+      onSuccess: (String) -> Unit,
+      onError: (Exception) -> Unit
+  ) {
     viewModelScope.launch {
       try {
         val imageUrl = userRepository.uploadUserProfileImageAndGetUrl(userId, imageUri)

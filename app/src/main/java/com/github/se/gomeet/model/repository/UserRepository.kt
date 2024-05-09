@@ -95,28 +95,26 @@ class UserRepository(private val db: FirebaseFirestore) {
         .addOnFailureListener { e -> Log.w(TAG, "Error updating document", e) }
   }
 
+  /**
+   * Upload a user profile image to Firebase Storage and return the download URL.
+   *
+   * @param userId the user ID
+   * @param imageUri the URI of the image to upload
+   * @return the download URL of the uploaded image
+   */
+  suspend fun uploadUserProfileImageAndGetUrl(userId: String, imageUri: Uri): String {
+    val storageReference = FirebaseStorage.getInstance().reference
+    val imageRef = storageReference.child("user_images/$userId/${imageUri.lastPathSegment}")
 
-    /**
-     * Upload a user profile image to Firebase Storage and return the download URL.
-     *
-     * @param userId the user ID
-     * @param imageUri the URI of the image to upload
-     * @return the download URL of the uploaded image
-     */
-    suspend fun uploadUserProfileImageAndGetUrl(userId: String, imageUri: Uri): String {
-        val storageReference = FirebaseStorage.getInstance().reference
-        val imageRef = storageReference.child("user_images/$userId/${imageUri.lastPathSegment}")
+    // Upload the file and await the completion
+    val uploadTaskSnapshot = imageRef.putFile(imageUri).await()
 
-        // Upload the file and await the completion
-        val uploadTaskSnapshot = imageRef.putFile(imageUri).await()
+    // Retrieve and return the download URL
+    return uploadTaskSnapshot.metadata?.reference?.downloadUrl?.await()?.toString()
+        ?: throw Exception("Failed to upload image and retrieve URL")
+  }
 
-        // Retrieve and return the download URL
-        return uploadTaskSnapshot.metadata?.reference?.downloadUrl?.await()?.toString()
-            ?: throw Exception("Failed to upload image and retrieve URL")
-    }
-
-
-    /**
+  /**
    * Remove a user from the database.
    *
    * @param uid the user id

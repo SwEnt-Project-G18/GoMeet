@@ -46,6 +46,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import coil.compose.rememberImagePainter
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
@@ -55,9 +56,8 @@ import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.auth
-import java.io.InputStream
-import coil.compose.rememberImagePainter
 import com.google.firebase.firestore.FirebaseFirestore
+import java.io.InputStream
 import kotlinx.coroutines.tasks.await
 
 @Composable
@@ -90,44 +90,46 @@ fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel = UserViewM
           focusedLabelColor = MaterialTheme.colorScheme.tertiary,
           focusedIndicatorColor = MaterialTheme.colorScheme.tertiary)
 
+  var imageUri by remember { mutableStateOf<android.net.Uri?>(null) }
+  var imageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
+  var profilePictureUrl by remember { mutableStateOf<String?>(null) }
 
-    var imageUri by remember { mutableStateOf<android.net.Uri?>(null) }
-    var imageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
-    var profilePictureUrl by remember { mutableStateOf<String?>(null) }
+  val context = LocalContext.current
 
-    val context = LocalContext.current
-
-    val imagePickerLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
+  val imagePickerLauncher =
+      rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri?
+        ->
         imageUri = uri
         uri?.let { uriNonNull ->
-            val inputStream: InputStream? = try {
+          val inputStream: InputStream? =
+              try {
                 context.contentResolver.openInputStream(uriNonNull)
-            } catch (e: Exception) {
+              } catch (e: Exception) {
                 e.printStackTrace()
                 null
-            }
-            inputStream?.let {
-                val bitmap = BitmapFactory.decodeStream(it)
-                imageBitmap = bitmap.asImageBitmap()
-                profilePictureUrl = uriNonNull.toString()
-            }
+              }
+          inputStream?.let {
+            val bitmap = BitmapFactory.decodeStream(it)
+            imageBitmap = bitmap.asImageBitmap()
+            profilePictureUrl = uriNonNull.toString()
+          }
         }
-    }
+      }
 
-    LaunchedEffect(currentUser.value?.uid) {
-        val db = FirebaseFirestore.getInstance()
-        val userDocRef = currentUser.value?.uid?.let { db.collection("users").document(it) }
-        try {
-            val snapshot = userDocRef?.get()?.await()
-            if (snapshot != null) {
-                profilePictureUrl = snapshot.getString("profilePicture")
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+  LaunchedEffect(currentUser.value?.uid) {
+    val db = FirebaseFirestore.getInstance()
+    val userDocRef = currentUser.value?.uid?.let { db.collection("users").document(it) }
+    try {
+      val snapshot = userDocRef?.get()?.await()
+      if (snapshot != null) {
+        profilePictureUrl = snapshot.getString("profilePicture")
+      }
+    } catch (e: Exception) {
+      e.printStackTrace()
     }
+  }
 
-    Scaffold(
+  Scaffold(
       topBar = {
         Row(
             horizontalArrangement = Arrangement.Start,
@@ -145,60 +147,55 @@ fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel = UserViewM
 
               Spacer(modifier = Modifier.weight(1f))
 
-            Text(
-                text = "Done",
-                modifier = Modifier
-                    .padding(start = 15.dp, top = 15.dp, end = 15.dp, bottom = 0.dp)
-                    .clickable {
-                        if (imageUri != null) {
-                            userViewModel.uploadImageAndGetUrl(
-                                userId = currentUser.value!!.uid,
-                                imageUri = imageUri!!,
-                                onSuccess = { imageUrl ->
-                                    val updatedUser = currentUser.value!!.copy(
-                                        firstName = firstName.value,
-                                        lastName = lastName.value,
-                                        email = email.value,
-                                        username = username.value,
-                                        phoneNumber = phoneNumber.value,
-                                        country = country.value,
-                                        profilePicture = imageUrl
-                                    )
+              Text(
+                  text = "Done",
+                  modifier =
+                      Modifier.padding(start = 15.dp, top = 15.dp, end = 15.dp, bottom = 0.dp)
+                          .clickable {
+                            if (imageUri != null) {
+                              userViewModel.uploadImageAndGetUrl(
+                                  userId = currentUser.value!!.uid,
+                                  imageUri = imageUri!!,
+                                  onSuccess = { imageUrl ->
+                                    val updatedUser =
+                                        currentUser.value!!.copy(
+                                            firstName = firstName.value,
+                                            lastName = lastName.value,
+                                            email = email.value,
+                                            username = username.value,
+                                            phoneNumber = phoneNumber.value,
+                                            country = country.value,
+                                            profilePicture = imageUrl)
                                     userViewModel.editUser(updatedUser)
                                     nav.goBack()
-                                },
-                                onError = { exception ->
+                                  },
+                                  onError = { exception ->
                                     Log.e(
                                         "ProfileUpdate",
-                                        "Failed to upload new image: ${exception.message}"
-                                    )
-                                }
-                            )
-                        } else {
-                            val updatedUser = currentUser.value!!.copy(
-                                firstName = firstName.value,
-                                lastName = lastName.value,
-                                email = email.value,
-                                username = username.value,
-                                phoneNumber = phoneNumber.value,
-                                country = country.value,
-                                profilePicture = profilePictureUrl ?: ""
-                            )
-                            userViewModel.editUser(updatedUser)
-                            nav.goBack()
-                            Log.e("ProfileUpdate", "No image selected")
-
-                        }
-                    },
-                color = MaterialTheme.colorScheme.onBackground,
-                fontStyle = FontStyle.Normal,
-                fontWeight = FontWeight.Normal,
-                fontFamily = FontFamily.Default,
-                textAlign = TextAlign.Start,
-                style = MaterialTheme.typography.bodyLarge
-            )
-
-        }
+                                        "Failed to upload new image: ${exception.message}")
+                                  })
+                            } else {
+                              val updatedUser =
+                                  currentUser.value!!.copy(
+                                      firstName = firstName.value,
+                                      lastName = lastName.value,
+                                      email = email.value,
+                                      username = username.value,
+                                      phoneNumber = phoneNumber.value,
+                                      country = country.value,
+                                      profilePicture = profilePictureUrl ?: "")
+                              userViewModel.editUser(updatedUser)
+                              nav.goBack()
+                              Log.e("ProfileUpdate", "No image selected")
+                            }
+                          },
+                  color = MaterialTheme.colorScheme.onBackground,
+                  fontStyle = FontStyle.Normal,
+                  fontWeight = FontWeight.Normal,
+                  fontFamily = FontFamily.Default,
+                  textAlign = TextAlign.Start,
+                  style = MaterialTheme.typography.bodyLarge)
+            }
       },
       bottomBar = {
         BottomNavigationMenu(
@@ -211,34 +208,30 @@ fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel = UserViewM
       content = { innerPadding ->
         Column(
             modifier =
-            Modifier
-                .padding(innerPadding)
-                .verticalScroll(rememberScrollState(0))
-                .fillMaxSize(),
+                Modifier.padding(innerPadding).verticalScroll(rememberScrollState(0)).fillMaxSize(),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally) {
-            Image(
-                painter = if (imageBitmap != null) {
-                    androidx.compose.ui.graphics.painter.BitmapPainter(imageBitmap!!)
-                } else if (!profilePictureUrl.isNullOrEmpty()) {
-                    rememberImagePainter(profilePictureUrl)
-                } else {
-                    painterResource(id = R.drawable.gomeet_logo)
-                },
-                contentDescription = "Profile picture",
-                modifier = Modifier
-                    .padding(start = 15.dp, end = 15.dp, top = 30.dp, bottom = 15.dp)
-                    .width(101.dp)
-                    .height(101.dp)
-                    .clickable { imagePickerLauncher.launch("image/*") }
-                    .clip(CircleShape)
-                    .background(color = MaterialTheme.colorScheme.background)
-                    .align(Alignment.CenterHorizontally),
-                contentScale = ContentScale.Crop
-            )
+              Image(
+                  painter =
+                      if (imageBitmap != null) {
+                        androidx.compose.ui.graphics.painter.BitmapPainter(imageBitmap!!)
+                      } else if (!profilePictureUrl.isNullOrEmpty()) {
+                        rememberImagePainter(profilePictureUrl)
+                      } else {
+                        painterResource(id = R.drawable.gomeet_logo)
+                      },
+                  contentDescription = "Profile picture",
+                  modifier =
+                      Modifier.padding(start = 15.dp, end = 15.dp, top = 30.dp, bottom = 15.dp)
+                          .width(101.dp)
+                          .height(101.dp)
+                          .clickable { imagePickerLauncher.launch("image/*") }
+                          .clip(CircleShape)
+                          .background(color = MaterialTheme.colorScheme.background)
+                          .align(Alignment.CenterHorizontally),
+                  contentScale = ContentScale.Crop)
 
-
-            Spacer(modifier = Modifier.size(16.dp))
+              Spacer(modifier = Modifier.size(16.dp))
 
               TextField(
                   value = firstName.value,
@@ -327,10 +320,9 @@ fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel = UserViewM
               Text(
                   text = "Edit Tags",
                   modifier =
-                  Modifier
-                      .padding(start = 15.dp, top = 15.dp, end = 15.dp, bottom = 15.dp)
-                      .align(Alignment.Start)
-                      .clickable { /* TODO: Edit the tags */ },
+                      Modifier.padding(start = 15.dp, top = 15.dp, end = 15.dp, bottom = 15.dp)
+                          .align(Alignment.Start)
+                          .clickable { /* TODO: Edit the tags */},
                   color = MaterialTheme.colorScheme.onBackground,
                   fontStyle = FontStyle.Normal,
                   fontWeight = FontWeight.Normal,
@@ -340,5 +332,3 @@ fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel = UserViewM
             }
       })
 }
-
-

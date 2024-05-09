@@ -156,8 +156,7 @@ fun Profile(
                     modifier =
                         Modifier.fillMaxWidth()
                             .padding(start = 15.dp, end = 0.dp, top = 0.dp, bottom = 30.dp)) {
-
-                        ProfileImage(userId = uid)
+                      ProfileImage(userId = uid)
                       Column(
                           horizontalAlignment = Alignment.CenterHorizontally,
                           modifier = Modifier.padding(0.dp)) {
@@ -397,7 +396,6 @@ fun Profile(
       }
 }
 
-
 /**
  * ProfileEventsList composable
  *
@@ -409,32 +407,33 @@ fun ProfileImage(
     modifier: Modifier = Modifier,
     defaultImageResId: Int = R.drawable.gomeet_logo
 ) {
-    var profilePictureUrl by remember { mutableStateOf<String?>(null) }
+  var profilePictureUrl by remember { mutableStateOf<String?>(null) }
 
-    LaunchedEffect(userId) {
-        val db = FirebaseFirestore.getInstance()
-        val userDocRef = db.collection("users").document(userId)
-        try {
-            val snapshot = userDocRef.get().await()
-            profilePictureUrl = snapshot.getString("profilePicture")
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+  LaunchedEffect(userId) {
+    val db = FirebaseFirestore.getInstance()
+    val userDocRef = db.collection("users").document(userId)
+    try {
+      val snapshot = userDocRef.get().await()
+      profilePictureUrl = snapshot.getString("profilePicture")
+    } catch (e: Exception) {
+      e.printStackTrace()
     }
+  }
 
-    Image(
-        painter = if (!profilePictureUrl.isNullOrEmpty()) {
+  Image(
+      painter =
+          if (!profilePictureUrl.isNullOrEmpty()) {
             rememberImagePainter(profilePictureUrl)
-        } else {
+          } else {
             painterResource(id = defaultImageResId)
-        },
-        contentDescription = "Profile picture",
-        modifier = modifier
-            .size(101.dp)
-            .clip(CircleShape)
-            .background(color = MaterialTheme.colorScheme.background),
-        contentScale = ContentScale.Crop
-    )
+          },
+      contentDescription = "Profile picture",
+      modifier =
+          modifier
+              .size(101.dp)
+              .clip(CircleShape)
+              .background(color = MaterialTheme.colorScheme.background),
+      contentScale = ContentScale.Crop)
 }
 
 @Preview
