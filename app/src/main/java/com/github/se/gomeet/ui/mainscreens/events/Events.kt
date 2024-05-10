@@ -27,6 +27,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBarDefaults
@@ -70,6 +71,7 @@ import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.repository.EventRepository
 import com.github.se.gomeet.model.repository.UserRepository
+import com.github.se.gomeet.model.event.location.Location
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
@@ -84,6 +86,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.text.SimpleDateFormat
+import java.time.LocalDate
 import java.time.ZoneId
 import java.util.Calendar
 import java.util.Date
@@ -121,9 +124,9 @@ fun Events(
       user.value = userViewModel.getUser(currentUser)
       val allEvents =
           eventViewModel.getAllEvents()!!.filter { e ->
-            user.value!!.myEvents.contains(e.uid) ||
+            (user.value!!.myEvents.contains(e.uid) ||
                 user.value!!.myFavorites.contains(e.uid) ||
-                user.value!!.joinedEvents.contains(e.uid)
+                user.value!!.joinedEvents.contains(e.uid)) && e.date.isAfter(LocalDate.now())
           }
       if (allEvents.isNotEmpty()) {
         eventList.addAll(allEvents)
@@ -164,7 +167,7 @@ fun Events(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(innerPadding)) {
               Spacer(modifier = Modifier.height(5.dp))
-              GoMeetSearchBar(query, NavBarUnselected, Color.DarkGray)
+              GoMeetSearchBar(nav, query, NavBarUnselected, Color.DarkGray)
               Spacer(modifier = Modifier.height(5.dp))
               Row(
                   verticalAlignment = Alignment.CenterVertically,
@@ -260,6 +263,7 @@ fun Events(
                                             .atStartOfDay(ZoneId.systemDefault())
                                             .toInstant()),
                                 eventPicture = painter,
+                                eventLocation = event.location,
                                 verified = false,
                                 nav = nav) // verification to be done using user details
                           }
@@ -314,6 +318,7 @@ fun Events(
                                             .atStartOfDay(ZoneId.systemDefault())
                                             .toInstant()),
                                 eventPicture = painter,
+                                eventLocation = event.location,
                                 verified = false,
                                 nav = nav)
                           }
@@ -367,6 +372,7 @@ fun Events(
                                             .atStartOfDay(ZoneId.systemDefault())
                                             .toInstant()),
                                 eventPicture = painter,
+                                eventLocation = event.location,
                                 verified = false,
                                 nav = nav)
                           }
@@ -401,6 +407,7 @@ fun EventWidget(
     eventDescription: String,
     eventDate: Date,
     eventPicture: Painter,
+    eventLocation: Location,
     verified: Boolean,
     nav: NavigationActions,
 ) {
@@ -455,7 +462,7 @@ fun EventWidget(
                     time = timeString,
                     description = eventDescription,
                     organizer = userName,
-                    loc = LatLng(46.5191, 6.5668), // TODO: replace with actual location
+                    loc = LatLng(eventLocation.latitude, eventLocation.longitude),
                     rating = 0.0 // TODO: replace with actual rating
                     // TODO: add image
                     )
@@ -555,7 +562,12 @@ fun EventWidget(
  */
 @ExperimentalMaterial3Api
 @Composable
-fun GoMeetSearchBar(query: MutableState<String>, backgroundColor: Color, contentColor: Color) {
+fun GoMeetSearchBar(
+    nav: NavigationActions,
+    query: MutableState<String>,
+    backgroundColor: Color,
+    contentColor: Color
+) {
   val customTextSelectionColors =
       TextSelectionColors(handleColor = DarkCyan, backgroundColor = DarkCyan.copy(alpha = 0.4f))
   CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
@@ -566,10 +578,12 @@ fun GoMeetSearchBar(query: MutableState<String>, backgroundColor: Color, content
         modifier = Modifier.fillMaxWidth().padding(start = 5.dp, end = 5.dp),
         placeholder = { Text("Search", color = contentColor) },
         leadingIcon = {
-          Icon(
-              ImageVector.vectorResource(R.drawable.gomeet_icon),
-              contentDescription = null,
-              tint = contentColor)
+          IconButton(onClick = { nav.navigateToScreen(Route.MESSAGE_CHANNELS) }) {
+            Icon(
+                ImageVector.vectorResource(R.drawable.gomeet_icon),
+                contentDescription = null,
+                tint = contentColor)
+          }
         },
         trailingIcon = {
           Icon(

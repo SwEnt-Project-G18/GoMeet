@@ -1,6 +1,7 @@
 package com.github.se.gomeet.ui.mainscreens.profile
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -37,8 +38,15 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
+import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.ui.theme.Grey
+import com.google.android.gms.maps.model.LatLng
+import java.text.SimpleDateFormat
+import java.time.ZoneId
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 /**
  * Composable function for the ProfileEventsList screen.
@@ -46,7 +54,12 @@ import com.github.se.gomeet.ui.theme.Grey
  * @param title The title of the event.
  */
 @Composable
-fun ProfileEventsList(title: String, listState: LazyListState, eventList: MutableList<Event>) {
+fun ProfileEventsList(
+    title: String,
+    listState: LazyListState,
+    eventList: MutableList<Event>,
+    nav: NavigationActions
+) {
   Spacer(modifier = Modifier.height(10.dp))
   Column {
     Row(
@@ -66,7 +79,10 @@ fun ProfileEventsList(title: String, listState: LazyListState, eventList: Mutabl
                       letterSpacing = 0.5.sp,
                   ),
               modifier = Modifier.width(104.dp).height(21.dp).align(Alignment.Bottom))
-          Text(text = "View all", color = Grey, modifier = Modifier.align(Alignment.Bottom))
+          Text(
+              text = "View all",
+              color = Grey,
+              modifier = Modifier.align(Alignment.Bottom).clickable {})
         }
     Spacer(modifier = Modifier.height(10.dp))
     LazyRow(
@@ -76,32 +92,81 @@ fun ProfileEventsList(title: String, listState: LazyListState, eventList: Mutabl
         contentPadding = PaddingValues(start = 15.dp, end = 15.dp),
         modifier = Modifier.heightIn(min = 56.dp).testTag("EventsListItems")) {
           itemsIndexed(eventList) { _, event ->
-            Column(modifier = Modifier.width(170.dp)) {
-              Image(
-                  painter =
-                      if (event.images.isNotEmpty()) {
-                        rememberAsyncImagePainter(
-                            ImageRequest.Builder(LocalContext.current)
-                                .data(data = event.images[0])
-                                .apply(
-                                    block =
-                                        fun ImageRequest.Builder.() {
-                                          crossfade(true)
-                                          placeholder(R.drawable.gomeet_logo)
-                                        })
-                                .build())
-                      } else {
-                        painterResource(id = R.drawable.gomeet_logo)
-                      },
-                  contentDescription = event.description,
-                  contentScale = ContentScale.Crop,
-                  modifier =
-                      Modifier.fillMaxWidth()
-                          .aspectRatio(3f / 1.75f)
-                          .clip(RoundedCornerShape(size = 10.dp)))
-              Text(text = event.title, color = DarkCyan)
-              Text(text = event.date.toString(), color = Grey)
-            }
+            Column(
+                modifier =
+                    Modifier.width(170.dp).clickable {
+                      val eventDate =
+                          Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant())
+
+                      val currentDate = Calendar.getInstance()
+                      val startOfWeek = currentDate.clone() as Calendar
+                      startOfWeek.set(Calendar.DAY_OF_WEEK, startOfWeek.firstDayOfWeek)
+                      val endOfWeek = startOfWeek.clone() as Calendar
+                      endOfWeek.add(Calendar.DAY_OF_WEEK, 6)
+
+                      val eventCalendar = Calendar.getInstance().apply { time = eventDate }
+
+                      val isThisWeek =
+                          eventCalendar.after(currentDate) && eventCalendar.before(endOfWeek)
+                      val isToday =
+                          currentDate.get(Calendar.YEAR) == eventCalendar.get(Calendar.YEAR) &&
+                              currentDate.get(Calendar.DAY_OF_YEAR) ==
+                                  eventCalendar.get(Calendar.DAY_OF_YEAR)
+
+                      val dayFormat =
+                          if (isThisWeek) {
+                            SimpleDateFormat("EEEE", Locale.getDefault())
+                          } else {
+                            SimpleDateFormat("dd/MM/yy", Locale.getDefault())
+                          }
+
+                      val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+
+                      val dayString =
+                          if (isToday) {
+                            "Today"
+                          } else {
+                            dayFormat.format(eventDate)
+                          }
+                      val timeString = timeFormat.format(eventDate)
+
+                      nav.navigateToEventInfo(
+                          eventId = event.uid,
+                          title = event.title,
+                          date = dayString,
+                          time = timeString,
+                          description = event.description,
+                          organizer = event.creator,
+                          loc = LatLng(event.location.latitude, event.location.longitude),
+                          rating = 0.0 // TODO: replace with actual rating
+                          // TODO: add image
+                          )
+                    }) {
+                  Image(
+                      painter =
+                          if (event.images.isNotEmpty()) {
+                            rememberAsyncImagePainter(
+                                ImageRequest.Builder(LocalContext.current)
+                                    .data(data = event.images[0])
+                                    .apply(
+                                        block =
+                                            fun ImageRequest.Builder.() {
+                                              crossfade(true)
+                                              placeholder(R.drawable.gomeet_logo)
+                                            })
+                                    .build())
+                          } else {
+                            painterResource(id = R.drawable.gomeet_logo)
+                          },
+                      contentDescription = event.description,
+                      contentScale = ContentScale.Crop,
+                      modifier =
+                          Modifier.fillMaxWidth()
+                              .aspectRatio(3f / 1.75f)
+                              .clip(RoundedCornerShape(size = 10.dp)))
+                  Text(text = event.title, color = DarkCyan)
+                  Text(text = event.date.toString(), color = Grey)
+                }
           }
         }
   }
