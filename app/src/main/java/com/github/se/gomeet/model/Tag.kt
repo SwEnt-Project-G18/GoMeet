@@ -41,9 +41,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.github.se.gomeet.ui.theme.DarkCyan
 
-/**
- * Tag that users can add to their profile and events
- */
+/** Tag that users can add to their profile and events */
 enum class Tag {
   // TODO: change this to actual tags
   tag1,
@@ -82,7 +80,8 @@ enum class Tag {
  * Composable function to display a menu that allows the user to choose tags.
  *
  * @param title: The title of the menu.
- * @param tags: The list of selected tags, this list will be updated by this function when the user (un)selects a tag.
+ * @param tags: The list of selected tags, this list will be updated by this function when the user
+ *   (un)selects a tag.
  * @param onSave: the code to execute when the Save button is pressed.
  */
 @OptIn(ExperimentalLayoutApi::class)
