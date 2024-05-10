@@ -69,6 +69,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
+import com.github.se.gomeet.model.event.location.Location
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
@@ -81,6 +82,7 @@ import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.android.gms.maps.model.LatLng
 import java.text.SimpleDateFormat
+import java.time.LocalDate
 import java.time.ZoneId
 import java.util.Calendar
 import java.util.Date
@@ -118,9 +120,9 @@ fun Events(
       user.value = userViewModel.getUser(currentUser)
       val allEvents =
           eventViewModel.getAllEvents()!!.filter { e ->
-            user.value!!.myEvents.contains(e.uid) ||
+            (user.value!!.myEvents.contains(e.uid) ||
                 user.value!!.myFavorites.contains(e.uid) ||
-                user.value!!.joinedEvents.contains(e.uid)
+                user.value!!.joinedEvents.contains(e.uid)) && e.date.isAfter(LocalDate.now())
           }
       if (allEvents.isNotEmpty()) {
         eventList.addAll(allEvents)
@@ -257,6 +259,7 @@ fun Events(
                                             .atStartOfDay(ZoneId.systemDefault())
                                             .toInstant()),
                                 eventPicture = painter,
+                                eventLocation = event.location,
                                 verified = false,
                                 nav = nav) // verification to be done using user details
                           }
@@ -311,6 +314,7 @@ fun Events(
                                             .atStartOfDay(ZoneId.systemDefault())
                                             .toInstant()),
                                 eventPicture = painter,
+                                eventLocation = event.location,
                                 verified = false,
                                 nav = nav)
                           }
@@ -364,6 +368,7 @@ fun Events(
                                             .atStartOfDay(ZoneId.systemDefault())
                                             .toInstant()),
                                 eventPicture = painter,
+                                eventLocation = event.location,
                                 verified = false,
                                 nav = nav)
                           }
@@ -398,6 +403,7 @@ fun EventWidget(
     eventDescription: String,
     eventDate: Date,
     eventPicture: Painter,
+    eventLocation: Location,
     verified: Boolean,
     nav: NavigationActions,
 ) {
@@ -452,7 +458,7 @@ fun EventWidget(
                     time = timeString,
                     description = eventDescription,
                     organizer = userName,
-                    loc = LatLng(46.5191, 6.5668), // TODO: replace with actual location
+                    loc = LatLng(eventLocation.latitude, eventLocation.longitude),
                     rating = 0.0 // TODO: replace with actual rating
                     // TODO: add image
                     )

@@ -70,6 +70,7 @@ import com.github.se.gomeet.ui.theme.LightGray
 import com.github.se.gomeet.ui.theme.NavBarUnselected
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
+import java.time.LocalDate
 import kotlinx.coroutines.launch
 
 /**
@@ -97,8 +98,12 @@ fun Profile(
       currentUser = userViewModel.getUser(userId)
       val allEvents =
           eventViewModel.getAllEvents()!!.filter { e -> currentUser!!.myEvents.contains(e.uid) }
-      if (allEvents.isNotEmpty()) {
-        myEventList.addAll(allEvents)
+      allEvents.forEach {
+        if (it.date.isAfter(LocalDate.now())) {
+          myEventList.add(it)
+        } else {
+          myHistoryList.add(it)
+        }
       }
       isProfileLoaded = true
     }
@@ -331,9 +336,7 @@ fun Profile(
                       Column(
                           modifier =
                               Modifier.clickable {
-                                nav.navigateToScreen(
-                                    Route.FOLLOWING.replace("{uid}", userId)
-                                        .replace("{isOwnList}", "true"))
+                                nav.navigateToScreen(Route.FOLLOWING.replace("{uid}", userId))
                               }) {
                             Text(
                                 text = currentUser?.following?.size.toString(),
@@ -401,9 +404,9 @@ fun Profile(
                       }
                 }
                 Spacer(modifier = Modifier.height(10.dp))
-                ProfileEventsList("My Events", rememberLazyListState(), myEventList)
+                ProfileEventsList("My Events", rememberLazyListState(), myEventList, nav)
                 Spacer(modifier = Modifier.height(10.dp))
-                ProfileEventsList("History", rememberLazyListState(), myHistoryList)
+                ProfileEventsList("History", rememberLazyListState(), myHistoryList, nav)
               }
         } else {
           LoadingText()
