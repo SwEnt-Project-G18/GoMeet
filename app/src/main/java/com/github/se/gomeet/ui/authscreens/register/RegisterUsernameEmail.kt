@@ -20,7 +20,6 @@ import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldColors
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -34,10 +33,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.se.gomeet.model.user.GoMeetUser
-import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.ui.theme.DarkGrey
 import com.github.se.gomeet.viewmodel.UserViewModel
 import kotlinx.coroutines.launch
@@ -152,24 +149,6 @@ fun RegisterUsernameEmail(
               }
         }
       }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewRegisterUsername() {
-  RegisterUsernameEmail(
-      callback = { username, email ->
-        println("Preview Username: $username, Preview Email: $email")
-      },
-      userViewModel = UserViewModel(),
-      TextFieldDefaults.colors(
-          focusedTextColor = DarkCyan,
-          unfocusedTextColor = DarkCyan,
-          unfocusedContainerColor = Color.Transparent,
-          focusedContainerColor = Color.Transparent,
-          cursorColor = DarkCyan,
-          focusedLabelColor = MaterialTheme.colorScheme.tertiary,
-          focusedIndicatorColor = MaterialTheme.colorScheme.tertiary))
 }
 
 fun validateEmail(email: String): Boolean {
