@@ -55,12 +55,10 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.Popup
-import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.TagsSelector
 import com.github.se.gomeet.model.event.location.Location
@@ -558,13 +556,4 @@ private fun fieldsAreFull(
       date.isNotEmpty() &&
       price.isNotEmpty() &&
       url.isNotEmpty()
-}
-
-@Preview
-@Composable
-fun preview() {
-  CreateEvent(
-      nav = NavigationActions(rememberNavController()),
-      eventViewModel = EventViewModel(),
-      isPrivate = true)
 }

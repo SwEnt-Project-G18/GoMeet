@@ -97,7 +97,7 @@ class EventsTest {
   }
 
   companion object {
-    private val userVM = UserViewModel()
+    private val userVM = UserViewModel(UserRepository(Firebase.firestore))
     private lateinit var currentUserId: String
 
     private val usr = "u@eventstest.com"

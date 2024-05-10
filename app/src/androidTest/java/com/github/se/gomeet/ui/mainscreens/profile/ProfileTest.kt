@@ -11,12 +11,11 @@ import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.util.concurrent.TimeUnit
 import org.junit.AfterClass
 import org.junit.BeforeClass
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import org.junit.Rule
 import org.junit.Test
 
@@ -46,7 +45,7 @@ class ProfileTest {
   }
 
   companion object {
-    private val userVM = UserViewModel()
+    private val userVM = UserViewModel(UserRepository(Firebase.firestore))
     private lateinit var currentUserId: String
 
     private val usr = "u@t.com"

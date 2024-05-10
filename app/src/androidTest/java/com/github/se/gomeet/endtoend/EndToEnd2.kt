@@ -209,7 +209,7 @@ class EndToEndTest2 : TestCase() {
         TimeUnit.SECONDS.sleep(1)
       }
 
-      eventVM = EventViewModel(Firebase.auth.currentUser!!.uid)
+      eventVM = EventViewModel(Firebase.auth.currentUser!!.uid, EventRepository(Firebase.firestore))
       eventVM.createEvent(
           "title",
           "description",

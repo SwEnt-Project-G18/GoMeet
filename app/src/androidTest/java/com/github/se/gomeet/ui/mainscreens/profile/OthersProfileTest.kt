@@ -15,12 +15,11 @@ import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.util.concurrent.TimeUnit
 import org.junit.AfterClass
 import org.junit.BeforeClass
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -37,7 +36,7 @@ class OthersProfileTest {
       navController = rememberNavController()
       OthersProfile(
           NavigationActions(navController),
-          "",
+          uid2,
           UserViewModel(UserRepository(Firebase.firestore)),
           EventViewModel(null, EventRepository(Firebase.firestore)))
     }
@@ -66,7 +65,7 @@ class OthersProfileTest {
     private var uid2 = ""
     private const val username2 = "othersrofiletest_user2"
 
-    private val userVM = UserViewModel()
+    private val userVM = UserViewModel(UserRepository(Firebase.firestore))
 
     @BeforeClass
     @JvmStatic
