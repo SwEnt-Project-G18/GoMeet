@@ -17,6 +17,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -91,14 +94,14 @@ fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel = UserViewM
           focusedIndicatorColor = MaterialTheme.colorScheme.tertiary)
 
   Scaffold(
+      modifier = Modifier.padding(start = 15.dp, end = 15.dp),
       topBar = {
         Row(
             horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically) {
               Text(
                   text = "My Profile",
-                  modifier =
-                      Modifier.padding(start = 15.dp, top = 15.dp, end = 15.dp, bottom = 0.dp),
+                  modifier = Modifier.padding(top = 15.dp),
                   color = DarkCyan,
                   fontStyle = FontStyle.Normal,
                   fontWeight = FontWeight.SemiBold,
@@ -111,18 +114,17 @@ fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel = UserViewM
               Text(
                   text = "Done",
                   modifier =
-                      Modifier.padding(start = 15.dp, top = 15.dp, end = 15.dp, bottom = 0.dp)
-                          .clickable {
-                            userViewModel.editUser(
-                                currentUser.value!!.copy(
-                                    firstName = firstName.value,
-                                    lastName = lastName.value,
-                                    email = email.value,
-                                    username = username.value,
-                                    phoneNumber = phoneNumber.value,
-                                    country = country.value))
-                            nav.navigateToScreen(Route.PROFILE)
-                          },
+                      Modifier.padding(top = 15.dp).clickable {
+                        userViewModel.editUser(
+                            currentUser.value!!.copy(
+                                firstName = firstName.value,
+                                lastName = lastName.value,
+                                email = email.value,
+                                username = username.value,
+                                phoneNumber = phoneNumber.value,
+                                country = country.value))
+                        nav.navigateToScreen(Route.PROFILE)
+                      },
                   color = MaterialTheme.colorScheme.onBackground,
                   fontStyle = FontStyle.Normal,
                   fontWeight = FontWeight.Normal,
@@ -150,7 +152,7 @@ fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel = UserViewM
               horizontalAlignment = Alignment.CenterHorizontally) {
                 Image(
                     modifier =
-                        Modifier.padding(start = 15.dp, end = 15.dp, top = 30.dp, bottom = 15.dp)
+                        Modifier.padding(top = 30.dp, bottom = 15.dp)
                             .width(101.dp)
                             .height(101.dp)
                             .clip(CircleShape)
@@ -247,19 +249,20 @@ fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel = UserViewM
                 Spacer(modifier = Modifier.size(16.dp))
 
                 Row(
-                    modifier =
-                        Modifier.fillMaxWidth()
-                            .padding(start = 15.dp, top = 15.dp, end = 15.dp, bottom = 10.dp),
+                    modifier = Modifier.fillMaxWidth().padding(top = 15.dp, bottom = 10.dp),
                     verticalAlignment = Alignment.CenterVertically) {
                       Text(
                           text = "Edit Tags",
-                          modifier = Modifier.clickable { showPopup.value = true },
                           color = MaterialTheme.colorScheme.onBackground,
                           fontStyle = FontStyle.Normal,
                           fontWeight = FontWeight.Normal,
                           fontFamily = FontFamily.Default,
                           textAlign = TextAlign.Start,
                           style = MaterialTheme.typography.bodyMedium)
+                      Icon(
+                          Icons.Default.KeyboardArrowRight,
+                          null,
+                          modifier = Modifier.clickable { showPopup.value = true })
                     }
               }
         } else {
@@ -269,7 +272,7 @@ fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel = UserViewM
           Popup(
               alignment = Alignment.Center,
               onDismissRequest = { showPopup.value = !showPopup.value }) {
-                TagsSelector("Edit tags", tags) {
+                TagsSelector("Edit Tags", tags) {
                   currentUser.value!!.tags = tags.value
                   userViewModel.editUser(currentUser.value!!)
                   showPopup.value = false
