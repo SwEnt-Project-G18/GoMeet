@@ -71,8 +71,8 @@ fun RegisterNameCountryPhone (callback: (String, String, String, String) -> Unit
         Text(
             text = "Tell Us More About Yourself",
             modifier = Modifier.fillMaxWidth(),
-            style = MaterialTheme.typography.bodyLarge,
-            textAlign = TextAlign.Centergit
+            style = MaterialTheme.typography.titleMedium,
+            textAlign = TextAlign.Center
         )
 
         Spacer(modifier = Modifier.size(screenHeight/20))

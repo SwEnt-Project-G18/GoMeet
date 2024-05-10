@@ -33,6 +33,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.se.gomeet.ui.theme.DarkCyan
@@ -53,15 +54,14 @@ fun RegisterPassword(callback: (String) -> Unit, textFieldColors: TextFieldColor
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceAround) {
 
-        Spacer(modifier = Modifier.size(screenHeight/40))
-
         Text(
             text = "Please enter your password.",
             modifier = Modifier.fillMaxWidth(),
-            style = MaterialTheme.typography.bodyLarge
+            style = MaterialTheme.typography.titleMedium,
+            textAlign = TextAlign.Center
         )
 
-        Spacer(modifier = Modifier.size(screenHeight/40))
+        Spacer(modifier = Modifier.size(screenHeight/20))
 
         TextField(
             value = password,

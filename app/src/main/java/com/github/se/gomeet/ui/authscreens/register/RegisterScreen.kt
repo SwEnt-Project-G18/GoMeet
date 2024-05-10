@@ -115,7 +115,7 @@ fun RegisterScreen(
         }
 
         when (state) {
-            1 -> RegisterUsernameEmail(
+            3 -> RegisterUsernameEmail(
                 callback = { username, email ->
                     nextState()
                     authViewModel.onUsernameRegisterChange(username)
@@ -133,7 +133,7 @@ fun RegisterScreen(
                 textFieldColors = textFieldColors
             )
 
-            3 -> RegisterNameCountryPhone(
+            1 -> RegisterNameCountryPhone(
                 callback = { firstname, lastname, country, phone ->
                     nextState()
                     authViewModel.onFirstNameRegisterChange(firstname)
