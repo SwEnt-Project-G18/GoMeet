@@ -125,7 +125,7 @@ fun RegisterScreen(
                       authViewModel.onEmailRegisterChange(email)
                       nextState()
                     },
-                    userViewModel = UserViewModel(),
+                    userViewModel = userViewModel,
                     textFieldColors = textFieldColors)
             2 ->
                 RegisterPassword(

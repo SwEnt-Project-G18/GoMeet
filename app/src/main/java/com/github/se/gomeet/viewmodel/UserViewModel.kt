@@ -93,7 +93,7 @@ class UserViewModel(userRepository: UserRepository) : ViewModel() {
   suspend fun getAllUser(): List<GoMeetUser>? {
     return try {
       val users = CompletableDeferred<List<GoMeetUser>?>()
-      userRepository.getAllUsers { t -> users.complete(t) }
+      repository.getAllUsers { t -> users.complete(t) }
       users.await()
     } catch (e: Exception) {
       emptyList()
