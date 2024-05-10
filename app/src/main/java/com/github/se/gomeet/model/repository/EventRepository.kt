@@ -5,6 +5,7 @@ import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.location.Location
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.MetadataChanges
 import java.time.LocalDate
 
 /**
@@ -199,7 +200,7 @@ class EventRepository(private val db: FirebaseFirestore) {
    * the database accordingly to what this function listens to
    */
   private fun startListeningForEvents() {
-    db.collection("events").addSnapshotListener { snapshot, e ->
+    db.collection("events").addSnapshotListener(MetadataChanges.INCLUDE) { snapshot, e ->
       if (e != null) {
         // Handle error
         Log.w("EventRepository", "Listen failed.", e)
@@ -222,6 +223,15 @@ class EventRepository(private val db: FirebaseFirestore) {
             localEventsList.removeIf { it == event }
           }
         }
+
+        val source =
+            if (snapshot.metadata.isFromCache) {
+              "local cache"
+            } else {
+              "server"
+            }
+
+        Log.d(TAG, "Data fetched from $source")
       }
     }
   }

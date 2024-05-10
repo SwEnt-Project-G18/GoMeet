@@ -70,6 +70,8 @@ import coil.request.ImageRequest
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.location.Location
+import com.github.se.gomeet.model.repository.EventRepository
+import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
@@ -81,6 +83,8 @@ import com.github.se.gomeet.ui.theme.NavBarUnselected
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.android.gms.maps.model.LatLng
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.ZoneId
@@ -491,7 +495,9 @@ fun EventWidget(
                         horizontalArrangement = Arrangement.Center) {
                           var username by remember { mutableStateOf<String?>("Loading...") }
                           LaunchedEffect(userName) {
-                            username = UserViewModel().getUsername(userName)
+                            username =
+                                UserViewModel(UserRepository(Firebase.firestore))
+                                    .getUsername(userName)
                           }
 
                           username?.let {
@@ -620,7 +626,11 @@ fun GoMeetSearchBar(
 @Composable
 @Preview
 fun EventPreview() {
-  Events("", nav = NavigationActions(rememberNavController()), UserViewModel(), EventViewModel())
+  Events(
+      "",
+      nav = NavigationActions(rememberNavController()),
+      UserViewModel(UserRepository(Firebase.firestore)),
+      EventViewModel("", EventRepository(Firebase.firestore)))
   /*EventWidget(
   "EPFL Chess Club",
   "Chess Tournament",

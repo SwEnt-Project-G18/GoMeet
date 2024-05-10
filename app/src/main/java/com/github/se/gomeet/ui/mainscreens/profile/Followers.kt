@@ -41,11 +41,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.R
+import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.viewmodel.UserViewModel
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 
 private var currentUser: GoMeetUser? = null
@@ -153,5 +156,8 @@ fun Followers(nav: NavigationActions, uid: String, userViewModel: UserViewModel)
 @Preview
 @Composable
 fun FollowersPreview() {
-  Followers(NavigationActions(rememberNavController()), "", UserViewModel())
+  Followers(
+      NavigationActions(rememberNavController()),
+      "",
+      UserViewModel(UserRepository(Firebase.firestore)))
 }

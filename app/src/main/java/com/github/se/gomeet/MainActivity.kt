@@ -19,6 +19,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.github.se.gomeet.model.repository.EventRepository
+import com.github.se.gomeet.model.repository.InvitesRepository
+import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.ui.authscreens.LoginScreen
 import com.github.se.gomeet.ui.authscreens.RegisterScreen
 import com.github.se.gomeet.ui.authscreens.WelcomeScreen
@@ -50,6 +53,12 @@ import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.android.gms.maps.MapsInitializer
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreSettings
+import com.google.firebase.firestore.firestoreSettings
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.memoryCacheSettings
+import com.google.firebase.firestore.persistentCacheSettings
 import com.google.firebase.ktx.Firebase
 import io.getstream.chat.android.client.ChatClient
 import io.getstream.chat.android.client.logger.ChatLogLevel
@@ -65,10 +74,36 @@ import io.getstream.chat.android.state.plugin.factory.StreamStatePluginFactory
 
 /** The main activity of the application. */
 class MainActivity : ComponentActivity() {
+
+  private lateinit var db: FirebaseFirestore
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
     MapsInitializer.initialize(this)
+
+    val cacheSize = 1024L * 1024L * 100L
+
+    // Initialize Firestore settings
+    val firestoreSettings =
+        FirebaseFirestoreSettings.Builder()
+            .setLocalCacheSettings(memoryCacheSettings {})
+            .setLocalCacheSettings(
+                persistentCacheSettings {
+                  // Set size to 100 MB
+                  setSizeBytes(cacheSize)
+                })
+            .build()
+
+    // Get Firestore instance and apply settings
+    db = Firebase.firestore
+    db.firestoreSettings = firestoreSettings
+
+    // Enable indexing for persistent cache
+    db.persistentCacheIndexManager?.apply {
+      // Indexing is disabled by default
+      enableIndexAutoCreation()
+    } ?: println("indexManager is null")
 
     // 1 - Set up the OfflinePlugin for offline storage
     val offlinePluginFactory = StreamOfflinePluginFactory(appContext = applicationContext)
@@ -91,10 +126,13 @@ class MainActivity : ComponentActivity() {
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
           val userIdState = remember { mutableStateOf("") }
           val nav = rememberNavController()
+          val eventRepository = EventRepository(db)
+          val userRepository = UserRepository(db)
+          val invitesRepository = InvitesRepository(db)
           val authViewModel = AuthViewModel()
-          val eventViewModel = EventViewModel()
-          val userViewModel = UserViewModel()
-          val eventInviteViewModel = EventInviteViewModel()
+          val eventViewModel = EventViewModel(null, eventRepository)
+          val userViewModel = UserViewModel(userRepository)
+          val eventInviteViewModel = EventInviteViewModel(invitesRepository)
           val navAction = NavigationActions(nav)
           NavHost(navController = nav, startDestination = Route.WELCOME) {
             composable(Route.WELCOME) {
@@ -151,10 +189,10 @@ class MainActivity : ComponentActivity() {
             composable(Route.EXPLORE) { Explore(navAction, eventViewModel) }
             composable(Route.EVENTS) {
               userIdState.value = Firebase.auth.currentUser!!.uid
-              Events(userIdState.value, navAction, UserViewModel(), eventViewModel)
+              Events(userIdState.value, navAction, UserViewModel(userRepository), eventViewModel)
             }
             composable(Route.TRENDS) {
-              Trends(userIdState.value, navAction, UserViewModel(), eventViewModel)
+              Trends(userIdState.value, navAction, UserViewModel(userRepository), eventViewModel)
             }
             composable(Route.CREATE) {
               userIdState.value = Firebase.auth.currentUser!!.uid
@@ -175,10 +213,14 @@ class MainActivity : ComponentActivity() {
                       eventViewModel)
                 }
             composable(Route.PRIVATE_CREATE) {
-              CreateEvent(navAction, EventViewModel(Firebase.auth.currentUser!!.uid), true)
+              CreateEvent(
+                  navAction, EventViewModel(Firebase.auth.currentUser!!.uid, eventRepository), true)
             }
             composable(Route.PUBLIC_CREATE) {
-              CreateEvent(navAction, EventViewModel(Firebase.auth.currentUser!!.uid), false)
+              CreateEvent(
+                  navAction,
+                  EventViewModel(Firebase.auth.currentUser!!.uid, eventRepository),
+                  false)
             }
 
             composable(
