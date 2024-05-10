@@ -15,7 +15,6 @@ import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import java.util.concurrent.TimeUnit
-import kotlinx.coroutines.runBlocking
 import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.junit.Rule
@@ -34,6 +33,8 @@ class OthersProfileTest {
       navController = rememberNavController()
       OthersProfile(NavigationActions(navController), uid2, UserViewModel(), EventViewModel())
     }
+
+    TimeUnit.SECONDS.sleep(3)
 
     rule.onNodeWithTag("TopBar").assertIsDisplayed()
     rule.onNodeWithTag("UserInfo").assertIsDisplayed()
@@ -57,46 +58,48 @@ class OthersProfileTest {
     private var uid2 = ""
     private const val username2 = "othersrofiletest_user2"
 
-    private lateinit var userVM: UserViewModel
+    private val userVM = UserViewModel()
 
     @BeforeClass
     @JvmStatic
     fun setUp() {
       TimeUnit.SECONDS.sleep(3)
-      userVM = UserViewModel()
+
       // create two new users
       var result = Firebase.auth.createUserWithEmailAndPassword(email1, pwd1)
-      while (!result.isComplete) {}
+      while (!result.isComplete) {
+        TimeUnit.SECONDS.sleep(1)
+      }
       uid1 = result.result.user!!.uid
       result = Firebase.auth.createUserWithEmailAndPassword(email2, pwd2)
-      while (!result.isComplete) {}
+      while (!result.isComplete) {
+        TimeUnit.SECONDS.sleep(1)
+      }
       uid2 = result.result.user!!.uid
-      runBlocking {
-        userVM.createUserIfNew(
-            uid1,
-            username1,
-            "testfirstname",
-            "testlastname",
-            email1,
-            "testphonenumber",
-            "testcountry")
-      }
-      runBlocking {
-        userVM.createUserIfNew(
-            uid2,
-            username2,
-            "testfirstname2",
-            "testlastname2",
-            email2,
-            "testphonenumber2",
-            "testcountry2")
-      }
+
+      userVM.createUserIfNew(
+          uid1,
+          username1,
+          "testfirstname",
+          "testlastname",
+          email1,
+          "testphonenumber",
+          "testcountry")
+      TimeUnit.SECONDS.sleep(3)
+      userVM.createUserIfNew(
+          uid2,
+          username2,
+          "testfirstname2",
+          "testlastname2",
+          email2,
+          "testphonenumber2",
+          "testcountry2")
+      TimeUnit.SECONDS.sleep(3)
 
       result = Firebase.auth.signInWithEmailAndPassword(email1, pwd1)
-      while (!result.isComplete) {}
-
-      // Ensure user is logged out before proceeding
-      TimeUnit.SECONDS.sleep(2)
+      while (!result.isComplete) {
+        TimeUnit.SECONDS.sleep(1)
+      }
     }
 
     @AfterClass
@@ -108,7 +111,9 @@ class OthersProfileTest {
       userVM.deleteUser(uid2)
 
       val result = Firebase.auth.signInWithEmailAndPassword(email2, pwd2)
-      while (!result.isComplete) {}
+      while (!result.isComplete) {
+        TimeUnit.SECONDS.sleep(1)
+      }
       Firebase.auth.currentUser?.delete()
     }
   }

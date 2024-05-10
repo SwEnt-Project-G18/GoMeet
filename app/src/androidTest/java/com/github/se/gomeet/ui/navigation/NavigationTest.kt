@@ -30,7 +30,6 @@ class NavigationTest {
 
   @Test
   fun testNavigateTo() {
-
     composeTestRule.setContent {
       val nav = rememberNavController()
       NavHost(navController = nav, startDestination = Route.EVENTS) {
@@ -53,7 +52,7 @@ class NavigationTest {
         }
         composable(TOP_LEVEL_DESTINATIONS[3].route) { Create(NavigationActions(nav)) }
         composable(TOP_LEVEL_DESTINATIONS[4].route) {
-          Profile(NavigationActions(nav), userId = currentUserId, UserViewModel(), EventViewModel())
+          Profile(NavigationActions(nav), currentUserId, UserViewModel(), EventViewModel())
         }
         // Add more destinations as needed
       }
@@ -69,7 +68,6 @@ class NavigationTest {
 
   @Test
   fun testGoBack() {
-
     composeTestRule.setContent {
       val nav = rememberNavController()
       NavHost(navController = nav, startDestination = TOP_LEVEL_DESTINATIONS[0].route) {
@@ -92,7 +90,7 @@ class NavigationTest {
         }
         composable(TOP_LEVEL_DESTINATIONS[3].route) { Create(NavigationActions(nav)) }
         composable(TOP_LEVEL_DESTINATIONS[4].route) {
-          Profile(NavigationActions(nav), userId = currentUserId, UserViewModel(), EventViewModel())
+          Profile(NavigationActions(nav), currentUserId, UserViewModel(), EventViewModel())
         }
       }
 
@@ -109,7 +107,7 @@ class NavigationTest {
   }
 
   companion object {
-    private val userViewModel = UserViewModel()
+    private val userVM = UserViewModel()
     private lateinit var currentUserId: String
 
     private val usr = "u@navtest.com"
@@ -118,16 +116,24 @@ class NavigationTest {
     @BeforeClass
     @JvmStatic
     fun setUp() {
-      Firebase.auth.createUserWithEmailAndPassword(usr, pwd)
-      TimeUnit.SECONDS.sleep(2)
-      Firebase.auth.signInWithEmailAndPassword(usr, pwd)
-      TimeUnit.SECONDS.sleep(2)
+      TimeUnit.SECONDS.sleep(3)
+
+      // Create a new user and sign in
+      var result = Firebase.auth.createUserWithEmailAndPassword(usr, pwd)
+      while (!result.isComplete) {
+        TimeUnit.SECONDS.sleep(1)
+      }
+      result = Firebase.auth.signInWithEmailAndPassword(usr, pwd)
+      while (!result.isComplete) {
+        TimeUnit.SECONDS.sleep(1)
+      }
+
       // Set up the user view model
       // Order is important here, since createUserIfNew sets current user to created user (so we
       // need to create the current user last)
       currentUserId = Firebase.auth.currentUser!!.uid
-      userViewModel.createUserIfNew(currentUserId, "a", "b", "c", usr, "4567", "Angola")
-      TimeUnit.SECONDS.sleep(2)
+      userVM.createUserIfNew(currentUserId, "a", "b", "c", usr, "4567", "Angola")
+      TimeUnit.SECONDS.sleep(3)
     }
 
     @AfterClass
@@ -135,7 +141,7 @@ class NavigationTest {
     fun tearDown() {
       // Clean up the user view model
       Firebase.auth.currentUser!!.delete()
-      userViewModel.deleteUser(currentUserId)
+      userVM.deleteUser(currentUserId)
     }
   }
 }

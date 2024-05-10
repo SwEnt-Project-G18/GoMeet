@@ -160,68 +160,73 @@ class EndToEndTest2 : TestCase() {
     private var uid2 = ""
     private const val username2 = "test_user2"
 
-    private lateinit var userVM: UserViewModel
+    private val userVM = UserViewModel()
     private lateinit var eventVM: EventViewModel
 
     @JvmStatic
     @BeforeClass
     fun setup() {
+      TimeUnit.SECONDS.sleep(3)
+
       // create two new users
-      userVM = UserViewModel()
       var result = Firebase.auth.createUserWithEmailAndPassword(email1, pwd1)
-      while (!result.isComplete) {}
+      while (!result.isComplete) {
+        TimeUnit.SECONDS.sleep(1)
+      }
       uid1 = result.result.user!!.uid
+
       result = Firebase.auth.createUserWithEmailAndPassword(email2, pwd2)
-      while (!result.isComplete) {}
+      while (!result.isComplete) {
+        TimeUnit.SECONDS.sleep(1)
+      }
       uid2 = result.result.user!!.uid
-      runBlocking {
-        userVM.createUserIfNew(
-            uid1,
-            username1,
-            "testfirstname",
-            "testlastname",
-            email1,
-            "testphonenumber",
-            "testcountry")
-      }
-      runBlocking {
-        userVM.createUserIfNew(
-            uid2,
-            username2,
-            "testfirstname2",
-            "testlastname2",
-            email2,
-            "testphonenumber2",
-            "testcountry2")
-      }
+
+      userVM.createUserIfNew(
+          uid1,
+          username1,
+          "testfirstname",
+          "testlastname",
+          email1,
+          "testphonenumber",
+          "testcountry")
+      TimeUnit.SECONDS.sleep(3)
+      userVM.createUserIfNew(
+          uid2,
+          username2,
+          "testfirstname2",
+          "testlastname2",
+          email2,
+          "testphonenumber2",
+          "testcountry2")
+      TimeUnit.SECONDS.sleep(3)
 
       // the first user is used to create an event
       result = Firebase.auth.signInWithEmailAndPassword(email1, pwd1)
-      while (!result.isComplete) {}
-
-      eventVM = EventViewModel(Firebase.auth.currentUser!!.uid)
-      runBlocking {
-        eventVM.createEvent(
-            "title",
-            "description",
-            Location(0.0, 0.0, "location"),
-            LocalDate.of(2025, 3, 30),
-            0.0,
-            "url",
-            emptyList(),
-            emptyList(),
-            0,
-            true,
-            emptyList(),
-            emptyList(),
-            null,
-            userVM,
-            "eventuid1")
-        Firebase.auth.signOut()
+      while (!result.isComplete) {
+        TimeUnit.SECONDS.sleep(1)
       }
 
-      // Ensure user is logged out before proceeding
-      TimeUnit.SECONDS.sleep(2)
+      eventVM = EventViewModel(Firebase.auth.currentUser!!.uid)
+      eventVM.createEvent(
+          "title",
+          "description",
+          Location(0.0, 0.0, "location"),
+          LocalDate.of(2025, 3, 30),
+          0.0,
+          "url",
+          emptyList(),
+          emptyList(),
+          0,
+          true,
+          emptyList(),
+          emptyList(),
+          null,
+          userVM,
+          "eventuid1")
+      TimeUnit.SECONDS.sleep(3)
+
+      Firebase.auth.signOut()
+      TimeUnit.SECONDS.sleep(3)
 
       // the second user is used to log in and perform the tests
       eventVM = EventViewModel(uid2)
@@ -239,7 +244,9 @@ class EndToEndTest2 : TestCase() {
       userVM.deleteUser(uid2)
 
       val result = Firebase.auth.signInWithEmailAndPassword(email1, pwd1)
-      while (!result.isComplete) {}
+      while (!result.isComplete) {
+        TimeUnit.SECONDS.sleep(1)
+      }
       Firebase.auth.currentUser?.delete()
     }
   }
