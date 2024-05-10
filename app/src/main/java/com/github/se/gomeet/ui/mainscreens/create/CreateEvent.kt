@@ -65,6 +65,7 @@ import com.github.se.gomeet.R
 import com.github.se.gomeet.model.TagsSelector
 import com.github.se.gomeet.model.event.location.Location
 import com.github.se.gomeet.model.repository.EventRepository
+import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
@@ -94,8 +95,9 @@ private const val NUMBER_OF_SUGGESTIONS = 3
 @Composable
 fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivate: Boolean) {
 
-  val db = EventRepository(Firebase.firestore)
-  val uid = db.getNewId()
+  val eventRepository = EventRepository(Firebase.firestore)
+  val userRepository = UserRepository(Firebase.firestore)
+  val uid = eventRepository.getNewId()
   val titleState = remember { mutableStateOf("") }
   val descriptionState = remember { mutableStateOf("") }
   val locationState = remember { mutableStateOf("") }
@@ -377,7 +379,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                                 listOf(),
                                 listOf(),
                                 imageUri,
-                                UserViewModel(),
+                                UserViewModel(userRepository),
                                 uid)
 
                             nav.goBack()
@@ -398,7 +400,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                             tags.value,
                             listOf(),
                             imageUri,
-                            UserViewModel(),
+                            UserViewModel(userRepository),
                             uid)
 
                         nav.goBack()

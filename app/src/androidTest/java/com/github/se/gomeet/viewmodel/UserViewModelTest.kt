@@ -1,7 +1,10 @@
 package com.github.se.gomeet.viewmodel
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.model.user.GoMeetUser
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.test.runTest
 import org.junit.BeforeClass
@@ -72,7 +75,7 @@ class UserViewModelTest {
     @BeforeClass
     @JvmStatic
     fun setup() {
-      userViewModel = UserViewModel()
+      userViewModel = UserViewModel(UserRepository(Firebase.firestore))
     }
   }
 }

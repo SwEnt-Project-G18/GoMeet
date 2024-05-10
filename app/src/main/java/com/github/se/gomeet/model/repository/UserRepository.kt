@@ -19,29 +19,6 @@ class UserRepository(private val db: FirebaseFirestore) {
   }
 
   /**
-   * This function retrieves all users from the database
-   *
-   * @param callback The callback function to be called when the users are retrieved
-   */
-  fun getAllUsers(callback: (List<GoMeetUser>) -> Unit) {
-    db.collection(USERS_COLLECTION)
-        .get()
-        .addOnSuccessListener { querySnapshot ->
-          val userList = mutableListOf<GoMeetUser>()
-          for (document in querySnapshot.documents) {
-            val user = document.data?.fromMap(document.id)
-            if (user != null) {
-              userList.add(user)
-            }
-          }
-        }
-        .addOnFailureListener { exception ->
-          Log.d(TAG, "Error getting documents: ", exception)
-          callback(emptyList())
-        }
-  }
-
-  /**
    * Get the user with its id.
    *
    * @param uid the user id

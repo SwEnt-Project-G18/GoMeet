@@ -3,18 +3,15 @@ package com.github.se.gomeet.viewmodel
 import com.github.se.gomeet.model.event.EventInviteUsers
 import com.github.se.gomeet.model.event.InviteStatus
 import com.github.se.gomeet.model.repository.InvitesRepository
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.CompletableDeferred
 
-// _db argument to be able to pass a mock FirebaseFirestore instance for testing
 /**
  * ViewModel for event invitation logic. The viewModel is responsible for handling the logic that
  * comes from the UI and the repository.
  */
-class EventInviteViewModel {
+class EventInviteViewModel(invitesRepository: InvitesRepository) {
 
-  private val repository = InvitesRepository(Firebase.firestore)
+  private val repository = invitesRepository
 
   /**
    * Get the users invited to an event.

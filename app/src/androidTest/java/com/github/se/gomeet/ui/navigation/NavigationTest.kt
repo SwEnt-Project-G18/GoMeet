@@ -6,6 +6,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.se.gomeet.model.repository.EventRepository
+import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.ui.mainscreens.Explore
 import com.github.se.gomeet.ui.mainscreens.Trends
 import com.github.se.gomeet.ui.mainscreens.create.Create
@@ -16,6 +18,8 @@ import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import java.util.concurrent.TimeUnit
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.runBlocking
 import org.junit.AfterClass
 import org.junit.BeforeClass
@@ -32,27 +36,33 @@ class NavigationTest {
   fun testNavigateTo() {
     composeTestRule.setContent {
       val nav = rememberNavController()
+      val userRepository = UserRepository(Firebase.firestore)
+      val eventRepository = EventRepository(Firebase.firestore)
       NavHost(navController = nav, startDestination = Route.EVENTS) {
         composable(TOP_LEVEL_DESTINATIONS[0].route) {
-          Explore(nav = NavigationActions(nav), EventViewModel())
+          Explore(nav = NavigationActions(nav), EventViewModel(null, eventRepository))
         }
         composable(TOP_LEVEL_DESTINATIONS[1].route) {
           Events(
               currentUser = currentUserId,
               nav = NavigationActions(rememberNavController()),
-              userViewModel = UserViewModel(),
-              eventViewModel = EventViewModel())
+              userViewModel = UserViewModel(userRepository),
+              eventViewModel = EventViewModel("NEEGn5cbkJZDXaezeGdfd2D4u6b2", eventRepository))
         }
         composable(TOP_LEVEL_DESTINATIONS[2].route) {
           Trends(
               currentUser = currentUserId,
               nav = NavigationActions(rememberNavController()),
-              userViewModel = UserViewModel(),
-              eventViewModel = EventViewModel())
+              userViewModel = UserViewModel(userRepository),
+              eventViewModel = EventViewModel("NEEGn5cbkJZDXaezeGdfd2D4u6b2", eventRepository))
         }
         composable(TOP_LEVEL_DESTINATIONS[3].route) { Create(NavigationActions(nav)) }
         composable(TOP_LEVEL_DESTINATIONS[4].route) {
-          Profile(NavigationActions(nav), currentUserId, UserViewModel(), EventViewModel())
+          Profile(
+              NavigationActions(nav),
+              userId = currentUserId,
+              UserViewModel(userRepository),
+              EventViewModel(currentUserId, eventRepository))
         }
         // Add more destinations as needed
       }
@@ -70,27 +80,33 @@ class NavigationTest {
   fun testGoBack() {
     composeTestRule.setContent {
       val nav = rememberNavController()
+      val userRepository = UserRepository(Firebase.firestore)
+      val eventRepository = EventRepository(Firebase.firestore)
       NavHost(navController = nav, startDestination = TOP_LEVEL_DESTINATIONS[0].route) {
         composable(TOP_LEVEL_DESTINATIONS[0].route) {
-          Explore(nav = NavigationActions(nav), EventViewModel())
+          Explore(nav = NavigationActions(nav), EventViewModel(null, eventRepository))
         }
         composable(TOP_LEVEL_DESTINATIONS[1].route) {
           Events(
               currentUser = currentUserId,
               nav = NavigationActions(rememberNavController()),
-              userViewModel = UserViewModel(),
-              eventViewModel = EventViewModel())
+              userViewModel = UserViewModel(userRepository),
+              eventViewModel = EventViewModel("NEEGn5cbkJZDXaezeGdfd2D4u6b2", eventRepository))
         }
         composable(TOP_LEVEL_DESTINATIONS[2].route) {
           Trends(
               currentUser = currentUserId,
               nav = NavigationActions(rememberNavController()),
-              userViewModel = UserViewModel(),
-              eventViewModel = EventViewModel())
+              userViewModel = UserViewModel(userRepository),
+              eventViewModel = EventViewModel("NEEGn5cbkJZDXaezeGdfd2D4u6b2", eventRepository))
         }
         composable(TOP_LEVEL_DESTINATIONS[3].route) { Create(NavigationActions(nav)) }
         composable(TOP_LEVEL_DESTINATIONS[4].route) {
-          Profile(NavigationActions(nav), currentUserId, UserViewModel(), EventViewModel())
+          Profile(
+              NavigationActions(nav),
+              userId = currentUserId,
+              UserViewModel(userRepository),
+              EventViewModel(currentUserId, eventRepository))
         }
       }
 

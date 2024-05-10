@@ -9,6 +9,8 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.se.gomeet.model.repository.EventRepository
+import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
@@ -17,6 +19,8 @@ import com.google.firebase.ktx.Firebase
 import java.util.concurrent.TimeUnit
 import org.junit.AfterClass
 import org.junit.BeforeClass
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -31,7 +35,11 @@ class OthersProfileTest {
 
     rule.setContent {
       navController = rememberNavController()
-      OthersProfile(NavigationActions(navController), uid2, UserViewModel(), EventViewModel())
+      OthersProfile(
+          NavigationActions(navController),
+          "",
+          UserViewModel(UserRepository(Firebase.firestore)),
+          EventViewModel(null, EventRepository(Firebase.firestore)))
     }
 
     TimeUnit.SECONDS.sleep(3)

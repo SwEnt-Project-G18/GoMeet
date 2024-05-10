@@ -47,6 +47,7 @@ import androidx.compose.ui.window.Popup
 import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.TagsSelector
+import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
@@ -56,10 +57,15 @@ import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.auth
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel = UserViewModel()) {
+fun EditProfile(
+    nav: NavigationActions,
+    userViewModel: UserViewModel = UserViewModel(UserRepository(Firebase.firestore))
+) {
   val currentUser = remember { mutableStateOf<GoMeetUser?>(null) }
   val firstName = remember { mutableStateOf("") }
   val lastName = remember { mutableStateOf("") }

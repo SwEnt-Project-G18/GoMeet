@@ -4,10 +4,13 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.model.event.location.Location
+import com.github.se.gomeet.model.repository.EventRepository
+import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.time.LocalDate
 import java.util.concurrent.TimeUnit
@@ -29,8 +32,8 @@ class EventsTest {
       Events(
           currentUser = currentUserId,
           nav = NavigationActions(rememberNavController()),
-          userViewModel = UserViewModel(),
-          eventViewModel = EventViewModel())
+          userViewModel = UserViewModel(UserRepository(Firebase.firestore)),
+          eventViewModel = EventViewModel("test", EventRepository(Firebase.firestore)))
     }
 
     composeTestRule.onNode(hasText("My events")).assertIsDisplayed()
@@ -48,8 +51,9 @@ class EventsTest {
       Events(
           currentUser = currentUserId,
           nav = NavigationActions(rememberNavController()),
-          userViewModel = UserViewModel(),
-          eventViewModel = EventViewModel())
+          userViewModel = UserViewModel(UserRepository(Firebase.firestore)),
+          eventViewModel =
+              EventViewModel("NEEGn5cbkJZDXaezeGdfd2D4u6b2", EventRepository(Firebase.firestore)))
     }
 
     composeTestRule.onNodeWithText("JoinedEvents").performClick()
@@ -60,7 +64,7 @@ class EventsTest {
   @Test
   fun eventsScreen_AsyncBehavior() {
     // Test asynchronous behavior of fetching events
-    val eventViewModel = EventViewModel()
+    val eventViewModel = EventViewModel(null, EventRepository(Firebase.firestore))
     runBlocking(Dispatchers.IO) {
       // Add a mock event to the view model
       eventViewModel.createEvent(
@@ -77,7 +81,7 @@ class EventsTest {
           tags = emptyList(),
           images = emptyList(),
           imageUri = null,
-          userViewModel = UserViewModel(),
+          userViewModel = UserViewModel(UserRepository(Firebase.firestore)),
           uid = "")
       TimeUnit.SECONDS.sleep(3)
     }
@@ -86,8 +90,9 @@ class EventsTest {
       Events(
           currentUser = currentUserId,
           nav = NavigationActions(rememberNavController()),
-          userViewModel = UserViewModel(),
-          eventViewModel = EventViewModel())
+          userViewModel = UserViewModel(UserRepository(Firebase.firestore)),
+          eventViewModel =
+              EventViewModel("NEEGn5cbkJZDXaezeGdfd2D4u6b2", EventRepository(Firebase.firestore)))
     }
   }
 

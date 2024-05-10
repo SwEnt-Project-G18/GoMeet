@@ -11,6 +11,8 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.MainActivity
 import com.github.se.gomeet.model.event.location.Location
+import com.github.se.gomeet.model.repository.EventRepository
+import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.screens.EventInfoScreen
 import com.github.se.gomeet.screens.FollowersScreen
 import com.github.se.gomeet.screens.FollowingScreen
@@ -22,6 +24,7 @@ import com.github.se.gomeet.screens.WelcomeScreenScreen
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen
@@ -160,7 +163,7 @@ class EndToEndTest2 : TestCase() {
     private var uid2 = ""
     private const val username2 = "test_user2"
 
-    private val userVM = UserViewModel()
+    private val userVM = UserViewModel(UserRepository(Firebase.firestore))
     private lateinit var eventVM: EventViewModel
 
     @JvmStatic
@@ -229,7 +232,7 @@ class EndToEndTest2 : TestCase() {
       TimeUnit.SECONDS.sleep(3)
 
       // the second user is used to log in and perform the tests
-      eventVM = EventViewModel(uid2)
+      eventVM = EventViewModel(uid2, EventRepository(Firebase.firestore))
     }
 
     @AfterClass
