@@ -6,6 +6,7 @@ import com.github.se.gomeet.model.event.InviteStatus
 import com.github.se.gomeet.model.event.UserInvitedToEvents
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.MetadataChanges
 
 /**
  * This class represents the repository for the invites. A repository is a class that communicates
@@ -260,7 +261,7 @@ class InvitesRepository(private val db: FirebaseFirestore) {
    * @return the list of users invited to events
    */
   private fun startListeningForInvites() {
-    db.collection("events").addSnapshotListener { snapshot, e ->
+    db.collection("events").addSnapshotListener(MetadataChanges.INCLUDE) { snapshot, e ->
       if (e != null) {
         // Handle error
         Log.w("EventRepository", "Listen failed.", e)
@@ -283,6 +284,14 @@ class InvitesRepository(private val db: FirebaseFirestore) {
             localInvitedTo.removeIf { it == userInvitedToEvents }
           }
         }
+        val source =
+            if (snapshot.metadata.isFromCache) {
+              "local cache"
+            } else {
+              "server"
+            }
+
+        Log.d(TAG, "Data fetched from $source")
       }
     }
   }
