@@ -110,7 +110,7 @@ class UserViewModel : ViewModel() {
       userRepository.getAllUsers { t -> users.complete(t) }
       users.await()
     } catch (e: Exception) {
-      null
+      emptyList()
     }
   }
 

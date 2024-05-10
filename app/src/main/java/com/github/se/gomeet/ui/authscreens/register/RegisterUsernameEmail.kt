@@ -1,12 +1,14 @@
 package com.github.se.gomeet.ui.authscreens.register
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
@@ -15,9 +17,14 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonColors
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -35,8 +42,14 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.se.gomeet.model.user.GoMeetUser
+import com.github.se.gomeet.ui.theme.Black
 import com.github.se.gomeet.ui.theme.Cyan
 import com.github.se.gomeet.ui.theme.DarkCyan
+import com.github.se.gomeet.ui.theme.DarkGrey
+import com.github.se.gomeet.ui.theme.DarkerCyan
+import com.github.se.gomeet.ui.theme.Purple80
+import com.github.se.gomeet.ui.theme.PurpleGrey40
+import com.github.se.gomeet.ui.theme.TranslucentCyan
 import com.github.se.gomeet.viewmodel.UserViewModel
 import kotlinx.coroutines.launch
 
@@ -64,13 +77,18 @@ fun RegisterUsernameEmail(callback: (String, String) -> Unit,
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceAround) {
+
+        Spacer(modifier = Modifier.size(screenHeight/40))
+
         Text(
             text = "Welcome to GoMeet !\nPlease enter a username and an email.",
             modifier = Modifier.fillMaxWidth(),
             style = MaterialTheme.typography.bodyLarge
         )
 
-        OutlinedTextField(
+        Spacer(modifier = Modifier.size(screenHeight/40))
+
+        TextField(
             value = username,
             onValueChange = {
                 if (it.length < 26) {
@@ -78,6 +96,7 @@ fun RegisterUsernameEmail(callback: (String, String) -> Unit,
                     username = it
                 } else{
                     charactersExceeded = true
+                    username = it
                 }
             },
             colors = textFieldColors,
@@ -94,8 +113,9 @@ fun RegisterUsernameEmail(callback: (String, String) -> Unit,
         if (!firstClick && !isValidUsername){
             Text(text = "The Username is not valid or already taken", color = Color.Red)
         }
+        Spacer(modifier = Modifier.size(16.dp))
 
-        OutlinedTextField(
+        TextField(
             value = email,
             onValueChange = {
                     email = it
@@ -112,33 +132,37 @@ fun RegisterUsernameEmail(callback: (String, String) -> Unit,
             Text("The Email is not valid or already taken", color = Color.Red)
         }
 
-        Spacer(Modifier.height(screenHeight/10))
+        Spacer(modifier = Modifier.size(screenHeight/15))
+
 
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End){
-            CircularProgressIndicator(
+            LinearProgressIndicator(
+                modifier = Modifier.padding(top = 20.dp, end = 25.dp),
                 progress = { 0.2f },
-                color = DarkCyan,
+                color = DarkGrey,
                 trackColor = Color.LightGray,
+                strokeCap = ProgressIndicatorDefaults.CircularIndeterminateStrokeCap
             )
-
-            Spacer(modifier = Modifier.width (10.dp))
-
             IconButton(
+                modifier = Modifier.padding(bottom = 2.5.dp, end = 3.dp).size(screenHeight/19),
+                colors = IconButtonDefaults.outlinedIconButtonColors(),
                 onClick = {
                     firstClick = false
                     isValidUsername = !(allUsers!!.any { u -> u.username == username }) && username.isNotBlank()
-                    isValidEmail = !(allUsers!!.any { u -> u.email == username })
+                    isValidEmail = isValidEmail && !(allUsers!!.any { u -> u.email == username })
                     if (isValidUsername && isValidEmail) {
                         callback(username, email)
                     }
-                },
-                modifier = Modifier.size(50.dp)) {
+                }){
                 Icon(
                     Icons.AutoMirrored.Filled.ArrowForward,
                     contentDescription = "Next",
-                    tint = Cyan
+                    tint = DarkGrey,
+                    modifier = Modifier.size(60.dp)
                 )
             }
+
+
 
         }
     }
@@ -161,6 +185,6 @@ fun PreviewRegisterUsername() {
 }
 
 fun validateEmail(email: String): Boolean {
-    val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$".toRegex()
-    return email.matches(emailRegex)
+    return email.isNotEmpty() &&
+            android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
 }

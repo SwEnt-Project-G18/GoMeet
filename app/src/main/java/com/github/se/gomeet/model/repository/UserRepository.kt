@@ -27,13 +27,14 @@ class UserRepository(private val db: FirebaseFirestore) {
     db.collection(USERS_COLLECTION)
         .get()
         .addOnSuccessListener { querySnapshot ->
-          val userList = mutableListOf<GoMeetUser>()
-          for (document in querySnapshot.documents) {
-            val user = document.data?.fromMap(document.id)
-            if (user != null) {
-              userList.add(user)
+            val userList = mutableListOf<GoMeetUser>()
+            for (document in querySnapshot.documents) {
+                val user = document.data?.fromMap(document.id)
+                if (user != null) {
+                    userList.add(user)
+                }
             }
-          }
+            callback(userList)
         }
         .addOnFailureListener { exception ->
           Log.d(TAG, "Error getting documents: ", exception)
