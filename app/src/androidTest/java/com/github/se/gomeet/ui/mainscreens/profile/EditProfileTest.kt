@@ -38,7 +38,7 @@ class EditProfileTest {
   }
 
   companion object {
-    private val userViewModel = UserViewModel(UserRepository(Firebase.firestore))
+    private val userVM = UserViewModel(UserRepository(Firebase.firestore))
     private lateinit var currentUserId: String
 
     private val usr = "u@t.com"
@@ -47,16 +47,24 @@ class EditProfileTest {
     @BeforeClass
     @JvmStatic
     fun setUp() {
-      Firebase.auth.createUserWithEmailAndPassword(usr, pwd)
-      TimeUnit.SECONDS.sleep(2)
-      Firebase.auth.signInWithEmailAndPassword(usr, pwd)
-      TimeUnit.SECONDS.sleep(2)
+      TimeUnit.SECONDS.sleep(3)
+
+      // Create a new user and sign in
+      var result = Firebase.auth.createUserWithEmailAndPassword(usr, pwd)
+      while (!result.isComplete) {
+        TimeUnit.SECONDS.sleep(1)
+      }
+      result = Firebase.auth.signInWithEmailAndPassword(usr, pwd)
+      while (!result.isComplete) {
+        TimeUnit.SECONDS.sleep(1)
+      }
+
       // Set up the user view model
       // Order is important here, since createUserIfNew sets current user to created user (so we
       // need to create the current user last)
       currentUserId = Firebase.auth.currentUser!!.uid
-      userViewModel.createUserIfNew(currentUserId, "a", "b", "c", usr, "4567", "Angola")
-      TimeUnit.SECONDS.sleep(2)
+      userVM.createUserIfNew(currentUserId, "a", "b", "c", usr, "4567", "Angola")
+      TimeUnit.SECONDS.sleep(3)
     }
 
     @AfterClass
@@ -64,7 +72,7 @@ class EditProfileTest {
     fun tearDown() {
       // Clean up the user view model
       Firebase.auth.currentUser!!.delete()
-      userViewModel.deleteUser(currentUserId)
+      userVM.deleteUser(currentUserId)
     }
   }
 }

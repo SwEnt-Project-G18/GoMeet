@@ -406,10 +406,10 @@ fun OthersProfile(
                           horizontalArrangement = Arrangement.spacedBy(8.dp),
                           contentPadding = PaddingValues(start = 15.dp, end = 15.dp),
                           modifier = Modifier.heightIn(min = 56.dp)) {
-                            items(10) {
+                            items(user!!.tags.size) { index ->
                               Button(
                                   onClick = {},
-                                  content = { Text("Tag") },
+                                  content = { Text(user!!.tags[index]) },
                                   colors =
                                       ButtonDefaults.buttonColors(
                                           containerColor = NavBarUnselected,

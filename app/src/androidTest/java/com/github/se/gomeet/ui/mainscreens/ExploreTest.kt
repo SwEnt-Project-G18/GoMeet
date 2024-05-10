@@ -20,7 +20,6 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.util.concurrent.TimeUnit
-import kotlinx.coroutines.runBlocking
 import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.junit.Rule
@@ -53,8 +52,8 @@ class ExploreTest {
 
   companion object {
 
-    private lateinit var eventViewModel: EventViewModel
-    private lateinit var userViewModel: UserViewModel
+    private lateinit var eventVM: EventViewModel
+    private val userVM = UserViewModel(UserRepository(Firebase.firestore))
 
     private const val email = "user@exploretest.com"
     private const val pwd = "123456"
@@ -64,24 +63,23 @@ class ExploreTest {
     @BeforeClass
     fun setup() {
       TimeUnit.SECONDS.sleep(3)
+
       // create a new user
-      userViewModel = UserViewModel(UserRepository(Firebase.firestore))
       var result = Firebase.auth.createUserWithEmailAndPassword(email, pwd)
       while (!result.isComplete) {
         TimeUnit.SECONDS.sleep(1)
       }
       uid = result.result.user!!.uid
 
-      runBlocking {
-        userViewModel.createUserIfNew(
-            uid,
-            "explore_test_user",
-            "testfirstname",
-            "testlastname",
-            email,
-            "testphonenumber",
-            "testcountry")
-      }
+      userVM.createUserIfNew(
+          uid,
+          "explore_test_user",
+          "testfirstname",
+          "testlastname",
+          email,
+          "testphonenumber",
+          "testcountry")
+      TimeUnit.SECONDS.sleep(3)
 
       // sign in as the new user
       result = Firebase.auth.signInWithEmailAndPassword(email, pwd)
@@ -89,14 +87,14 @@ class ExploreTest {
         TimeUnit.SECONDS.sleep(1)
       }
 
-      eventViewModel = EventViewModel(uid, EventRepository(Firebase.firestore))
+      eventVM = EventViewModel(uid, EventRepository(Firebase.firestore))
     }
 
     @AfterClass
     @JvmStatic
     fun tearDown() {
       // clean up the user
-      userViewModel.deleteUser(uid)
+      userVM.deleteUser(uid)
       Firebase.auth.currentUser?.delete()
     }
   }

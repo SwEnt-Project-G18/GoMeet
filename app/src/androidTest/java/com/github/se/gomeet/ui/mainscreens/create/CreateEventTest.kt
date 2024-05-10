@@ -60,6 +60,8 @@ class CreateEventTest {
     // Enter a URL
     rule.onNodeWithText("Link").performTextInput("http://example.com")
 
+    rule.onNodeWithText("Add Tags").assertIsDisplayed()
+
     rule.onNodeWithText("Add Participants").assertIsDisplayed()
 
     rule.onNodeWithText("Add Image").assertIsDisplayed()
@@ -93,6 +95,8 @@ class CreateEventTest {
     rule.onNodeWithText("Price").performTextInput("25.00")
     // Enter a URL
     rule.onNodeWithText("Link").performTextInput("http://example.com")
+
+    rule.onNodeWithText("Add Tags").assertIsDisplayed()
 
     rule.onNodeWithText("Add Image").assertIsDisplayed()
 

@@ -9,11 +9,15 @@ import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.time.LocalDate
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import org.junit.AfterClass
+import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 
@@ -26,7 +30,7 @@ class EventsTest {
     // Test rendering correctness with events available
     composeTestRule.setContent {
       Events(
-          currentUser = "test",
+          currentUser = currentUserId,
           nav = NavigationActions(rememberNavController()),
           userViewModel = UserViewModel(UserRepository(Firebase.firestore)),
           eventViewModel = EventViewModel("test", EventRepository(Firebase.firestore)))
@@ -45,7 +49,7 @@ class EventsTest {
     // Test button click handling
     composeTestRule.setContent {
       Events(
-          currentUser = "NEEGn5cbkJZDXaezeGdfd2D4u6b2",
+          currentUser = currentUserId,
           nav = NavigationActions(rememberNavController()),
           userViewModel = UserViewModel(UserRepository(Firebase.firestore)),
           eventViewModel =
@@ -79,15 +83,55 @@ class EventsTest {
           imageUri = null,
           userViewModel = UserViewModel(UserRepository(Firebase.firestore)),
           uid = "")
+      TimeUnit.SECONDS.sleep(3)
     }
 
     composeTestRule.setContent {
       Events(
-          currentUser = "NEEGn5cbkJZDXaezeGdfd2D4u6b2",
+          currentUser = currentUserId,
           nav = NavigationActions(rememberNavController()),
           userViewModel = UserViewModel(UserRepository(Firebase.firestore)),
           eventViewModel =
               EventViewModel("NEEGn5cbkJZDXaezeGdfd2D4u6b2", EventRepository(Firebase.firestore)))
+    }
+  }
+
+  companion object {
+    private val userVM = UserViewModel(UserRepository(Firebase.firestore))
+    private lateinit var currentUserId: String
+
+    private val usr = "u@eventstest.com"
+    private val pwd = "123456"
+
+    @BeforeClass
+    @JvmStatic
+    fun setUp() {
+      TimeUnit.SECONDS.sleep(3)
+
+      // Create a new user and sign in
+      var result = Firebase.auth.createUserWithEmailAndPassword(usr, pwd)
+      while (!result.isComplete) {
+        TimeUnit.SECONDS.sleep(1)
+      }
+      result = Firebase.auth.signInWithEmailAndPassword(usr, pwd)
+      while (!result.isComplete) {
+        TimeUnit.SECONDS.sleep(1)
+      }
+
+      // Set up the user view model
+      // Order is important here, since createUserIfNew sets current user to created user (so we
+      // need to create the current user last)
+      currentUserId = Firebase.auth.currentUser!!.uid
+      userVM.createUserIfNew(currentUserId, "a", "b", "c", usr, "4567", "Angola")
+      TimeUnit.SECONDS.sleep(3)
+    }
+
+    @AfterClass
+    @JvmStatic
+    fun tearDown() {
+      // Clean up the user view model
+      Firebase.auth.currentUser!!.delete()
+      userVM.deleteUser(currentUserId)
     }
   }
 }

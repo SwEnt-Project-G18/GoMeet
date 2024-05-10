@@ -37,7 +37,7 @@ class EventInfoTest {
           rating = eventRating,
           description = eventDescription,
           loc = eventLocation,
-          userViewModel = userViewModel)
+          userViewModel = userVM)
     }
 
     assert(composeTestRule.onNodeWithTag("TopBar").isDisplayed(), { "TopBar not displayed" })
@@ -68,7 +68,7 @@ class EventInfoTest {
     private val eventTime = "00:00"
     private val eventDescription = "Event Description"
     private val eventLocation = LatLng(0.0, 0.0)
-    private val userViewModel = UserViewModel(UserRepository(Firebase.firestore))
+    private val userVM = UserViewModel(UserRepository(Firebase.firestore))
     private val eventRating = 4.5
     private lateinit var currentUserId: String
 
@@ -78,20 +78,28 @@ class EventInfoTest {
     @BeforeClass
     @JvmStatic
     fun setUp() {
-      Firebase.auth.createUserWithEmailAndPassword(usr, pwd)
-      TimeUnit.SECONDS.sleep(2)
-      Firebase.auth.signInWithEmailAndPassword(usr, pwd)
-      TimeUnit.SECONDS.sleep(2)
+      TimeUnit.SECONDS.sleep(3)
+
+      // Create a new user and sign in
+      var result = Firebase.auth.createUserWithEmailAndPassword(usr, pwd)
+      while (!result.isComplete) {
+        TimeUnit.SECONDS.sleep(1)
+      }
+      result = Firebase.auth.signInWithEmailAndPassword(usr, pwd)
+      while (!result.isComplete) {
+        TimeUnit.SECONDS.sleep(1)
+      }
+
       // Set up the user view model
       // Order is important here, since createUserIfNew sets current user to created user (so we
       // need to create the current user last)
       currentUserId = Firebase.auth.currentUser!!.uid
       runBlocking {
-        userViewModel.createUserIfNew(
+        userVM.createUserIfNew(
             organiserId, "testorganiser", "test", "name", "test@email.com", "0123", "Afghanistan")
       }
-      userViewModel.createUserIfNew(currentUserId, "a", "b", "c", usr, "4567", "Angola")
-      TimeUnit.SECONDS.sleep(2)
+      userVM.createUserIfNew(currentUserId, "a", "b", "c", usr, "4567", "Angola")
+      TimeUnit.SECONDS.sleep(3)
     }
 
     @AfterClass
@@ -100,8 +108,8 @@ class EventInfoTest {
       // Clean up the user view model
       Firebase.auth.currentUser!!.delete()
 
-      userViewModel.deleteUser(organiserId)
-      userViewModel.deleteUser(currentUserId)
+      userVM.deleteUser(organiserId)
+      userVM.deleteUser(currentUserId)
     }
   }
 }

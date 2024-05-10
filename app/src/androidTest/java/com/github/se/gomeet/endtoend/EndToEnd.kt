@@ -153,24 +153,23 @@ class EndToEndTest : TestCase() {
     private var uid = ""
     private const val username = "testuser"
 
-    private lateinit var userVM: UserViewModel
+    private val userVM = UserViewModel(UserRepository(Firebase.firestore))
     private lateinit var eventVM: EventViewModel
 
     @JvmStatic
     @BeforeClass
     fun setup() {
       TimeUnit.SECONDS.sleep(3)
+
       // create a new user
-      userVM = UserViewModel(UserRepository(Firebase.firestore))
       var result = Firebase.auth.createUserWithEmailAndPassword(email, pwd)
       while (!result.isComplete) {
         TimeUnit.SECONDS.sleep(1)
       }
       uid = result.result.user!!.uid
-      runBlocking {
-        userVM.createUserIfNew(
-            uid, username, "testfirstname", "testlastname", email, "testphonenumber", "testcountry")
-      }
+      userVM.createUserIfNew(
+          uid, username, "testfirstname", "testlastname", email, "testphonenumber", "testcountry")
+      TimeUnit.SECONDS.sleep(3)
       result = Firebase.auth.signInWithEmailAndPassword(email, pwd)
       while (!result.isComplete) {
         TimeUnit.SECONDS.sleep(1)

@@ -25,7 +25,7 @@ class UserViewModelTest {
   fun test() = runTest {
     // Create user and wait for it to be created
     userViewModel.createUserIfNew(uid, username, firstname, lastname, email, phonenumber, country)
-    TimeUnit.SECONDS.sleep(2)
+    TimeUnit.SECONDS.sleep(3)
 
     // test getUser and createUser
     var user = userViewModel.getUser(uid)
@@ -47,6 +47,7 @@ class UserViewModelTest {
             user.email,
             user.phoneNumber,
             user.country,
+            emptyList(),
             emptyList(),
             emptyList(),
             emptyList(),
