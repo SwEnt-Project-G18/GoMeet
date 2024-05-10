@@ -7,11 +7,16 @@ import com.github.se.gomeet.model.event.location.Location
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import java.time.LocalDate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import org.junit.AfterClass
+import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
+import java.util.concurrent.TimeUnit
 
 class EventsTest {
 
@@ -22,7 +27,7 @@ class EventsTest {
     // Test rendering correctness with events available
     composeTestRule.setContent {
       Events(
-          currentUser = "test",
+          currentUser = currentUserId,
           nav = NavigationActions(rememberNavController()),
           userViewModel = UserViewModel(),
           eventViewModel = EventViewModel())
@@ -41,7 +46,7 @@ class EventsTest {
     // Test button click handling
     composeTestRule.setContent {
       Events(
-          currentUser = "NEEGn5cbkJZDXaezeGdfd2D4u6b2",
+          currentUser = currentUserId,
           nav = NavigationActions(rememberNavController()),
           userViewModel = UserViewModel(),
           eventViewModel = EventViewModel())
@@ -78,10 +83,41 @@ class EventsTest {
 
     composeTestRule.setContent {
       Events(
-          currentUser = "NEEGn5cbkJZDXaezeGdfd2D4u6b2",
+          currentUser = currentUserId,
           nav = NavigationActions(rememberNavController()),
           userViewModel = UserViewModel(),
           eventViewModel = EventViewModel())
     }
   }
+
+    companion object {
+        private val userViewModel = UserViewModel()
+        private lateinit var currentUserId: String
+
+        private val usr = "u@eventstest.com"
+        private val pwd = "123456"
+
+        @BeforeClass
+        @JvmStatic
+        fun setUp() {
+            Firebase.auth.createUserWithEmailAndPassword(usr, pwd)
+            TimeUnit.SECONDS.sleep(2)
+            Firebase.auth.signInWithEmailAndPassword(usr, pwd)
+            TimeUnit.SECONDS.sleep(2)
+            // Set up the user view model
+            // Order is important here, since createUserIfNew sets current user to created user (so we
+            // need to create the current user last)
+            currentUserId = Firebase.auth.currentUser!!.uid
+            userViewModel.createUserIfNew(currentUserId, "a", "b", "c", usr, "4567", "Angola")
+            TimeUnit.SECONDS.sleep(2)
+        }
+
+        @AfterClass
+        @JvmStatic
+        fun tearDown() {
+            // Clean up the user view model
+            Firebase.auth.currentUser!!.delete()
+            userViewModel.deleteUser(currentUserId)
+        }
+    }
 }

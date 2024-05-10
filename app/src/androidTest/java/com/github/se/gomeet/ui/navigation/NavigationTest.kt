@@ -13,10 +13,15 @@ import com.github.se.gomeet.ui.mainscreens.events.Events
 import com.github.se.gomeet.ui.mainscreens.profile.Profile
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.runBlocking
+import org.junit.AfterClass
+import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
 class NavigationTest {
@@ -34,21 +39,21 @@ class NavigationTest {
         }
         composable(TOP_LEVEL_DESTINATIONS[1].route) {
           Events(
-              currentUser = "NEEGn5cbkJZDXaezeGdfd2D4u6b2",
+              currentUser = currentUserId,
               nav = NavigationActions(rememberNavController()),
               userViewModel = UserViewModel(),
               eventViewModel = EventViewModel())
         }
         composable(TOP_LEVEL_DESTINATIONS[2].route) {
           Trends(
-              currentUser = "NEEGn5cbkJZDXaezeGdfd2D4u6b2",
+              currentUser = currentUserId,
               nav = NavigationActions(rememberNavController()),
               userViewModel = UserViewModel(),
               eventViewModel = EventViewModel())
         }
         composable(TOP_LEVEL_DESTINATIONS[3].route) { Create(NavigationActions(nav)) }
         composable(TOP_LEVEL_DESTINATIONS[4].route) {
-          Profile(NavigationActions(nav), userId = "1234", UserViewModel(), EventViewModel())
+          Profile(NavigationActions(nav), userId = currentUserId, UserViewModel(), EventViewModel())
         }
         // Add more destinations as needed
       }
@@ -73,21 +78,21 @@ class NavigationTest {
         }
         composable(TOP_LEVEL_DESTINATIONS[1].route) {
           Events(
-              currentUser = "NEEGn5cbkJZDXaezeGdfd2D4u6b2",
+              currentUser = currentUserId,
               nav = NavigationActions(rememberNavController()),
               userViewModel = UserViewModel(),
               eventViewModel = EventViewModel())
         }
         composable(TOP_LEVEL_DESTINATIONS[2].route) {
           Trends(
-              currentUser = "NEEGn5cbkJZDXaezeGdfd2D4u6b2",
+              currentUser = currentUserId,
               nav = NavigationActions(rememberNavController()),
               userViewModel = UserViewModel(),
               eventViewModel = EventViewModel())
         }
         composable(TOP_LEVEL_DESTINATIONS[3].route) { Create(NavigationActions(nav)) }
         composable(TOP_LEVEL_DESTINATIONS[4].route) {
-          Profile(NavigationActions(nav), userId = "TestUser", UserViewModel(), EventViewModel())
+          Profile(NavigationActions(nav), userId = currentUserId, UserViewModel(), EventViewModel())
         }
       }
 
@@ -102,4 +107,35 @@ class NavigationTest {
       }
     }
   }
+
+    companion object {
+        private val userViewModel = UserViewModel()
+        private lateinit var currentUserId: String
+
+        private val usr = "u@navtest.com"
+        private val pwd = "123456"
+
+        @BeforeClass
+        @JvmStatic
+        fun setUp() {
+            Firebase.auth.createUserWithEmailAndPassword(usr, pwd)
+            TimeUnit.SECONDS.sleep(2)
+            Firebase.auth.signInWithEmailAndPassword(usr, pwd)
+            TimeUnit.SECONDS.sleep(2)
+            // Set up the user view model
+            // Order is important here, since createUserIfNew sets current user to created user (so we
+            // need to create the current user last)
+            currentUserId = Firebase.auth.currentUser!!.uid
+            userViewModel.createUserIfNew(currentUserId, "a", "b", "c", usr, "4567", "Angola")
+            TimeUnit.SECONDS.sleep(2)
+        }
+
+        @AfterClass
+        @JvmStatic
+        fun tearDown() {
+            // Clean up the user view model
+            Firebase.auth.currentUser!!.delete()
+            userViewModel.deleteUser(currentUserId)
+        }
+    }
 }
