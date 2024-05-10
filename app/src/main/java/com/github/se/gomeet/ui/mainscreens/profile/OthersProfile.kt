@@ -470,5 +470,8 @@ fun MoreActionsButton() {
 @Composable
 fun OthersProfilePreview() {
   OthersProfile(
-      nav = NavigationActions(rememberNavController()), "", UserViewModel(UserRepository(Firebase.firestore)), EventViewModel(null, EventRepository(Firebase.firestore)))
+      nav = NavigationActions(rememberNavController()),
+      "",
+      UserViewModel(UserRepository(Firebase.firestore)),
+      EventViewModel(null, EventRepository(Firebase.firestore)))
 }

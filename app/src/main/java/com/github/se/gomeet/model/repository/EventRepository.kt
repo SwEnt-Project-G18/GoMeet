@@ -6,11 +6,6 @@ import com.github.se.gomeet.model.event.location.Location
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.MetadataChanges
-import com.google.firebase.firestore.firestoreSettings
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.firestore.memoryCacheSettings
-import com.google.firebase.firestore.persistentCacheSettings
-import com.google.firebase.ktx.Firebase
 import java.time.LocalDate
 
 /**

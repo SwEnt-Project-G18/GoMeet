@@ -32,8 +32,8 @@ class NavigationTest {
 
     composeTestRule.setContent {
       val nav = rememberNavController()
-        val userRepository = UserRepository(Firebase.firestore)
-        val eventRepository = EventRepository(Firebase.firestore)
+      val userRepository = UserRepository(Firebase.firestore)
+      val eventRepository = EventRepository(Firebase.firestore)
       NavHost(navController = nav, startDestination = Route.EVENTS) {
         composable(TOP_LEVEL_DESTINATIONS[0].route) {
           Explore(nav = NavigationActions(nav), EventViewModel(null, eventRepository))
@@ -54,7 +54,11 @@ class NavigationTest {
         }
         composable(TOP_LEVEL_DESTINATIONS[3].route) { Create(NavigationActions(nav)) }
         composable(TOP_LEVEL_DESTINATIONS[4].route) {
-          Profile(NavigationActions(nav), userId = "1234", UserViewModel(userRepository), EventViewModel("1234", eventRepository))
+          Profile(
+              NavigationActions(nav),
+              userId = "1234",
+              UserViewModel(userRepository),
+              EventViewModel("1234", eventRepository))
         }
         // Add more destinations as needed
       }
@@ -73,8 +77,8 @@ class NavigationTest {
 
     composeTestRule.setContent {
       val nav = rememberNavController()
-        val userRepository = UserRepository(Firebase.firestore)
-        val eventRepository = EventRepository(Firebase.firestore)
+      val userRepository = UserRepository(Firebase.firestore)
+      val eventRepository = EventRepository(Firebase.firestore)
       NavHost(navController = nav, startDestination = TOP_LEVEL_DESTINATIONS[0].route) {
         composable(TOP_LEVEL_DESTINATIONS[0].route) {
           Explore(nav = NavigationActions(nav), EventViewModel(null, eventRepository))
@@ -95,7 +99,11 @@ class NavigationTest {
         }
         composable(TOP_LEVEL_DESTINATIONS[3].route) { Create(NavigationActions(nav)) }
         composable(TOP_LEVEL_DESTINATIONS[4].route) {
-          Profile(NavigationActions(nav), userId = "TestUser", UserViewModel(userRepository), EventViewModel("TestUser", eventRepository))
+          Profile(
+              NavigationActions(nav),
+              userId = "TestUser",
+              UserViewModel(userRepository),
+              EventViewModel("TestUser", eventRepository))
         }
       }
 

@@ -39,7 +39,9 @@ class ExploreTest {
 
     rule.setContent {
       navController = rememberNavController()
-      Explore(nav = NavigationActions(navController), eventViewModel = EventViewModel(null, EventRepository(Firebase.firestore)))
+      Explore(
+          nav = NavigationActions(navController),
+          eventViewModel = EventViewModel(null, EventRepository(Firebase.firestore)))
     }
 
     rule.waitUntil(timeoutMillis = 10000) { rule.onNodeWithTag("Map").isDisplayed() }

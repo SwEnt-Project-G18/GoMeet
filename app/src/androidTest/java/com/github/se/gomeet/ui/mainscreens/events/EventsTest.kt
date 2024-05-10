@@ -48,7 +48,8 @@ class EventsTest {
           currentUser = "NEEGn5cbkJZDXaezeGdfd2D4u6b2",
           nav = NavigationActions(rememberNavController()),
           userViewModel = UserViewModel(UserRepository(Firebase.firestore)),
-          eventViewModel = EventViewModel("NEEGn5cbkJZDXaezeGdfd2D4u6b2", EventRepository(Firebase.firestore)))
+          eventViewModel =
+              EventViewModel("NEEGn5cbkJZDXaezeGdfd2D4u6b2", EventRepository(Firebase.firestore)))
     }
 
     composeTestRule.onNodeWithText("JoinedEvents").performClick()
@@ -85,7 +86,8 @@ class EventsTest {
           currentUser = "NEEGn5cbkJZDXaezeGdfd2D4u6b2",
           nav = NavigationActions(rememberNavController()),
           userViewModel = UserViewModel(UserRepository(Firebase.firestore)),
-          eventViewModel = EventViewModel("NEEGn5cbkJZDXaezeGdfd2D4u6b2", EventRepository(Firebase.firestore)))
+          eventViewModel =
+              EventViewModel("NEEGn5cbkJZDXaezeGdfd2D4u6b2", EventRepository(Firebase.firestore)))
     }
   }
 }

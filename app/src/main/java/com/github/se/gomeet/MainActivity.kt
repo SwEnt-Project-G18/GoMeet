@@ -75,33 +75,35 @@ import io.getstream.chat.android.state.plugin.factory.StreamStatePluginFactory
 /** The main activity of the application. */
 class MainActivity : ComponentActivity() {
 
-    private lateinit var db: FirebaseFirestore
+  private lateinit var db: FirebaseFirestore
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
     MapsInitializer.initialize(this)
 
-      val cacheSize = 1024L * 1024L * 100L
+    val cacheSize = 1024L * 1024L * 100L
 
-      // Initialize Firestore settings
-      val firestoreSettings = FirebaseFirestoreSettings.Builder()
-          .setLocalCacheSettings(memoryCacheSettings {})
-          .setLocalCacheSettings(
-              persistentCacheSettings {
+    // Initialize Firestore settings
+    val firestoreSettings =
+        FirebaseFirestoreSettings.Builder()
+            .setLocalCacheSettings(memoryCacheSettings {})
+            .setLocalCacheSettings(
+                persistentCacheSettings {
                   // Set size to 100 MB
                   setSizeBytes(cacheSize)
-              })
-          .build()
+                })
+            .build()
 
-      // Get Firestore instance and apply settings
-      db = Firebase.firestore
-      db.firestoreSettings = firestoreSettings
+    // Get Firestore instance and apply settings
+    db = Firebase.firestore
+    db.firestoreSettings = firestoreSettings
 
-      // Enable indexing for persistent cache
-      db.persistentCacheIndexManager?.apply {
-          // Indexing is disabled by default
-          enableIndexAutoCreation()
-      } ?: println("indexManager is null")
+    // Enable indexing for persistent cache
+    db.persistentCacheIndexManager?.apply {
+      // Indexing is disabled by default
+      enableIndexAutoCreation()
+    } ?: println("indexManager is null")
 
     // 1 - Set up the OfflinePlugin for offline storage
     val offlinePluginFactory = StreamOfflinePluginFactory(appContext = applicationContext)
@@ -124,9 +126,9 @@ class MainActivity : ComponentActivity() {
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
           val userIdState = remember { mutableStateOf("") }
           val nav = rememberNavController()
-            val eventRepository = EventRepository(db)
-            val userRepository = UserRepository(db)
-            val invitesRepository = InvitesRepository(db)
+          val eventRepository = EventRepository(db)
+          val userRepository = UserRepository(db)
+          val invitesRepository = InvitesRepository(db)
           val authViewModel = AuthViewModel()
           val eventViewModel = EventViewModel(null, eventRepository)
           val userViewModel = UserViewModel(userRepository)
@@ -211,10 +213,14 @@ class MainActivity : ComponentActivity() {
                       eventViewModel)
                 }
             composable(Route.PRIVATE_CREATE) {
-              CreateEvent(navAction, EventViewModel(Firebase.auth.currentUser!!.uid, eventRepository), true)
+              CreateEvent(
+                  navAction, EventViewModel(Firebase.auth.currentUser!!.uid, eventRepository), true)
             }
             composable(Route.PUBLIC_CREATE) {
-              CreateEvent(navAction, EventViewModel(Firebase.auth.currentUser!!.uid, eventRepository), false)
+              CreateEvent(
+                  navAction,
+                  EventViewModel(Firebase.auth.currentUser!!.uid, eventRepository),
+                  false)
             }
 
             composable(

@@ -156,5 +156,8 @@ fun Followers(nav: NavigationActions, uid: String, userViewModel: UserViewModel)
 @Preview
 @Composable
 fun FollowersPreview() {
-  Followers(NavigationActions(rememberNavController()), "", UserViewModel(UserRepository(Firebase.firestore)))
+  Followers(
+      NavigationActions(rememberNavController()),
+      "",
+      UserViewModel(UserRepository(Firebase.firestore)))
 }

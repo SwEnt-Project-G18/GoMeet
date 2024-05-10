@@ -17,7 +17,6 @@ import com.github.se.gomeet.model.repository.EventRepository
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
@@ -45,7 +44,8 @@ import org.json.JSONArray
  *
  * @param creatorId the id of the creator of the event
  */
-class EventViewModel(private val creatorId: String? = null, eventRepository: EventRepository) : ViewModel() {
+class EventViewModel(private val creatorId: String? = null, eventRepository: EventRepository) :
+    ViewModel() {
   private val repository = eventRepository
   private val _bitmapDescriptors = mutableStateMapOf<String, BitmapDescriptor>()
   val bitmapDescriptors: MutableMap<String, BitmapDescriptor> = _bitmapDescriptors

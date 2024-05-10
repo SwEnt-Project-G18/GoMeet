@@ -90,7 +90,7 @@ private const val NUMBER_OF_SUGGESTIONS = 3
 fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivate: Boolean) {
 
   val eventRepository = EventRepository(Firebase.firestore)
-    val userRepository = UserRepository(Firebase.firestore)
+  val userRepository = UserRepository(Firebase.firestore)
   val uid = eventRepository.getNewId()
   val titleState = remember { mutableStateOf("") }
   val descriptionState = remember { mutableStateOf("") }

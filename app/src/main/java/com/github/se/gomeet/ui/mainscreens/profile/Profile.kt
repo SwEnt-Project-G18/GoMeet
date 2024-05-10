@@ -422,6 +422,8 @@ fun Profile(
 @Composable
 fun ProfilePreview() {
   Profile(
-      nav = NavigationActions(rememberNavController()), "John", UserViewModel(UserRepository(
-          Firebase.firestore)), EventViewModel("John", EventRepository(Firebase.firestore)))
+      nav = NavigationActions(rememberNavController()),
+      "John",
+      UserViewModel(UserRepository(Firebase.firestore)),
+      EventViewModel("John", EventRepository(Firebase.firestore)))
 }

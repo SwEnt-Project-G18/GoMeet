@@ -123,7 +123,13 @@ fun MyEventInfo(
                 Spacer(modifier = Modifier.height(20.dp))
 
                 var imageUrl by remember { mutableStateOf<String?>(null) }
-                LaunchedEffect(eventId) { imageUrl = EventViewModel(userViewModel.getCurrentUser()!!.uid,eventRepository = EventRepository(Firebase.firestore)).getEventImageUrl(eventId) }
+                LaunchedEffect(eventId) {
+                  imageUrl =
+                      EventViewModel(
+                              organizer.value!!.uid,
+                              eventRepository = EventRepository(Firebase.firestore))
+                          .getEventImageUrl(eventId)
+                }
                 EventImage(imageUrl = imageUrl)
                 Spacer(modifier = Modifier.height(20.dp))
                 EventDescription(text = description)

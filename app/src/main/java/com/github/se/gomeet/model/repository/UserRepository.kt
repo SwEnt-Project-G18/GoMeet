@@ -3,11 +3,6 @@ package com.github.se.gomeet.model.repository
 import android.util.Log
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.firestoreSettings
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.firestore.memoryCacheSettings
-import com.google.firebase.firestore.persistentCacheSettings
-import com.google.firebase.ktx.Firebase
 
 /**
  * Class that connects to the Firebase Firestore database to get, add, update and remove users.

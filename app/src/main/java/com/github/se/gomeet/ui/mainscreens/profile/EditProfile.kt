@@ -52,8 +52,10 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
 @Composable
-fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel = UserViewModel(UserRepository(
-    Firebase.firestore))) {
+fun EditProfile(
+    nav: NavigationActions,
+    userViewModel: UserViewModel = UserViewModel(UserRepository(Firebase.firestore))
+) {
   val currentUser = remember { mutableStateOf<GoMeetUser?>(null) }
   val firstName = remember { mutableStateOf("") }
   val lastName = remember { mutableStateOf("") }

@@ -495,7 +495,9 @@ fun EventWidget(
                         horizontalArrangement = Arrangement.Center) {
                           var username by remember { mutableStateOf<String?>("Loading...") }
                           LaunchedEffect(userName) {
-                            username = UserViewModel(UserRepository(Firebase.firestore)).getUsername(userName)
+                            username =
+                                UserViewModel(UserRepository(Firebase.firestore))
+                                    .getUsername(userName)
                           }
 
                           username?.let {
@@ -624,7 +626,11 @@ fun GoMeetSearchBar(
 @Composable
 @Preview
 fun EventPreview() {
-  Events("", nav = NavigationActions(rememberNavController()), UserViewModel(UserRepository(Firebase.firestore)), EventViewModel("", EventRepository(Firebase.firestore)))
+  Events(
+      "",
+      nav = NavigationActions(rememberNavController()),
+      UserViewModel(UserRepository(Firebase.firestore)),
+      EventViewModel("", EventRepository(Firebase.firestore)))
   /*EventWidget(
   "EPFL Chess Club",
   "Chess Tournament",

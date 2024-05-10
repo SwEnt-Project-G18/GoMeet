@@ -30,7 +30,11 @@ class OthersProfileTest {
 
     rule.setContent {
       navController = rememberNavController()
-      OthersProfile(NavigationActions(navController), "", UserViewModel(UserRepository(Firebase.firestore)), EventViewModel(null, EventRepository(Firebase.firestore)))
+      OthersProfile(
+          NavigationActions(navController),
+          "",
+          UserViewModel(UserRepository(Firebase.firestore)),
+          EventViewModel(null, EventRepository(Firebase.firestore)))
     }
 
     rule.onNodeWithTag("TopBar").assertIsDisplayed()
