@@ -4,7 +4,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.location.Location
 import java.time.LocalDate
-import kotlinx.coroutines.runBlocking
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -20,24 +20,23 @@ class EventViewModelTest {
     val eventViewModel = EventViewModel(uid)
 
     // test getAllEvents and createEvent
-    runBlocking {
-      eventViewModel.createEvent(
-          title,
-          "description",
-          Location(0.0, 0.0, "name"),
-          LocalDate.of(2024, 4, 29),
-          0.0,
-          "url",
-          emptyList(),
-          emptyList(),
-          0,
-          false,
-          emptyList(),
-          emptyList(),
-          null,
-          UserViewModel(),
-          uid)
-    }
+    eventViewModel.createEvent(
+        title,
+        "description",
+        Location(0.0, 0.0, "name"),
+        LocalDate.of(2024, 4, 29),
+        0.0,
+        "url",
+        emptyList(),
+        emptyList(),
+        0,
+        false,
+        emptyList(),
+        emptyList(),
+        null,
+        UserViewModel(),
+        uid)
+    TimeUnit.SECONDS.sleep(3)
 
     var events: List<Event> = eventViewModel.getAllEvents()!!.filter { it.title == title }
     while (events.isEmpty()) {
@@ -48,10 +47,9 @@ class EventViewModelTest {
 
     // test getEvent
     val uid = events[0].uid
-    lateinit var event: Event
-    event = eventViewModel.getEvent(uid)!!
+    var event = eventViewModel.getEvent(uid)!!
+    TimeUnit.SECONDS.sleep(3)
 
-    assert(event != null)
     assert(event.uid == uid)
     assert(event.title == title)
 
@@ -77,14 +75,17 @@ class EventViewModelTest {
             event.images)
 
     eventViewModel.editEvent(newEvent)
-    event = eventViewModel.getEvent(uid)!!
+    TimeUnit.SECONDS.sleep(3)
 
-    assert(event != null)
+    event = eventViewModel.getEvent(uid)!!
+    TimeUnit.SECONDS.sleep(3)
+
     assert(event.uid == uid)
     assert(event.title == newTitle)
 
     // test removeEvent
     eventViewModel.removeEvent(uid)
+    TimeUnit.SECONDS.sleep(3)
     assert(eventViewModel.getEvent(uid) == null)
   }
 }
