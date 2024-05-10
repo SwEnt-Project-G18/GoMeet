@@ -28,12 +28,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.github.se.gomeet.R
 import com.github.se.gomeet.ui.navigation.NavigationActions
-import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.viewmodel.AuthViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
@@ -61,11 +61,11 @@ fun RegisterScreen(
   val signInState = authViewModel.signInState.collectAsState()
   val textFieldColors =
       TextFieldDefaults.colors(
-          focusedTextColor = DarkCyan,
-          unfocusedTextColor = DarkCyan,
+          focusedTextColor = Color.Black,
+          unfocusedTextColor = Color.Black,
           unfocusedContainerColor = Color.Transparent,
           focusedContainerColor = Color.Transparent,
-          cursorColor = DarkCyan,
+          cursorColor = Color.Black,
           focusedLabelColor = MaterialTheme.colorScheme.tertiary,
           focusedIndicatorColor = MaterialTheme.colorScheme.tertiary)
 
@@ -133,24 +133,22 @@ fun RegisterScreen(
                 textFieldColors = textFieldColors
             )
 
-            3 -> RegisterNamePfpCountry(
-                callback = { firstname, lastname, country ->
+            3 -> RegisterNameCountryPhone(
+                callback = { firstname, lastname, country, phone ->
                     nextState()
                     authViewModel.onFirstNameRegisterChange(firstname)
                     authViewModel.onLastNameChange(lastname)
                     authViewModel.onCountryChange(country)
-                },
-                textFieldColors = textFieldColors
-            )
-
-            4 -> RegisterEmailPhoneNumber(
-                callback = { email, phone ->
-                    nextState()
-                    authViewModel.onEmailRegisterChange(email)
                     authViewModel.onPhoneNumberRegisterChange(phone)
                 },
                 textFieldColors = textFieldColors
             )
+
+            4 -> RegisterTags(callback = {})
+
+            5 -> RegisterTags(callback = {})
+
+            6 ->  authViewModel.signUpWithEmailPassword(LocalContext.current)
         }
 
           }
