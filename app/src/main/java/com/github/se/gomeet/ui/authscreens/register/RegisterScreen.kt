@@ -42,12 +42,18 @@ import io.getstream.chat.android.client.ChatClient
 import io.getstream.chat.android.models.User
 
 /**
- * Composable function for the Login Screen.
+ * This composable function represents the Register Screen, where users can sign up for a new
+ * account. It navigates through multiple registration steps, each handling different parts of the
+ * registration process, including entering username, email, password, personal details, and
+ * uploading a profile picture.
  *
- * @param client The ChatClient instance.
- * @param authViewModel The ViewModel for the authentication.
- * @param userViewModel The ViewModel for the user.
- * @param onNavToExplore The navigation function to navigate to the Explore Screen.
+ * @param client ChatClient instance used for handling user connection.
+ * @param nav Navigation actions for handling back navigation and successful registration
+ *   completion.
+ * @param authViewModel ViewModel to manage and observe authentication related data.
+ * @param userViewModel ViewModel to manage user related data and operations.
+ * @param onNavToExplore Function to execute once registration completes successfully and user
+ *   navigates to Explore Screen.
  */
 @Composable
 fun RegisterScreen(
@@ -78,29 +84,26 @@ fun RegisterScreen(
         elevation = 0.dp,
         title = {},
         navigationIcon = {
-          IconButton(onClick = {
-              if (state == 0) {
+          IconButton(
+              onClick = {
+                if (state == 0) {
                   nav.goBack()
-              }else {
+                } else {
                   state -= 1
+                }
+              }) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back",
+                    tint = MaterialTheme.colorScheme.onBackground)
               }
-          }) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Back",
-                tint = MaterialTheme.colorScheme.onBackground)
-          }
         })
 
     Column(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(25.dp)
-            .verticalScroll(ScrollState(0))) {
-
-        Spacer(modifier = Modifier.height(screenHeight/10))
+        modifier = Modifier.fillMaxSize().padding(25.dp).verticalScroll(ScrollState(0))) {
+          Spacer(modifier = Modifier.height(screenHeight / 10))
           Image(
               painter = painterResource(id = R.drawable.gomeet_text),
               contentDescription = "Go Meet",
@@ -108,49 +111,51 @@ fun RegisterScreen(
               alignment = Alignment.Center,
               colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.tertiary))
 
-        Spacer(modifier = Modifier.height(screenHeight/10))
+          Spacer(modifier = Modifier.height(screenHeight / 10))
 
-        fun nextState() {
+          fun nextState() {
             state += 1 // Simplified state increment
-        }
+          }
 
-        when (state) {
-            3 -> RegisterUsernameEmail(
-                callback = { username, email ->
-                    nextState()
-                    authViewModel.onUsernameRegisterChange(username)
-                    authViewModel.onEmailRegisterChange(email)
-                },
-                userViewModel = UserViewModel(),
-                textFieldColors = textFieldColors
-            )
-
-            2 -> RegisterPassword(
-                callback = { password ->
-                    nextState()
-                    authViewModel.onPasswordRegisterChange(password)
-                },
-                textFieldColors = textFieldColors
-            )
-
-            1 -> RegisterNameCountryPhone(
-                callback = { firstname, lastname, country, phone ->
-                    nextState()
-                    authViewModel.onFirstNameRegisterChange(firstname)
-                    authViewModel.onLastNameChange(lastname)
-                    authViewModel.onCountryChange(country)
-                    authViewModel.onPhoneNumberRegisterChange(phone)
-                },
-                textFieldColors = textFieldColors
-            )
-
-            4 -> RegisterTags(callback = {})
-
-            5 -> RegisterTags(callback = {})
-
-            6 ->  authViewModel.signUpWithEmailPassword(LocalContext.current)
-        }
-
+          when (state) {
+            1 ->
+                RegisterUsernameEmail(
+                    callback = { username, email ->
+                      authViewModel.onUsernameRegisterChange(username)
+                      authViewModel.onEmailRegisterChange(email)
+                      nextState()
+                    },
+                    userViewModel = UserViewModel(),
+                    textFieldColors = textFieldColors)
+            2 ->
+                RegisterPassword(
+                    callback = { password ->
+                      authViewModel.onPasswordRegisterChange(password)
+                      nextState()
+                    },
+                    textFieldColors = textFieldColors)
+            3 ->
+                RegisterNameCountryPhone(
+                    callback = { firstname, lastname, country, phone ->
+                      authViewModel.onFirstNameRegisterChange(firstname)
+                      authViewModel.onLastNameRegisterChange(lastname)
+                      authViewModel.onCountryRegisterChange(country)
+                      authViewModel.onPhoneNumberRegisterChange(phone)
+                      nextState()
+                    },
+                    textFieldColors = textFieldColors)
+            4 ->
+                RegisterPfp(
+                    callback = { pfp ->
+                      authViewModel.onPfpRegisterChange(pfp)
+                      nextState()
+                    },
+                    signInState.value.firstNameRegister)
+            5 -> {
+              authViewModel.signUpWithEmailPassword(LocalContext.current)
+              nextState()
+            }
+            6 -> {}
           }
           if (signInState.value.isLoading) {
             CircularProgressIndicator()
@@ -160,12 +165,13 @@ fun RegisterScreen(
             val currentUser = Firebase.auth.currentUser
             if (currentUser != null) {
               val uid = currentUser.uid
-              val email = currentUser.email ?: ""
+              val email = signInState.value.emailRegister
               val firstName = signInState.value.firstNameRegister
               val lastName = signInState.value.lastNameRegister
               val phoneNumber = signInState.value.phoneNumberRegister
               val country = signInState.value.countryRegister
               val username = signInState.value.usernameRegister
+              val pfp = signInState.value.pfp
 
               userViewModel.createUserIfNew(
                   uid, username, firstName, lastName, email, phoneNumber, country)
@@ -185,3 +191,4 @@ fun RegisterScreen(
           }
         }
   }
+}

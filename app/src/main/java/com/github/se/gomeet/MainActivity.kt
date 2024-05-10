@@ -20,8 +20,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.github.se.gomeet.ui.authscreens.LoginScreen
-import com.github.se.gomeet.ui.authscreens.register.RegisterScreen
 import com.github.se.gomeet.ui.authscreens.WelcomeScreen
+import com.github.se.gomeet.ui.authscreens.register.RegisterScreen
 import com.github.se.gomeet.ui.mainscreens.Explore
 import com.github.se.gomeet.ui.mainscreens.Trends
 import com.github.se.gomeet.ui.mainscreens.create.AddParticipants

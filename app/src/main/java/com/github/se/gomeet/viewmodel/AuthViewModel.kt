@@ -72,6 +72,15 @@ class AuthViewModel : ViewModel() {
   }
 
   /**
+   * Update the pfp field in the signInState.
+   *
+   * @param pfpRegister the password to update the field with
+   */
+  fun onPfpRegisterChange(pfpRegister: String) {
+    _signInState.value = _signInState.value.copy(pfp = pfpRegister)
+  }
+
+  /**
    * Update the firstNameRegister field in the signInState.
    *
    * @param firstName the first name to update the field with
@@ -181,10 +190,6 @@ class AuthViewModel : ViewModel() {
   fun signUpWithEmailPassword(context: Context) {
     viewModelScope.launch {
       try {
-        require(validateRegisterForm()) { "Please fill in all the fields" }
-        require(_signInState.value.passwordRegister == _signInState.value.confirmPasswordRegister) {
-          "Passwords do not match"
-        }
 
         _signInState.value = _signInState.value.copy(isLoading = true)
         _signInState.value = _signInState.value.copy(registerError = null)
@@ -216,8 +221,6 @@ class AuthViewModel : ViewModel() {
   fun signInWithEmailPassword(context: Context) {
     viewModelScope.launch {
       try {
-        require(validateSignInForm()) { "Please fill in all the fields" }
-
         _signInState.value = _signInState.value.copy(isLoading = true)
         _signInState.value = _signInState.value.copy(signInError = null)
 

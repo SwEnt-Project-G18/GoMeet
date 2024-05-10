@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
@@ -39,29 +38,33 @@ import androidx.compose.ui.unit.dp
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.ui.theme.DarkGrey
 
+/**
+ * This composable function allows the user to input and confirm their password. It checks that the
+ * passwords match and meet minimum security requirements before proceeding.
+ *
+ * @param callback Function to be called with the password when validation passes.
+ * @param textFieldColors Custom colors for the TextField components used in this Composable.
+ */
 @Composable
 fun RegisterPassword(callback: (String) -> Unit, textFieldColors: TextFieldColors) {
-    var password by remember { mutableStateOf("") }
-    var confirmPassword by remember { mutableStateOf("") }
-    var firstClick by remember { mutableStateOf(true) }
-    var passwordsMatch by remember { mutableStateOf(false) }
-    var isEmpty by remember { mutableStateOf(true) }
-    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+  var password by remember { mutableStateOf("") }
+  var confirmPassword by remember { mutableStateOf("") }
+  var firstClick by remember { mutableStateOf(true) }
+  var passwordsMatch by remember { mutableStateOf(false) }
+  var lengthValid by remember { mutableStateOf(true) }
+  val screenHeight = LocalConfiguration.current.screenHeightDp.dp
 
-
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceAround) {
-
+  Column(
+      modifier = Modifier.fillMaxSize(),
+      horizontalAlignment = Alignment.CenterHorizontally,
+      verticalArrangement = Arrangement.SpaceAround) {
         Text(
             text = "Please enter your password.",
             modifier = Modifier.fillMaxWidth(),
             style = MaterialTheme.typography.titleMedium,
-            textAlign = TextAlign.Center
-        )
+            textAlign = TextAlign.Center)
 
-        Spacer(modifier = Modifier.size(screenHeight/20))
+        Spacer(modifier = Modifier.size(screenHeight / 20))
 
         TextField(
             value = password,
@@ -70,11 +73,8 @@ fun RegisterPassword(callback: (String) -> Unit, textFieldColors: TextFieldColor
             singleLine = true,
             visualTransformation = PasswordVisualTransformation(),
             colors = textFieldColors,
-            keyboardOptions = KeyboardOptions.Default.copy(
-                imeAction = ImeAction.Done
-            ),
-            modifier = Modifier.fillMaxWidth()
-        )
+            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
+            modifier = Modifier.fillMaxWidth())
 
         Spacer(modifier = Modifier.size(16.dp))
 
@@ -85,66 +85,59 @@ fun RegisterPassword(callback: (String) -> Unit, textFieldColors: TextFieldColor
             singleLine = true,
             visualTransformation = PasswordVisualTransformation(),
             colors = textFieldColors,
-            keyboardOptions = KeyboardOptions.Default.copy(
-                imeAction = ImeAction.Done
-            ),
-            modifier = Modifier.fillMaxWidth()
-        )
+            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
+            modifier = Modifier.fillMaxWidth())
 
-        if (isEmpty && !firstClick){
-            Text(text = "Your Password cannot be empty", color = Color.Red)
+        if (!lengthValid && !firstClick) {
+          Text(text = "Your Password should be at least 6 characters", color = Color.Red)
         }
 
-        if (!passwordsMatch && !firstClick){
-            Text(text = "Your Passwords should match", color = Color.Red)
+        if (!passwordsMatch && !firstClick) {
+          Text(text = "Your Passwords should match", color = Color.Red)
         }
 
         Spacer(modifier = Modifier.size(screenHeight / 15))
 
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-            LinearProgressIndicator(
-                modifier = Modifier.padding(top = 20.dp, end = 25.dp),
-                progress = { 0.4f },
-                color = DarkGrey,
-                trackColor = Color.LightGray,
-                strokeCap = ProgressIndicatorDefaults.CircularIndeterminateStrokeCap
-            )
-            IconButton(
-                modifier = Modifier.padding(bottom = 2.5.dp, end = 3.dp).size(screenHeight / 19),
-                colors = IconButtonDefaults.outlinedIconButtonColors(),
-                onClick = {
-                    firstClick = false
-                    passwordsMatch = password.equals(confirmPassword)
-                    isEmpty = password.isEmpty()
-                    if (!isEmpty && passwordsMatch) {
-                        callback(password)
-                    }
-                }) {
+          LinearProgressIndicator(
+              modifier = Modifier.padding(top = 20.dp, end = 25.dp),
+              progress = { 0.4f },
+              color = DarkGrey,
+              trackColor = Color.LightGray,
+              strokeCap = ProgressIndicatorDefaults.CircularIndeterminateStrokeCap)
+          IconButton(
+              modifier = Modifier.padding(bottom = 2.5.dp, end = 3.dp).size(screenHeight / 19),
+              colors = IconButtonDefaults.outlinedIconButtonColors(),
+              onClick = {
+                firstClick = false
+                passwordsMatch = password == confirmPassword
+                lengthValid = password.length >= 6
+                if (lengthValid && passwordsMatch) {
+                  callback(password)
+                }
+              }) {
                 Icon(
                     Icons.AutoMirrored.Filled.ArrowForward,
                     contentDescription = "Next",
                     tint = DarkGrey,
-                    modifier = Modifier.size(60.dp)
-                )
-            }
-
+                    modifier = Modifier.size(60.dp))
+              }
         }
-
-    }
+      }
 }
-
 
 @Preview(showBackground = true)
 @Composable
 fun PreviewRegisterPassword() {
-    RegisterPassword(
-        callback = { password -> println("Preview Password: $password") },
-        textFieldColors = TextFieldDefaults.colors(
-            focusedTextColor = DarkCyan,
-            unfocusedTextColor = DarkCyan,
-            unfocusedContainerColor = Color.Transparent,
-            focusedContainerColor = Color.Transparent,
-            cursorColor = DarkCyan,
-            focusedLabelColor = MaterialTheme.colorScheme.tertiary,
-            focusedIndicatorColor = MaterialTheme.colorScheme.tertiary))
+  RegisterPassword(
+      callback = { password -> println("Preview Password: $password") },
+      textFieldColors =
+          TextFieldDefaults.colors(
+              focusedTextColor = DarkCyan,
+              unfocusedTextColor = DarkCyan,
+              unfocusedContainerColor = Color.Transparent,
+              focusedContainerColor = Color.Transparent,
+              cursorColor = DarkCyan,
+              focusedLabelColor = MaterialTheme.colorScheme.tertiary,
+              focusedIndicatorColor = MaterialTheme.colorScheme.tertiary))
 }

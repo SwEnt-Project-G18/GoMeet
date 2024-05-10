@@ -98,7 +98,6 @@ class UserViewModel : ViewModel() {
     }
   }
 
-
   /**
    * Get all users of the app
    *
