@@ -324,6 +324,8 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                             })
                   }
 
+              Spacer(modifier = Modifier.height(16.dp))
+
               var showDialog by remember { mutableStateOf(false) }
               imageUri?.let {
                 Text(
@@ -352,7 +354,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                 }
               }
 
-              Spacer(modifier = Modifier.height(32.dp))
+              Spacer(modifier = Modifier.height(16.dp))
 
               Button(
                   modifier = Modifier.width(250.dp),
