@@ -37,13 +37,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.github.se.gomeet.ui.theme.DarkCyan
 
 /** Tag that users can add to their profile and events */
 enum class Tag {
-  // TODO: change this to actual tags
+  // TODO: replace these by actual tags
   tag1,
   tag2,
   tag3,
@@ -111,12 +112,16 @@ fun TagsSelector(title: String, tags: MutableState<List<String>>, onSave: () -> 
                   Modifier.fillMaxSize()
                       .verticalScroll(rememberScrollState())
                       .weight(1f, fill = false)
-                      .padding(start = 15.dp)) {
+                      .padding(start = 15.dp)
+                      .testTag("TagList")) {
                 for (tag in Tag.entries) {
                   if (tags.value.contains(tag.name)) {
                     Button(
                         onClick = { tags.value = tags.value.minus(tag.name) },
-                        modifier = Modifier.padding(end = 15.dp, bottom = 5.dp).wrapContentSize(),
+                        modifier =
+                            Modifier.padding(end = 15.dp, bottom = 5.dp)
+                                .wrapContentSize()
+                                .testTag("Tag"),
                         colors =
                             ButtonDefaults.buttonColors(
                                 containerColor = DarkCyan, contentColor = Color.White),
