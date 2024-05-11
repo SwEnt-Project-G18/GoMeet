@@ -58,7 +58,7 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.github.se.gomeet.R
-import com.github.se.gomeet.model.event.EventInviteUsers
+import com.github.se.gomeet.model.event.InviteStatus
 import com.github.se.gomeet.model.event.UserInvitedToEvents
 import com.github.se.gomeet.model.repository.InvitesRepository
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
@@ -88,10 +88,10 @@ fun Notifications(nav: NavigationActions, userId: String) {
       coroutineScope.launch {
           val pendingInvitations = inviteViewModel.getEventsUserHasBeenInvitedTo(userId)
           if (pendingInvitations != null) {
+              // Filter only pending invitations
+              pendingInvitations.invitedToEvents = pendingInvitations.invitedToEvents.filter { it.second == InviteStatus.PENDING }.toMutableList()
               eventsPendingInvitations.value = pendingInvitations
           }
-
-
       }
   }
 

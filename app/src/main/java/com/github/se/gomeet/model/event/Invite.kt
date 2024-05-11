@@ -9,7 +9,7 @@ package com.github.se.gomeet.model.event
  */
 data class EventInviteUsers(
     val event: String,
-    val usersInvited: MutableList<Pair<String, InviteStatus>>,
+    var usersInvited: MutableList<Pair<String, InviteStatus>>,
 )
 
 /**
@@ -22,7 +22,7 @@ data class EventInviteUsers(
  */
 data class UserInvitedToEvents(
     val user: String,
-    val invitedToEvents: MutableList<Pair<String, InviteStatus>>
+    var invitedToEvents: MutableList<Pair<String, InviteStatus>>
 )
 
 /**
