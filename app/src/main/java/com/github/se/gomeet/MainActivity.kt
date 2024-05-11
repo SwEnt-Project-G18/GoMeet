@@ -198,7 +198,7 @@ class MainActivity : ComponentActivity() {
               userIdState.value = Firebase.auth.currentUser!!.uid
               Create(navAction)
             }
-            composable(Route.NOTIFICATIONS) { Notifications(navAction) }
+            composable(Route.NOTIFICATIONS) { Notifications(navAction, userIdState.value) }
 
             composable(Route.PROFILE) {
               Profile(navAction, userId = userIdState.value, userViewModel, eventViewModel)
