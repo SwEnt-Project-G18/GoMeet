@@ -86,7 +86,7 @@ fun RegisterScreen(
         navigationIcon = {
           IconButton(
               onClick = {
-                if (state == 0) {
+                if (state == 1) {
                   nav.goBack()
                 } else {
                   state -= 1

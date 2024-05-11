@@ -64,7 +64,7 @@ fun RegisterUsernameEmail(
   var allUsers by remember { mutableStateOf<List<GoMeetUser>?>(null) }
   val coroutineScope = rememberCoroutineScope()
 
-  LaunchedEffect(Unit) { coroutineScope.launch { allUsers = userViewModel.getAllUser() } }
+  LaunchedEffect(Unit) { coroutineScope.launch { allUsers = userViewModel.getAllUsers() } }
 
   Column(
       modifier = Modifier.fillMaxSize(),
@@ -102,7 +102,7 @@ fun RegisterUsernameEmail(
         if (!firstClick && !isValidUsername) {
           Text(text = "The Username is not valid or already taken", color = Color.Red)
         }
-        Spacer(modifier = Modifier.size(16.dp))
+        Spacer(modifier = Modifier.size(screenHeight / 60))
 
         TextField(
             value = email,

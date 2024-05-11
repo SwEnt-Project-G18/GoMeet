@@ -76,7 +76,7 @@ fun RegisterPassword(callback: (String) -> Unit, textFieldColors: TextFieldColor
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
             modifier = Modifier.fillMaxWidth())
 
-        Spacer(modifier = Modifier.size(16.dp))
+        Spacer(modifier = Modifier.size(screenHeight / 60))
 
         TextField(
             value = confirmPassword,

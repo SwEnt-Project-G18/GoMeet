@@ -92,7 +92,7 @@ fun RegisterNameCountryPhone(
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
             modifier = Modifier.fillMaxWidth())
 
-        Spacer(modifier = Modifier.size(16.dp))
+        Spacer(modifier = Modifier.size(screenHeight / 60))
 
         TextField(
             value = lastName,
@@ -103,7 +103,7 @@ fun RegisterNameCountryPhone(
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
             modifier = Modifier.fillMaxWidth())
 
-        Spacer(modifier = Modifier.size(16.dp))
+        Spacer(modifier = Modifier.size(screenHeight / 60))
 
         Column {
           TextField(
@@ -151,7 +151,7 @@ fun RegisterNameCountryPhone(
           Text(text = "Country is not valid", color = Color.Red)
         }
 
-        Spacer(modifier = Modifier.size(16.dp))
+        Spacer(modifier = Modifier.size(screenHeight / 60))
 
         TextField(
             value = phoneNumber,
@@ -206,7 +206,7 @@ fun RegisterNameCountryPhone(
       }
 }
 
-fun getCountries(): ArrayList<String> {
+private fun getCountries(): ArrayList<String> {
   val isoCountryCodes: Array<String> = Locale.getISOCountries()
   val countriesWithEmojis: ArrayList<String> = arrayListOf()
   for (countryCode in isoCountryCodes) {
