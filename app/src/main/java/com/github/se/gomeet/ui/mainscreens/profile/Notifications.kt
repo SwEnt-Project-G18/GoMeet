@@ -28,6 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -57,38 +58,42 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.github.se.gomeet.R
-import com.github.se.gomeet.model.event.InviteStatus
+import com.github.se.gomeet.model.event.EventInviteUsers
 import com.github.se.gomeet.model.event.UserInvitedToEvents
+import com.github.se.gomeet.model.repository.InvitesRepository
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.ui.theme.NavBarUnselected
+import com.github.se.gomeet.viewmodel.EventInviteViewModel
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
 @Composable
-fun Notifications(nav: NavigationActions) {
+fun Notifications(nav: NavigationActions, userId: String) {
+    val inviteViewModel = EventInviteViewModel(InvitesRepository(Firebase.firestore))
 
-  val initialState =
-      UserInvitedToEvents(user = "", invitedToEvents = mutableListOf("" to InviteStatus.PENDING))
   var selectedFilter by remember { mutableStateOf("All") }
-  val inviteList = remember { mutableStateOf(initialState) }
+  val eventsPendingInvitations = remember { mutableStateOf<UserInvitedToEvents?>(null) }
   val coroutineScope = rememberCoroutineScope()
-
-  /*
+    
   LaunchedEffect(Unit) {
       coroutineScope.launch {
-          val allInvitedEvents = inviteViewModel.getUsersInvitedToEvent(userId)
-          if (allInvitedEvents != null) {
-              inviteList.value = allInvitedEvents
+          val pendingInvitations = inviteViewModel.getEventsUserHasBeenInvitedTo(userId)
+          if (pendingInvitations != null) {
+              eventsPendingInvitations.value = pendingInvitations
           }
+
+
       }
   }
-  */
 
   // Define a function to handle button clicks
   fun onFilterButtonClick(filterType: String) {
@@ -125,7 +130,7 @@ fun Notifications(nav: NavigationActions) {
                   verticalAlignment = Alignment.CenterVertically,
                   horizontalArrangement = Arrangement.Start,
                   modifier =
-                      Modifier.testTag("Back").clickable { nav.navigateToScreen(Route.PROFILE) }) {
+                      Modifier.testTag("Back").clickable { nav.goBack() }) {
                     Icon(
                         painter = painterResource(id = R.drawable.arrow_back_24px),
                         contentDescription = "image description",
@@ -403,5 +408,5 @@ fun NotificationsWidget(
 @Preview
 @Composable
 fun NotificationsPreview() {
-  Notifications(nav = NavigationActions(rememberNavController()))
+  Notifications(nav = NavigationActions(rememberNavController()), userId = "1234")
 }

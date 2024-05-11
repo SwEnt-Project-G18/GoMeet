@@ -32,18 +32,18 @@ class InvitesRepository(private val db: FirebaseFirestore) {
   /**
    * This function retrieves all the events the user has been invited to
    *
-   * @param uid The user ID
+   * @param eventId The event ID
    * @param callback The callback function to be called when the events are retrieved
    * @return the events the user has been invited to if they exist, null otherwise
    */
-  fun getUserInvites(uid: String, callback: (EventInviteUsers?) -> Unit) {
-    db.collection(USER_INVITES_COLLECTION)
-        .document(uid)
+  fun getUsersInvitedToThisEvent(eventId: String, callback: (EventInviteUsers?) -> Unit) {
+    db.collection(EVENT_INVITES_COLLECTION)
+        .document(eventId)
         .get()
         .addOnSuccessListener { document ->
           if (document != null && document.exists()) {
-            val eventInvite = document.data!!.toEventInviteUsers(uid)
-            callback(eventInvite)
+            val usersInvited = document.data!!.toEventInviteUsers(eventId)
+            callback(usersInvited)
           } else {
             Log.d(TAG, "No such document")
             callback(null)
@@ -54,6 +54,32 @@ class InvitesRepository(private val db: FirebaseFirestore) {
           callback(null)
         }
   }
+
+    /**
+     * This function retrieves all the events the user has been invited to
+     *
+     * @param userId The user ID
+     * @param callback The callback function to be called when the events are retrieved
+     * @return the events the user has been invited to if they exist, null otherwise
+     */
+    fun getEventsUserHasBeenInvitedTo(userId: String, callback: (UserInvitedToEvents?) -> Unit) {
+        db.collection(USER_INVITES_COLLECTION)
+            .document(userId)
+            .get()
+            .addOnSuccessListener { document ->
+                if (document != null && document.exists()) {
+                    val eventInvite = document.data!!.toUserInvitedToEvents(userId)
+                    callback(eventInvite)
+                } else {
+                    Log.d(TAG, "No such document")
+                    callback(null)
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.d(TAG, "get failed with ", exception)
+                callback(null)
+            }
+    }
 
   /**
    * This function retrieves all the users invited to an event
@@ -68,7 +94,7 @@ class InvitesRepository(private val db: FirebaseFirestore) {
         .get()
         .addOnSuccessListener { document ->
           if (document != null && document.exists()) {
-            val usersInvited = document.data!!.toUsersInvitedToEvents(id)
+            val usersInvited = document.data!!.toUserInvitedToEvents(id)
             callback(usersInvited)
           } else {
             Log.d(TAG, "No such document")
@@ -211,7 +237,7 @@ class InvitesRepository(private val db: FirebaseFirestore) {
           val userSnapshot = transaction.get(userInviteRef)
           val updatedUserEvents =
               userSnapshot.data!!
-                  .toUsersInvitedToEvents(toUserID)
+                  .toUserInvitedToEvents(toUserID)
                   .invitedToEvents
                   .filterNot { it.first == eventID }
                   .toMutableList()
@@ -248,7 +274,7 @@ class InvitesRepository(private val db: FirebaseFirestore) {
    *
    * @param id The user ID
    */
-  private fun Map<String, Any>.toUsersInvitedToEvents(id: String? = null): UserInvitedToEvents {
+  private fun Map<String, Any>.toUserInvitedToEvents(id: String? = null): UserInvitedToEvents {
     return UserInvitedToEvents(
         user = id ?: this["u"] as? String ?: "",
         invitedToEvents =
@@ -270,7 +296,7 @@ class InvitesRepository(private val db: FirebaseFirestore) {
 
       for (docChange in snapshot?.documentChanges!!) {
 
-        val userInvitedToEvents = docChange.document.data.toUsersInvitedToEvents()
+        val userInvitedToEvents = docChange.document.data.toUserInvitedToEvents()
         when (docChange.type) {
           DocumentChange.Type.ADDED -> {
             localInvitedTo.add(userInvitedToEvents)

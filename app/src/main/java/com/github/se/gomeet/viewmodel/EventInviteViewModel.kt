@@ -2,6 +2,7 @@ package com.github.se.gomeet.viewmodel
 
 import com.github.se.gomeet.model.event.EventInviteUsers
 import com.github.se.gomeet.model.event.InviteStatus
+import com.github.se.gomeet.model.event.UserInvitedToEvents
 import com.github.se.gomeet.model.repository.InvitesRepository
 import kotlinx.coroutines.CompletableDeferred
 
@@ -22,7 +23,7 @@ class EventInviteViewModel(invitesRepository: InvitesRepository) {
   suspend fun getUsersInvitedToEvent(eventId: String): EventInviteUsers? {
     return try {
       val eventInviteUsers = CompletableDeferred<EventInviteUsers?>()
-      repository.getUserInvites(eventId) { t -> eventInviteUsers.complete(t) }
+      repository.getUsersInvitedToThisEvent(eventId) { t -> eventInviteUsers.complete(t) }
       eventInviteUsers.await()
     } catch (e: Exception) {
       null
@@ -35,11 +36,11 @@ class EventInviteViewModel(invitesRepository: InvitesRepository) {
    * @param userId the id of the user
    * @return the events the user has been invited to
    */
-  suspend fun getEventsUserHasBeenInvitedTo(userId: String): EventInviteUsers? {
+  suspend fun getEventsUserHasBeenInvitedTo(userId: String): UserInvitedToEvents? {
     return try {
-      val eventInviteUsers = CompletableDeferred<EventInviteUsers?>()
-      repository.getUserInvites(userId) { t -> eventInviteUsers.complete(t) }
-      eventInviteUsers.await()
+      val userInvitedToEvents = CompletableDeferred<UserInvitedToEvents?>()
+      repository.getEventsUserHasBeenInvitedTo(userId) { t -> userInvitedToEvents.complete(t) }
+      userInvitedToEvents.await()
     } catch (e: Exception) {
       null
     }
