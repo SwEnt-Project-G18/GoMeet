@@ -86,6 +86,21 @@ class UserViewModel(userRepository: UserRepository) : ViewModel() {
     }
   }
 
+  /**
+   * Get all users of the app
+   *
+   * @return a list of all users
+   */
+  suspend fun getAllUsers(): List<GoMeetUser>? {
+    return try {
+      val users = CompletableDeferred<List<GoMeetUser>?>()
+      repository.getAllUsers { t -> users.complete(t) }
+      users.await()
+    } catch (e: Exception) {
+      emptyList()
+    }
+  }
+
   // TODO: fix the following method
   fun getCurrentUser(): GoMeetUser? {
     return currentUser.value

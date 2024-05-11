@@ -23,8 +23,8 @@ import com.github.se.gomeet.model.repository.EventRepository
 import com.github.se.gomeet.model.repository.InvitesRepository
 import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.ui.authscreens.LoginScreen
-import com.github.se.gomeet.ui.authscreens.RegisterScreen
 import com.github.se.gomeet.ui.authscreens.WelcomeScreen
+import com.github.se.gomeet.ui.authscreens.register.RegisterScreen
 import com.github.se.gomeet.ui.mainscreens.Explore
 import com.github.se.gomeet.ui.mainscreens.Trends
 import com.github.se.gomeet.ui.mainscreens.create.AddParticipants
