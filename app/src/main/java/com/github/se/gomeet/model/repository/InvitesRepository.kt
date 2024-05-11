@@ -30,7 +30,7 @@ class InvitesRepository(private val db: FirebaseFirestore) {
   }
 
   /**
-   * This function retrieves all the events the user has been invited to
+   * This function retrieves all the users invited to the event given with the event ID as parameter
    *
    * @param eventId The event ID
    * @param callback The callback function to be called when the events are retrieved
