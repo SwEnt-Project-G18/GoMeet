@@ -38,7 +38,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import com.github.se.gomeet.ui.theme.DarkGrey
 import java.util.Locale
 
 /**
@@ -174,7 +173,7 @@ fun RegisterNameCountryPhone(
           LinearProgressIndicator(
               modifier = Modifier.padding(top = 20.dp, end = 25.dp),
               progress = { 0.6f },
-              color = DarkGrey,
+              color = MaterialTheme.colorScheme.tertiary,
               trackColor = Color.LightGray,
               strokeCap = ProgressIndicatorDefaults.CircularIndeterminateStrokeCap)
           IconButton(
@@ -199,7 +198,7 @@ fun RegisterNameCountryPhone(
                 Icon(
                     Icons.AutoMirrored.Filled.ArrowForward,
                     contentDescription = "Next",
-                    tint = DarkGrey,
+                    tint = MaterialTheme.colorScheme.tertiary,
                     modifier = Modifier.size(60.dp))
               }
         }

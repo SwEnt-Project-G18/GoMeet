@@ -67,11 +67,11 @@ fun RegisterScreen(
   val signInState = authViewModel.signInState.collectAsState()
   val textFieldColors =
       TextFieldDefaults.colors(
-          focusedTextColor = Color.Black,
-          unfocusedTextColor = Color.Black,
+          focusedTextColor = MaterialTheme.colorScheme.onBackground,
+          unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
           unfocusedContainerColor = Color.Transparent,
           focusedContainerColor = Color.Transparent,
-          cursorColor = Color.Black,
+          cursorColor = MaterialTheme.colorScheme.onBackground,
           focusedLabelColor = MaterialTheme.colorScheme.tertiary,
           focusedIndicatorColor = MaterialTheme.colorScheme.tertiary)
 

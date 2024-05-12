@@ -36,7 +36,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.se.gomeet.ui.theme.DarkCyan
-import com.github.se.gomeet.ui.theme.DarkGrey
 
 /**
  * This composable function allows the user to input and confirm their password. It checks that the
@@ -102,7 +101,7 @@ fun RegisterPassword(callback: (String) -> Unit, textFieldColors: TextFieldColor
           LinearProgressIndicator(
               modifier = Modifier.padding(top = 20.dp, end = 25.dp),
               progress = { 0.4f },
-              color = DarkGrey,
+              color = MaterialTheme.colorScheme.tertiary,
               trackColor = Color.LightGray,
               strokeCap = ProgressIndicatorDefaults.CircularIndeterminateStrokeCap)
           IconButton(
@@ -119,7 +118,7 @@ fun RegisterPassword(callback: (String) -> Unit, textFieldColors: TextFieldColor
                 Icon(
                     Icons.AutoMirrored.Filled.ArrowForward,
                     contentDescription = "Next",
-                    tint = DarkGrey,
+                    tint = MaterialTheme.colorScheme.tertiary,
                     modifier = Modifier.size(60.dp))
               }
         }
