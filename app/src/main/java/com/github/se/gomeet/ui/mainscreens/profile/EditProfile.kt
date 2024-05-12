@@ -91,8 +91,8 @@ fun EditProfile(
 
   val textFieldColors =
       TextFieldDefaults.colors(
-          focusedTextColor = DarkCyan,
-          unfocusedTextColor = DarkCyan,
+          focusedTextColor = MaterialTheme.colorScheme.onBackground,
+          unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
           unfocusedContainerColor = Color.Transparent,
           focusedContainerColor = Color.Transparent,
           cursorColor = DarkCyan,

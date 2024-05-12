@@ -139,8 +139,8 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
 
   val textFieldColors =
       androidx.compose.material3.TextFieldDefaults.colors(
-          focusedTextColor = DarkCyan,
-          unfocusedTextColor = DarkCyan,
+          focusedTextColor = MaterialTheme.colorScheme.onBackground,
+          unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
           unfocusedContainerColor = Color.Transparent,
           focusedContainerColor = Color.Transparent,
           cursorColor = DarkCyan,
@@ -497,8 +497,8 @@ fun LocationField(
             singleLine = true,
             colors =
                 androidx.compose.material3.TextFieldDefaults.colors(
-                    focusedTextColor = DarkCyan,
-                    unfocusedTextColor = DarkCyan,
+                    focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
                     unfocusedContainerColor = Color.Transparent,
                     focusedContainerColor = Color.Transparent,
                     cursorColor = DarkCyan,
