@@ -10,6 +10,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,6 +22,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -47,8 +51,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
+import androidx.compose.ui.window.Popup
 import com.github.se.gomeet.R
+import com.github.se.gomeet.model.TagsSelector
+import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.model.user.GoMeetUser
+import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
@@ -59,9 +67,15 @@ import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import java.io.InputStream
 import kotlinx.coroutines.tasks.await
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel = UserViewModel()) {
+fun EditProfile(
+    nav: NavigationActions,
+    userViewModel: UserViewModel = UserViewModel(UserRepository(Firebase.firestore))
+) {
   val currentUser = remember { mutableStateOf<GoMeetUser?>(null) }
   val firstName = remember { mutableStateOf("") }
   val lastName = remember { mutableStateOf("") }
@@ -69,6 +83,9 @@ fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel = UserViewM
   val username = remember { mutableStateOf("") }
   val phoneNumber = remember { mutableStateOf("") }
   val country = remember { mutableStateOf("") }
+  val tags = remember { mutableStateOf(emptyList<String>()) }
+  var isLoaded by remember { mutableStateOf(false) }
+  val showPopup = remember { mutableStateOf(false) }
 
   LaunchedEffect(Unit) {
     currentUser.value = userViewModel.getUser(com.google.firebase.Firebase.auth.currentUser!!.uid)
@@ -78,12 +95,14 @@ fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel = UserViewM
     username.value = currentUser.value!!.username
     phoneNumber.value = currentUser.value!!.phoneNumber
     country.value = currentUser.value!!.country
+    tags.value = (currentUser.value!!.tags)
+    isLoaded = true
   }
 
   val textFieldColors =
       TextFieldDefaults.colors(
-          focusedTextColor = DarkCyan,
-          unfocusedTextColor = DarkCyan,
+          focusedTextColor = MaterialTheme.colorScheme.onBackground,
+          unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
           unfocusedContainerColor = Color.Transparent,
           focusedContainerColor = Color.Transparent,
           cursorColor = DarkCyan,
@@ -130,14 +149,14 @@ fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel = UserViewM
   }
 
   Scaffold(
+      modifier = Modifier.padding(start = 15.dp, end = 15.dp),
       topBar = {
         Row(
             horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically) {
               Text(
                   text = "My Profile",
-                  modifier =
-                      Modifier.padding(start = 15.dp, top = 15.dp, end = 15.dp, bottom = 0.dp),
+                  modifier = Modifier.padding(top = 15.dp),
                   color = DarkCyan,
                   fontStyle = FontStyle.Normal,
                   fontWeight = FontWeight.SemiBold,
@@ -206,129 +225,149 @@ fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel = UserViewM
             selectedItem = Route.PROFILE)
       },
       content = { innerPadding ->
-        Column(
-            modifier =
+
+        if (isLoaded) {
+            Column(
+                modifier =
                 Modifier.padding(innerPadding).verticalScroll(rememberScrollState(0)).fillMaxSize(),
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally) {
-              Image(
-                  painter =
-                      if (imageBitmap != null) {
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally) {
+                Image(
+                    painter =
+                    if (imageBitmap != null) {
                         androidx.compose.ui.graphics.painter.BitmapPainter(imageBitmap!!)
-                      } else if (!profilePictureUrl.isNullOrEmpty()) {
+                    } else if (!profilePictureUrl.isNullOrEmpty()) {
                         rememberImagePainter(profilePictureUrl)
-                      } else {
+                    } else {
                         painterResource(id = R.drawable.gomeet_logo)
-                      },
-                  contentDescription = "Profile picture",
-                  modifier =
-                      Modifier.padding(start = 15.dp, end = 15.dp, top = 30.dp, bottom = 15.dp)
-                          .width(101.dp)
-                          .height(101.dp)
-                          .clickable { imagePickerLauncher.launch("image/*") }
-                          .clip(CircleShape)
-                          .background(color = MaterialTheme.colorScheme.background)
-                          .align(Alignment.CenterHorizontally),
-                  contentScale = ContentScale.Crop)
+                    },
+                    contentDescription = "Profile picture",
+                    modifier =
+                    Modifier.padding(start = 15.dp, end = 15.dp, top = 30.dp, bottom = 15.dp)
+                        .width(101.dp)
+                        .height(101.dp)
+                        .clickable { imagePickerLauncher.launch("image/*") }
+                        .clip(CircleShape)
+                        .background(color = MaterialTheme.colorScheme.background)
+                        .align(Alignment.CenterHorizontally),
+                    contentScale = ContentScale.Crop)
 
-              Spacer(modifier = Modifier.size(16.dp))
+                Spacer(modifier = Modifier.size(16.dp))
 
-              TextField(
-                  value = firstName.value,
-                  onValueChange = { newValue ->
-                    if (newValue.isNotBlank() && newValue.isNotEmpty()) {
-                      firstName.value = newValue
+                TextField(
+                    value = firstName.value,
+                    onValueChange = { newValue ->
+                      if (newValue.isNotBlank() && newValue.isNotEmpty()) {
+                        firstName.value = newValue
+                      }
+                    },
+                    label = { Text("First Name") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = textFieldColors)
+
+                Spacer(modifier = Modifier.size(16.dp))
+
+                TextField(
+                    value = lastName.value,
+                    onValueChange = { newValue ->
+                      if (newValue.isNotBlank() && newValue.isNotEmpty()) {
+                        lastName.value = newValue
+                      }
+                    },
+                    label = { Text("Last Name") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = textFieldColors)
+
+                Spacer(modifier = Modifier.size(16.dp))
+
+                TextField(
+                    value = email.value,
+                    onValueChange = { newValue ->
+                      if (newValue.isNotBlank() && newValue.isNotEmpty()) {
+                        email.value = newValue
+                      }
+                    },
+                    label = { Text("Email Address") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = textFieldColors)
+
+                Spacer(modifier = Modifier.size(16.dp))
+
+                TextField(
+                    value = username.value,
+                    onValueChange = { newValue ->
+                      if (newValue.isNotBlank() && newValue.isNotEmpty()) {
+                        username.value = newValue
+                      }
+                    },
+                    label = { Text("Username") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = textFieldColors)
+
+                Spacer(modifier = Modifier.size(16.dp))
+
+                TextField(
+                    value = phoneNumber.value,
+                    onValueChange = { newValue ->
+                      if (newValue.isNotBlank() && newValue.isNotEmpty()) {
+                        phoneNumber.value = newValue
+                      }
+                    },
+                    label = { Text("Phone Number") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = textFieldColors)
+
+                Spacer(modifier = Modifier.size(16.dp))
+
+                TextField(
+                    value = country.value,
+                    onValueChange = { newValue ->
+                      if (newValue.isNotBlank() && newValue.isNotEmpty()) {
+                        country.value = newValue
+                      }
+                    },
+                    label = { Text("Country") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = textFieldColors)
+
+                Spacer(modifier = Modifier.size(16.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(top = 15.dp, bottom = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically) {
+                      Text(
+                          text = "Edit Tags",
+                          color = MaterialTheme.colorScheme.onBackground,
+                          fontStyle = FontStyle.Normal,
+                          fontWeight = FontWeight.Normal,
+                          fontFamily = FontFamily.Default,
+                          textAlign = TextAlign.Start,
+                          style = MaterialTheme.typography.bodyMedium)
+                      Icon(
+                          Icons.Default.KeyboardArrowRight,
+                          null,
+                          modifier = Modifier.clickable { showPopup.value = true })
                     }
-                  },
-                  label = { Text("First Name") },
-                  singleLine = true,
-                  modifier = Modifier.fillMaxWidth(),
-                  colors = textFieldColors)
-
-              Spacer(modifier = Modifier.size(16.dp))
-
-              TextField(
-                  value = lastName.value,
-                  onValueChange = { newValue ->
-                    if (newValue.isNotBlank() && newValue.isNotEmpty()) {
-                      lastName.value = newValue
-                    }
-                  },
-                  label = { Text("Last Name") },
-                  singleLine = true,
-                  modifier = Modifier.fillMaxWidth(),
-                  colors = textFieldColors)
-
-              Spacer(modifier = Modifier.size(16.dp))
-
-              TextField(
-                  value = email.value,
-                  onValueChange = { newValue ->
-                    if (newValue.isNotBlank() && newValue.isNotEmpty()) {
-                      email.value = newValue
-                    }
-                  },
-                  label = { Text("Email Address") },
-                  singleLine = true,
-                  modifier = Modifier.fillMaxWidth(),
-                  colors = textFieldColors)
-
-              Spacer(modifier = Modifier.size(16.dp))
-
-              TextField(
-                  value = username.value,
-                  onValueChange = { newValue ->
-                    if (newValue.isNotBlank() && newValue.isNotEmpty()) {
-                      username.value = newValue
-                    }
-                  },
-                  label = { Text("Username") },
-                  singleLine = true,
-                  modifier = Modifier.fillMaxWidth(),
-                  colors = textFieldColors)
-
-              Spacer(modifier = Modifier.size(16.dp))
-
-              TextField(
-                  value = phoneNumber.value,
-                  onValueChange = { newValue ->
-                    if (newValue.isNotBlank() && newValue.isNotEmpty()) {
-                      phoneNumber.value = newValue
-                    }
-                  },
-                  label = { Text("Phone Number") },
-                  singleLine = true,
-                  modifier = Modifier.fillMaxWidth(),
-                  colors = textFieldColors)
-
-              Spacer(modifier = Modifier.size(16.dp))
-
-              TextField(
-                  value = country.value,
-                  onValueChange = { newValue ->
-                    if (newValue.isNotBlank() && newValue.isNotEmpty()) {
-                      country.value = newValue
-                    }
-                  },
-                  label = { Text("Country") },
-                  singleLine = true,
-                  modifier = Modifier.fillMaxWidth(),
-                  colors = textFieldColors)
-
-              Spacer(modifier = Modifier.size(16.dp))
-
-              Text(
-                  text = "Edit Tags",
-                  modifier =
-                      Modifier.padding(start = 15.dp, top = 15.dp, end = 15.dp, bottom = 15.dp)
-                          .align(Alignment.Start)
-                          .clickable { /* TODO: Edit the tags */},
-                  color = MaterialTheme.colorScheme.onBackground,
-                  fontStyle = FontStyle.Normal,
-                  fontWeight = FontWeight.Normal,
-                  fontFamily = FontFamily.Default,
-                  textAlign = TextAlign.Start,
-                  style = MaterialTheme.typography.bodyMedium)
-            }
+              }
+        } else {
+          LoadingText()
+        }
+        if (showPopup.value) {
+          Popup(
+              alignment = Alignment.Center,
+              onDismissRequest = { showPopup.value = !showPopup.value }) {
+                TagsSelector("Edit Tags", tags) {
+                  currentUser.value!!.tags = tags.value
+                  userViewModel.editUser(currentUser.value!!)
+                  showPopup.value = false
+                }
+              }
+        }
       })
 }

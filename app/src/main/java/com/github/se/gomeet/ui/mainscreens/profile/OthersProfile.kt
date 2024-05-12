@@ -58,6 +58,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
+import com.github.se.gomeet.model.repository.EventRepository
+import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
@@ -69,6 +71,7 @@ import com.github.se.gomeet.ui.theme.NavBarUnselected
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.time.LocalDate
 import kotlinx.coroutines.launch
@@ -389,10 +392,10 @@ fun OthersProfile(
                           horizontalArrangement = Arrangement.spacedBy(8.dp),
                           contentPadding = PaddingValues(start = 15.dp, end = 15.dp),
                           modifier = Modifier.heightIn(min = 56.dp)) {
-                            items(10) {
+                            items(user!!.tags.size) { index ->
                               Button(
                                   onClick = {},
-                                  content = { Text("Tag") },
+                                  content = { Text(user!!.tags[index]) },
                                   colors =
                                       ButtonDefaults.buttonColors(
                                           containerColor = NavBarUnselected,
@@ -402,17 +405,9 @@ fun OthersProfile(
                           }
                     }
                 Spacer(modifier = Modifier.height(10.dp))
-                ProfileEventsList(
-                    "My Events",
-                    rememberLazyListState(),
-                    myEventList,
-                    NavigationActions(rememberNavController()))
+                ProfileEventsList("My Events", rememberLazyListState(), myEventList, nav)
                 Spacer(modifier = Modifier.height(10.dp))
-                ProfileEventsList(
-                    "History",
-                    rememberLazyListState(),
-                    myHistoryList,
-                    NavigationActions(rememberNavController()))
+                ProfileEventsList("History", rememberLazyListState(), myHistoryList, nav)
               }
         } else {
           LoadingText()
@@ -453,5 +448,8 @@ fun MoreActionsButton() {
 @Composable
 fun OthersProfilePreview() {
   OthersProfile(
-      nav = NavigationActions(rememberNavController()), "", UserViewModel(), EventViewModel())
+      nav = NavigationActions(rememberNavController()),
+      "",
+      UserViewModel(UserRepository(Firebase.firestore)),
+      EventViewModel(null, EventRepository(Firebase.firestore)))
 }

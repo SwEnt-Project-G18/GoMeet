@@ -58,6 +58,8 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberImagePainter
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
+import com.github.se.gomeet.model.repository.EventRepository
+import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
@@ -71,8 +73,8 @@ import com.github.se.gomeet.ui.theme.LightGray
 import com.github.se.gomeet.ui.theme.NavBarUnselected
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
-import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.time.LocalDate
 import kotlinx.coroutines.launch
@@ -172,7 +174,7 @@ fun Profile(
                     modifier =
                         Modifier.fillMaxWidth()
                             .padding(start = 15.dp, end = 0.dp, top = 0.dp, bottom = 30.dp)) {
-                      ProfileImage(userId = uid)
+                      ProfileImage(userId = userId)
                       Column(
                           horizontalAlignment = Alignment.CenterHorizontally,
                           modifier = Modifier.padding(0.dp)) {
@@ -387,10 +389,10 @@ fun Profile(
                       horizontalArrangement = Arrangement.spacedBy(8.dp),
                       contentPadding = PaddingValues(start = 15.dp, end = 15.dp),
                       modifier = Modifier.heightIn(min = 56.dp)) {
-                        items(10) {
+                        items(currentUser!!.tags.size) { index ->
                           Button(
                               onClick = {},
-                              content = { Text("Tag") },
+                              content = { Text(currentUser!!.tags[index]) },
                               colors =
                                   ButtonDefaults.buttonColors(
                                       containerColor = NavBarUnselected, contentColor = DarkCyan),
@@ -454,5 +456,8 @@ fun ProfileImage(
 @Composable
 fun ProfilePreview() {
   Profile(
-      nav = NavigationActions(rememberNavController()), "John", UserViewModel(), EventViewModel())
+      nav = NavigationActions(rememberNavController()),
+      "John",
+      UserViewModel(UserRepository(Firebase.firestore)),
+      EventViewModel("John", EventRepository(Firebase.firestore)))
 }

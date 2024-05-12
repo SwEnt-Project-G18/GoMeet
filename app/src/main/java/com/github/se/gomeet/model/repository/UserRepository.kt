@@ -37,6 +37,7 @@ class UserRepository(private val db: FirebaseFirestore) {
               userList.add(user)
             }
           }
+          callback(userList)
         }
         .addOnFailureListener { exception ->
           Log.d(TAG, "Error getting documents: ", exception)
@@ -147,7 +148,8 @@ class UserRepository(private val db: FirebaseFirestore) {
         "myTickets" to joinedEvents,
         "myEvents" to myEvents,
         "myFavorites" to myFavorites,
-        "profilePicture" to profilePicture)
+        "profilePicture" to profilePicture,
+        "tags" to tags)
   }
 
   /**
@@ -168,8 +170,9 @@ class UserRepository(private val db: FirebaseFirestore) {
         email = this["email"] as? String ?: "",
         phoneNumber = this["phoneNumber"] as? String ?: "",
         country = this["country"] as? String ?: "",
-        joinedEvents = this["myTickets"] as List<String>,
-        myEvents = this["myEvents"] as List<String>,
-        myFavorites = this["myFavorites"] as List<String>)
+        joinedEvents = this["myTickets"] as? List<String>?: emptyList(),
+        myEvents = this["myEvents"] as? List<String>?: emptyList(),
+        myFavorites = this["myFavorites"] as? List<String>?: emptyList(),
+        tags = this["tags"]as? List<String>?: emptyList())
   }
 }

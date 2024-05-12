@@ -11,9 +11,12 @@ import androidx.compose.ui.test.performTextInput
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.se.gomeet.model.repository.EventRepository
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.google.android.gms.maps.MapsInitializer
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import java.time.LocalDate
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -57,6 +60,8 @@ class CreateEventTest {
     // Enter a URL
     rule.onNodeWithText("Link").performTextInput("http://example.com")
 
+    rule.onNodeWithText("Add Tags").assertIsDisplayed()
+
     rule.onNodeWithText("Add Participants").assertIsDisplayed()
 
     rule.onNodeWithText("Add Image").assertIsDisplayed()
@@ -91,6 +96,8 @@ class CreateEventTest {
     // Enter a URL
     rule.onNodeWithText("Link").performTextInput("http://example.com")
 
+    rule.onNodeWithText("Add Tags").assertIsDisplayed()
+
     rule.onNodeWithText("Add Image").assertIsDisplayed()
 
     rule.onNodeWithText("Post").performClick()
@@ -104,7 +111,7 @@ class CreateEventTest {
     @JvmStatic
     @BeforeClass
     fun setup() {
-      eventViewModel = EventViewModel(uid)
+      eventViewModel = EventViewModel(uid, EventRepository(Firebase.firestore))
     }
   }
 }
