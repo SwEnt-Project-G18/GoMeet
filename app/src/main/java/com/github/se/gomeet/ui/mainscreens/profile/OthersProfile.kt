@@ -419,17 +419,9 @@ fun OthersProfile(
                           }
                     }
                 Spacer(modifier = Modifier.height(10.dp))
-                ProfileEventsList(
-                    "My Events",
-                    rememberLazyListState(),
-                    myEventList,
-                    NavigationActions(rememberNavController()))
+                ProfileEventsList("My Events", rememberLazyListState(), myEventList, nav)
                 Spacer(modifier = Modifier.height(10.dp))
-                ProfileEventsList(
-                    "History",
-                    rememberLazyListState(),
-                    myHistoryList,
-                    NavigationActions(rememberNavController()))
+                ProfileEventsList("History", rememberLazyListState(), myHistoryList, nav)
               }
         } else {
           LoadingText()
