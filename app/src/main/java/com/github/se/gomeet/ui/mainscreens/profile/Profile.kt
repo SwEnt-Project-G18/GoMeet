@@ -55,7 +55,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.repository.EventRepository
@@ -174,7 +174,7 @@ fun Profile(
                     modifier =
                         Modifier.fillMaxWidth()
                             .padding(start = 15.dp, end = 0.dp, top = 0.dp, bottom = 30.dp)) {
-                      ProfileImage(userId = userId)
+                      ProfileImage(userId = userId, modifier = Modifier.testTag("Profile Picture"))
                       Column(
                           horizontalAlignment = Alignment.CenterHorizontally,
                           modifier = Modifier.padding(0.dp)) {
@@ -412,11 +412,6 @@ fun Profile(
       }
 }
 
-/**
- * ProfileEventsList composable
- *
- * @param title String
- */
 @Composable
 fun ProfileImage(
     userId: String,
@@ -439,7 +434,7 @@ fun ProfileImage(
   Image(
       painter =
           if (!profilePictureUrl.isNullOrEmpty()) {
-            rememberImagePainter(profilePictureUrl)
+            rememberAsyncImagePainter(profilePictureUrl)
           } else {
             painterResource(id = defaultImageResId)
           },

@@ -44,6 +44,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
@@ -250,7 +251,8 @@ fun EditProfile(
                             .clickable { imagePickerLauncher.launch("image/*") }
                             .clip(CircleShape)
                             .background(color = MaterialTheme.colorScheme.background)
-                            .align(Alignment.CenterHorizontally),
+                            .align(Alignment.CenterHorizontally)
+                            .testTag("Profile Picture"),
                     contentScale = ContentScale.Crop)
 
                 Spacer(modifier = Modifier.size(16.dp))
