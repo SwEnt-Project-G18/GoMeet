@@ -170,9 +170,9 @@ class UserRepository(private val db: FirebaseFirestore) {
         email = this["email"] as? String ?: "",
         phoneNumber = this["phoneNumber"] as? String ?: "",
         country = this["country"] as? String ?: "",
-        joinedEvents = this["myTickets"] as? List<String>?: emptyList(),
-        myEvents = this["myEvents"] as? List<String>?: emptyList(),
-        myFavorites = this["myFavorites"] as? List<String>?: emptyList(),
-        tags = this["tags"]as? List<String>?: emptyList())
+        joinedEvents = this["myTickets"] as? List<String> ?: emptyList(),
+        myEvents = this["myEvents"] as? List<String> ?: emptyList(),
+        myFavorites = this["myFavorites"] as? List<String> ?: emptyList(),
+        tags = this["tags"] as? List<String> ?: emptyList())
   }
 }

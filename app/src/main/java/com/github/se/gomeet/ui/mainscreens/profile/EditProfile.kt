@@ -50,8 +50,8 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberImagePainter
 import androidx.compose.ui.window.Popup
+import coil.compose.rememberImagePainter
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.TagsSelector
 import com.github.se.gomeet.model.repository.UserRepository
@@ -65,10 +65,10 @@ import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FirebaseFirestore
-import java.io.InputStream
-import kotlinx.coroutines.tasks.await
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import java.io.InputStream
+import kotlinx.coroutines.tasks.await
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -225,31 +225,32 @@ fun EditProfile(
             selectedItem = Route.PROFILE)
       },
       content = { innerPadding ->
-
         if (isLoaded) {
-            Column(
-                modifier =
-                Modifier.padding(innerPadding).verticalScroll(rememberScrollState(0)).fillMaxSize(),
-                verticalArrangement = Arrangement.Top,
-                horizontalAlignment = Alignment.CenterHorizontally) {
+          Column(
+              modifier =
+                  Modifier.padding(innerPadding)
+                      .verticalScroll(rememberScrollState(0))
+                      .fillMaxSize(),
+              verticalArrangement = Arrangement.Top,
+              horizontalAlignment = Alignment.CenterHorizontally) {
                 Image(
                     painter =
-                    if (imageBitmap != null) {
-                        androidx.compose.ui.graphics.painter.BitmapPainter(imageBitmap!!)
-                    } else if (!profilePictureUrl.isNullOrEmpty()) {
-                        rememberImagePainter(profilePictureUrl)
-                    } else {
-                        painterResource(id = R.drawable.gomeet_logo)
-                    },
+                        if (imageBitmap != null) {
+                          androidx.compose.ui.graphics.painter.BitmapPainter(imageBitmap!!)
+                        } else if (!profilePictureUrl.isNullOrEmpty()) {
+                          rememberImagePainter(profilePictureUrl)
+                        } else {
+                          painterResource(id = R.drawable.gomeet_logo)
+                        },
                     contentDescription = "Profile picture",
                     modifier =
-                    Modifier.padding(start = 15.dp, end = 15.dp, top = 30.dp, bottom = 15.dp)
-                        .width(101.dp)
-                        .height(101.dp)
-                        .clickable { imagePickerLauncher.launch("image/*") }
-                        .clip(CircleShape)
-                        .background(color = MaterialTheme.colorScheme.background)
-                        .align(Alignment.CenterHorizontally),
+                        Modifier.padding(start = 15.dp, end = 15.dp, top = 30.dp, bottom = 15.dp)
+                            .width(101.dp)
+                            .height(101.dp)
+                            .clickable { imagePickerLauncher.launch("image/*") }
+                            .clip(CircleShape)
+                            .background(color = MaterialTheme.colorScheme.background)
+                            .align(Alignment.CenterHorizontally),
                     contentScale = ContentScale.Crop)
 
                 Spacer(modifier = Modifier.size(16.dp))

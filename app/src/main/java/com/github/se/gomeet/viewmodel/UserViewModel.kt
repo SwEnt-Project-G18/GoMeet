@@ -99,7 +99,6 @@ class UserViewModel(userRepository: UserRepository) : ViewModel() {
     }
   }
 
-
   /**
    * Get the user with its id.
    *
