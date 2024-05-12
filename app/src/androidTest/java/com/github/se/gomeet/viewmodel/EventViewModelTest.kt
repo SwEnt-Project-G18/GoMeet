@@ -85,7 +85,6 @@ class EventViewModelTest {
     eventViewModel.editEvent(newEvent)
     event = eventViewModel.getEvent(uid)!!
 
-    assert(event != null)
     assert(event.eventID == uid)
     assert(event.title == newTitle)
 

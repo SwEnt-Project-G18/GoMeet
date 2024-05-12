@@ -218,16 +218,20 @@ fun ManageInvites(
                 }
 
                 usersInvitedToEvent.forEach { userInvited ->
-                  UserInviteWidget(
-                      userInvited!!.username,
-                      user.value!!.uid,
-                      currentEvent,
-                      status =
-                          userInvited.pendingRequests
-                              .find { it.userId == user.value!!.uid && it.eventId == currentEvent }
-                              ?.status,
-                      userViewModel = userViewModel,
-                      eventViewModel = eventViewModel)
+                  if (userInvited != user.value) {
+                    UserInviteWidget(
+                        userInvited!!.username,
+                        user.value!!.uid,
+                        currentEvent,
+                        status =
+                            userInvited.pendingRequests
+                                .find {
+                                  it.userId == user.value!!.uid && it.eventId == currentEvent
+                                }
+                                ?.status,
+                        userViewModel = userViewModel,
+                        eventViewModel = eventViewModel)
+                  }
                 }
               }
             }

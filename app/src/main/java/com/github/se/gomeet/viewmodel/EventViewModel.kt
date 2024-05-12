@@ -287,36 +287,42 @@ class EventViewModel(private val creatorId: String? = null, eventRepository: Eve
   /**
    * Remove an event by its UID.
    *
-   * @param uid the UID of the event to remove
+   * @param eventID the ID of the event to remove
    */
-  fun removeEvent(uid: String) {
-    repository.removeEvent(uid)
+  fun removeEvent(eventID: String) {
+    repository.removeEvent(eventID)
   }
 
   fun joinEvent(event: Event, userId: String) {
+    assert(!event.participants.contains(userId))
     repository.updateEvent(event.copy(participants = event.participants.plus(userId)))
   }
 
   fun sendInvitation(event: Event, userId: String) {
+    assert(!event.pendingParticipants.contains(userId))
     repository.updateEvent(event.copy(pendingParticipants = event.pendingParticipants.plus(userId)))
   }
 
   fun acceptInvitation(event: Event, userId: String) {
+    assert(event.pendingParticipants.contains(userId))
     repository.updateEvent(
         event.copy(pendingParticipants = event.pendingParticipants.minus(userId)))
     joinEvent(event, userId)
   }
 
   fun declineInvitation(event: Event, userId: String) {
+    assert(event.pendingParticipants.contains(userId))
     repository.updateEvent(
         event.copy(pendingParticipants = event.pendingParticipants.minus(userId)))
   }
 
   fun kickParticipant(event: Event, userId: String) {
+    assert(event.participants.contains(userId))
     repository.updateEvent(event.copy(participants = event.participants.minus(userId)))
   }
 
   fun cancelInvitation(event: Event, userId: String) {
+    assert(event.pendingParticipants.contains(userId))
     repository.updateEvent(
         event.copy(pendingParticipants = event.pendingParticipants.minus(userId)))
   }
