@@ -55,31 +55,31 @@ class InvitesRepository(private val db: FirebaseFirestore) {
         }
   }
 
-    /**
-     * This function retrieves all the events the user has been invited to
-     *
-     * @param userId The user ID
-     * @param callback The callback function to be called when the events are retrieved
-     * @return the events the user has been invited to if they exist, null otherwise
-     */
-    fun getEventsUserHasBeenInvitedTo(userId: String, callback: (UserInvitedToEvents?) -> Unit) {
-        db.collection(USER_INVITES_COLLECTION)
-            .document(userId)
-            .get()
-            .addOnSuccessListener { document ->
-                if (document != null && document.exists()) {
-                    val eventInvite = document.data!!.toUserInvitedToEvents(userId)
-                    callback(eventInvite)
-                } else {
-                    Log.d(TAG, "No such document")
-                    callback(null)
-                }
-            }
-            .addOnFailureListener { exception ->
-                Log.d(TAG, "get failed with ", exception)
-                callback(null)
-            }
-    }
+  /**
+   * This function retrieves all the events the user has been invited to
+   *
+   * @param userId The user ID
+   * @param callback The callback function to be called when the events are retrieved
+   * @return the events the user has been invited to if they exist, null otherwise
+   */
+  fun getEventsUserHasBeenInvitedTo(userId: String, callback: (UserInvitedToEvents?) -> Unit) {
+    db.collection(USER_INVITES_COLLECTION)
+        .document(userId)
+        .get()
+        .addOnSuccessListener { document ->
+          if (document != null && document.exists()) {
+            val eventInvite = document.data!!.toUserInvitedToEvents(userId)
+            callback(eventInvite)
+          } else {
+            Log.d(TAG, "No such document")
+            callback(null)
+          }
+        }
+        .addOnFailureListener { exception ->
+          Log.d(TAG, "get failed with ", exception)
+          callback(null)
+        }
+  }
 
   /**
    * This function retrieves all the users invited to an event

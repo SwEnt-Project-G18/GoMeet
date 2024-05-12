@@ -58,8 +58,10 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.github.se.gomeet.R
+import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.InviteStatus
 import com.github.se.gomeet.model.event.UserInvitedToEvents
+import com.github.se.gomeet.model.repository.EventRepository
 import com.github.se.gomeet.model.repository.InvitesRepository
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
@@ -68,31 +70,36 @@ import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.ui.theme.NavBarUnselected
 import com.github.se.gomeet.viewmodel.EventInviteViewModel
+import com.github.se.gomeet.viewmodel.EventViewModel
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Date
+import java.time.LocalDate
 import java.util.Locale
+import kotlinx.coroutines.launch
 
 @Composable
 fun Notifications(nav: NavigationActions, userId: String) {
-    val inviteViewModel = EventInviteViewModel(InvitesRepository(Firebase.firestore))
+  val inviteViewModel = EventInviteViewModel(InvitesRepository(Firebase.firestore))
+  val eventViewModel = EventViewModel(null, EventRepository(Firebase.firestore))
 
   var selectedFilter by remember { mutableStateOf("All") }
   val eventsPendingInvitations = remember { mutableStateOf<UserInvitedToEvents?>(null) }
+  val event = remember { mutableStateOf<Event?>(null) }
   val coroutineScope = rememberCoroutineScope()
-    
+
   LaunchedEffect(Unit) {
-      coroutineScope.launch {
-          val pendingInvitations = inviteViewModel.getEventsUserHasBeenInvitedTo(userId)
-          if (pendingInvitations != null) {
-              // Filter only pending invitations
-              pendingInvitations.invitedToEvents = pendingInvitations.invitedToEvents.filter { it.second == InviteStatus.PENDING }.toMutableList()
-              eventsPendingInvitations.value = pendingInvitations
-          }
+    coroutineScope.launch {
+      val pendingInvitations = inviteViewModel.getEventsUserHasBeenInvitedTo(userId)
+      if (pendingInvitations != null) {
+        // Filter only pending invitations
+        pendingInvitations.invitedToEvents =
+            pendingInvitations.invitedToEvents
+                .filter { it.second == InviteStatus.PENDING }
+                .toMutableList()
+        eventsPendingInvitations.value = pendingInvitations
       }
+    }
   }
 
   // Define a function to handle button clicks
@@ -129,8 +136,7 @@ fun Notifications(nav: NavigationActions, userId: String) {
               Row(
                   verticalAlignment = Alignment.CenterVertically,
                   horizontalArrangement = Arrangement.Start,
-                  modifier =
-                      Modifier.testTag("Back").clickable { nav.goBack() }) {
+                  modifier = Modifier.testTag("Back").clickable { nav.goBack() }) {
                     Icon(
                         painter = painterResource(id = R.drawable.arrow_back_24px),
                         contentDescription = "image description",
@@ -203,14 +209,27 @@ fun Notifications(nav: NavigationActions, userId: String) {
                                       placeholder(R.drawable.gomeet_logo)
                                     })
                             .build())
-                NotificationsWidget(
-                    userName = "Bill Clinton",
-                    eventName = "Chess night",
-                    eventDate = Date(),
-                    eventPicture = painter,
-                    organizerName = "EPFL Chess Club",
-                    verified = true)
-                Spacer(Modifier.height(10.dp))
+
+                eventsPendingInvitations.value?.invitedToEvents?.forEach {
+                  val eventName = it.first
+                  coroutineScope.launch {
+                    val currentEvent = eventViewModel.getEvent(eventName)
+
+                    if (currentEvent != null) {
+                      event.value = currentEvent
+                    }
+                  }
+
+                  NotificationsWidget(
+                      userName = event.value?.creator!!,
+                      eventName = event.value?.uid!!,
+                      eventDate = event.value?.date!!,
+                      eventPicture = painter,
+                      organizerName = event.value?.creator!!,
+                      verified = true)
+
+                  Spacer(Modifier.height(10.dp))
+                }
               }
             }
       }
@@ -221,7 +240,7 @@ fun NotificationsWidget(
     userName: String,
     organizerName: String,
     eventName: String,
-    eventDate: Date,
+    eventDate: LocalDate,
     eventPicture: Painter,
     verified: Boolean
 ) {
@@ -313,16 +332,21 @@ fun NotificationsWidget(
                           }
                         }
 
-                    val currentDate = Calendar.getInstance()
-                    val startOfWeek = currentDate.clone() as Calendar
-                    startOfWeek[Calendar.DAY_OF_WEEK] = startOfWeek.firstDayOfWeek
-                    val endOfWeek = startOfWeek.clone() as Calendar
-                    endOfWeek.add(Calendar.DAY_OF_WEEK, 6)
+                    // Get the current date and time
+                    val currentDate = LocalDate.now()
 
-                    val eventCalendar = Calendar.getInstance().apply { time = eventDate }
+                    // Get the start of the week
+                    val startOfWeek = currentDate.with(java.time.DayOfWeek.MONDAY)
+
+                    // Get the end of the week
+                    val endOfWeek = startOfWeek.plusDays(6)
+
+                    // Convert eventDate to LocalDateTime (assuming eventDate has both date and
+                    // time)
+                    val eventDateTime = eventDate.atStartOfDay()
 
                     // Determine if the event date is within this week
-                    val isThisWeek = eventCalendar >= startOfWeek && eventCalendar <= endOfWeek
+                    val isThisWeek = eventDateTime.toLocalDate() in startOfWeek..endOfWeek
 
                     // Format based on whether the date is in the current week
                     val dateFormat =
@@ -351,7 +375,7 @@ fun NotificationsWidget(
                         Button(
                             onClick = {},
                             content = {
-                              Row() {
+                              Row {
                                 /*Icon(
                                 painter = painterResource(id = R.drawable.check_circle),
                                 contentDescription = "Accept",
