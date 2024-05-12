@@ -59,18 +59,17 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
-import com.github.se.gomeet.model.event.InviteStatus
-import com.github.se.gomeet.model.event.UserInvitedToEvents
 import com.github.se.gomeet.model.repository.EventRepository
-import com.github.se.gomeet.model.repository.InvitesRepository
+import com.github.se.gomeet.model.repository.UserRepository
+import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.ui.theme.NavBarUnselected
-import com.github.se.gomeet.viewmodel.EventInviteViewModel
 import com.github.se.gomeet.viewmodel.EventViewModel
+import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.text.SimpleDateFormat
@@ -80,24 +79,20 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun Notifications(nav: NavigationActions, userId: String) {
-  val inviteViewModel = EventInviteViewModel(InvitesRepository(Firebase.firestore))
   val eventViewModel = EventViewModel(null, EventRepository(Firebase.firestore))
+  val userViewModel = UserViewModel(UserRepository(Firebase.firestore))
 
   var selectedFilter by remember { mutableStateOf("All") }
-  val eventsPendingInvitations = remember { mutableStateOf<UserInvitedToEvents?>(null) }
   val event = remember { mutableStateOf<Event?>(null) }
+  val user = remember { mutableStateOf<GoMeetUser?>(null) }
   val coroutineScope = rememberCoroutineScope()
 
   LaunchedEffect(Unit) {
     coroutineScope.launch {
-      val pendingInvitations = inviteViewModel.getEventsUserHasBeenInvitedTo(userId)
-      if (pendingInvitations != null) {
-        // Filter only pending invitations
-        pendingInvitations.invitedToEvents =
-            pendingInvitations.invitedToEvents
-                .filter { it.value == InviteStatus.PENDING }
-                .toMutableMap()
-        eventsPendingInvitations.value = pendingInvitations
+      val currentUser = userViewModel.getUser(userId)
+
+      if (currentUser != null) {
+        user.value = currentUser
       }
     }
   }
@@ -210,8 +205,8 @@ fun Notifications(nav: NavigationActions, userId: String) {
                                     })
                             .build())
 
-                eventsPendingInvitations.value?.invitedToEvents?.forEach {
-                  val eventName = it.key
+                user.value?.pendingRequests?.forEach { invitation ->
+                  val eventName = invitation.eventId
                   coroutineScope.launch {
                     val currentEvent = eventViewModel.getEvent(eventName)
 
@@ -221,8 +216,8 @@ fun Notifications(nav: NavigationActions, userId: String) {
                   }
 
                   NotificationsWidget(
-                      userName = event.value?.creator!!,
-                      eventName = event.value?.uid!!,
+                      userName = user.value?.username!!,
+                      eventName = event.value?.eventID!!,
                       eventDate = event.value?.date!!,
                       eventPicture = painter,
                       organizerName = event.value?.creator!!,

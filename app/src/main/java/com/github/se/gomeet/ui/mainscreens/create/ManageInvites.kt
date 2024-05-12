@@ -44,7 +44,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
-import com.github.se.gomeet.model.event.EventInviteUsers
 import com.github.se.gomeet.model.event.InviteStatus
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
@@ -53,10 +52,11 @@ import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.ui.theme.NavBarUnselected
-import com.github.se.gomeet.viewmodel.EventInviteViewModel
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 /**
@@ -69,8 +69,7 @@ fun ManageInvites(
     currentEvent: String,
     nav: NavigationActions,
     userViewModel: UserViewModel,
-    eventViewModel: EventViewModel,
-    eventInviteViewModel: EventInviteViewModel
+    eventViewModel: EventViewModel
 ) {
 
   var selectedFilter by remember { mutableStateOf("All") }
@@ -78,13 +77,12 @@ fun ManageInvites(
   val coroutineScope = rememberCoroutineScope()
   val user = remember { mutableStateOf<GoMeetUser?>(null) }
   val event = remember { mutableStateOf<Event?>(null) }
-  val eventInviteUsers = remember { mutableStateOf<EventInviteUsers?>(null) }
+  val usersInvitedToEvent = remember { mutableListOf<GoMeetUser?>() }
 
   LaunchedEffect(Unit) {
     coroutineScope.launch {
       user.value = userViewModel.getUser(currentUser)
       event.value = eventViewModel.getEvent(currentEvent)
-      eventInviteUsers.value = eventInviteViewModel.getUsersInvitedToEvent(event.value!!.uid)
 
       while (user.value == null || event.value == null) {
         TimeUnit.SECONDS.sleep(1)
@@ -94,6 +92,29 @@ fun ManageInvites(
         followers.forEach {
           val followerUser = userViewModel.getUser(it)
           followersList.add(followerUser!!)
+        }
+      }
+
+      val pendingInvitations =
+          eventViewModel.getEvent(currentEvent)?.pendingParticipants?.toMutableList()
+
+      val participantsOfEvent = eventViewModel.getEvent(currentEvent)?.participants?.toMutableList()
+
+      if (pendingInvitations != null) {
+        if (pendingInvitations.isNotEmpty()) {
+          pendingInvitations.forEach { invitedUser ->
+            val userInvited = userViewModel.getUser(invitedUser)
+            usersInvitedToEvent.add(userInvited)
+          }
+        }
+      }
+
+      if (participantsOfEvent != null) {
+        if (participantsOfEvent.isNotEmpty()) {
+          participantsOfEvent.forEach { invitedUser ->
+            val userInvited = userViewModel.getUser(invitedUser)
+            usersInvitedToEvent.add(userInvited)
+          }
         }
       }
     }
@@ -182,20 +203,31 @@ fun ManageInvites(
 
               // Display the list of followers to manage our invitations
               Column(modifier = Modifier.verticalScroll(rememberScrollState()).fillMaxSize()) {
-                  followersList.forEach {follower ->
-                      val invitationStatus = follower.pendingRequests.find { it.userId == follower.uid && it.eventId == currentEvent }?.status
-                      UserInviteWidget(follower.username, follower.uid, currentEvent, invitationStatus, eventInviteViewModel)
-                  }
+                followersList.forEach { follower ->
+                  val invitationStatus =
+                      follower.pendingRequests
+                          .find { it.userId == follower.uid && it.eventId == currentEvent }
+                          ?.status
+                  UserInviteWidget(
+                      follower.username,
+                      user.value!!.uid,
+                      currentEvent,
+                      invitationStatus,
+                      userViewModel,
+                      eventViewModel)
+                }
 
-                if (eventInviteUsers.value != null) {
-                  eventInviteUsers.value!!.usersInvited.forEach { userInvited ->
-                    UserInviteWidget(
-                        userInvited.key,
-                        user.value!!.uid,
-                        currentEvent,
-                        status = userInvited.value,
-                        eventInviteViewModel)
-                  }
+                usersInvitedToEvent.forEach { userInvited ->
+                  UserInviteWidget(
+                      userInvited!!.username,
+                      user.value!!.uid,
+                      currentEvent,
+                      status =
+                          userInvited.pendingRequests
+                              .find { it.userId == user.value!!.uid && it.eventId == currentEvent }
+                              ?.status,
+                      userViewModel = userViewModel,
+                      eventViewModel = eventViewModel)
                 }
               }
             }
@@ -208,7 +240,8 @@ fun UserInviteWidget(
     userUid: String,
     eventUid: String,
     status: InviteStatus?,
-    eventInviteViewModel: EventInviteViewModel
+    userViewModel: UserViewModel,
+    eventViewModel: EventViewModel
 ) {
   Row(
       modifier = Modifier.fillMaxWidth().padding(start = 15.dp, end = 15.dp).height(50.dp),
@@ -247,7 +280,37 @@ fun UserInviteWidget(
 
         // Button to invite or cancel invitation
         Button(
-            onClick = { eventInviteViewModel.sendInviteToUser(userUid, eventUid) },
+            onClick = {
+              CoroutineScope(Dispatchers.Main).launch {
+                val event = eventViewModel.getEvent(eventUid)
+                when (status) {
+                  null -> {
+                    userViewModel.gotInvitation(eventUid, userUid)
+                    if (event != null) {
+                      eventViewModel.sendInvitation(event, userUid)
+                    }
+                  }
+                  InviteStatus.PENDING -> {
+                    userViewModel.invitationCanceled(eventUid, userUid)
+                    if (event != null) {
+                      eventViewModel.cancelInvitation(event, userUid)
+                    }
+                  }
+                  InviteStatus.ACCEPTED -> {
+                    userViewModel.gotKickedFromEvent(eventUid, userUid)
+                    if (event != null) {
+                      eventViewModel.kickParticipant(event, userUid)
+                    }
+                  }
+                  InviteStatus.REFUSED -> {
+                    userViewModel.gotInvitation(eventUid, userUid)
+                    if (event != null) {
+                      eventViewModel.sendInvitation(event, userUid)
+                    }
+                  }
+                }
+              }
+            },
             modifier = Modifier.height(26.dp).width(82.dp),
             contentPadding = PaddingValues(vertical = 2.dp),
             shape = RoundedCornerShape(10.dp),
@@ -279,13 +342,3 @@ fun UserInviteWidget(
             }
       }
 }
-
-/*
-@Preview
-@Composable
-fun ManageInvitesPreview() {
-    ManageInvites("eventId",nav = NavigationActions(rememberNavController()))
-
-}
-
- */

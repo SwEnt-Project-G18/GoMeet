@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
@@ -131,7 +130,7 @@ fun ProfileEventsList(
                       val timeString = timeFormat.format(eventDate)
 
                       nav.navigateToEventInfo(
-                          eventId = event.uid,
+                          eventId = event.eventID,
                           title = event.title,
                           date = dayString,
                           time = timeString,

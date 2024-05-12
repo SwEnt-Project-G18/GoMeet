@@ -32,7 +32,9 @@ class CreateEventTest {
 
   @After
   fun tearDown() {
-    runBlocking { eventViewModel.getAllEvents()?.forEach { eventViewModel.removeEvent(it.uid) } }
+    runBlocking {
+      eventViewModel.getAllEvents()?.forEach { eventViewModel.removeEvent(it.eventID) }
+    }
   }
 
   @Test

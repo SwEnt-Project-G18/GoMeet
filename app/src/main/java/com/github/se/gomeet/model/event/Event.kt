@@ -6,7 +6,7 @@ import java.time.LocalDate
 /**
  * This data class represents an event. An event is the main entity of the application.
  *
- * @param uid Event's uid
+ * @param eventID Event's uid
  * @param creator Creator of the event
  * @param title Title of the event
  * @param description Description of the event
@@ -22,7 +22,7 @@ import java.time.LocalDate
  * @param images Is it the right type?
  */
 data class Event(
-    val uid: String, // Event's uid
+    val eventID: String, // Event's uid
     val creator: String, // Creator of the event
     val title: String, // title of the event
     val description: String, // Description of the event
@@ -30,6 +30,7 @@ data class Event(
     val date: LocalDate, // Date of the event
     val price: Double, // price of the Event
     val url: String, // Website of the event (can be ticketLink)
+    val pendingParticipants: List<String>, // Pending users invitations to the event
     val participants: List<String>, // People participating to the event
     val visibleToIfPrivate: List<String>, // People that can enter the event if it's private
     val maxParticipants: Int, // Maximum number of Participants of the event

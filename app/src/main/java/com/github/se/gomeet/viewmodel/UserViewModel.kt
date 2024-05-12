@@ -4,6 +4,8 @@ import android.content.ContentValues
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import com.github.se.gomeet.model.event.Invitation
+import com.github.se.gomeet.model.event.InviteStatus
 import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.google.firebase.auth.ktx.auth
@@ -101,11 +103,6 @@ class UserViewModel(userRepository: UserRepository) : ViewModel() {
     }
   }
 
-  // TODO: fix the following method
-  fun getCurrentUser(): GoMeetUser? {
-    return currentUser.value
-  }
-
   /**
    * Edit the user globally.
    *
@@ -131,18 +128,101 @@ class UserViewModel(userRepository: UserRepository) : ViewModel() {
    * @param userId The id of the user joining the event.
    */
   suspend fun joinEvent(eventId: String, userId: String) {
+    val possibleInvitation =
+        getUser(userId)!!.pendingRequests.find {
+          it.eventId == eventId && it.status == InviteStatus.PENDING && it.userId == userId
+        }
     try {
       val goMeetUser = getUser(userId)!!
-      editUser(goMeetUser.copy(myEvents = goMeetUser.myEvents.plus(eventId)))
+      if (possibleInvitation != null) {
+        editUser(
+            goMeetUser.copy(pendingRequests = goMeetUser.pendingRequests.minus(possibleInvitation)))
+      }
+      editUser(goMeetUser.copy(joinedEvents = goMeetUser.joinedEvents.plus(eventId)))
     } catch (e: Exception) {
       Log.w(ContentValues.TAG, "Couldn't join the event", e)
     }
   }
 
-  /** TODO */
-  suspend fun gotTicket(eventId: String, userId: String) {
-    val goMeetUser = getUser(userId)!!
-    editUser(goMeetUser.copy(joinedEvents = goMeetUser.joinedEvents.plus(eventId)))
+  suspend fun userCreatesEvent(eventId: String, userId: String) {
+    try {
+      val goMeetUser = getUser(userId)!!
+      editUser(goMeetUser.copy(myEvents = goMeetUser.myEvents.plus(eventId)))
+    } catch (e: Exception) {
+      Log.w(ContentValues.TAG, "Couldn't create the event", e)
+    }
+  }
+
+  suspend fun gotInvitation(eventId: String, userId: String) {
+    try {
+      val goMeetUser = getUser(userId)!!
+      editUser(
+          goMeetUser.copy(
+              pendingRequests =
+                  goMeetUser.pendingRequests.plus(
+                      Invitation(eventId, userId, InviteStatus.PENDING))))
+    } catch (e: Exception) {
+      Log.w(ContentValues.TAG, "Couldn't get the invitation", e)
+    }
+  }
+
+  suspend fun gotKickedFromEvent(eventId: String, userId: String) {
+    try {
+      val goMeetUser = getUser(userId)!!
+      editUser(goMeetUser.copy(joinedEvents = goMeetUser.joinedEvents.minus(eventId)))
+    } catch (e: Exception) {
+      Log.w(ContentValues.TAG, "Couldn't get kicked from the event", e)
+    }
+  }
+
+  suspend fun invitationCanceled(eventId: String, userId: String) {
+    val possibleInvitation =
+        getUser(userId)!!.pendingRequests.find {
+          it.eventId == eventId && it.status == InviteStatus.PENDING && it.userId == userId
+        }
+    try {
+      val goMeetUser = getUser(userId)!!
+      if (possibleInvitation != null) {
+        editUser(
+            goMeetUser.copy(pendingRequests = goMeetUser.pendingRequests.minus(possibleInvitation)))
+      }
+    } catch (e: Exception) {
+      Log.w(ContentValues.TAG, "Couldn't cancel the invitation", e)
+    }
+  }
+
+  suspend fun userAcceptsInvitation(eventId: String, userId: String) {
+    val possibleInvitation =
+        getUser(userId)!!.pendingRequests.find {
+          it.eventId == eventId && it.status == InviteStatus.PENDING && it.userId == userId
+        }
+    try {
+      val goMeetUser = getUser(userId)!!
+      if (possibleInvitation != null) {
+        editUser(
+            goMeetUser.copy(pendingRequests = goMeetUser.pendingRequests.minus(possibleInvitation)))
+      }
+      editUser(goMeetUser.copy(joinedEvents = goMeetUser.joinedEvents.plus(eventId)))
+    } catch (e: Exception) {
+      Log.w(ContentValues.TAG, "Couldn't accept the invitation", e)
+    }
+  }
+
+  suspend fun userRefusesInvitation(eventId: String, userId: String) {
+    val possibleInvitation =
+        getUser(userId)!!.pendingRequests.find {
+          it.eventId == eventId && it.status == InviteStatus.PENDING && it.userId == userId
+        }
+
+    try {
+      val goMeetUser = getUser(userId)!!
+      if (possibleInvitation != null) {
+        editUser(
+            goMeetUser.copy(pendingRequests = goMeetUser.pendingRequests.minus(possibleInvitation)))
+      }
+    } catch (e: Exception) {
+      Log.w(ContentValues.TAG, "Couldn't refuse the invitation", e)
+    }
   }
 
   /**

@@ -96,7 +96,7 @@ class EventRepository(private val db: FirebaseFirestore) {
    */
   fun addEvent(event: Event) {
     db.collection(EVENT_COLLECTION)
-        .document(event.uid)
+        .document(event.eventID)
         .set(event.toMap())
         .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully written!") }
         .addOnFailureListener { e -> Log.w(TAG, "Error adding document", e) }
@@ -108,7 +108,7 @@ class EventRepository(private val db: FirebaseFirestore) {
    * @param event The event to be updated
    */
   fun updateEvent(event: Event) {
-    val documentRef = db.collection(EVENT_COLLECTION).document(event.uid)
+    val documentRef = db.collection(EVENT_COLLECTION).document(event.eventID)
     documentRef
         .update(event.toMap())
         .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully updated!") }
@@ -135,7 +135,7 @@ class EventRepository(private val db: FirebaseFirestore) {
    */
   private fun Event.toMap(): Map<String, Any?> {
     return mapOf(
-        "uid" to uid,
+        "uid" to eventID,
         "creator" to creator,
         "title" to title,
         "description" to description,
@@ -167,7 +167,7 @@ class EventRepository(private val db: FirebaseFirestore) {
    */
   private fun Map<String, Any>.toEvent(id: String? = null): Event {
     return Event(
-        uid = id ?: this["uid"] as? String ?: "",
+        eventID = id ?: this["uid"] as? String ?: "",
         creator = this["creator"] as? String ?: "",
         title = this["title"] as? String ?: "",
         description = this["description"] as? String ?: "",
@@ -175,6 +175,7 @@ class EventRepository(private val db: FirebaseFirestore) {
         date = LocalDate.parse(this["date"] as? String ?: ""),
         price = this["price"] as? Double ?: 0.0,
         url = this["url"] as? String ?: "",
+        pendingParticipants = this["pendingInvitations"] as? List<String> ?: emptyList(),
         participants = this["participants"] as? List<String> ?: emptyList(),
         visibleToIfPrivate = this["visibleToIfPrivate"] as? List<String> ?: emptyList(),
         maxParticipants = (this["maxParticipants"] as? String)?.toIntOrNull() ?: 0,

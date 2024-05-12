@@ -48,7 +48,7 @@ class EndToEndTest : TestCase() {
   @After
   fun tearDown() {
     // Clean up the event
-    runBlocking { eventVM.getAllEvents()?.forEach { eventVM.removeEvent(it.uid) } }
+    runBlocking { eventVM.getAllEvents()?.forEach { eventVM.removeEvent(it.eventID) } }
 
     // Clean up the user
     Firebase.auth.currentUser?.delete()

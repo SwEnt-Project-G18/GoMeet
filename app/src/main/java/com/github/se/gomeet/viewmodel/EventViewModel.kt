@@ -68,16 +68,16 @@ class EventViewModel(private val creatorId: String? = null, eventRepository: Eve
           val loadJobs =
               events.map { event ->
                 async {
-                  val imagePath = "event_icons/${event.uid}.png"
+                  val imagePath = "event_icons/${event.eventID}.png"
                   val storageRef = FirebaseStorage.getInstance().reference.child(imagePath)
                   val uri = storageRef.downloadUrl.await() // Await the download URL
                   try {
                     val bitmapDescriptor =
                         loadBitmapFromUri(context, uri) // Load the bitmap as a BitmapDescriptor
-                    _bitmapDescriptors[event.uid] = bitmapDescriptor
+                    _bitmapDescriptors[event.eventID] = bitmapDescriptor
                   } catch (e: Exception) {
                     Log.e("ViewModel", "Error loading bitmap descriptor: ${e.message}")
-                    _bitmapDescriptors[event.uid] =
+                    _bitmapDescriptors[event.eventID] =
                         BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)
                   }
                 }
@@ -232,6 +232,7 @@ class EventViewModel(private val creatorId: String? = null, eventRepository: Eve
       date: LocalDate,
       price: Double,
       url: String,
+      pendingParticipants: List<String>,
       participants: List<String>,
       visibleToIfPrivate: List<String>,
       maxParticipants: Int,
@@ -257,6 +258,7 @@ class EventViewModel(private val creatorId: String? = null, eventRepository: Eve
                 date,
                 price,
                 url,
+                pendingParticipants,
                 participants,
                 visibleToIfPrivate,
                 maxParticipants,
@@ -266,7 +268,7 @@ class EventViewModel(private val creatorId: String? = null, eventRepository: Eve
 
         repository.addEvent(event)
         joinEvent(event, creatorId)
-        userViewModel.joinEvent(event.uid, creatorId)
+        userViewModel.userCreatesEvent(event.eventID, creatorId)
       } catch (e: Exception) {
         Log.w(TAG, "Error uploading image or adding event", e)
       }
@@ -293,6 +295,30 @@ class EventViewModel(private val creatorId: String? = null, eventRepository: Eve
 
   fun joinEvent(event: Event, userId: String) {
     repository.updateEvent(event.copy(participants = event.participants.plus(userId)))
+  }
+
+  fun sendInvitation(event: Event, userId: String) {
+    repository.updateEvent(event.copy(pendingParticipants = event.pendingParticipants.plus(userId)))
+  }
+
+  fun acceptInvitation(event: Event, userId: String) {
+    repository.updateEvent(
+        event.copy(pendingParticipants = event.pendingParticipants.minus(userId)))
+    joinEvent(event, userId)
+  }
+
+  fun declineInvitation(event: Event, userId: String) {
+    repository.updateEvent(
+        event.copy(pendingParticipants = event.pendingParticipants.minus(userId)))
+  }
+
+  fun kickParticipant(event: Event, userId: String) {
+    repository.updateEvent(event.copy(participants = event.participants.minus(userId)))
+  }
+
+  fun cancelInvitation(event: Event, userId: String) {
+    repository.updateEvent(
+        event.copy(pendingParticipants = event.pendingParticipants.minus(userId)))
   }
 
   /**

@@ -20,7 +20,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.github.se.gomeet.model.repository.EventRepository
-import com.github.se.gomeet.model.repository.InvitesRepository
 import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.ui.authscreens.LoginScreen
 import com.github.se.gomeet.ui.authscreens.WelcomeScreen
@@ -47,7 +46,6 @@ import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.GoMeetTheme
 import com.github.se.gomeet.ui.theme.SetStatusBarColor
 import com.github.se.gomeet.viewmodel.AuthViewModel
-import com.github.se.gomeet.viewmodel.EventInviteViewModel
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.android.gms.maps.MapsInitializer
@@ -55,7 +53,6 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
-import com.google.firebase.firestore.firestoreSettings
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.memoryCacheSettings
 import com.google.firebase.firestore.persistentCacheSettings
@@ -128,11 +125,9 @@ class MainActivity : ComponentActivity() {
           val nav = rememberNavController()
           val eventRepository = EventRepository(db)
           val userRepository = UserRepository(db)
-          val invitesRepository = InvitesRepository(db)
           val authViewModel = AuthViewModel()
           val eventViewModel = EventViewModel(null, eventRepository)
           val userViewModel = UserViewModel(userRepository)
-          val eventInviteViewModel = EventInviteViewModel(invitesRepository)
           val navAction = NavigationActions(nav)
           NavHost(navController = nav, startDestination = Route.WELCOME) {
             composable(Route.WELCOME) {
@@ -231,8 +226,7 @@ class MainActivity : ComponentActivity() {
                       nav = navAction,
                       userId = userIdState.value,
                       userViewModel = userViewModel,
-                      eventId = eventId,
-                      eventInviteViewModel = eventInviteViewModel)
+                      eventId = eventId)
                 }
 
             composable(
@@ -241,12 +235,7 @@ class MainActivity : ComponentActivity() {
                   val eventId = entry.arguments?.getString("eventId") ?: ""
 
                   ManageInvites(
-                      userIdState.value,
-                      eventId,
-                      navAction,
-                      userViewModel,
-                      eventViewModel,
-                      eventInviteViewModel)
+                      userIdState.value, eventId, navAction, userViewModel, eventViewModel)
                 }
 
             composable(

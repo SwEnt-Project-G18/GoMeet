@@ -219,6 +219,7 @@ class EndToEndTest2 : TestCase() {
           "url",
           emptyList(),
           emptyList(),
+          emptyList(),
           0,
           true,
           emptyList(),
@@ -239,7 +240,7 @@ class EndToEndTest2 : TestCase() {
     @JvmStatic
     fun tearDown() {
       // clean up the event
-      runBlocking { eventVM.getAllEvents()?.forEach { eventVM.removeEvent(it.uid) } }
+      runBlocking { eventVM.getAllEvents()?.forEach { eventVM.removeEvent(it.eventID) } }
 
       // clean up the users
       Firebase.auth.currentUser?.delete()
