@@ -41,7 +41,7 @@ class EditProfileTest {
     private val userVM = UserViewModel(UserRepository(Firebase.firestore))
     private lateinit var currentUserId: String
 
-    private val usr = "u@t.com"
+    private val usr = "u@editprofiletest.com"
     private val pwd = "123456"
 
     @BeforeClass
