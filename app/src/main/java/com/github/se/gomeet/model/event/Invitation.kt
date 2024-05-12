@@ -9,7 +9,7 @@ package com.github.se.gomeet.model.event
  */
 data class EventInviteUsers(
     val event: String,
-    var usersInvited: MutableList<Pair<String, InviteStatus>>,
+    var usersInvited: MutableMap<String, InviteStatus>
 )
 
 /**
@@ -22,7 +22,7 @@ data class EventInviteUsers(
  */
 data class UserInvitedToEvents(
     val user: String,
-    var invitedToEvents: MutableList<Pair<String, InviteStatus>>
+    var invitedToEvents: MutableMap<String, InviteStatus>
 )
 
 /**
@@ -34,4 +34,7 @@ enum class InviteStatus {
   REFUSED,
 }
 
-data class Invite(val eventId: String, val userId: String, val status: InviteStatus)
+/**
+ *
+ */
+data class Invitation(val eventId: String, val userId: String, val status: InviteStatus)

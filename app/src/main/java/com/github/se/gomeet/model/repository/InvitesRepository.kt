@@ -127,12 +127,12 @@ class InvitesRepository(private val db: FirebaseFirestore) {
           val snapshot = transaction.get(eventInviteRef)
           val currentUsers =
               if (snapshot.exists()) {
-                snapshot.toObject(EventInviteUsers::class.java)?.usersInvited?.toMutableList()
-                    ?: mutableListOf()
+                snapshot.toObject(EventInviteUsers::class.java)?.usersInvited?.toMutableMap()
+                    ?: mutableMapOf()
               } else {
-                mutableListOf()
+                mutableMapOf()
               }
-          currentUsers.add(Pair(userID, status))
+        currentUsers[userID] = status
           transaction.set(eventInviteRef, EventInviteUsers(eventID, currentUsers))
         }
         .addOnSuccessListener {
@@ -165,12 +165,12 @@ class InvitesRepository(private val db: FirebaseFirestore) {
           val snapshot = transaction.get(userInviteRef)
           val currentEvents =
               if (snapshot.exists()) {
-                snapshot.toObject(UserInvitedToEvents::class.java)?.invitedToEvents?.toMutableList()
-                    ?: mutableListOf()
+                snapshot.toObject(UserInvitedToEvents::class.java)?.invitedToEvents?.toMutableMap()
+                    ?: mutableMapOf()
               } else {
-                mutableListOf()
+                mutableMapOf()
               }
-          currentEvents.add(Pair(eventID, status))
+          currentEvents[eventID] = status
           transaction.set(userInviteRef, UserInvitedToEvents(userID, currentEvents))
         }
         .addOnSuccessListener {
@@ -229,8 +229,8 @@ class InvitesRepository(private val db: FirebaseFirestore) {
               eventSnapshot.data!!
                   .toEventInviteUsers(eventID)
                   .usersInvited
-                  .filterNot { it.first == toUserID }
-                  .toMutableList()
+                  .filterNot { it.key == toUserID }
+                  .toMutableMap()
           transaction.set(eventInviteRef, EventInviteUsers(eventID, updatedEventUsers))
 
           // Remove event from user's invites
@@ -239,8 +239,8 @@ class InvitesRepository(private val db: FirebaseFirestore) {
               userSnapshot.data!!
                   .toUserInvitedToEvents(toUserID)
                   .invitedToEvents
-                  .filterNot { it.first == eventID }
-                  .toMutableList()
+                  .filterNot { it.key == eventID }
+                  .toMutableMap()
           transaction.set(userInviteRef, UserInvitedToEvents(toUserID, updatedUserEvents))
         }
         .addOnSuccessListener { Log.d(TAG, "Transaction successful: both invites removed") }
@@ -261,7 +261,7 @@ class InvitesRepository(private val db: FirebaseFirestore) {
     return EventInviteUsers(
         event = id ?: this["e"] as? String ?: "",
         usersInvited =
-            this["usersInvited"] as? MutableList<Pair<String, InviteStatus>> ?: mutableListOf())
+            this["usersInvited"] as? MutableMap<String, InviteStatus> ?: mutableMapOf())
   }
 
   /** Maps the users and events to their respective fields in the database */
@@ -278,7 +278,7 @@ class InvitesRepository(private val db: FirebaseFirestore) {
     return UserInvitedToEvents(
         user = id ?: this["u"] as? String ?: "",
         invitedToEvents =
-            this["invitedToEvents"] as? MutableList<Pair<String, InviteStatus>> ?: mutableListOf())
+            this["invitedToEvents"] as? MutableMap<String, InviteStatus> ?: mutableMapOf())
   }
 
   /**

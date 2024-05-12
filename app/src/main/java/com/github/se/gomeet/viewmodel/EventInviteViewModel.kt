@@ -56,7 +56,7 @@ class EventInviteViewModel(invitesRepository: InvitesRepository) {
    */
   fun sendInviteToUser(userID: String, eventId: String): Boolean? {
     return try {
-      repository.sendInvite(userID, eventId)
+      repository.sendInvite(eventID = eventId, toUserID = userID)
     } catch (e: Exception) {
       null
     }
@@ -95,6 +95,6 @@ class EventInviteViewModel(invitesRepository: InvitesRepository) {
   }
 
   fun addEventInviteUsers(e: EventInviteUsers) {
-    e.usersInvited.forEach { repository.sendInvite(e.event, it.first) }
+    e.usersInvited.forEach { repository.sendInvite(e.event, it.key) }
   }
 }

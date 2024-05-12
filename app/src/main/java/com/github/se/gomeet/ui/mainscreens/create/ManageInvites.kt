@@ -180,23 +180,20 @@ fun ManageInvites(
                         }
                   }
 
-              /* TODO: for every followers this user has, retrieve them and stock them in a list and
-                 display them in the following way using the UserInviteWidget in a for-loop
-              */
-              followersList.forEach {
-                UserInviteWidget(it.username, it.uid, currentEvent, null, eventInviteViewModel)
-              }
-
-              // Display the list of followers to manage our invitations based to the selected
-              // filter
+              // Display the list of followers to manage our invitations
               Column(modifier = Modifier.verticalScroll(rememberScrollState()).fillMaxSize()) {
+                  followersList.forEach {follower ->
+                      val invitationStatus = follower.pendingRequests.find { it.userId == follower.uid && it.eventId == currentEvent }?.status
+                      UserInviteWidget(follower.username, follower.uid, currentEvent, invitationStatus, eventInviteViewModel)
+                  }
+
                 if (eventInviteUsers.value != null) {
-                  eventInviteUsers.value!!.usersInvited.forEach {
+                  eventInviteUsers.value!!.usersInvited.forEach { userInvited ->
                     UserInviteWidget(
-                        it.first,
+                        userInvited.key,
                         user.value!!.uid,
                         currentEvent,
-                        status = it.second,
+                        status = userInvited.value,
                         eventInviteViewModel)
                   }
                 }

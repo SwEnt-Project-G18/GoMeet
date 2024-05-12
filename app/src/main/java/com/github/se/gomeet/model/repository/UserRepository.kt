@@ -1,6 +1,7 @@
 package com.github.se.gomeet.model.repository
 
 import android.util.Log
+import com.github.se.gomeet.model.event.Invitation
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -141,7 +142,7 @@ class UserRepository(private val db: FirebaseFirestore) {
         username = this["username"] as String,
         following = this["following"] as List<String>,
         followers = this["followers"] as List<String>,
-        pendingRequests = this["pendingRequests"] as List<String>,
+        pendingRequests = this["pendingRequests"] as List<Invitation>,
         firstName = this["firstName"] as? String ?: "",
         lastName = this["lastName"] as? String ?: "",
         email = this["email"] as? String ?: "",

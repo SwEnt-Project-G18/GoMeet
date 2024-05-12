@@ -95,8 +95,8 @@ fun Notifications(nav: NavigationActions, userId: String) {
         // Filter only pending invitations
         pendingInvitations.invitedToEvents =
             pendingInvitations.invitedToEvents
-                .filter { it.second == InviteStatus.PENDING }
-                .toMutableList()
+                .filter { it.value == InviteStatus.PENDING }
+                .toMutableMap()
         eventsPendingInvitations.value = pendingInvitations
       }
     }
@@ -211,7 +211,7 @@ fun Notifications(nav: NavigationActions, userId: String) {
                             .build())
 
                 eventsPendingInvitations.value?.invitedToEvents?.forEach {
-                  val eventName = it.first
+                  val eventName = it.key
                   coroutineScope.launch {
                     val currentEvent = eventViewModel.getEvent(eventName)
 
