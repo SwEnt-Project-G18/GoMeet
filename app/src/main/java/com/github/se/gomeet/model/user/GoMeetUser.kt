@@ -31,6 +31,7 @@ data class GoMeetUser(
     val joinedEvents: List<String>,
     var myEvents: List<String>,
     var myFavorites: List<String>,
+    var profilePicture: String = "",
     var tags: List<String>
     // can add more things later
 )

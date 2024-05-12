@@ -2,7 +2,6 @@ package com.github.se.gomeet.ui.mainscreens.profile
 
 import android.net.Uri
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -19,7 +18,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.TopAppBar
@@ -46,12 +44,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -165,16 +160,7 @@ fun OthersProfile(
                         Modifier.fillMaxWidth()
                             .padding(start = 15.dp, end = 0.dp, top = 0.dp, bottom = 30.dp)
                             .testTag("UserInfo")) {
-                      Image(
-                          modifier =
-                              Modifier.padding(start = 0.dp, end = 0.dp, top = 0.dp, bottom = 0.dp)
-                                  .width(101.dp)
-                                  .height(101.dp)
-                                  .clip(CircleShape)
-                                  .background(color = MaterialTheme.colorScheme.background),
-                          painter = painterResource(id = R.drawable.gomeet_logo),
-                          contentDescription = "image description",
-                          contentScale = ContentScale.None)
+                      ProfileImage(userId = uid)
                       Column(
                           horizontalAlignment =
                               Alignment

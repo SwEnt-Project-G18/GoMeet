@@ -20,6 +20,7 @@ class UserViewModelTest {
   private val email = "testemail"
   private val phonenumber = "testphonenumber"
   private val country = "testcountry"
+  private val pfp = ""
 
   @Test
   fun test() = runTest {
@@ -53,6 +54,7 @@ class UserViewModelTest {
             emptyList(),
             emptyList(),
             emptyList(),
+            pfp,
             emptyList())
 
     userViewModel.editUser(newUser)

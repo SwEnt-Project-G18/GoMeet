@@ -55,6 +55,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberAsyncImagePainter
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.repository.EventRepository
@@ -72,10 +73,12 @@ import com.github.se.gomeet.ui.theme.LightGray
 import com.github.se.gomeet.ui.theme.NavBarUnselected
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.time.LocalDate
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 /**
  * Profile screen composable
@@ -171,16 +174,7 @@ fun Profile(
                     modifier =
                         Modifier.fillMaxWidth()
                             .padding(start = 15.dp, end = 0.dp, top = 0.dp, bottom = 30.dp)) {
-                      Image(
-                          modifier =
-                              Modifier.padding(start = 0.dp, end = 0.dp, top = 0.dp, bottom = 0.dp)
-                                  .width(101.dp)
-                                  .height(101.dp)
-                                  .clip(CircleShape)
-                                  .background(color = MaterialTheme.colorScheme.background),
-                          painter = painterResource(id = R.drawable.gomeet_logo),
-                          contentDescription = "image description",
-                          contentScale = ContentScale.None)
+                      ProfileImage(userId = userId, modifier = Modifier.testTag("Profile Picture"))
                       Column(
                           horizontalAlignment = Alignment.CenterHorizontally,
                           modifier = Modifier.padding(0.dp)) {
@@ -416,6 +410,41 @@ fun Profile(
           LoadingText()
         }
       }
+}
+
+@Composable
+fun ProfileImage(
+    userId: String,
+    modifier: Modifier = Modifier,
+    defaultImageResId: Int = R.drawable.gomeet_logo
+) {
+  var profilePictureUrl by remember { mutableStateOf<String?>(null) }
+
+  LaunchedEffect(userId) {
+    val db = FirebaseFirestore.getInstance()
+    val userDocRef = db.collection("users").document(userId)
+    try {
+      val snapshot = userDocRef.get().await()
+      profilePictureUrl = snapshot.getString("profilePicture")
+    } catch (e: Exception) {
+      e.printStackTrace()
+    }
+  }
+
+  Image(
+      painter =
+          if (!profilePictureUrl.isNullOrEmpty()) {
+            rememberAsyncImagePainter(profilePictureUrl)
+          } else {
+            painterResource(id = defaultImageResId)
+          },
+      contentDescription = "Profile picture",
+      modifier =
+          modifier
+              .size(101.dp)
+              .clip(CircleShape)
+              .background(color = MaterialTheme.colorScheme.background),
+      contentScale = ContentScale.Crop)
 }
 
 @Preview
