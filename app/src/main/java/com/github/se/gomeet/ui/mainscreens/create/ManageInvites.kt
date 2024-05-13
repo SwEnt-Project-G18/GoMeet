@@ -209,10 +209,10 @@ fun ManageInvites(
                           .find { it.userId == follower.uid && it.eventId == currentEvent }
                           ?.status
                   UserInviteWidget(
+                      follower.uid,
                       follower.username,
-                      user.value!!.uid,
                       currentEvent,
-                      invitationStatus,
+                      // invitationStatus,
                       userViewModel,
                       eventViewModel)
                 }
@@ -220,15 +220,16 @@ fun ManageInvites(
                 usersInvitedToEvent.forEach { userInvited ->
                   if (userInvited != user.value) {
                     UserInviteWidget(
-                        userInvited!!.username,
-                        user.value!!.uid,
+                        userInvited!!.uid,
+                        userInvited.username,
                         currentEvent,
-                        status =
-                            userInvited.pendingRequests
-                                .find {
-                                  it.userId == user.value!!.uid && it.eventId == currentEvent
-                                }
-                                ?.status,
+                        //                        status =
+                        //                            userInvited.pendingRequests
+                        //                                .find {
+                        //                                  it.userId == user.value!!.uid &&
+                        // it.eventId == currentEvent
+                        //                                }
+                        //                                ?.status,
                         userViewModel = userViewModel,
                         eventViewModel = eventViewModel)
                   }
@@ -240,13 +241,23 @@ fun ManageInvites(
 
 @Composable
 fun UserInviteWidget(
+    userID: String,
     username: String,
-    userUid: String,
-    eventUid: String,
-    status: InviteStatus?,
+    eventID: String,
+    // status: InviteStatus?,
     userViewModel: UserViewModel,
     eventViewModel: EventViewModel
 ) {
+  var status by remember { mutableStateOf<InviteStatus?>(null) }
+
+  LaunchedEffect(Unit) {
+    status =
+        userViewModel
+            .getUser(userID)
+            ?.pendingRequests
+            ?.find { it.userId == userID && it.eventId == eventID }
+            ?.status
+  }
   Row(
       modifier = Modifier.fillMaxWidth().padding(start = 15.dp, end = 15.dp).height(50.dp),
       horizontalArrangement = Arrangement.SpaceBetween,
@@ -286,30 +297,30 @@ fun UserInviteWidget(
         Button(
             onClick = {
               CoroutineScope(Dispatchers.Main).launch {
-                val event = eventViewModel.getEvent(eventUid)
+                val event = eventViewModel.getEvent(eventID)
                 when (status) {
                   null -> {
-                    userViewModel.gotInvitation(eventUid, userUid)
+                    userViewModel.gotInvitation(eventID, userID)
                     if (event != null) {
-                      eventViewModel.sendInvitation(event, userUid)
+                      eventViewModel.sendInvitation(event, userID)
                     }
                   }
                   InviteStatus.PENDING -> {
-                    userViewModel.invitationCanceled(eventUid, userUid)
+                    userViewModel.invitationCanceled(eventID, userID)
                     if (event != null) {
-                      eventViewModel.cancelInvitation(event, userUid)
+                      eventViewModel.cancelInvitation(event, userID)
                     }
                   }
                   InviteStatus.ACCEPTED -> {
-                    userViewModel.gotKickedFromEvent(eventUid, userUid)
+                    userViewModel.gotKickedFromEvent(eventID, userID)
                     if (event != null) {
-                      eventViewModel.kickParticipant(event, userUid)
+                      eventViewModel.kickParticipant(event, userID)
                     }
                   }
                   InviteStatus.REFUSED -> {
-                    userViewModel.gotInvitation(eventUid, userUid)
+                    userViewModel.gotInvitation(eventID, userID)
                     if (event != null) {
-                      eventViewModel.sendInvitation(event, userUid)
+                      eventViewModel.sendInvitation(event, userID)
                     }
                   }
                 }
