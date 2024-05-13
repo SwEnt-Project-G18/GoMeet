@@ -204,10 +204,10 @@ fun ManageInvites(
               // Display the list of followers to manage our invitations
               Column(modifier = Modifier.verticalScroll(rememberScrollState()).fillMaxSize()) {
                 followersList.forEach { follower ->
-                  val invitationStatus =
-                      follower.pendingRequests
-                          .find { it.userId == follower.uid && it.eventId == currentEvent }
-                          ?.status
+//                  val invitationStatus =
+//                      follower.pendingRequests
+//                          .find { it.userId == follower.uid && it.eventId == currentEvent }
+//                          ?.status
                   UserInviteWidget(
                       follower.uid,
                       follower.username,
