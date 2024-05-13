@@ -40,7 +40,7 @@ import com.github.se.gomeet.ui.theme.DarkCyan
 
 @Composable
 fun SettingsAbout(
-    nav: NavigationActions, /*userViewModel: UserViewModel*/
+    nav: NavigationActions,
 ) {
     Scaffold(
         modifier = Modifier.testTag("SettingsAbout"),
@@ -139,6 +139,19 @@ fun SettingsAbout(
                 textAlign = TextAlign.Start,
                 style = MaterialTheme.typography.titleSmall
             )
+            Spacer(modifier = Modifier.padding(20.dp))
+            Text(
+                text = "This app was develloped by the GoMeet Team for the EPFL Software Entreprise Class.",
+                color = MaterialTheme.colorScheme.onBackground.copy (alpha = 0.75f),
+                fontStyle = FontStyle.Normal,
+                fontWeight = FontWeight.SemiBold,
+                fontFamily = FontFamily.Default,
+                textAlign = TextAlign.Start,
+                style = MaterialTheme.typography.titleSmall,
+                fontSize = 14.sp,
+                modifier = Modifier.padding(25.dp))
+
+
 
 
 
