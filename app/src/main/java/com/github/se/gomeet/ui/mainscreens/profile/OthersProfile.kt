@@ -2,7 +2,6 @@ package com.github.se.gomeet.ui.mainscreens.profile
 
 import android.net.Uri
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -19,7 +18,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.TopAppBar
@@ -46,12 +44,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -63,6 +58,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
+import com.github.se.gomeet.model.repository.EventRepository
+import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
@@ -74,6 +71,7 @@ import com.github.se.gomeet.ui.theme.NavBarUnselected
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.time.LocalDate
 import kotlinx.coroutines.launch
@@ -162,16 +160,7 @@ fun OthersProfile(
                         Modifier.fillMaxWidth()
                             .padding(start = 15.dp, end = 0.dp, top = 0.dp, bottom = 30.dp)
                             .testTag("UserInfo")) {
-                      Image(
-                          modifier =
-                              Modifier.padding(start = 0.dp, end = 0.dp, top = 0.dp, bottom = 0.dp)
-                                  .width(101.dp)
-                                  .height(101.dp)
-                                  .clip(CircleShape)
-                                  .background(color = MaterialTheme.colorScheme.background),
-                          painter = painterResource(id = R.drawable.gomeet_logo),
-                          contentDescription = "image description",
-                          contentScale = ContentScale.None)
+                      ProfileImage(userId = uid)
                       Column(
                           horizontalAlignment =
                               Alignment
@@ -403,10 +392,10 @@ fun OthersProfile(
                           horizontalArrangement = Arrangement.spacedBy(8.dp),
                           contentPadding = PaddingValues(start = 15.dp, end = 15.dp),
                           modifier = Modifier.heightIn(min = 56.dp)) {
-                            items(10) {
+                            items(user!!.tags.size) { index ->
                               Button(
                                   onClick = {},
-                                  content = { Text("Tag") },
+                                  content = { Text(user!!.tags[index]) },
                                   colors =
                                       ButtonDefaults.buttonColors(
                                           containerColor = NavBarUnselected,
@@ -416,17 +405,9 @@ fun OthersProfile(
                           }
                     }
                 Spacer(modifier = Modifier.height(10.dp))
-                ProfileEventsList(
-                    "My Events",
-                    rememberLazyListState(),
-                    myEventList,
-                    NavigationActions(rememberNavController()))
+                ProfileEventsList("My Events", rememberLazyListState(), myEventList, nav)
                 Spacer(modifier = Modifier.height(10.dp))
-                ProfileEventsList(
-                    "History",
-                    rememberLazyListState(),
-                    myHistoryList,
-                    NavigationActions(rememberNavController()))
+                ProfileEventsList("History", rememberLazyListState(), myHistoryList, nav)
               }
         } else {
           LoadingText()
@@ -467,5 +448,8 @@ fun MoreActionsButton() {
 @Composable
 fun OthersProfilePreview() {
   OthersProfile(
-      nav = NavigationActions(rememberNavController()), "", UserViewModel(), EventViewModel())
+      nav = NavigationActions(rememberNavController()),
+      "",
+      UserViewModel(UserRepository(Firebase.firestore)),
+      EventViewModel(null, EventRepository(Firebase.firestore)))
 }

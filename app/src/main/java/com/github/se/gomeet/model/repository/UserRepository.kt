@@ -1,8 +1,11 @@
 package com.github.se.gomeet.model.repository
 
+import android.net.Uri
 import android.util.Log
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.tasks.await
 
 /**
  * Class that connects to the Firebase Firestore database to get, add, update and remove users.
@@ -34,6 +37,7 @@ class UserRepository(private val db: FirebaseFirestore) {
               userList.add(user)
             }
           }
+          callback(userList)
         }
         .addOnFailureListener { exception ->
           Log.d(TAG, "Error getting documents: ", exception)
@@ -93,6 +97,25 @@ class UserRepository(private val db: FirebaseFirestore) {
   }
 
   /**
+   * Upload a user profile image to Firebase Storage and return the download URL.
+   *
+   * @param userId the user ID
+   * @param imageUri the URI of the image to upload
+   * @return the download URL of the uploaded image
+   */
+  suspend fun uploadUserProfileImageAndGetUrl(userId: String, imageUri: Uri): String {
+    val storageReference = FirebaseStorage.getInstance().reference
+    val imageRef = storageReference.child("user_images/$userId/${imageUri.lastPathSegment}")
+
+    // Upload the file and await the completion
+    val uploadTaskSnapshot = imageRef.putFile(imageUri).await()
+
+    // Retrieve and return the download URL
+    return uploadTaskSnapshot.metadata?.reference?.downloadUrl?.await()?.toString()
+        ?: throw Exception("Failed to upload image and retrieve URL")
+  }
+
+  /**
    * Remove a user from the database.
    *
    * @param uid the user id
@@ -124,7 +147,9 @@ class UserRepository(private val db: FirebaseFirestore) {
         "country" to country,
         "myTickets" to joinedEvents,
         "myEvents" to myEvents,
-        "myFavorites" to myFavorites)
+        "myFavorites" to myFavorites,
+        "profilePicture" to profilePicture,
+        "tags" to tags)
   }
 
   /**
@@ -145,8 +170,9 @@ class UserRepository(private val db: FirebaseFirestore) {
         email = this["email"] as? String ?: "",
         phoneNumber = this["phoneNumber"] as? String ?: "",
         country = this["country"] as? String ?: "",
-        joinedEvents = this["myTickets"] as List<String>,
-        myEvents = this["myEvents"] as List<String>,
-        myFavorites = this["myFavorites"] as List<String>)
+        joinedEvents = this["myTickets"] as? List<String> ?: emptyList(),
+        myEvents = this["myEvents"] as? List<String> ?: emptyList(),
+        myFavorites = this["myFavorites"] as? List<String> ?: emptyList(),
+        tags = this["tags"] as? List<String> ?: emptyList())
   }
 }

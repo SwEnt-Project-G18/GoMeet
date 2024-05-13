@@ -11,6 +11,8 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
 import com.github.se.gomeet.MainActivity
+import com.github.se.gomeet.model.repository.EventRepository
+import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.screens.CreateEventScreen
 import com.github.se.gomeet.screens.CreateScreen
 import com.github.se.gomeet.screens.EventsScreen
@@ -19,6 +21,7 @@ import com.github.se.gomeet.screens.WelcomeScreenScreen
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen
@@ -150,29 +153,28 @@ class EndToEndTest : TestCase() {
     private var uid = ""
     private const val username = "testuser"
 
-    private lateinit var userVM: UserViewModel
+    private val userVM = UserViewModel(UserRepository(Firebase.firestore))
     private lateinit var eventVM: EventViewModel
 
     @JvmStatic
     @BeforeClass
     fun setup() {
       TimeUnit.SECONDS.sleep(3)
+
       // create a new user
-      userVM = UserViewModel()
       var result = Firebase.auth.createUserWithEmailAndPassword(email, pwd)
       while (!result.isComplete) {
         TimeUnit.SECONDS.sleep(1)
       }
       uid = result.result.user!!.uid
-      runBlocking {
-        userVM.createUserIfNew(
-            uid, username, "testfirstname", "testlastname", email, "testphonenumber", "testcountry")
-      }
+      userVM.createUserIfNew(
+          uid, username, "testfirstname", "testlastname", email, "testphonenumber", "testcountry")
+      TimeUnit.SECONDS.sleep(3)
       result = Firebase.auth.signInWithEmailAndPassword(email, pwd)
       while (!result.isComplete) {
         TimeUnit.SECONDS.sleep(1)
       }
-      eventVM = EventViewModel(uid)
+      eventVM = EventViewModel(uid, EventRepository(Firebase.firestore))
     }
   }
 }
