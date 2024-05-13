@@ -204,10 +204,11 @@ fun ManageInvites(
               // Display the list of followers to manage our invitations
               Column(modifier = Modifier.verticalScroll(rememberScrollState()).fillMaxSize()) {
                 followersList.forEach { follower ->
-//                  val invitationStatus =
-//                      follower.pendingRequests
-//                          .find { it.userId == follower.uid && it.eventId == currentEvent }
-//                          ?.status
+                  //                  val invitationStatus =
+                  //                      follower.pendingRequests
+                  //                          .find { it.userId == follower.uid && it.eventId ==
+                  // currentEvent }
+                  //                          ?.status
                   UserInviteWidget(
                       follower.uid,
                       follower.username,
@@ -251,12 +252,16 @@ fun UserInviteWidget(
   var status by remember { mutableStateOf<InviteStatus?>(null) }
 
   LaunchedEffect(Unit) {
-    status =
-        userViewModel
-            .getUser(userID)
-            ?.pendingRequests
-            ?.find { it.userId == userID && it.eventId == eventID }
-            ?.status
+    // TODO: this commented code returns me an HashMap for some reason and makes the app crash
+    // because it expects a List of Invitation
+    val user = userViewModel.getUser(userID)
+
+    //    status =
+    //        userViewModel
+    //            .getUser(userID)
+    //            ?.pendingRequests
+    //            ?.find { it.userId == userID && it.eventId == eventID }
+    //            ?.status
   }
   Row(
       modifier = Modifier.fillMaxWidth().padding(start = 15.dp, end = 15.dp).height(50.dp),

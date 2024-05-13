@@ -154,8 +154,20 @@ class UserViewModel(userRepository: UserRepository) : ViewModel() {
   }
 
   suspend fun gotInvitation(eventId: String, userId: String) {
+    val possibleInvitation =
+        getUser(userId)!!.pendingRequests.find {
+          it.eventId == eventId && it.status == InviteStatus.PENDING && it.userId == userId
+        }
+
     try {
       val goMeetUser = getUser(userId)!!
+      if (goMeetUser.joinedEvents.contains(eventId) ||
+          goMeetUser.pendingRequests.contains(possibleInvitation)) {
+        Log.w(
+            (ContentValues.TAG),
+            "User already joined this event or has a pending request for this event")
+        return
+      }
       editUser(
           goMeetUser.copy(
               pendingRequests =

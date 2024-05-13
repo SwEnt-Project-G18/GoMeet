@@ -2,6 +2,7 @@ package com.github.se.gomeet.model.repository
 
 import android.util.Log
 import com.github.se.gomeet.model.event.Invitation
+import com.github.se.gomeet.model.event.InviteStatus
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -30,7 +31,7 @@ class UserRepository(private val db: FirebaseFirestore) {
         .addOnSuccessListener { querySnapshot ->
           val userList = mutableListOf<GoMeetUser>()
           for (document in querySnapshot.documents) {
-            val user = document.data?.fromMap(document.id)
+            val user = document.data?.toUser(document.id)
             if (user != null) {
               userList.add(user)
             }
@@ -55,7 +56,7 @@ class UserRepository(private val db: FirebaseFirestore) {
         .get()
         .addOnSuccessListener { document ->
           if (document != null && document.exists()) {
-            val user = document.data!!.fromMap(uid)
+            val user = document.data!!.toUser(uid)
             callback(user)
           } else {
             Log.d(TAG, "No such document")
@@ -136,13 +137,13 @@ class UserRepository(private val db: FirebaseFirestore) {
    * @param id the user id
    * @return the GoMeetUser
    */
-  private fun Map<String, Any>.fromMap(id: String): GoMeetUser {
+  private fun Map<String, Any>.toUser(id: String): GoMeetUser {
     return GoMeetUser(
         uid = id,
         username = this["username"] as String,
         following = this["following"] as List<String>,
         followers = this["followers"] as List<String>,
-        pendingRequests = this["pendingRequests"] as List<Invitation>,
+        pendingRequests = convertToInvitationsList(this["pendingRequests"]),
         firstName = this["firstName"] as? String ?: "",
         lastName = this["lastName"] as? String ?: "",
         email = this["email"] as? String ?: "",
@@ -152,5 +153,25 @@ class UserRepository(private val db: FirebaseFirestore) {
         myEvents = this["myEvents"] as List<String>,
         myFavorites = this["myFavorites"] as List<String>,
         tags = this["tags"] as List<String>)
+  }
+
+  private fun convertToInvitationsList(data: Any?): List<Invitation> {
+    if (data is List<*>) {
+      return data.mapNotNull { element ->
+        if (element is Map<*, *>) {
+          val eventId = element["eventId"] as? String
+          val userId = element["userId"] as? String
+          val status = element["status"] as? String
+          if (eventId != null && userId != null && status != null) {
+            Invitation(eventId, userId, InviteStatus.valueOf(status))
+          } else {
+            null
+          }
+        } else {
+          null
+        }
+      }
+    }
+    return emptyList()
   }
 }
