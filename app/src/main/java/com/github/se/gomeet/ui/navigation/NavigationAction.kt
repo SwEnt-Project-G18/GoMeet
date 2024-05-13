@@ -5,10 +5,17 @@ import android.util.Log
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.AddCircle
+import androidx.compose.material.icons.outlined.DateRange
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Person
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
@@ -184,18 +191,35 @@ class NavigationActions(val navController: NavHostController) {
   }
 }
 /**
- * Gets the icon for the given route.
+ * Gets the icon for the given route if not selected.
  *
  * @param route The route to get the icon for.
  */
 @Composable
 fun getIconForRoute(route: String): ImageVector {
   return when (route) {
-    Route.EVENTS -> Icons.Default.DateRange
+    Route.EVENTS -> Icons.Outlined.DateRange
     Route.TRENDS -> ImageVector.vectorResource(R.drawable.arrow_trending)
-    Route.EXPLORE -> Icons.Default.Home
-    Route.CREATE -> Icons.Default.Add
-    Route.PROFILE -> Icons.Default.Person
-    else -> Icons.Default.AccountCircle
+    Route.EXPLORE -> Icons.Outlined.Home
+    Route.CREATE -> Icons.Outlined.AddCircle
+    Route.PROFILE -> Icons.Outlined.Person
+    else -> Icons.Outlined.AccountCircle
   }
+}
+
+/**
+ * Gets the icon for the given route if selected.
+ *
+ * @param route The route to get the icon for.
+ */
+@Composable
+fun getIconForSelectedRoute(route: String): ImageVector {
+    return when (route) {
+        Route.EVENTS -> Icons.Filled.DateRange
+        Route.TRENDS -> ImageVector.vectorResource(R.drawable.arrow_trending)
+        Route.EXPLORE -> Icons.Filled.Home
+        Route.CREATE -> Icons.Filled.AddCircle
+        Route.PROFILE -> Icons.Filled.Person
+        else -> Icons.Filled.AccountCircle
+    }
 }

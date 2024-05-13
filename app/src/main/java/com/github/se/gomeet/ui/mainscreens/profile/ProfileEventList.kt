@@ -1,5 +1,6 @@
 package com.github.se.gomeet.ui.mainscreens.profile
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -25,11 +26,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
@@ -57,7 +61,7 @@ fun ProfileEventsList(
 ) {
   Column(Modifier.fillMaxWidth().padding(start = 15.dp)) {
     Row(Modifier.testTag("EventsListHeader"), verticalAlignment = Alignment.CenterVertically) {
-      Text(text = title, style = MaterialTheme.typography.titleLarge)
+      Text(text = title, style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.W400))
       Spacer(modifier = Modifier.width(10.dp))
       ClickableText(
           style =
@@ -66,7 +70,9 @@ fun ProfileEventsList(
           },
           text = AnnotatedString(text = "View All >"))
     }
+
     Spacer(modifier = Modifier.height(5.dp))
+
     LazyRow(
         state = listState,
         verticalAlignment = Alignment.CenterVertically,
@@ -150,8 +156,7 @@ fun ProfileEventsList(
                   Text(
                       text = event.title,
                       style =
-                          MaterialTheme.typography.bodyLarge.copy(
-                              color = MaterialTheme.colorScheme.outline))
+                          MaterialTheme.typography.bodyLarge)
                   Text(
                       text = event.date.toString(),
                       style =

@@ -270,8 +270,8 @@ fun OthersProfile(
                             colors =
                                 ButtonDefaults.buttonColors(
                                     containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                    contentColor = MaterialTheme.colorScheme.outline),
-                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+                                    contentColor = MaterialTheme.colorScheme.outlineVariant),
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
                         )
                       }
                     }

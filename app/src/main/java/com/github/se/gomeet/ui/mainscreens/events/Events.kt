@@ -1,35 +1,34 @@
 package com.github.se.gomeet.ui.mainscreens.events
 
+import EventWidget
+import androidx.collection.emptyLongSet
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
@@ -44,21 +43,16 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -69,7 +63,6 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
-import com.github.se.gomeet.model.event.location.Location
 import com.github.se.gomeet.model.repository.EventRepository
 import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.model.user.GoMeetUser
@@ -82,16 +75,12 @@ import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.ui.theme.NavBarUnselected
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
-import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import java.text.SimpleDateFormat
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.ZoneId
-import java.util.Calendar
 import java.util.Date
-import java.util.Locale
-import kotlinx.coroutines.launch
 
 /**
  * Composable function to display the Events screen.
@@ -109,7 +98,8 @@ fun Events(
     userViewModel: UserViewModel,
     eventViewModel: EventViewModel
 ) {
-
+    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
   // State management for event filters and list
   var selectedFilter by remember { mutableStateOf("All") }
   val eventList = remember { mutableListOf<Event>() }
@@ -144,16 +134,12 @@ fun Events(
   // Scaffold is a structure that supports top bar, content area, and bottom navigation
   Scaffold(
       topBar = {
-        Text(
-            text = "Events",
-            modifier = Modifier.padding(start = 15.dp, top = 15.dp, end = 15.dp, bottom = 0.dp),
-            color = DarkCyan,
-            fontStyle = FontStyle.Normal,
-            fontWeight = FontWeight.SemiBold,
-            fontFamily = FontFamily.Default,
-            textAlign = TextAlign.Start,
-            style = MaterialTheme.typography.headlineLarge)
-      },
+          Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(start = screenWidth/15, top = screenHeight/30)) {
+              Text(text = "Events",
+                  style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.SemiBold))
+              Spacer(Modifier.weight(1f))
+          }
+               },
       bottomBar = {
         BottomNavigationMenu(
             onTabSelect = { selectedTab ->
@@ -167,7 +153,7 @@ fun Events(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(innerPadding)) {
               Spacer(modifier = Modifier.height(5.dp))
-              GoMeetSearchBar(nav, query, NavBarUnselected, Color.DarkGray)
+              GoMeetSearchBar(nav, query, NavBarUnselected, MaterialTheme.colorScheme.tertiary)
               Spacer(modifier = Modifier.height(5.dp))
               Row(
                   verticalAlignment = Alignment.CenterVertically,
@@ -176,37 +162,41 @@ fun Events(
                     Button(
                         onClick = { onFilterButtonClick("Joined") },
                         content = { Text("JoinedEvents") },
-                        colors =
+                        shape = RoundedCornerShape(10.dp),
+                        colors = if( selectedFilter == "Joined")
                             ButtonDefaults.buttonColors(
-                                containerColor =
-                                    if (selectedFilter == "Joined") DarkCyan else NavBarUnselected,
-                                contentColor =
-                                    if (selectedFilter == "Joined") Color.White else DarkCyan),
-                        border = BorderStroke(1.dp, DarkCyan))
-                    Spacer(modifier = Modifier.width(10.dp))
+                                containerColor =  MaterialTheme.colorScheme.outlineVariant,
+                                contentColor = Color.White)
+                            else
+                  ButtonDefaults.buttonColors(
+                      containerColor = MaterialTheme.colorScheme.primaryContainer,
+                      contentColor = MaterialTheme.colorScheme.primary))
+
+
                     Button(
                         onClick = { onFilterButtonClick("Favourites") },
                         content = { Text("Favourites") },
-                        colors =
+                        shape = RoundedCornerShape(10.dp),
+                        colors = if( selectedFilter == "Favourites")
                             ButtonDefaults.buttonColors(
-                                containerColor =
-                                    if (selectedFilter == "Favourites") DarkCyan
-                                    else NavBarUnselected,
-                                contentColor =
-                                    if (selectedFilter == "Favourites") Color.White else DarkCyan),
-                        border = BorderStroke(1.dp, DarkCyan))
-                    Spacer(modifier = Modifier.width(10.dp))
+                                containerColor =  MaterialTheme.colorScheme.outlineVariant,
+                                contentColor = Color.White)
+                        else
+                            ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                contentColor = MaterialTheme.colorScheme.primary))
                     Button(
                         onClick = { onFilterButtonClick("MyEvents") },
                         content = { Text("My events") },
-                        colors =
+                        shape = RoundedCornerShape(10.dp),
+                        colors = if( selectedFilter == "MyEvents")
                             ButtonDefaults.buttonColors(
-                                containerColor =
-                                    if (selectedFilter == "MyEvents") DarkCyan
-                                    else NavBarUnselected,
-                                contentColor =
-                                    if (selectedFilter == "MyEvents") Color.White else DarkCyan),
-                        border = BorderStroke(1.dp, DarkCyan))
+                                containerColor =  MaterialTheme.colorScheme.outlineVariant,
+                                contentColor = Color.White)
+                        else
+                            ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                contentColor = MaterialTheme.colorScheme.primary))
                   }
 
               if (!eventsLoaded.value) {
@@ -219,16 +209,7 @@ fun Events(
                   if (selectedFilter == "All" || selectedFilter == "Joined") {
                     Text(
                         text = "Joined Events",
-                        style =
-                            TextStyle(
-                                fontSize = 20.sp,
-                                lineHeight = 16.sp,
-                                fontFamily = FontFamily(Font(R.font.roboto)),
-                                fontWeight = FontWeight(1000),
-                                color = DarkCyan,
-                                textAlign = TextAlign.Center,
-                                letterSpacing = 0.5.sp,
-                            ),
+                        style = MaterialTheme.typography.titleLarge,
                         modifier = Modifier.padding(10.dp).align(Alignment.Start))
 
                     // Loop through and display events that match the joined events criteria
@@ -384,176 +365,6 @@ fun Events(
       }
 }
 
-/**
- * A composable function that displays detailed information about an event in a card layout. This
- * widget is designed to present event details including the name, description, date, and an image
- * if available. The card is interactive and can be tapped to navigate to further event details.
- *
- * @param userName The name of the event creator.
- * @param eventId The unique identifier for the event.
- * @param eventName The name of the event.
- * @param eventDescription A short description of the event.
- * @param eventDate The date and time at which the event is scheduled.
- * @param eventPicture A painter object that handles the rendering of the event's image.
- * @param verified A boolean indicating whether the event or the creator is verified. This could
- *   influence the visual representation.
- * @param nav NavigationActions object to handle navigation events such as tapping on the event
- */
-@Composable
-fun EventWidget(
-    userName: String,
-    eventId: String,
-    eventName: String,
-    eventDescription: String,
-    eventDate: Date,
-    eventPicture: Painter,
-    eventLocation: Location,
-    verified: Boolean,
-    nav: NavigationActions,
-) {
-
-  val configuration = LocalConfiguration.current
-  val screenWidth = configuration.screenWidthDp.dp
-  val density = LocalDensity.current
-
-  val smallTextSize = with(density) { screenWidth.toPx() / 85 }
-  val bigTextSize = with(density) { screenWidth.toPx() / 60 }
-
-  val currentDate = Calendar.getInstance()
-  val startOfWeek = currentDate.clone() as Calendar
-  startOfWeek.set(Calendar.DAY_OF_WEEK, startOfWeek.firstDayOfWeek)
-  val endOfWeek = startOfWeek.clone() as Calendar
-  endOfWeek.add(Calendar.DAY_OF_WEEK, 6)
-
-  val eventCalendar = Calendar.getInstance().apply { time = eventDate }
-
-  val isThisWeek = eventCalendar.after(currentDate) && eventCalendar.before(endOfWeek)
-  val isToday =
-      currentDate.get(Calendar.YEAR) == eventCalendar.get(Calendar.YEAR) &&
-          currentDate.get(Calendar.DAY_OF_YEAR) == eventCalendar.get(Calendar.DAY_OF_YEAR)
-
-  val dayFormat =
-      if (isThisWeek) {
-        SimpleDateFormat("EEEE", Locale.getDefault())
-      } else {
-        SimpleDateFormat("dd/MM/yy", Locale.getDefault())
-      }
-
-  val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-
-  val dayString =
-      if (isToday) {
-        "Today"
-      } else {
-        dayFormat.format(eventDate)
-      }
-  val timeString = timeFormat.format(eventDate)
-
-  Card(
-      modifier =
-          Modifier.fillMaxWidth()
-              .testTag("Card")
-              .padding(start = 10.dp, top = 5.dp, end = 10.dp, bottom = 5.dp)
-              .clickable {
-                nav.navigateToEventInfo(
-                    eventId = eventId,
-                    title = eventName,
-                    date = dayString,
-                    time = timeString,
-                    description = eventDescription,
-                    organizer = userName,
-                    loc = LatLng(eventLocation.latitude, eventLocation.longitude),
-                    rating = 0.0 // TODO: replace with actual rating
-                    // TODO: add image
-                    )
-              },
-      colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-      border = BorderStroke(2.dp, DarkCyan)) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceAround) {
-              Column(
-                  modifier = Modifier.weight(4f).padding(15.dp),
-                  horizontalAlignment = Alignment.Start, // Align text horizontally to center
-                  verticalArrangement = Arrangement.Center) {
-                    Text(
-                        text = eventName,
-                        style =
-                            TextStyle(
-                                fontSize = bigTextSize.sp,
-                                lineHeight = 20.sp,
-                                fontFamily = FontFamily(Font(R.font.roboto)),
-                                fontWeight = FontWeight(700),
-                                color = MaterialTheme.colorScheme.onBackground,
-                                letterSpacing = 0.25.sp,
-                            ),
-                        modifier = Modifier.testTag("EventName"))
-
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center) {
-                          var username by remember { mutableStateOf<String?>("Loading...") }
-                          LaunchedEffect(userName) {
-                            username =
-                                UserViewModel(UserRepository(Firebase.firestore))
-                                    .getUsername(userName)
-                          }
-
-                          username?.let {
-                            Text(
-                                it,
-                                style =
-                                    TextStyle(
-                                        fontSize = smallTextSize.sp,
-                                        lineHeight = 24.sp,
-                                        fontFamily = FontFamily(Font(R.font.roboto)),
-                                        fontWeight = FontWeight(700),
-                                        color = MaterialTheme.colorScheme.onBackground,
-                                        letterSpacing = 0.15.sp,
-                                    ),
-                                modifier = Modifier.padding(top = 5.dp).testTag("UserName"))
-                          }
-                          if (verified) {
-                            Box(
-                                contentAlignment = Alignment.Center,
-                                modifier = Modifier.padding(5.dp).size(smallTextSize.dp * (1.4f))) {
-                                  Image(
-                                      painter = painterResource(id = R.drawable.verified),
-                                      contentDescription = "Verified",
-                                  )
-                                }
-                          }
-                        }
-
-                    Text(
-                        dayString + " - " + timeString,
-                        style =
-                            TextStyle(
-                                fontSize = smallTextSize.sp,
-                                lineHeight = 20.sp,
-                                fontFamily = FontFamily(Font(R.font.roboto)),
-                                fontWeight = FontWeight(700),
-                                color = MaterialTheme.colorScheme.onBackground,
-                                letterSpacing = 0.25.sp,
-                            ),
-                        modifier = Modifier.testTag("EventDate"))
-                  }
-              Image(
-                  painter = eventPicture,
-                  contentDescription = "Event Picture",
-                  modifier =
-                      Modifier.weight(3f)
-                          .fillMaxHeight()
-                          .aspectRatio(3f / 1.75f)
-                          .clipToBounds()
-                          .padding(0.dp) // Clip the image if it overflows its bounds
-                          .testTag("EventPicture"),
-                  contentScale = ContentScale.Crop, // Crop the image to fit the aspect ratio
-              )
-            }
-      }
-}
 
 /**
  * Composable function to display the search bar.
@@ -573,7 +384,8 @@ fun GoMeetSearchBar(
   val customTextSelectionColors =
       TextSelectionColors(handleColor = DarkCyan, backgroundColor = DarkCyan.copy(alpha = 0.4f))
   CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
-    androidx.compose.material3.SearchBar(
+    SearchBar(
+        shape = RoundedCornerShape(10.dp),
         query = query.value,
         onQueryChange = { query.value = it },
         active = false,
@@ -631,11 +443,4 @@ fun EventPreview() {
       nav = NavigationActions(rememberNavController()),
       UserViewModel(UserRepository(Firebase.firestore)),
       EventViewModel("", EventRepository(Firebase.firestore)))
-  /*EventWidget(
-  "EPFL Chess Club",
-  "Chess Tournament",
-  eventDate,
-  R.drawable.gomeet_logo,
-  R.drawable.intbee_logo,
-  true)*/
 }

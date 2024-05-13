@@ -126,13 +126,12 @@ fun WelcomeScreen(
                   color = Color.White)
             }
 
-        Spacer(modifier = Modifier.size(screenHeight/40))
+        Spacer(modifier = Modifier.size(10.dp))
       OutlinedButton(
           onClick = { onNavToLogin() },
           modifier = Modifier
               .width((screenWidth / 1.5.dp).dp)
-              .height(screenHeight / 17)
-              .testTag("LogInButton"),
+              .height(screenHeight / 17),
           shape = RoundedCornerShape(10.dp),
           border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
           enabled = true,

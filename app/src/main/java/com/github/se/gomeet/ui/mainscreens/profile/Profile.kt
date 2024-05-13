@@ -47,6 +47,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -120,9 +121,8 @@ fun Profile(
             selectedItem = Route.PROFILE)
       },
       topBar = {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-          Spacer(Modifier.width(15.dp))
-          Text(text = "My Profile", style = MaterialTheme.typography.headlineMedium)
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(start = screenWidth/15, top = screenHeight/30)) {
+          Text(text = "My Profile", style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.SemiBold))
           Spacer(Modifier.weight(1f))
           IconButton(
               modifier = Modifier.align(Alignment.CenterVertically),
@@ -276,8 +276,8 @@ fun Profile(
                             colors =
                                 ButtonDefaults.buttonColors(
                                     containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                    contentColor = MaterialTheme.colorScheme.outline),
-                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+                                    contentColor = MaterialTheme.colorScheme.outlineVariant),
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
                         )
                       }
                     }

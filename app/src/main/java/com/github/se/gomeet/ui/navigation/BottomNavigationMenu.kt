@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.se.gomeet.ui.theme.Cyan
@@ -32,28 +33,36 @@ fun BottomNavigationMenu(
     selectedItem: String
 ) {
   NavigationBar(
-      modifier = Modifier.navigationBarsPadding().height(80.dp),
+      modifier = Modifier
+          .navigationBarsPadding()
+          .height(80.dp),
       containerColor = Color.Transparent,
       tonalElevation = 0.dp,
   ) {
     tabList.forEach { destination ->
+        val selected = selectedItem == destination.route
       NavigationBarItem(
           modifier = Modifier.testTag(destination.route),
           icon = {
-            Icon(
-                imageVector = getIconForRoute(destination.route),
-                contentDescription = destination.textId,
-                modifier = Modifier.size(24.dp))
+                  Icon(
+                      imageVector = if (selected)
+                          getIconForSelectedRoute(destination.route)
+                      else
+                          getIconForRoute(destination.route),
+                      contentDescription = destination.textId,
+                      modifier = Modifier.size(24.dp))
           },
-          label = { Text(destination.textId) },
-          selected = destination.route == selectedItem,
+          label = { Text(destination.textId,
+
+              style =  if (selected) MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold) else MaterialTheme.typography.labelLarge) },
+          selected = selected,
           onClick = { onTabSelect(destination.route) },
           colors =
               NavigationBarItemDefaults.colors(
-                  unselectedIconColor = MaterialTheme.colorScheme.onBackground,
+                  unselectedIconColor = MaterialTheme.colorScheme.primary,
                   unselectedTextColor = MaterialTheme.colorScheme.onBackground,
-                  selectedTextColor = Cyan,
-                  selectedIconColor = Cyan,
+                  selectedTextColor = MaterialTheme.colorScheme.tertiary,
+                  selectedIconColor = MaterialTheme.colorScheme.tertiary,
                   indicatorColor = TranslucentCyan))
     }
   }
