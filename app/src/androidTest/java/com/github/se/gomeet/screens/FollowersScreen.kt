@@ -5,4 +5,5 @@ import io.github.kakaocup.compose.node.element.ComposeScreen
 
 class FollowersScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
     ComposeScreen<FollowersScreen>(
-        semanticsProvider = semanticsProvider, viewBuilderAction = { hasTestTag("Followers") }) {}
+        semanticsProvider = semanticsProvider,
+        viewBuilderAction = { hasTestTag("FollowingFollower") }) {}

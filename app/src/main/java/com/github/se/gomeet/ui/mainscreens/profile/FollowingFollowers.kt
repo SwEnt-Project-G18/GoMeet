@@ -108,17 +108,19 @@ fun FollowingFollowers(
   }
 
   Scaffold(
-      modifier = Modifier.testTag("Following"),
+      modifier = Modifier.testTag("FollowingFollower"),
       topBar = {
-        Column {
+        Column() {
           Box(contentAlignment = Alignment.Center) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically) {
-                  IconButton(onClick = { nav.goBack() }) {
-                    Icon(
-                        Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = "Go back")
-                  }
+                  IconButton(
+                      modifier = Modifier.testTag("GoBackFollower"), onClick = { nav.goBack() }) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                            contentDescription = "Go back")
+                      }
                 }
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -244,7 +246,7 @@ fun PageUsers(
                       userViewModel.unfollow(user.uid)
                       isFollowing = false
                     },
-                    modifier = Modifier.padding(start = 15.dp).width(110.dp),
+                    modifier = Modifier.padding(start = 15.dp).width(110.dp).testTag("Unfollow"),
                     colors =
                         ButtonColors(
                             containerColor = MaterialTheme.colorScheme.primaryContainer,
