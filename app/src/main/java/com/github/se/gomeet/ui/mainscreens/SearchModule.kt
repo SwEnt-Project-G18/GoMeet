@@ -1,5 +1,6 @@
 package com.github.se.gomeet.ui.mainscreens
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -21,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.viewmodel.SearchViewModel
+import kotlin.reflect.typeOf
 
 @Composable
 fun SearchModule() {
@@ -44,17 +46,29 @@ fun SearchModule() {
       }
     } else {
       LazyColumn(modifier = Modifier.fillMaxWidth().weight(1f)) {
-        item { persons?.forEach { person -> SearchModuleSnippet(person) } }
+        item { persons.forEach { person -> SearchModuleSnippet(person) } }
       }
     }
   }
 }
 
 @Composable
-fun SearchModuleSnippet(person: GoMeetUser) {
-  Text(
-      text = "${person.firstName} ${person.lastName}",
-      modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp))
+fun SearchModuleSnippet(item: SearchViewModel.SearchableItem) {
+    println("### SEARCHMODULESNIPPET : " + item::class.simpleName)
+    when (item){
+        is SearchViewModel.SearchableItem.User -> {
+            Text(
+                text = "${item.user.firstName} ${item.user.lastName}",
+                modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp))
+        }
+        is SearchViewModel.SearchableItem.Event -> {
+            Text(
+                text = item.event.title,
+                modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp))
+
+        }
+
+    }
 }
 
 @Preview

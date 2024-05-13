@@ -104,10 +104,16 @@ class SearchViewModel() : ViewModel() {
               emptyList(),
               emptyList()))
 
+  private val _searchQuery = MutableStateFlow<List<SearchableItem>>(emptyList())
+
   init {
-    getAllUsers()
-    getAllEvents()
-    println("### Users: ${allUsersList.toString()}")
+    _searchQuery.value =
+        (allUsersList?.map { SearchableItem.User(it) } ?: emptyList()) +
+            (allPublicEventsList?.map { SearchableItem.Event(it) } ?: emptyList())
+
+    // getAllUsers()
+    // getAllEvents()
+    // println("### Users: ${allUsersList.toString()}")
   }
 
   private fun getAllUsers() {
@@ -123,9 +129,6 @@ class SearchViewModel() : ViewModel() {
   private val _isSearching = MutableStateFlow(false)
   val isSearching = _isSearching.asStateFlow()
 
-  //private val _searchQuery = MutableStateFlow(allUsersList)
-  private val _searchQuery = MutableStateFlow<List<SearchableItem>>(listOf())
-
   val searchQuery =
       searchText
           .debounce(1000L)
@@ -134,8 +137,8 @@ class SearchViewModel() : ViewModel() {
             if (text.isBlank()) {
               query
             } else {
-              delay(2000L)
-              query?.filter { it.doesMatchSearchQuery(text) }
+              delay(1000L)
+              query.filter { it.doesMatchSearchQuery(text) }
             }
           }
           .onEach { _isSearching.update { false } }
@@ -144,8 +147,17 @@ class SearchViewModel() : ViewModel() {
   fun onSearchTextChange(text: String) {
     _searchText.value = text
   }
-}
-sealed class SearchableItem {
-    data class Event(val event: Event) : SearchableItem()
-    data class GoMeetUser(val user: GoMeetUser) : SearchableItem()
+
+  sealed class SearchableItem {
+    data class User(val user: GoMeetUser) : SearchableItem()
+
+    data class Event(val event: com.github.se.gomeet.model.event.Event) : SearchableItem()
+  }
+
+  private fun SearchableItem.doesMatchSearchQuery(query: String): Boolean {
+    return when (this) {
+      is SearchableItem.User -> user.doesMatchSearchQuery(query)
+      is SearchableItem.Event -> event.doesMatchSearchQuery(query)
+    }
+  }
 }
