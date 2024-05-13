@@ -169,6 +169,7 @@ class UserRepository(private val db: FirebaseFirestore) {
         lastName = this["lastName"] as? String ?: "",
         email = this["email"] as? String ?: "",
         phoneNumber = this["phoneNumber"] as? String ?: "",
+        profilePicture = this["profilePicture"] as? String?: "",
         country = this["country"] as? String ?: "",
         joinedEvents = this["myTickets"] as? List<String> ?: emptyList(),
         myEvents = this["myEvents"] as? List<String> ?: emptyList(),
