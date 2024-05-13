@@ -122,10 +122,7 @@ val SETTINGS =
             route = Route.ABOUT, icon = Icons.Default.Settings, textId = Route.ABOUT),
         TopLevelDestination(
             route = Route.PERMISSIONS, icon = Icons.Default.Settings, textId = Route.PERMISSIONS),
-        TopLevelDestination(
-                route = Route.HELP, icon = Icons.Default.Settings, textId = Route.HELP)
-
-)
+        TopLevelDestination(route = Route.HELP, icon = Icons.Default.Settings, textId = Route.HELP))
 
 /**
  * Class that handles navigation in the app.

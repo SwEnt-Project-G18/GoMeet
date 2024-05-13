@@ -20,7 +20,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
@@ -42,66 +41,61 @@ import com.github.se.gomeet.ui.theme.DarkCyan
 fun SettingsAbout(
     nav: NavigationActions,
 ) {
-    Scaffold(
-        modifier = Modifier.testTag("SettingsAbout"),
-        topBar = {
-            Column {
-                Text(
-                    text = "About",
-                    modifier = Modifier.padding(top = 15.dp, start = 15.dp, end = 18.dp, bottom = 0.dp),
-                    color = DarkCyan,
-                    fontStyle = FontStyle.Normal,
-                    fontWeight = FontWeight.SemiBold,
-                    fontFamily = FontFamily.Default,
-                    textAlign = TextAlign.Start,
-                    style = MaterialTheme.typography.headlineLarge)
+  Scaffold(
+      modifier = Modifier.testTag("SettingsAbout"),
+      topBar = {
+        Column {
+          Text(
+              text = "About",
+              modifier = Modifier.padding(top = 15.dp, start = 15.dp, end = 18.dp, bottom = 0.dp),
+              color = DarkCyan,
+              fontStyle = FontStyle.Normal,
+              fontWeight = FontWeight.SemiBold,
+              fontFamily = FontFamily.Default,
+              textAlign = TextAlign.Start,
+              style = MaterialTheme.typography.headlineLarge)
 
-                Row(
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Surface(onClick = { nav.goBack() }, shape = CircleShape, color = Color.Transparent) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.arrow_back),
-                            contentDescription = "Back button",
-                            modifier = Modifier.padding(15.dp),
-                            tint = MaterialTheme.colorScheme.onBackground)
-                    }
-
-                    Text(
-                        text = "Back",
-                        color = MaterialTheme.colorScheme.onBackground,
-                        fontStyle = FontStyle.Normal,
-                        fontWeight = FontWeight.SemiBold,
-                        fontFamily = FontFamily.Default,
-                        textAlign = TextAlign.Start,
-                        style = MaterialTheme.typography.titleSmall)
-                }
+          Row(
+              horizontalArrangement = Arrangement.Start,
+              verticalAlignment = Alignment.CenterVertically,
+          ) {
+            Surface(onClick = { nav.goBack() }, shape = CircleShape, color = Color.Transparent) {
+              Icon(
+                  painter = painterResource(id = R.drawable.arrow_back),
+                  contentDescription = "Back button",
+                  modifier = Modifier.padding(15.dp),
+                  tint = MaterialTheme.colorScheme.onBackground)
             }
-        },
-        bottomBar = {
-            BottomNavigationMenu(
-                onTabSelect = { selectedTab ->
-                    nav.navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == selectedTab })
-                },
-                tabList = TOP_LEVEL_DESTINATIONS,
-                selectedItem = Route.PROFILE)
-        }) { innerPadding ->
+
+            Text(
+                text = "Back",
+                color = MaterialTheme.colorScheme.onBackground,
+                fontStyle = FontStyle.Normal,
+                fontWeight = FontWeight.SemiBold,
+                fontFamily = FontFamily.Default,
+                textAlign = TextAlign.Start,
+                style = MaterialTheme.typography.titleSmall)
+          }
+        }
+      },
+      bottomBar = {
+        BottomNavigationMenu(
+            onTabSelect = { selectedTab ->
+              nav.navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == selectedTab })
+            },
+            tabList = TOP_LEVEL_DESTINATIONS,
+            selectedItem = Route.PROFILE)
+      }) { innerPadding ->
         Column(
             modifier =
-            Modifier
-                .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
-                .testTag("Settings")
-                .fillMaxWidth(),
-
+                Modifier.padding(innerPadding)
+                    .verticalScroll(rememberScrollState())
+                    .testTag("Settings")
+                    .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
-
             verticalArrangement = Arrangement.Center) {
-            Spacer(modifier = Modifier.padding(10.dp))
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ){
+              Spacer(modifier = Modifier.padding(10.dp))
+              Row(verticalAlignment = Alignment.CenterVertically) {
                 Image(
                     painter = painterResource(id = R.drawable.gomeet_logo),
                     contentDescription = "GoMeet Logo",
@@ -125,45 +119,35 @@ fun SettingsAbout(
                     fontFamily = FontFamily.Default,
                     textAlign = TextAlign.Start,
                     style = MaterialTheme.typography.titleSmall)
-
-
+              }
+              Spacer(modifier = Modifier.padding(10.dp))
+              Text(
+                  text = "version alpha.m2",
+                  color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.70f),
+                  fontStyle = FontStyle.Normal,
+                  fontSize = 15.sp,
+                  fontWeight = FontWeight.SemiBold,
+                  fontFamily = FontFamily.Default,
+                  textAlign = TextAlign.Start,
+                  style = MaterialTheme.typography.titleSmall)
+              Spacer(modifier = Modifier.padding(20.dp))
+              Text(
+                  text =
+                      "This app was develloped by the GoMeet Team for the EPFL Software Entreprise Class.",
+                  color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.75f),
+                  fontStyle = FontStyle.Normal,
+                  fontWeight = FontWeight.SemiBold,
+                  fontFamily = FontFamily.Default,
+                  textAlign = TextAlign.Start,
+                  style = MaterialTheme.typography.titleSmall,
+                  fontSize = 14.sp,
+                  modifier = Modifier.padding(25.dp))
             }
-            Spacer(modifier = Modifier.padding(10.dp))
-            Text(
-                text = "version alpha.m2",
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.70f),
-                fontStyle = FontStyle.Normal,
-                fontSize = 15.sp,
-                fontWeight = FontWeight.SemiBold,
-                fontFamily = FontFamily.Default,
-                textAlign = TextAlign.Start,
-                style = MaterialTheme.typography.titleSmall
-            )
-            Spacer(modifier = Modifier.padding(20.dp))
-            Text(
-                text = "This app was develloped by the GoMeet Team for the EPFL Software Entreprise Class.",
-                color = MaterialTheme.colorScheme.onBackground.copy (alpha = 0.75f),
-                fontStyle = FontStyle.Normal,
-                fontWeight = FontWeight.SemiBold,
-                fontFamily = FontFamily.Default,
-                textAlign = TextAlign.Start,
-                style = MaterialTheme.typography.titleSmall,
-                fontSize = 14.sp,
-                modifier = Modifier.padding(25.dp))
-
-
-
-
-
-
-
-
-        }
-    }
+      }
 }
 
 @Preview
 @Composable
 fun SettingsAboutPreview() {
-    SettingsAbout(nav = NavigationActions(rememberNavController()))
+  SettingsAbout(nav = NavigationActions(rememberNavController()))
 }

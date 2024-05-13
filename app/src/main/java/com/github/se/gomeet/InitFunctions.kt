@@ -334,10 +334,10 @@ fun InitNavigation(
           }
         }
 
-      composable(Route.SETTINGS) { SettingsScreen(navAction) }
-      composable(Route.ABOUT) { SettingsAbout(navAction) }
-      composable(Route.HELP) { SettingsHelp(navAction) }
-      composable(Route.PERMISSIONS) { SettingsPermissions(navAction) }
+    composable(Route.SETTINGS) { SettingsScreen(navAction) }
+    composable(Route.ABOUT) { SettingsAbout(navAction) }
+    composable(Route.HELP) { SettingsHelp(navAction) }
+    composable(Route.PERMISSIONS) { SettingsPermissions(navAction) }
     composable(Route.EDIT_PROFILE) { EditProfile(nav = navAction) }
     composable(
         route = Route.FOLLOWERS,
