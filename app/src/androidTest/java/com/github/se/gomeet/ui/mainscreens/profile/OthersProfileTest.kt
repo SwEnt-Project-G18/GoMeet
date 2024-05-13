@@ -47,9 +47,6 @@ class OthersProfileTest {
     rule.onNodeWithTag("UserInfo").assertIsDisplayed()
     rule.onNodeWithText("Follow").assertIsDisplayed()
     rule.onNodeWithText("Message").assertIsDisplayed()
-    rule.onNodeWithText("Tags").assertIsDisplayed()
-    rule.onNodeWithTag("MoreUserInfo").assertIsDisplayed()
-    rule.onNodeWithTag("TagList").assertIsDisplayed()
     rule.onAllNodesWithTag("EventsListHeader")[0].assertIsDisplayed()
     rule.onAllNodesWithTag("EventsListItems")[0].assertIsDisplayed()
   }

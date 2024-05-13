@@ -122,7 +122,7 @@ fun OthersProfile(
             selectedItem = "")
       },
       topBar = {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(modifier = Modifier.testTag("TopBar"), verticalAlignment = Alignment.CenterVertically) {
           IconButton(onClick = { nav.goBack() }) {
             Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = "Go back")
           }
