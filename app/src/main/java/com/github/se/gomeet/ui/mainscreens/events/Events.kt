@@ -158,7 +158,9 @@ fun Events(
               Row(
                   verticalAlignment = Alignment.CenterVertically,
                   horizontalArrangement = Arrangement.SpaceEvenly,
-                  modifier = Modifier.heightIn(min = 56.dp).fillMaxWidth()) {
+                  modifier = Modifier
+                      .heightIn(min = 56.dp)
+                      .fillMaxWidth()) {
                     Button(
                         onClick = { onFilterButtonClick("Joined") },
                         content = { Text("JoinedEvents") },
@@ -204,13 +206,16 @@ fun Events(
               } else {
 
                 // Display events based on the selected filter
-                Column(modifier = Modifier.verticalScroll(rememberScrollState()).fillMaxSize()) {
+            Column(modifier = Modifier
+                .verticalScroll(rememberScrollState())
+                .fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
                   // Display joined events if 'All' or 'Joined' is selected
                   if (selectedFilter == "All" || selectedFilter == "Joined") {
+                      Spacer(modifier = Modifier.height(screenHeight/40))
                     Text(
                         text = "Joined Events",
                         style = MaterialTheme.typography.titleLarge,
-                        modifier = Modifier.padding(10.dp).align(Alignment.Start))
+                        modifier = Modifier.padding(horizontal = screenWidth/15))
 
                     // Loop through and display events that match the joined events criteria
                     eventList
@@ -253,20 +258,11 @@ fun Events(
 
                   // Display favourite events if 'All' or 'Favourites' is selected
                   if (selectedFilter == "All" || selectedFilter == "Favourites") {
-
+                      Spacer(modifier = Modifier.height(screenHeight/40))
                     Text(
                         text = "Favourites",
-                        style =
-                            TextStyle(
-                                fontSize = 20.sp,
-                                lineHeight = 16.sp,
-                                fontFamily = FontFamily(Font(R.font.roboto)),
-                                fontWeight = FontWeight(1000),
-                                color = DarkCyan,
-                                textAlign = TextAlign.Center,
-                                letterSpacing = 0.5.sp,
-                            ),
-                        modifier = Modifier.padding(10.dp).align(Alignment.Start))
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.padding(horizontal = screenWidth/15))
 
                     // Loop through and display events are marked favourites by the currentUser
                     eventList
@@ -308,19 +304,12 @@ fun Events(
 
                   // Display user's own events if 'All' or 'MyEvents' is selected
                   if (selectedFilter == "All" || selectedFilter == "MyEvents") {
-                    Text(
+                      Spacer(modifier = Modifier.height(screenHeight/40))
+
+                      Text(
                         text = "My Events",
-                        style =
-                            TextStyle(
-                                fontSize = 20.sp,
-                                lineHeight = 16.sp,
-                                fontFamily = FontFamily(Font(R.font.roboto)),
-                                fontWeight = FontWeight(1000),
-                                color = DarkCyan,
-                                textAlign = TextAlign.Center,
-                                letterSpacing = 0.5.sp,
-                            ),
-                        modifier = Modifier.padding(10.dp).align(Alignment.Start))
+                          style = MaterialTheme.typography.titleLarge,
+                          modifier = Modifier.padding(horizontal = screenWidth/15))
 
                     // Loop through and display events created by currentUser
                     eventList
@@ -389,7 +378,9 @@ fun GoMeetSearchBar(
         query = query.value,
         onQueryChange = { query.value = it },
         active = false,
-        modifier = Modifier.fillMaxWidth().padding(start = 5.dp, end = 5.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 5.dp, end = 5.dp),
         placeholder = { Text("Search", color = contentColor) },
         leadingIcon = {
           IconButton(onClick = { nav.navigateToScreen(Route.MESSAGE_CHANNELS) }) {
