@@ -5,12 +5,9 @@ import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-<<<<<<< HEAD
 import com.github.se.gomeet.model.event.Invitation
 import com.github.se.gomeet.model.event.InviteStatus
-=======
 import androidx.lifecycle.viewModelScope
->>>>>>> main
 import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.google.firebase.auth.ktx.auth
