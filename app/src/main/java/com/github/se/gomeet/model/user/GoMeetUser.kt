@@ -30,7 +30,7 @@ data class GoMeetUser(
     val following: List<String>,
     val followers: List<String>,
     val pendingRequests: List<Invitation>, // For now, the requests are just invitations
-    val joinedEvents: List<String>,
+    var joinedEvents: List<String>,
     var myEvents: List<String>,
     var myFavorites: List<String>,
     var tags: List<String>

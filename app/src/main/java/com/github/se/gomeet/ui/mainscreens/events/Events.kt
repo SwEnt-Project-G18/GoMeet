@@ -116,7 +116,7 @@ fun Events(
   val coroutineScope = rememberCoroutineScope()
   val query = remember { mutableStateOf("") }
   val user = remember { mutableStateOf<GoMeetUser?>(null) }
-  var eventsLoaded = remember { mutableStateOf(false) }
+  val eventsLoaded = remember { mutableStateOf(false) }
 
   // Initial data loading using LaunchedEffect
   LaunchedEffect(Unit) {
@@ -233,7 +233,7 @@ fun Events(
 
                     // Loop through and display events that match the joined events criteria
                     eventList
-                        .filter { e -> user.value!!.myEvents.contains(e.eventID) }
+                        .filter { e -> user.value!!.joinedEvents.contains(e.eventID) }
                         .forEach { event ->
                           if (event.title.contains(query.value, ignoreCase = true)) {
                             val painter: Painter =
@@ -343,7 +343,7 @@ fun Events(
 
                     // Loop through and display events created by currentUser
                     eventList
-                        .filter { e -> e.creator == user.value!!.uid }
+                        .filter { e -> user.value!!.myEvents.contains(e.eventID) }
                         .forEach { event ->
                           if (event.title.contains(query.value, ignoreCase = true)) {
                             val painter: Painter =

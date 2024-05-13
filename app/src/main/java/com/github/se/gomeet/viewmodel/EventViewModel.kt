@@ -14,9 +14,11 @@ import androidx.lifecycle.viewModelScope
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.location.Location
 import com.github.se.gomeet.model.repository.EventRepository
+import com.github.se.gomeet.model.repository.UserRepository
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
@@ -268,6 +270,7 @@ class EventViewModel(private val creatorId: String? = null, eventRepository: Eve
 
         repository.addEvent(event)
         joinEvent(event, creatorId)
+          userViewModel.joinEvent(event.eventID, creatorId)
         userViewModel.userCreatesEvent(event.eventID, creatorId)
       } catch (e: Exception) {
         Log.w(TAG, "Error uploading image or adding event", e)
@@ -294,7 +297,7 @@ class EventViewModel(private val creatorId: String? = null, eventRepository: Eve
   }
 
   fun joinEvent(event: Event, userId: String) {
-    if (!event.participants.contains(userId)) {
+    if (event.participants.contains(userId)) {
       Log.w(TAG, "User $userId is already in event ${event.eventID}")
       return
     }

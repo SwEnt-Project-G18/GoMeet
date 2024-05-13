@@ -278,7 +278,8 @@ class MainActivity : ComponentActivity() {
                       painterResource(id = R.drawable.gomeet_logo),
                       description,
                       loc,
-                      userViewModel)
+                      userViewModel,
+                      eventViewModel)
                 }
 
             composable(

@@ -31,7 +31,7 @@ data class Event(
     val price: Double, // price of the Event
     val url: String, // Website of the event (can be ticketLink)
     val pendingParticipants: List<String>, // Pending users invitations to the event
-    val participants: List<String>, // People participating to the event
+    var participants: List<String>, // People participating to the event
     val visibleToIfPrivate: List<String>, // People that can enter the event if it's private
     val maxParticipants: Int, // Maximum number of Participants of the event
     val public: Boolean, // True if the event is public, false if it's private

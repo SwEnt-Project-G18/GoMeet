@@ -24,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,10 +49,12 @@ import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.github.se.gomeet.R
+import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.theme.DarkCyan
+import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
@@ -85,7 +88,9 @@ fun EventHeader(
     time: String
 ) {
   Row(
-      modifier = Modifier.fillMaxWidth().testTag("EventHeader"),
+      modifier = Modifier
+          .fillMaxWidth()
+          .testTag("EventHeader"),
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.SpaceBetween) {
         Column {
@@ -100,14 +105,15 @@ fun EventHeader(
           Spacer(modifier = Modifier.height(5.dp))
           Text(
               modifier =
-                  Modifier.clickable {
-                        if (organizer.uid == currentUser.uid) {
+              Modifier
+                  .clickable {
+                      if (organizer.uid == currentUser.uid) {
                           nav.navigateToScreen(Route.PROFILE)
-                        } else {
+                      } else {
                           nav.navigateToScreen(Route.OTHERS_PROFILE.replace("{uid}", organizer.uid))
-                        }
                       }
-                      .testTag("Username"),
+                  }
+                  .testTag("Username"),
               text = organizer.username,
               style =
                   TextStyle(
@@ -176,12 +182,16 @@ fun EventImage(imageUrl: String?) {
                 .build())
       } else defaultImagePainter
 
-  Column(modifier = Modifier.fillMaxWidth().testTag("EventImage")) {
+  Column(modifier = Modifier
+      .fillMaxWidth()
+      .testTag("EventImage")) {
     Image(
         painter = imagePainter,
         contentDescription = "Event Image",
         contentScale = ContentScale.Crop,
-        modifier = Modifier.aspectRatio(3f / 1.75f).clip(RoundedCornerShape(20.dp)))
+        modifier = Modifier
+            .aspectRatio(3f / 1.75f)
+            .clip(RoundedCornerShape(20.dp)))
   }
 }
 
@@ -222,13 +232,22 @@ fun EventButtons(
     organizer: GoMeetUser,
     eventId: String,
     userViewModel: UserViewModel,
+    eventViewModel: EventViewModel,
     nav: NavigationActions
 ) {
+    val isFavorite = remember { mutableStateOf(currentUser.myFavorites.contains(eventId)) }
+    val currentEvent = remember { mutableStateOf<Event?>(null) }
 
-  val isFavorite = remember { mutableStateOf(currentUser.myFavorites.contains(eventId)) }
-  val isJoined = remember { mutableStateOf(currentUser.myEvents.contains(eventId)) }
+    LaunchedEffect(Unit) {
+        currentEvent.value = eventViewModel.getEvent(eventId)
+    }
+
+    val isJoined = remember { mutableStateOf(currentUser.joinedEvents.contains(eventId) &&  currentEvent.value!!.participants.contains(currentUser.uid)) }
+
   Row(
-      modifier = Modifier.fillMaxWidth().testTag("EventButton"),
+      modifier = Modifier
+          .fillMaxWidth()
+          .testTag("EventButton"),
       horizontalArrangement = Arrangement.SpaceBetween) {
         TextButton(
             onClick = {
@@ -236,11 +255,14 @@ fun EventButtons(
                 // TODO: GO TO EDIT EVENT PARAMETERS SCREEN
               } else {
                 if (!isJoined.value) {
-                  currentUser.myEvents = currentUser.myEvents.plus(eventId)
+                  currentUser.joinedEvents = currentUser.joinedEvents.plus(eventId)
+                    currentEvent.value!!.participants = currentEvent.value!!.participants.plus(currentUser.uid)
                 } else {
-                  currentUser.myEvents = currentUser.myEvents.minus(eventId)
+                  currentUser.joinedEvents = currentUser.joinedEvents.minus(eventId)
+                    currentEvent.value!!.participants = currentEvent.value!!.participants.minus(currentUser.uid)
                 }
                 userViewModel.editUser(currentUser)
+                eventViewModel.editEvent(currentEvent.value!!)
                 isJoined.value = !isJoined.value
               }
             },
@@ -333,7 +355,11 @@ fun MapViewComposable(
   // Set up the GoogleMap composable
   GoogleMap(
       modifier =
-          Modifier.testTag("MapView").fillMaxWidth().height(200.dp).clip(RoundedCornerShape(20.dp)),
+      Modifier
+          .testTag("MapView")
+          .fillMaxWidth()
+          .height(200.dp)
+          .clip(RoundedCornerShape(20.dp)),
       cameraPositionState = cameraPositionState) {
         Marker(
             state = markerState,

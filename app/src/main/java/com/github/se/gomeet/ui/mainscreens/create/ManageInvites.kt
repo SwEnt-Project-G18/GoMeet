@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
+import com.github.se.gomeet.model.event.Invitation
 import com.github.se.gomeet.model.event.InviteStatus
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
@@ -203,39 +204,47 @@ fun ManageInvites(
 
               // Display the list of followers to manage our invitations
               Column(modifier = Modifier.verticalScroll(rememberScrollState()).fillMaxSize()) {
-                followersList.forEach { follower ->
-                  //                  val invitationStatus =
-                  //                      follower.pendingRequests
-                  //                          .find { it.userId == follower.uid && it.eventId ==
-                  // currentEvent }
-                  //                          ?.status
-                  UserInviteWidget(
-                      follower.uid,
-                      follower.username,
-                      currentEvent,
-                      // invitationStatus,
-                      userViewModel,
-                      eventViewModel)
-                }
+                  if (selectedFilter == "All" || selectedFilter == "Uninvited") {
+                      followersList.filter {
+                          follower ->
+                          !follower.joinedEvents.contains(currentEvent) && !follower.pendingRequests.contains(Invitation(eventId = currentEvent, userId = follower.uid, status = InviteStatus.PENDING))
+                      }.forEach { follower ->
+                          UserInviteWidget(
+                              follower.uid,
+                              follower.username,
+                              currentEvent,
+                              userViewModel,
+                              eventViewModel)
+                      }
+                  }
 
-                //                usersInvitedToEvent.forEach { userInvited ->
-                //                  if (userInvited != user.value) {
-                //                    UserInviteWidget(
-                //                        userInvited!!.uid,
-                //                        userInvited.username,
-                //                        currentEvent,
-                //                        //                        status =
-                //                        //                            userInvited.pendingRequests
-                //                        //                                .find {
-                //                        //                                  it.userId ==
-                // user.value!!.uid &&
-                //                        // it.eventId == currentEvent
-                //                        //                                }
-                //                        //                                ?.status,
-                //                        userViewModel = userViewModel,
-                //                        eventViewModel = eventViewModel)
-                //                  }
-                //                }
+                  if (selectedFilter == "All" || selectedFilter == "Invited") {
+                      followersList.filter {
+                          follower ->
+                          follower.pendingRequests.contains(Invitation(eventId = currentEvent, userId = follower.uid, status = InviteStatus.PENDING))
+                      }.forEach { follower ->
+                          UserInviteWidget(
+                              follower.uid,
+                              follower.username,
+                              currentEvent,
+                              userViewModel,
+                              eventViewModel)
+                      }
+                  }
+
+                  if (selectedFilter == "All" || selectedFilter == "Accepted") {
+                      followersList.filter { follower ->
+                          follower.joinedEvents.contains(currentEvent)
+                      }
+                          .forEach { follower ->
+                          UserInviteWidget(
+                              follower.uid,
+                              follower.username,
+                              currentEvent,
+                              userViewModel,
+                              eventViewModel)
+                      }
+                  }
               }
             }
       }
