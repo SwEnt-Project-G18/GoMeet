@@ -28,6 +28,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -66,6 +67,7 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
+import kotlinx.coroutines.launch
 
 /**
  * EventHeader is a composable that displays the header of an event.
@@ -235,14 +237,20 @@ fun EventButtons(
     eventViewModel: EventViewModel,
     nav: NavigationActions
 ) {
+    val coroutineScope = rememberCoroutineScope()
     val isFavorite = remember { mutableStateOf(currentUser.myFavorites.contains(eventId)) }
     val currentEvent = remember { mutableStateOf<Event?>(null) }
+    val isJoined = remember { mutableStateOf(false) }
+
 
     LaunchedEffect(Unit) {
-        currentEvent.value = eventViewModel.getEvent(eventId)
+        coroutineScope.launch {
+            currentEvent.value = eventViewModel.getEvent(eventId)
+            isJoined.value = currentUser.joinedEvents.contains(eventId) &&
+                    currentEvent.value!!.participants.contains(currentUser.uid)
+        }
     }
 
-    val isJoined = remember { mutableStateOf(currentUser.joinedEvents.contains(eventId) &&  currentEvent.value!!.participants.contains(currentUser.uid)) }
 
   Row(
       modifier = Modifier
