@@ -252,17 +252,14 @@ fun UserInviteWidget(
   var status by remember { mutableStateOf<InviteStatus?>(null) }
 
   LaunchedEffect(Unit) {
-    // TODO: this commented code returns me an HashMap for some reason and makes the app crash
-    // because it expects a List of Invitation
-    val user = userViewModel.getUser(userID)
-
-    //    status =
-    //        userViewModel
-    //            .getUser(userID)
-    //            ?.pendingRequests
-    //            ?.find { it.userId == userID && it.eventId == eventID }
-    //            ?.status
+    status =
+        userViewModel
+            .getUser(userID)
+            ?.pendingRequests
+            ?.find { it.userId == userID && it.eventId == eventID }
+            ?.status
   }
+
   Row(
       modifier = Modifier.fillMaxWidth().padding(start = 15.dp, end = 15.dp).height(50.dp),
       horizontalArrangement = Arrangement.SpaceBetween,
