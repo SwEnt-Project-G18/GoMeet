@@ -10,4 +10,4 @@ enum class InviteStatus {
 }
 
 /**  */
-data class Invitation(val eventId: String, val userId: String, val status: InviteStatus)
+data class Invitation(val eventId: String, val status: InviteStatus)

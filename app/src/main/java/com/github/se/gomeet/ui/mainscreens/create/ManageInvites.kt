@@ -1,24 +1,37 @@
 package com.github.se.gomeet.ui.mainscreens.create
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -32,8 +45,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
@@ -64,6 +79,7 @@ import kotlinx.coroutines.launch
  * This composable function represents the screen where the user can manage the invitations for one
  * of his event.
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ManageInvites(
     currentUser: String,
@@ -73,56 +89,37 @@ fun ManageInvites(
     eventViewModel: EventViewModel
 ) {
 
-  var selectedFilter by remember { mutableStateOf("All") }
-  val followersList = remember { mutableListOf<GoMeetUser>() }
+    val pagerState = rememberPagerState(pageCount = {4})
+    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
   val coroutineScope = rememberCoroutineScope()
   val user = remember { mutableStateOf<GoMeetUser?>(null) }
+  var isLoaded by remember {mutableStateOf(false)}
   val event = remember { mutableStateOf<Event?>(null) }
-  val usersInvitedToEvent = remember { mutableListOf<GoMeetUser?>() }
+  val followersFollowingList = remember { mutableListOf<GoMeetUser>() }
+    val toUpdate = remember { mutableListOf<GoMeetUser>()}
 
-  LaunchedEffect(Unit) {
+
+    LaunchedEffect(Unit) {
     coroutineScope.launch {
       user.value = userViewModel.getUser(currentUser)
       event.value = eventViewModel.getEvent(currentEvent)
 
-      while (user.value == null || event.value == null) {
-        TimeUnit.SECONDS.sleep(1)
-      }
       val followers = user.value!!.followers
       if (followers.isNotEmpty()) {
         followers.forEach {
-          val followerUser = userViewModel.getUser(it)
-          followersList.add(followerUser!!)
+            val followerUser = userViewModel.getUser(it)
+            followersFollowingList.add(followerUser!!)
         }
       }
-
-      val pendingInvitations =
-          eventViewModel.getEvent(currentEvent)?.pendingParticipants?.toMutableList()
-
-      val participantsOfEvent = eventViewModel.getEvent(currentEvent)?.participants?.toMutableList()
-
-      if (pendingInvitations != null) {
-        if (pendingInvitations.isNotEmpty()) {
-          pendingInvitations.forEach { invitedUser ->
-            val userInvited = userViewModel.getUser(invitedUser)
-            usersInvitedToEvent.add(userInvited)
-          }
+        val following = user.value!!.following
+        if (following.isNotEmpty()) {
+            following.forEach {
+                val followingUser = userViewModel.getUser(it)
+                followersFollowingList.add(followingUser!!)
+            }
         }
-      }
-
-      if (participantsOfEvent != null) {
-        if (participantsOfEvent.isNotEmpty()) {
-          participantsOfEvent.forEach { invitedUser ->
-            val userInvited = userViewModel.getUser(invitedUser)
-            usersInvitedToEvent.add(userInvited)
-          }
-        }
-      }
+        isLoaded = true
     }
-  }
-
-  fun onFilterButtonClick(filterType: String) {
-    selectedFilter = if (selectedFilter == filterType) "All" else filterType
   }
 
   Scaffold(
@@ -136,159 +133,233 @@ fun ManageInvites(
             selectedItem = Route.EVENTS)
       },
       topBar = {
-        Row {
-          Text(
-              text = "Manage Invites",
-              modifier = Modifier.padding(start = 15.dp, top = 15.dp, end = 15.dp, bottom = 15.dp),
-              color = DarkCyan,
-              fontStyle = FontStyle.Normal,
-              fontWeight = FontWeight.SemiBold,
-              fontFamily = FontFamily.Default,
-              textAlign = TextAlign.Start,
-              style = MaterialTheme.typography.headlineLarge)
-        }
-      }) { innerPadding ->
-        Column(
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(innerPadding).fillMaxSize()) {
-              Row(
-                  modifier =
-                      Modifier.fillMaxWidth().padding(start = 15.dp, end = 15.dp, bottom = 15.dp),
-                  horizontalArrangement = Arrangement.spacedBy(10.dp),
-                  verticalAlignment = Alignment.Top) {
-                    Button(
-                        onClick = { onFilterButtonClick("Uninvited") },
-                        modifier = Modifier.height(40.dp).weight(1f),
-                        shape = RoundedCornerShape(10.dp),
-                        colors =
-                            ButtonDefaults.buttonColors(
-                                containerColor =
-                                    if (selectedFilter == "Uninvited") DarkCyan
-                                    else NavBarUnselected,
-                                contentColor =
-                                    if (selectedFilter == "Uninvited") Color.White else DarkCyan),
-                        border = BorderStroke(1.dp, DarkCyan)) {
-                          Text(text = "Uninvited", color = Color.Black)
-                        }
-
-                    Button(
-                        onClick = { onFilterButtonClick("Invited") },
-                        modifier = Modifier.height(40.dp).weight(1f),
-                        shape = RoundedCornerShape(10.dp),
-                        colors =
-                            ButtonDefaults.buttonColors(
-                                containerColor =
-                                    if (selectedFilter == "Invited") DarkCyan else NavBarUnselected,
-                                contentColor =
-                                    if (selectedFilter == "Invited") Color.White else DarkCyan),
-                        border = BorderStroke(1.dp, DarkCyan)) {
-                          Text(text = "Invited", color = Color.Black)
-                        }
-
-                    Button(
-                        onClick = { onFilterButtonClick("Accepted") },
-                        modifier = Modifier.height(40.dp).weight(1f),
-                        shape = RoundedCornerShape(10.dp),
-                        colors =
-                            ButtonDefaults.buttonColors(
-                                containerColor =
-                                    if (selectedFilter == "Accepted") DarkCyan
-                                    else NavBarUnselected,
-                                contentColor =
-                                    if (selectedFilter == "Accepted") Color.White else DarkCyan),
-                        border = BorderStroke(1.dp, DarkCyan)) {
-                          Text(text = "Accepted", color = Color.Black)
-                        }
-                  }
-
-              // Display the list of followers to manage our invitations
-              Column(modifier = Modifier.verticalScroll(rememberScrollState()).fillMaxSize()) {
-                  if (selectedFilter == "All" || selectedFilter == "Uninvited") {
-                      followersList.filter {
-                          follower ->
-                          !follower.joinedEvents.contains(currentEvent) && !follower.pendingRequests.contains(Invitation(eventId = currentEvent, userId = follower.uid, status = InviteStatus.PENDING))
-                      }.forEach { follower ->
-                          UserInviteWidget(
-                              follower.uid,
-                              follower.username,
-                              currentEvent,
-                              userViewModel,
-                              eventViewModel)
+          Column {
+              Box(contentAlignment = Alignment.Center) {
+                  Row(
+                      modifier = Modifier.fillMaxWidth(),
+                      verticalAlignment = Alignment.CenterVertically) {
+                      IconButton(onClick = {
+                          toUpdate.forEach{userViewModel.editUser(it)}
+                          nav.goBack()
+                      }) {
+                          Icon(
+                              Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = "Go back")
                       }
                   }
-
-                  if (selectedFilter == "All" || selectedFilter == "Invited") {
-                      followersList.filter {
-                          follower ->
-                          follower.pendingRequests.contains(Invitation(eventId = currentEvent, userId = follower.uid, status = InviteStatus.PENDING))
-                      }.forEach { follower ->
-                          UserInviteWidget(
-                              follower.uid,
-                              follower.username,
-                              currentEvent,
-                              userViewModel,
-                              eventViewModel)
-                      }
-                  }
-
-                  if (selectedFilter == "All" || selectedFilter == "Accepted") {
-                      followersList.filter { follower ->
-                          follower.joinedEvents.contains(currentEvent)
-                      }
-                          .forEach { follower ->
-                          UserInviteWidget(
-                              follower.uid,
-                              follower.username,
-                              currentEvent,
-                              userViewModel,
-                              eventViewModel)
-                      }
+                  Row(
+                      modifier = Modifier.fillMaxWidth(),
+                      verticalAlignment = Alignment.CenterVertically,
+                      horizontalArrangement = Arrangement.Center) {
+                      Text(
+                          text = "Manage Invites",
+                          style =
+                          MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold))
                   }
               }
-            }
+
+              Row(
+                  modifier = Modifier.fillMaxWidth(),
+                  verticalAlignment = Alignment.CenterVertically,
+                  horizontalArrangement = Arrangement.SpaceAround) {
+                  Box(
+                      contentAlignment = Alignment.Center,
+                      modifier =
+                      Modifier
+                          .weight(1f)
+                          .height(screenHeight / 20)
+                          .clickable {
+                              coroutineScope.launch { pagerState.animateScrollToPage(0) }
+                          }) {
+                      Text(
+                          text = "To Invite",
+                          style =
+                          MaterialTheme.typography.bodyMedium.copy(
+                              fontWeight =
+                              if (pagerState.currentPage == 0) FontWeight.Bold
+                              else FontWeight.Normal))
+                  }
+
+                  // Right half of the screen
+                  Box(
+                      contentAlignment = Alignment.Center,
+                      modifier =
+                      Modifier
+                          .height(screenHeight / 20)
+                          .weight(1f)
+                          .clickable {
+                              coroutineScope.launch { pagerState.animateScrollToPage(1) }
+                          }) {
+                      Text(
+                          text = "Pending",
+                          style =
+                          MaterialTheme.typography.bodyMedium.copy(
+                              fontWeight =
+                              if (pagerState.currentPage == 1) FontWeight.Bold
+                              else FontWeight.Normal))
+                  }
+                  Box(
+                      contentAlignment = Alignment.Center,
+                      modifier =
+                      Modifier
+                          .height(screenHeight / 20)
+                          .weight(1f)
+                          .clickable {
+                              coroutineScope.launch { pagerState.animateScrollToPage(2) }
+                          }) {
+                      Text(
+                          text = "Accepted",
+                          style =
+                          MaterialTheme.typography.bodyMedium.copy(
+                              fontWeight =
+                              if (pagerState.currentPage == 2) FontWeight.Bold
+                              else FontWeight.Normal))
+                  }
+                  Box(
+                      contentAlignment = Alignment.Center,
+                      modifier =
+                      Modifier
+                          .height(screenHeight / 20)
+                          .weight(1f)
+                          .clickable {
+                              coroutineScope.launch { pagerState.animateScrollToPage(3) }
+                          }) {
+                      Text(
+                          text = "Rejected",
+                          style =
+                          MaterialTheme.typography.bodyMedium.copy(
+                              fontWeight =
+                              if (pagerState.currentPage == 3) FontWeight.Bold
+                              else FontWeight.Normal))
+                  }
+              }
+              Canvas(
+                  modifier =
+                  Modifier
+                      .fillMaxWidth() // Ensures the Canvas takes up full screen width
+                      .height(1.dp) // Sets the height of the Canvas to 1 dp
+              ) {
+                  val canvasWidth = size.width
+                  drawLine(
+                      color = Color.Black,
+                      start =
+                      when (pagerState.currentPage) {
+                          0 -> Offset(x = 0f, y = 0f)
+                          1 -> Offset(x = canvasWidth / 4, y = 0f)
+                          2 -> Offset(x = canvasWidth / 2, y = 0f)
+                          else -> Offset(x = canvasWidth*3 / 4, y = 0f)
+                      },
+                      end =
+                      when (pagerState.currentPage) {
+                          0 -> Offset(x = canvasWidth / 4, y = 0f)
+                          1 -> Offset(x = canvasWidth / 2, y = 0f)
+                          2 -> Offset(x = canvasWidth*3 / 4, y = 0f)
+                          else -> Offset(x = canvasWidth, y = 0f)
+                      },
+                      strokeWidth = 5f)
+              }
+              Spacer(modifier = Modifier.height(screenHeight / 30))
+          }
+      }) { innerPadding ->
+      if (isLoaded){
+          HorizontalPager(state = pagerState, modifier = Modifier.padding(innerPadding)) {page ->
+                when (page) {
+                    0 -> {
+                        PageUserInvites(
+                            followersFollowingList.filter {
+                                u -> !u.pendingRequests.any {
+                                    invitation -> invitation.eventId == event.value!!.eventID}},
+                            event.value!!, null, callback = {
+                                toUpdate.add(it)
+                            })
+                    }
+                    1 -> {
+                        PageUserInvites(followersFollowingList.filter {
+                                u -> u.pendingRequests.any {
+                                invitation -> (invitation.eventId == event.value!!.eventID) && (invitation.status == InviteStatus.PENDING)}},
+                            event.value!!, InviteStatus.PENDING, callback = {
+                                toUpdate.add(it)
+                            })
+                    }
+                    2 -> {
+                        PageUserInvites(followersFollowingList.filter {
+                                u -> u.pendingRequests.any {
+                                invitation -> (invitation.eventId == event.value!!.eventID) && (invitation.status == InviteStatus.ACCEPTED)}},
+                            event.value!!, InviteStatus.ACCEPTED, callback = {
+                                toUpdate.add(it)
+                            })
+                    }
+                    3 -> {
+                        PageUserInvites(followersFollowingList.filter {
+                                u -> u.pendingRequests.any {
+                                invitation -> (invitation.eventId == event.value!!.eventID) && (invitation.status == InviteStatus.REFUSED)}},
+                            event.value!!, InviteStatus.REFUSED, callback = {
+                                toUpdate.add(it)
+                            })
+                    }
+                }
+          }
+      }else{
+          Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+              CircularProgressIndicator()
+          }
       }
+
+      }
+}
+
+
+
+
+@Composable
+fun PageUserInvites(list: List<GoMeetUser>,
+                    currentEvent: Event,
+                    status: InviteStatus?,
+                    callback : (GoMeetUser) -> Unit){
+
+    Column(
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .fillMaxSize()) {
+        list.forEach { follower ->
+            UserInviteWidget(
+                follower,
+                currentEvent,
+                status,
+                callback)
+        }
+    }
 }
 
 @Composable
 fun UserInviteWidget(
-    userID: String,
-    username: String,
-    eventID: String,
-    // status: InviteStatus?,
-    userViewModel: UserViewModel,
-    eventViewModel: EventViewModel
+    user: GoMeetUser,
+    event: Event,
+    status: InviteStatus?,
+    callback : (GoMeetUser) -> Unit
 ) {
-  var status by remember { mutableStateOf<InviteStatus?>(null) }
-  var event by remember { mutableStateOf<Event?>(null) }
 
-  LaunchedEffect(Unit) {
-    status =
-        userViewModel
-            .getUser(userID)
-            ?.pendingRequests
-            ?.find { it.userId == userID && it.eventId == eventID }
-            ?.status
-
-    event = eventViewModel.getEvent(eventID)
-  }
-
+    var clicked by remember { mutableStateOf(false) }
   Row(
-      modifier = Modifier.fillMaxWidth().padding(start = 15.dp, end = 15.dp).height(50.dp),
+      modifier = Modifier
+          .fillMaxWidth()
+          .padding(start = 15.dp, end = 15.dp)
+          .height(50.dp),
       horizontalArrangement = Arrangement.SpaceBetween,
       verticalAlignment = Alignment.CenterVertically) {
         // Profile picture
         Image(
             modifier =
-                Modifier.size(40.dp)
-                    .clip(CircleShape)
-                    .background(color = MaterialTheme.colorScheme.background),
+            Modifier
+                .size(40.dp)
+                .clip(CircleShape)
+                .background(color = MaterialTheme.colorScheme.background),
             painter = painterResource(id = R.drawable.gomeet_logo),
             contentDescription = "profile picture",
             contentScale = ContentScale.None)
 
         // Username text
-        Text(text = username, color = MaterialTheme.colorScheme.onBackground)
+        Text(text = user.username, color = MaterialTheme.colorScheme.onBackground)
 
         // Status text
         Text(
@@ -303,7 +374,7 @@ fun UserInviteWidget(
             color =
                 when (status) {
                   null -> MaterialTheme.colorScheme.onBackground
-                  InviteStatus.PENDING -> MaterialTheme.colorScheme.onBackground
+                  InviteStatus.PENDING -> if (clicked) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.primary
                   InviteStatus.ACCEPTED -> Color.Green
                   InviteStatus.REFUSED -> Color.Red
                 })
@@ -311,61 +382,47 @@ fun UserInviteWidget(
         // Button to invite or cancel invitation
         Button(
             onClick = {
-              CoroutineScope(Dispatchers.Main).launch {
-                when (status) {
-                  null -> {
-                    userViewModel.gotInvitation(eventID, userID)
-                    if (event != null) {
-                      eventViewModel.sendInvitation(event!!, userID)
-                    }
-                  }
-                  InviteStatus.PENDING -> {
-                    userViewModel.invitationCanceled(eventID, userID)
-                    if (event != null) {
-                      eventViewModel.cancelInvitation(event!!, userID)
-                    }
-                  }
-                  InviteStatus.ACCEPTED -> {
-                    userViewModel.gotKickedFromEvent(eventID, userID)
-                    if (event != null) {
-                      eventViewModel.kickParticipant(event!!, userID)
-                    }
-                  }
-                  InviteStatus.REFUSED -> {
-                    userViewModel.gotInvitation(eventID, userID)
-                    if (event != null) {
-                      eventViewModel.sendInvitation(event!!, userID)
-                    }
-                  }
-                }
-              }
+                clicked = !clicked
+                val toAdd = (clicked && (status == null || status == InviteStatus.REFUSED)) ||
+                    (!clicked && (status == InviteStatus.PENDING || status == InviteStatus.ACCEPTED))
+                Log.d("ManageInvites", "toAdd: $toAdd, clicked: $clicked, status: $status")
+                callback(
+                    user.copy(
+                        pendingRequests =
+                        if (toAdd)
+                            user.pendingRequests.plus(Invitation(event.eventID, status?: InviteStatus.PENDING))
+                        else
+                            user.pendingRequests.minus(Invitation(event.eventID, status?: InviteStatus.PENDING))))
+
             },
-            modifier = Modifier.height(26.dp).width(82.dp),
+            modifier = Modifier
+                .height(26.dp)
+                .width(82.dp),
             contentPadding = PaddingValues(vertical = 2.dp),
             shape = RoundedCornerShape(10.dp),
             colors =
                 ButtonDefaults.buttonColors(
                     containerColor =
                         when (status) {
-                          null -> DarkCyan
-                          InviteStatus.PENDING -> Color.LightGray
-                          InviteStatus.ACCEPTED -> Color.Red
-                          InviteStatus.REFUSED -> Color.LightGray
+                          null -> if (!clicked) DarkCyan else Color.LightGray
+                          InviteStatus.PENDING -> if (clicked) DarkCyan else Color.LightGray
+                          InviteStatus.ACCEPTED -> if (clicked) DarkCyan else Color.LightGray
+                          InviteStatus.REFUSED -> if (!clicked) DarkCyan else Color.LightGray
                         })) {
               Text(
                   text =
                       when (status) {
-                        null -> "Invite"
-                        InviteStatus.PENDING -> "Cancel"
-                        InviteStatus.ACCEPTED -> "Cancel"
-                        InviteStatus.REFUSED -> "Invite"
+                        null -> if (!clicked) "Invite" else "Cancel"
+                        InviteStatus.PENDING -> if (clicked) "Invite" else "Cancel"
+                        InviteStatus.ACCEPTED -> if (clicked) "Invite" else "Cancel"
+                        InviteStatus.REFUSED -> if (!clicked) "Invite" else "Cancel"
                       },
                   color =
                       when (status) {
-                        null -> Color.White
-                        InviteStatus.PENDING -> Color.DarkGray
-                        InviteStatus.ACCEPTED -> Color.White
-                        InviteStatus.REFUSED -> Color.DarkGray
+                        null -> if (!clicked) Color.White else Color.DarkGray
+                        InviteStatus.PENDING -> if (clicked) Color.White else Color.DarkGray
+                        InviteStatus.ACCEPTED -> if (clicked) Color.White else Color.DarkGray
+                        InviteStatus.REFUSED -> if (!clicked) Color.White else Color.DarkGray
                       },
                   fontSize = 12.sp)
             }

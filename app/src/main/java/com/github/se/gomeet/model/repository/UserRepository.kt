@@ -141,7 +141,7 @@ class UserRepository(private val db: FirebaseFirestore) {
         "username" to username,
         "following" to following,
         "followers" to followers,
-        "pendingRequests" to pendingRequests,
+        "pendingRequests" to pendingRequests.toList(),
         "firstName" to firstName,
         "lastName" to lastName,
         "email" to email,
@@ -166,7 +166,7 @@ class UserRepository(private val db: FirebaseFirestore) {
         username = this["username"] as String,
         following = (this["following"] as? List<String>) ?: emptyList(),
         followers = (this["followers"] as? List<String>) ?: emptyList(),
-        pendingRequests = convertToInvitationsList(this["pendingRequests"]),
+        pendingRequests = convertToInvitationsList(this["pendingRequests"]).toSet(),
         firstName = this["firstName"] as? String ?: "",
         lastName = this["lastName"] as? String ?: "",
         email = this["email"] as? String ?: "",
@@ -183,10 +183,9 @@ class UserRepository(private val db: FirebaseFirestore) {
       return data.mapNotNull { element ->
         if (element is Map<*, *>) {
           val eventId = element["eventId"] as? String
-          val userId = element["userId"] as? String
           val status = element["status"] as? String
-          if (eventId != null && userId != null && status != null) {
-            Invitation(eventId, userId, InviteStatus.valueOf(status))
+          if (eventId != null && status != null) {
+            Invitation(eventId, InviteStatus.valueOf(status))
           } else {
             null
           }

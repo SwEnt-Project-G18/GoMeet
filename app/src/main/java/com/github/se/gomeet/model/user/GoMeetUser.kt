@@ -29,7 +29,7 @@ data class GoMeetUser(
     val country: String,
     val following: List<String>,
     val followers: List<String>,
-    val pendingRequests: List<Invitation>, // For now, the requests are just invitations
+    val pendingRequests: Set<Invitation>, // For now, the requests are just invitations
     var joinedEvents: List<String>,
     var myEvents: List<String>,
     var myFavorites: List<String>,

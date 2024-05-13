@@ -5,9 +5,9 @@ import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.github.se.gomeet.model.event.Invitation
 import com.github.se.gomeet.model.event.InviteStatus
-import androidx.lifecycle.viewModelScope
 import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.google.firebase.auth.ktx.auth
@@ -54,7 +54,7 @@ class UserViewModel(userRepository: UserRepository) : ViewModel() {
                   username = username,
                   following = emptyList(),
                   followers = emptyList(),
-                  pendingRequests = emptyList(),
+                  pendingRequests = emptySet(),
                   firstName = firstName,
                   lastName = lastName,
                   email = email,
@@ -160,7 +160,7 @@ class UserViewModel(userRepository: UserRepository) : ViewModel() {
   suspend fun joinEvent(eventId: String, userId: String) {
     val possibleInvitation =
         getUser(userId)!!.pendingRequests.find {
-          it.eventId == eventId && it.status == InviteStatus.PENDING && it.userId == userId
+          it.eventId == eventId && it.status == InviteStatus.PENDING
         }
     try {
       val goMeetUser = getUser(userId)!!
@@ -186,7 +186,7 @@ class UserViewModel(userRepository: UserRepository) : ViewModel() {
   suspend fun gotInvitation(eventId: String, userId: String) {
     val possibleInvitation =
         getUser(userId)!!.pendingRequests.find {
-          it.eventId == eventId && it.status == InviteStatus.PENDING && it.userId == userId
+          it.eventId == eventId && it.status == InviteStatus.PENDING
         }
 
     try {
@@ -202,7 +202,7 @@ class UserViewModel(userRepository: UserRepository) : ViewModel() {
           goMeetUser.copy(
               pendingRequests =
                   goMeetUser.pendingRequests.plus(
-                      Invitation(eventId, userId, InviteStatus.PENDING))))
+                      Invitation(eventId, InviteStatus.PENDING))))
     } catch (e: Exception) {
       Log.w(ContentValues.TAG, "Couldn't get the invitation", e)
     }
@@ -220,7 +220,7 @@ class UserViewModel(userRepository: UserRepository) : ViewModel() {
   suspend fun invitationCanceled(eventId: String, userId: String) {
     val possibleInvitation =
         getUser(userId)!!.pendingRequests.find {
-          it.eventId == eventId && it.status == InviteStatus.PENDING && it.userId == userId
+          it.eventId == eventId && it.status == InviteStatus.PENDING
         }
     try {
       val goMeetUser = getUser(userId)!!
@@ -236,7 +236,7 @@ class UserViewModel(userRepository: UserRepository) : ViewModel() {
   suspend fun userAcceptsInvitation(eventId: String, userId: String) {
     val possibleInvitation =
         getUser(userId)!!.pendingRequests.find {
-          it.eventId == eventId && it.status == InviteStatus.PENDING && it.userId == userId
+          it.eventId == eventId && it.status == InviteStatus.PENDING
         }
     try {
       val goMeetUser = getUser(userId)!!
@@ -253,7 +253,7 @@ class UserViewModel(userRepository: UserRepository) : ViewModel() {
   suspend fun userRefusesInvitation(eventId: String, userId: String) {
     val possibleInvitation =
         getUser(userId)!!.pendingRequests.find {
-          it.eventId == eventId && it.status == InviteStatus.PENDING && it.userId == userId
+          it.eventId == eventId && it.status == InviteStatus.PENDING
         }
 
     try {
