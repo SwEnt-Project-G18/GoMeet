@@ -121,7 +121,7 @@ fun WelcomeScreen(
             enabled = true,
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.outlineVariant)) {
               Text(
-                  text = "Logel In",
+                  text = "Log In",
                   style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
                   color = Color.White)
             }
