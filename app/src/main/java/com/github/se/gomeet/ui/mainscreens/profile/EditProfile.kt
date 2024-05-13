@@ -23,8 +23,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -52,7 +54,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.TagsSelector
 import com.github.se.gomeet.model.repository.UserRepository
@@ -150,72 +152,55 @@ fun EditProfile(
   }
 
   Scaffold(
-      modifier = Modifier.padding(start = 15.dp, end = 15.dp),
+      modifier = Modifier.padding(horizontal = 15.dp),
       topBar = {
-        Row(
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically) {
-              Text(
-                  text = "My Profile",
-                  modifier = Modifier.padding(top = 15.dp),
-                  color = DarkCyan,
-                  fontStyle = FontStyle.Normal,
-                  fontWeight = FontWeight.SemiBold,
-                  fontFamily = FontFamily.Default,
-                  textAlign = TextAlign.Start,
-                  style = MaterialTheme.typography.headlineLarge)
-
-              Spacer(modifier = Modifier.weight(1f))
-
-              Text(
-                  text = "Done",
-                  modifier =
-                      Modifier.padding(start = 15.dp, top = 15.dp, end = 15.dp, bottom = 0.dp)
-                          .clickable {
-                            if (imageUri != null) {
-                              userViewModel.uploadImageAndGetUrl(
-                                  userId = currentUser.value!!.uid,
-                                  imageUri = imageUri!!,
-                                  onSuccess = { imageUrl ->
-                                    val updatedUser =
-                                        currentUser.value!!.copy(
-                                            firstName = firstName.value,
-                                            lastName = lastName.value,
-                                            email = email.value,
-                                            username = username.value,
-                                            phoneNumber = phoneNumber.value,
-                                            country = country.value,
-                                            profilePicture = imageUrl)
-                                    userViewModel.editUser(updatedUser)
-                                    nav.goBack()
-                                  },
-                                  onError = { exception ->
-                                    Log.e(
-                                        "ProfileUpdate",
-                                        "Failed to upload new image: ${exception.message}")
-                                  })
-                            } else {
-                              val updatedUser =
-                                  currentUser.value!!.copy(
-                                      firstName = firstName.value,
-                                      lastName = lastName.value,
-                                      email = email.value,
-                                      username = username.value,
-                                      phoneNumber = phoneNumber.value,
-                                      country = country.value,
-                                      profilePicture = profilePictureUrl ?: "")
-                              userViewModel.editUser(updatedUser)
-                              nav.goBack()
-                              Log.e("ProfileUpdate", "No image selected")
-                            }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+          IconButton(onClick = { nav.goBack() }) {
+            Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = "Go back")
+          }
+          Spacer(modifier = Modifier.weight(1f))
+          Text(
+              text = "Done",
+              style = MaterialTheme.typography.bodyLarge,
+              modifier =
+                  Modifier.padding(2.dp).clickable {
+                    if (imageUri != null) {
+                      userViewModel.uploadImageAndGetUrl(
+                          userId = currentUser.value!!.uid,
+                          imageUri = imageUri!!,
+                          onSuccess = { imageUrl ->
+                            val updatedUser =
+                                currentUser.value!!.copy(
+                                    firstName = firstName.value,
+                                    lastName = lastName.value,
+                                    email = email.value,
+                                    username = username.value,
+                                    phoneNumber = phoneNumber.value,
+                                    country = country.value,
+                                    profilePicture = imageUrl)
+                            userViewModel.editUser(updatedUser)
+                            nav.goBack()
                           },
-                  color = MaterialTheme.colorScheme.onBackground,
-                  fontStyle = FontStyle.Normal,
-                  fontWeight = FontWeight.Normal,
-                  fontFamily = FontFamily.Default,
-                  textAlign = TextAlign.Start,
-                  style = MaterialTheme.typography.bodyLarge)
-            }
+                          onError = { exception ->
+                            Log.e(
+                                "ProfileUpdate", "Failed to upload new image: ${exception.message}")
+                          })
+                    } else {
+                      val updatedUser =
+                          currentUser.value!!.copy(
+                              firstName = firstName.value,
+                              lastName = lastName.value,
+                              email = email.value,
+                              username = username.value,
+                              phoneNumber = phoneNumber.value,
+                              country = country.value,
+                              profilePicture = profilePictureUrl ?: "")
+                      userViewModel.editUser(updatedUser)
+                      nav.goBack()
+                      Log.e("ProfileUpdate", "No image selected")
+                    }
+                  })
+        }
       },
       bottomBar = {
         BottomNavigationMenu(
@@ -239,7 +224,7 @@ fun EditProfile(
                         if (imageBitmap != null) {
                           androidx.compose.ui.graphics.painter.BitmapPainter(imageBitmap!!)
                         } else if (!profilePictureUrl.isNullOrEmpty()) {
-                          rememberImagePainter(profilePictureUrl)
+                          rememberAsyncImagePainter(profilePictureUrl)
                         } else {
                           painterResource(id = R.drawable.gomeet_logo)
                         },

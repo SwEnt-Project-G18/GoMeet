@@ -26,7 +26,6 @@ class EditProfileTest {
   fun uiElementsDisplayed() {
     composeTestRule.setContent { EditProfile(NavigationActions(rememberNavController())) }
 
-    composeTestRule.onNodeWithText("My Profile").assertIsDisplayed()
     composeTestRule.onNodeWithTag("Profile Picture").assertIsDisplayed()
     composeTestRule.onNodeWithText("First Name").performScrollTo().assertIsDisplayed()
     composeTestRule.onNodeWithText("Last Name").performScrollTo().assertIsDisplayed()

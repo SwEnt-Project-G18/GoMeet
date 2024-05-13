@@ -18,6 +18,8 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -27,20 +29,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.ui.navigation.NavigationActions
-import com.github.se.gomeet.ui.theme.DarkCyan
-import com.github.se.gomeet.ui.theme.Grey
 import com.google.android.gms.maps.model.LatLng
 import java.text.SimpleDateFormat
 import java.time.ZoneId
@@ -60,36 +55,23 @@ fun ProfileEventsList(
     eventList: MutableList<Event>,
     nav: NavigationActions
 ) {
-  Spacer(modifier = Modifier.height(10.dp))
-  Column {
-    Row(
-        Modifier.padding(start = 15.dp, end = 0.dp, top = 0.dp, bottom = 0.dp)
-            .fillMaxWidth()
-            .testTag("EventsListHeader")) {
-          Text(
-              text = title,
-              style =
-                  TextStyle(
-                      fontSize = 18.sp,
-                      lineHeight = 16.sp,
-                      fontFamily = FontFamily(Font(R.font.roboto)),
-                      fontWeight = FontWeight(1000),
-                      color = DarkCyan,
-                      textAlign = TextAlign.Start,
-                      letterSpacing = 0.5.sp,
-                  ),
-              modifier = Modifier.width(104.dp).height(21.dp).align(Alignment.Bottom))
-          Text(
-              text = "View all",
-              color = Grey,
-              modifier = Modifier.align(Alignment.Bottom).clickable {})
-        }
-    Spacer(modifier = Modifier.height(10.dp))
+  Column(Modifier.fillMaxWidth().padding(start = 15.dp)) {
+    Row(Modifier.testTag("EventsListHeader"), verticalAlignment = Alignment.CenterVertically) {
+      Text(text = title, style = MaterialTheme.typography.titleLarge)
+      Spacer(modifier = Modifier.width(10.dp))
+      ClickableText(
+          style =
+              MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.primary),
+          onClick = { // TODO: Go to List of Events
+          },
+          text = AnnotatedString(text = "View All >"))
+    }
+    Spacer(modifier = Modifier.height(5.dp))
     LazyRow(
         state = listState,
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
-        contentPadding = PaddingValues(start = 15.dp, end = 15.dp),
+        contentPadding = PaddingValues(end = 15.dp),
         modifier = Modifier.heightIn(min = 56.dp).testTag("EventsListItems")) {
           itemsIndexed(eventList) { _, event ->
             Column(
@@ -97,7 +79,6 @@ fun ProfileEventsList(
                     Modifier.width(170.dp).clickable {
                       val eventDate =
                           Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant())
-
                       val currentDate = Calendar.getInstance()
                       val startOfWeek = currentDate.clone() as Calendar
                       startOfWeek.set(Calendar.DAY_OF_WEEK, startOfWeek.firstDayOfWeek)
@@ -164,8 +145,18 @@ fun ProfileEventsList(
                           Modifier.fillMaxWidth()
                               .aspectRatio(3f / 1.75f)
                               .clip(RoundedCornerShape(size = 10.dp)))
-                  Text(text = event.title, color = DarkCyan)
-                  Text(text = event.date.toString(), color = Grey)
+                  Spacer(modifier = Modifier.height(2.dp))
+
+                  Text(
+                      text = event.title,
+                      style =
+                          MaterialTheme.typography.bodyLarge.copy(
+                              color = MaterialTheme.colorScheme.outline))
+                  Text(
+                      text = event.date.toString(),
+                      style =
+                          MaterialTheme.typography.bodyLarge.copy(
+                              color = MaterialTheme.colorScheme.primary))
                 }
           }
         }
