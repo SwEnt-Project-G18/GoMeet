@@ -69,9 +69,11 @@ fun MyEventInfo(
   val coroutineScope = rememberCoroutineScope()
 
   LaunchedEffect(Unit) {
-    coroutineScope.launch { organizer.value = userViewModel.getUser(organizerId) }
-    currentUser.value = userViewModel.getUser(Firebase.auth.currentUser!!.uid)
-      myEvent.value = eventViewModel.getEvent(eventId)
+    coroutineScope.launch {
+        organizer.value = userViewModel.getUser(organizerId)
+        currentUser.value = userViewModel.getUser(Firebase.auth.currentUser!!.uid)
+        myEvent.value = eventViewModel.getEvent(eventId)
+    }
   }
 
   Log.d("EventInfo", "Organizer is $organizerId")

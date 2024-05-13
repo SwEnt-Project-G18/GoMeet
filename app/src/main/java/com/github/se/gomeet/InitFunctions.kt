@@ -131,7 +131,7 @@ fun InitNavigation(
   val eventRepository = EventRepository(db)
   val userRepository = UserRepository(db)
   val authViewModel = AuthViewModel()
-  val eventViewModel = EventViewModel(userIdState.value, eventRepository)
+  var eventViewModel = EventViewModel(null, eventRepository)
   val userViewModel = UserViewModel(userRepository)
 
   return NavHost(navController = nav, startDestination = Route.WELCOME) {
@@ -149,6 +149,7 @@ fun InitNavigation(
               val phoneNumber = authViewModel.signInState.value.phoneNumberRegister
               val country = authViewModel.signInState.value.countryRegister
               val username = authViewModel.signInState.value.usernameRegister
+              eventViewModel = EventViewModel(uid, eventRepository)
 
               userViewModel.createUserIfNew(
                   uid, username, firstName, lastName, email, phoneNumber, country)
