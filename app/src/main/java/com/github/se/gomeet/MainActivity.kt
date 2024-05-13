@@ -37,6 +37,7 @@ import com.github.se.gomeet.ui.mainscreens.profile.Notifications
 import com.github.se.gomeet.ui.mainscreens.profile.OthersProfile
 import com.github.se.gomeet.ui.mainscreens.profile.Profile
 import com.github.se.gomeet.ui.mainscreens.profile.settings.SettingsAbout
+import com.github.se.gomeet.ui.mainscreens.profile.settings.SettingsHelp
 import com.github.se.gomeet.ui.mainscreens.profile.settings.SettingsPermissions
 import com.github.se.gomeet.ui.mainscreens.profile.settings.SettingsScreen
 import com.github.se.gomeet.ui.navigation.LOGIN_ITEMS
@@ -306,6 +307,7 @@ class MainActivity : ComponentActivity() {
 
             composable(Route.SETTINGS) { SettingsScreen(navAction) }
             composable(Route.ABOUT) { SettingsAbout(navAction) }
+            composable(Route.HELP) { SettingsHelp(navAction) }
             composable(Route.PERMISSIONS) { SettingsPermissions(navAction) }
 
             composable(Route.EDIT_PROFILE) { EditProfile(nav = navAction) }

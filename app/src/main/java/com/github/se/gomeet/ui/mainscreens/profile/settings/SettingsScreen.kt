@@ -114,7 +114,7 @@ fun SettingsScreen(
               SettingsSubtitle(
                   "More info and support", Modifier.padding(15.dp).align(Alignment.Start))
 
-              SettingsComposable(R.drawable.baseline_chat_bubble_outline_24, "Help")
+              SettingsComposable(R.drawable.baseline_chat_bubble_outline_24, "Help",true, {nav.navigateToScreen(Route.HELP)})
               SettingsComposable(R.drawable.gomeet_icon, "About",true, {nav.navigateToScreen(Route.ABOUT)})
 
               Text(

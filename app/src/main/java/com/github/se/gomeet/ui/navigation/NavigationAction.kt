@@ -51,6 +51,7 @@ object Route {
   const val NOTIFICATIONS = "Notifications"
   const val SETTINGS = "Settings"
   const val ABOUT = "About"
+  const val HELP = "Help"
   const val PERMISSIONS = "Permissions"
   const val MESSAGE = "Message/{id}"
   const val FOLLOWERS = "Followers/{uid}"
@@ -118,7 +119,9 @@ val SETTINGS =
         TopLevelDestination(
             route = Route.ABOUT, icon = Icons.Default.Settings, textId = Route.ABOUT),
         TopLevelDestination(
-            route = Route.PERMISSIONS, icon = Icons.Default.Settings, textId = Route.PERMISSIONS)
+            route = Route.PERMISSIONS, icon = Icons.Default.Settings, textId = Route.PERMISSIONS),
+        TopLevelDestination(
+                route = Route.HELP, icon = Icons.Default.Settings, textId = Route.HELP)
 
 )
 
