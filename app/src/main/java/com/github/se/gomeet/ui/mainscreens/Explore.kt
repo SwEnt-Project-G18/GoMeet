@@ -209,9 +209,9 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
     val halfHeightPx = with(LocalDensity.current) { halfHeightDp.dp.toPx() }
 
     BackdropScaffold(
-        frontLayerBackgroundColor = Color.White,
-        backLayerBackgroundColor = Color.White,
-        backLayerContentColor = Color.White,
+        frontLayerBackgroundColor = MaterialTheme.colorScheme.background,
+        backLayerBackgroundColor = MaterialTheme.colorScheme.background,
+        backLayerContentColor = MaterialTheme.colorScheme.background,
         scaffoldState = backdropState,
         frontLayerScrimColor = Color.Unspecified,
         peekHeight = 0.dp,

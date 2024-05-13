@@ -40,7 +40,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.github.se.gomeet.R
-import com.github.se.gomeet.ui.theme.DarkGrey
 
 /**
  * This composable function handles the upload and display of the user's profile picture. It allows
@@ -95,7 +94,7 @@ fun RegisterPfp(callback: (String) -> Unit, name: String) {
       LinearProgressIndicator(
           modifier = Modifier.padding(top = 20.dp, end = 25.dp),
           progress = { 0.8f },
-          color = DarkGrey,
+          color = MaterialTheme.colorScheme.tertiary,
           trackColor = Color.LightGray,
           strokeCap = ProgressIndicatorDefaults.CircularIndeterminateStrokeCap)
       IconButton(
@@ -105,7 +104,7 @@ fun RegisterPfp(callback: (String) -> Unit, name: String) {
             Icon(
                 Icons.AutoMirrored.Filled.ArrowForward,
                 contentDescription = "Next",
-                tint = DarkGrey,
+                tint = MaterialTheme.colorScheme.tertiary,
                 modifier = Modifier.size(60.dp))
           }
     }

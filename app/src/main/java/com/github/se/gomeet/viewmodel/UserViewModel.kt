@@ -1,11 +1,16 @@
 package com.github.se.gomeet.viewmodel
 
 import android.content.ContentValues
+import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+<<<<<<< HEAD
 import com.github.se.gomeet.model.event.Invitation
 import com.github.se.gomeet.model.event.InviteStatus
+=======
+import androidx.lifecycle.viewModelScope
+>>>>>>> main
 import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.google.firebase.auth.ktx.auth
@@ -67,6 +72,34 @@ class UserViewModel(userRepository: UserRepository) : ViewModel() {
         } catch (e: Exception) {
           Log.w(ContentValues.TAG, "Error adding user", e)
         }
+      }
+    }
+  }
+
+  suspend fun getFollowers(uid: String): List<GoMeetUser> {
+    val followers = mutableListOf<GoMeetUser>()
+    repository.getAllUsers { users ->
+      for (user in users) {
+        if (user.uid != uid && user.following.contains(uid)) {
+          followers.add(user)
+        }
+      }
+    }
+    return followers
+  }
+
+  fun uploadImageAndGetUrl(
+      userId: String,
+      imageUri: Uri,
+      onSuccess: (String) -> Unit,
+      onError: (Exception) -> Unit
+  ) {
+    viewModelScope.launch {
+      try {
+        val imageUrl = repository.uploadUserProfileImageAndGetUrl(userId, imageUri)
+        onSuccess(imageUrl)
+      } catch (e: Exception) {
+        onError(e)
       }
     }
   }

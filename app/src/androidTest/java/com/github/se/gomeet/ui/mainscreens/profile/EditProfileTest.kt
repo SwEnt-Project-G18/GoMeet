@@ -2,7 +2,7 @@ package com.github.se.gomeet.ui.mainscreens.profile
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performScrollTo
 import androidx.navigation.compose.rememberNavController
@@ -27,7 +27,7 @@ class EditProfileTest {
     composeTestRule.setContent { EditProfile(NavigationActions(rememberNavController())) }
 
     composeTestRule.onNodeWithText("My Profile").assertIsDisplayed()
-    composeTestRule.onNodeWithContentDescription("image description").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("Profile Picture").assertIsDisplayed()
     composeTestRule.onNodeWithText("First Name").performScrollTo().assertIsDisplayed()
     composeTestRule.onNodeWithText("Last Name").performScrollTo().assertIsDisplayed()
     composeTestRule.onNodeWithText("Email Address").performScrollTo().assertIsDisplayed()
@@ -41,7 +41,7 @@ class EditProfileTest {
     private val userVM = UserViewModel(UserRepository(Firebase.firestore))
     private lateinit var currentUserId: String
 
-    private val usr = "u@t.com"
+    private val usr = "u@editprofiletest.com"
     private val pwd = "123456"
 
     @BeforeClass

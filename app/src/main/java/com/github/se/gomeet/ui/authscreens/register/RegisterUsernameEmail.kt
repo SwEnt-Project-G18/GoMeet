@@ -35,7 +35,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.github.se.gomeet.model.user.GoMeetUser
-import com.github.se.gomeet.ui.theme.DarkGrey
 import com.github.se.gomeet.viewmodel.UserViewModel
 import kotlinx.coroutines.launch
 
@@ -126,7 +125,7 @@ fun RegisterUsernameEmail(
           LinearProgressIndicator(
               modifier = Modifier.padding(top = 20.dp, end = 25.dp),
               progress = { 0.2f },
-              color = DarkGrey,
+              color = MaterialTheme.colorScheme.tertiary,
               trackColor = Color.LightGray,
               strokeCap = ProgressIndicatorDefaults.CircularIndeterminateStrokeCap)
           IconButton(
@@ -144,7 +143,7 @@ fun RegisterUsernameEmail(
                 Icon(
                     Icons.AutoMirrored.Filled.ArrowForward,
                     contentDescription = "Next",
-                    tint = DarkGrey,
+                    tint = MaterialTheme.colorScheme.tertiary,
                     modifier = Modifier.size(60.dp))
               }
         }
