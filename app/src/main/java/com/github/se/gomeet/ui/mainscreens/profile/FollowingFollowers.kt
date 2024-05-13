@@ -246,7 +246,8 @@ fun PageUsers(
                       userViewModel.unfollow(user.uid)
                       isFollowing = false
                     },
-                    modifier = Modifier.padding(start = 15.dp).width(110.dp).testTag("Unfollow"),
+                    modifier =
+                        Modifier.padding(start = 15.dp).width(110.dp).testTag("UnfollowButton"),
                     colors =
                         ButtonColors(
                             containerColor = MaterialTheme.colorScheme.primaryContainer,
