@@ -22,10 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
@@ -34,7 +31,6 @@ import com.github.se.gomeet.ui.navigation.CREATE_ITEMS
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
-import com.github.se.gomeet.ui.theme.DarkCyan
 
 /**
  * Composable function for the Create screen. This composable will navigate to either the
@@ -44,17 +40,23 @@ import com.github.se.gomeet.ui.theme.DarkCyan
  */
 @Composable
 fun Create(nav: NavigationActions) {
-    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
-    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+  val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+  val screenHeight = LocalConfiguration.current.screenHeightDp.dp
 
-    Scaffold(
+  Scaffold(
       modifier = Modifier.testTag("CreateUI"),
       topBar = {
-          Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(start = screenWidth/15, top = screenHeight/30)) {
-              Text(text = "Create",
-                  style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.SemiBold))
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(start = screenWidth / 15, top = screenHeight / 30)) {
+              Text(
+                  text = "Create",
+                  style =
+                      MaterialTheme.typography.headlineMedium.copy(
+                          fontWeight = FontWeight.SemiBold))
               Spacer(Modifier.weight(1f))
-          } },
+            }
+      },
       bottomBar = {
         BottomNavigationMenu(
             onTabSelect = { selectedTab ->
@@ -63,55 +65,53 @@ fun Create(nav: NavigationActions) {
             tabList = TOP_LEVEL_DESTINATIONS,
             selectedItem = Route.CREATE)
       }) { innerPadding ->
-      Column(
+        Column(
             modifier = Modifier.fillMaxSize().padding(innerPadding),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally) {
-              Spacer(modifier = Modifier.height(screenHeight/6))
+              Spacer(modifier = Modifier.height(screenHeight / 6))
 
-              Text(
-                  text = "Choose your audience",
-                  style = MaterialTheme.typography.headlineSmall
-              )
+              Text(text = "Choose your audience", style = MaterialTheme.typography.headlineSmall)
 
-          Spacer(modifier = Modifier.height(screenHeight/6))
-                  OutlinedButton(
-                      onClick = {
-                          nav.navigateTo(
-                              CREATE_ITEMS.first { it.route == Route.PUBLIC_CREATE })
-                      },
-                      modifier = Modifier
-                          .width((screenWidth / 1.5.dp).dp)
-                          .height(screenHeight / 17),
-                      shape = RoundedCornerShape(10.dp),
-                      enabled = true,
-                      colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.outlineVariant)){
-                      Text(
-                          text = "Public",
-                          style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
-                          color = Color.White)
+              Spacer(modifier = Modifier.height(screenHeight / 6))
+              OutlinedButton(
+                  onClick = {
+                    nav.navigateTo(CREATE_ITEMS.first { it.route == Route.PUBLIC_CREATE })
+                  },
+                  modifier = Modifier.width((screenWidth / 1.5.dp).dp).height(screenHeight / 17),
+                  shape = RoundedCornerShape(10.dp),
+                  enabled = true,
+                  colors =
+                      ButtonDefaults.buttonColors(
+                          containerColor = MaterialTheme.colorScheme.outlineVariant)) {
+                    Text(
+                        text = "Public",
+                        style =
+                            MaterialTheme.typography.bodyLarge.copy(
+                                fontWeight = FontWeight.SemiBold),
+                        color = Color.White)
                   }
 
-                    Spacer(modifier = Modifier.size(10.dp))
-                  OutlinedButton(
-                      onClick = {
-                          nav.navigateTo(
-                              CREATE_ITEMS.first { it.route == Route.PRIVATE_CREATE })
-
-                      },
-                      modifier = Modifier
-                          .width((screenWidth / 1.5.dp).dp)
-                          .height(screenHeight / 17),
-                      shape = RoundedCornerShape(10.dp),
-                      border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-                      enabled = true,
-                      colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.background)) {
-                      Text(
-                          text = "Private",
-                          style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
-                          color = MaterialTheme.colorScheme.outlineVariant)
+              Spacer(modifier = Modifier.size(10.dp))
+              OutlinedButton(
+                  onClick = {
+                    nav.navigateTo(CREATE_ITEMS.first { it.route == Route.PRIVATE_CREATE })
+                  },
+                  modifier = Modifier.width((screenWidth / 1.5.dp).dp).height(screenHeight / 17),
+                  shape = RoundedCornerShape(10.dp),
+                  border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                  enabled = true,
+                  colors =
+                      ButtonDefaults.buttonColors(
+                          containerColor = MaterialTheme.colorScheme.background)) {
+                    Text(
+                        text = "Private",
+                        style =
+                            MaterialTheme.typography.bodyLarge.copy(
+                                fontWeight = FontWeight.SemiBold),
+                        color = MaterialTheme.colorScheme.outlineVariant)
                   }
-              }
+            }
       }
 }
 

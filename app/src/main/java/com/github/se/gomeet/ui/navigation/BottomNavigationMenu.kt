@@ -16,7 +16,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.github.se.gomeet.ui.theme.Cyan
 import com.github.se.gomeet.ui.theme.TranslucentCyan
 
 /**
@@ -33,28 +32,30 @@ fun BottomNavigationMenu(
     selectedItem: String
 ) {
   NavigationBar(
-      modifier = Modifier
-          .navigationBarsPadding()
-          .height(80.dp),
+      modifier = Modifier.navigationBarsPadding().height(80.dp),
       containerColor = Color.Transparent,
       tonalElevation = 0.dp,
   ) {
     tabList.forEach { destination ->
-        val selected = selectedItem == destination.route
+      val selected = selectedItem == destination.route
       NavigationBarItem(
           modifier = Modifier.testTag(destination.route),
           icon = {
-                  Icon(
-                      imageVector = if (selected)
-                          getIconForSelectedRoute(destination.route)
-                      else
-                          getIconForRoute(destination.route),
-                      contentDescription = destination.textId,
-                      modifier = Modifier.size(24.dp))
+            Icon(
+                imageVector =
+                    if (selected) getIconForSelectedRoute(destination.route)
+                    else getIconForRoute(destination.route),
+                contentDescription = destination.textId,
+                modifier = Modifier.size(24.dp))
           },
-          label = { Text(destination.textId,
-
-              style =  if (selected) MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold) else MaterialTheme.typography.labelLarge) },
+          label = {
+            Text(
+                destination.textId,
+                style =
+                    if (selected)
+                        MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold)
+                    else MaterialTheme.typography.labelLarge)
+          },
           selected = selected,
           onClick = { onTabSelect(destination.route) },
           colors =

@@ -121,31 +121,39 @@ fun Profile(
             selectedItem = Route.PROFILE)
       },
       topBar = {
-        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(start = screenWidth/15, top = screenHeight/30)) {
-          Text(text = "My Profile", style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.SemiBold))
-          Spacer(Modifier.weight(1f))
-          IconButton(
-              modifier = Modifier.align(Alignment.CenterVertically),
-              onClick = { nav.navigateToScreen(Route.NOTIFICATIONS) }) {
-                Icon(
-                    Icons.Outlined.Notifications,
-                    contentDescription = "Notifications",
-                    modifier = Modifier.size(screenHeight / 28).align(Alignment.CenterVertically),
-                    tint = MaterialTheme.colorScheme.onBackground)
-              }
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(start = screenWidth / 15, top = screenHeight / 30)) {
+              Text(
+                  text = "My Profile",
+                  style =
+                      MaterialTheme.typography.headlineMedium.copy(
+                          fontWeight = FontWeight.SemiBold))
+              Spacer(Modifier.weight(1f))
+              IconButton(
+                  modifier = Modifier.align(Alignment.CenterVertically),
+                  onClick = { nav.navigateToScreen(Route.NOTIFICATIONS) }) {
+                    Icon(
+                        Icons.Outlined.Notifications,
+                        contentDescription = "Notifications",
+                        modifier =
+                            Modifier.size(screenHeight / 28).align(Alignment.CenterVertically),
+                        tint = MaterialTheme.colorScheme.onBackground)
+                  }
 
-          IconButton(
-              modifier = Modifier.align(Alignment.CenterVertically).padding(end = 15.dp),
-              onClick = {
-                nav.navigateTo(SECOND_LEVEL_DESTINATION.first { it.route == Route.SETTINGS })
-              }) {
-                Icon(
-                    Icons.Outlined.Settings,
-                    contentDescription = "Settings",
-                    modifier = Modifier.size(screenHeight / 28).align(Alignment.CenterVertically),
-                    tint = MaterialTheme.colorScheme.onBackground)
-              }
-        }
+              IconButton(
+                  modifier = Modifier.align(Alignment.CenterVertically).padding(end = 15.dp),
+                  onClick = {
+                    nav.navigateTo(SECOND_LEVEL_DESTINATION.first { it.route == Route.SETTINGS })
+                  }) {
+                    Icon(
+                        Icons.Outlined.Settings,
+                        contentDescription = "Settings",
+                        modifier =
+                            Modifier.size(screenHeight / 28).align(Alignment.CenterVertically),
+                        tint = MaterialTheme.colorScheme.onBackground)
+                  }
+            }
       }) { innerPadding ->
         if (isProfileLoaded) {
           Column(

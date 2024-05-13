@@ -1,4 +1,3 @@
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -39,7 +38,6 @@ import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.location.Location
 import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.ui.navigation.NavigationActions
-import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.firestore.ktx.firestore
@@ -77,49 +75,49 @@ fun EventWidget(
     nav: NavigationActions,
 ) {
 
-    val configuration = LocalConfiguration.current
-    val screenWidth = configuration.screenWidthDp.dp
-    val density = LocalDensity.current
+  val configuration = LocalConfiguration.current
+  val screenWidth = configuration.screenWidthDp.dp
+  val density = LocalDensity.current
 
-    val smallTextSize = with(density) { screenWidth.toPx() / 85 }
-    val bigTextSize = with(density) { screenWidth.toPx() / 60 }
+  val smallTextSize = with(density) { screenWidth.toPx() / 85 }
+  val bigTextSize = with(density) { screenWidth.toPx() / 60 }
 
-    val currentDate = Calendar.getInstance()
-    val startOfWeek = currentDate.clone() as Calendar
-    startOfWeek.set(Calendar.DAY_OF_WEEK, startOfWeek.firstDayOfWeek)
-    val endOfWeek = startOfWeek.clone() as Calendar
-    endOfWeek.add(Calendar.DAY_OF_WEEK, 6)
+  val currentDate = Calendar.getInstance()
+  val startOfWeek = currentDate.clone() as Calendar
+  startOfWeek.set(Calendar.DAY_OF_WEEK, startOfWeek.firstDayOfWeek)
+  val endOfWeek = startOfWeek.clone() as Calendar
+  endOfWeek.add(Calendar.DAY_OF_WEEK, 6)
 
-    val eventCalendar = Calendar.getInstance().apply { time = eventDate }
+  val eventCalendar = Calendar.getInstance().apply { time = eventDate }
 
-    val isThisWeek = eventCalendar.after(currentDate) && eventCalendar.before(endOfWeek)
-    val isToday =
-        currentDate.get(Calendar.YEAR) == eventCalendar.get(Calendar.YEAR) &&
-                currentDate.get(Calendar.DAY_OF_YEAR) == eventCalendar.get(Calendar.DAY_OF_YEAR)
+  val isThisWeek = eventCalendar.after(currentDate) && eventCalendar.before(endOfWeek)
+  val isToday =
+      currentDate.get(Calendar.YEAR) == eventCalendar.get(Calendar.YEAR) &&
+          currentDate.get(Calendar.DAY_OF_YEAR) == eventCalendar.get(Calendar.DAY_OF_YEAR)
 
-    val dayFormat =
-        if (isThisWeek) {
-            SimpleDateFormat("EEEE", Locale.getDefault())
-        } else {
-            SimpleDateFormat("dd/MM/yy", Locale.getDefault())
-        }
+  val dayFormat =
+      if (isThisWeek) {
+        SimpleDateFormat("EEEE", Locale.getDefault())
+      } else {
+        SimpleDateFormat("dd/MM/yy", Locale.getDefault())
+      }
 
-    val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+  val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
 
-    val dayString =
-        if (isToday) {
-            "Today"
-        } else {
-            dayFormat.format(eventDate)
-        }
-    val timeString = timeFormat.format(eventDate)
+  val dayString =
+      if (isToday) {
+        "Today"
+      } else {
+        dayFormat.format(eventDate)
+      }
+  val timeString = timeFormat.format(eventDate)
 
-    Card(
-        modifier =
-        Modifier.fillMaxWidth()
-            .testTag("Card")
-            .padding(start = 10.dp, top = 5.dp, end = 10.dp, bottom = 5.dp)
-            .clickable {
+  Card(
+      modifier =
+          Modifier.fillMaxWidth()
+              .testTag("Card")
+              .padding(start = 10.dp, top = 5.dp, end = 10.dp, bottom = 5.dp)
+              .clickable {
                 nav.navigateToEventInfo(
                     eventId = eventId,
                     title = eventName,
@@ -130,92 +128,91 @@ fun EventWidget(
                     loc = LatLng(eventLocation.latitude, eventLocation.longitude),
                     rating = 0.0 // TODO: replace with actual rating
                     // TODO: add image
-                )
-            },
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceAround) {
-            Column(
-                modifier = Modifier.weight(4f).padding(15.dp),
-                horizontalAlignment = Alignment.Start, // Align text horizontally to center
-                verticalArrangement = Arrangement.Center) {
+                    )
+              },
+      colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+  ) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceAround) {
+          Column(
+              modifier = Modifier.weight(4f).padding(15.dp),
+              horizontalAlignment = Alignment.Start, // Align text horizontally to center
+              verticalArrangement = Arrangement.Center) {
                 Text(
                     text = eventName,
                     style =
-                    TextStyle(
-                        fontSize = bigTextSize.sp,
-                        lineHeight = 20.sp,
-                        fontFamily = FontFamily(Font(R.font.roboto)),
-                        fontWeight = FontWeight(700),
-                        color = MaterialTheme.colorScheme.onBackground,
-                        letterSpacing = 0.25.sp,
-                    ),
+                        TextStyle(
+                            fontSize = bigTextSize.sp,
+                            lineHeight = 20.sp,
+                            fontFamily = FontFamily(Font(R.font.roboto)),
+                            fontWeight = FontWeight(700),
+                            color = MaterialTheme.colorScheme.onBackground,
+                            letterSpacing = 0.25.sp,
+                        ),
                     modifier = Modifier.testTag("EventName"))
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center) {
-                    var username by remember { mutableStateOf<String?>("Loading...") }
-                    LaunchedEffect(userName) {
+                      var username by remember { mutableStateOf<String?>("Loading...") }
+                      LaunchedEffect(userName) {
                         username =
-                            UserViewModel(UserRepository(Firebase.firestore))
-                                .getUsername(userName)
-                    }
+                            UserViewModel(UserRepository(Firebase.firestore)).getUsername(userName)
+                      }
 
-                    username?.let {
+                      username?.let {
                         Text(
                             it,
                             style =
-                            TextStyle(
-                                fontSize = smallTextSize.sp,
-                                lineHeight = 24.sp,
-                                fontFamily = FontFamily(Font(R.font.roboto)),
-                                fontWeight = FontWeight(700),
-                                color = MaterialTheme.colorScheme.onBackground,
-                                letterSpacing = 0.15.sp,
-                            ),
+                                TextStyle(
+                                    fontSize = smallTextSize.sp,
+                                    lineHeight = 24.sp,
+                                    fontFamily = FontFamily(Font(R.font.roboto)),
+                                    fontWeight = FontWeight(700),
+                                    color = MaterialTheme.colorScheme.onBackground,
+                                    letterSpacing = 0.15.sp,
+                                ),
                             modifier = Modifier.padding(top = 5.dp).testTag("UserName"))
-                    }
-                    if (verified) {
+                      }
+                      if (verified) {
                         Box(
                             contentAlignment = Alignment.Center,
                             modifier = Modifier.padding(5.dp).size(smallTextSize.dp * (1.4f))) {
-                            Image(
-                                painter = painterResource(id = R.drawable.verified),
-                                contentDescription = "Verified",
-                            )
-                        }
+                              Image(
+                                  painter = painterResource(id = R.drawable.verified),
+                                  contentDescription = "Verified",
+                              )
+                            }
+                      }
                     }
-                }
 
                 Text(
                     dayString + " - " + timeString,
                     style =
-                    TextStyle(
-                        fontSize = smallTextSize.sp,
-                        lineHeight = 20.sp,
-                        fontFamily = FontFamily(Font(R.font.roboto)),
-                        fontWeight = FontWeight(700),
-                        color = MaterialTheme.colorScheme.onBackground,
-                        letterSpacing = 0.25.sp,
-                    ),
+                        TextStyle(
+                            fontSize = smallTextSize.sp,
+                            lineHeight = 20.sp,
+                            fontFamily = FontFamily(Font(R.font.roboto)),
+                            fontWeight = FontWeight(700),
+                            color = MaterialTheme.colorScheme.onBackground,
+                            letterSpacing = 0.25.sp,
+                        ),
                     modifier = Modifier.testTag("EventDate"))
-            }
-            Image(
-                painter = eventPicture,
-                contentDescription = "Event Picture",
-                modifier =
-                Modifier.weight(3f)
-                    .fillMaxHeight()
-                    .aspectRatio(3f / 1.75f)
-                    .clipToBounds()
-                    .padding(0.dp) // Clip the image if it overflows its bounds
-                    .testTag("EventPicture"),
-                contentScale = ContentScale.Crop, // Crop the image to fit the aspect ratio
-            )
+              }
+          Image(
+              painter = eventPicture,
+              contentDescription = "Event Picture",
+              modifier =
+                  Modifier.weight(3f)
+                      .fillMaxHeight()
+                      .aspectRatio(3f / 1.75f)
+                      .clipToBounds()
+                      .padding(0.dp) // Clip the image if it overflows its bounds
+                      .testTag("EventPicture"),
+              contentScale = ContentScale.Crop, // Crop the image to fit the aspect ratio
+          )
         }
-    }
+  }
 }

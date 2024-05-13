@@ -214,12 +214,12 @@ fun getIconForRoute(route: String): ImageVector {
  */
 @Composable
 fun getIconForSelectedRoute(route: String): ImageVector {
-    return when (route) {
-        Route.EVENTS -> Icons.Filled.DateRange
-        Route.TRENDS -> ImageVector.vectorResource(R.drawable.arrow_trending)
-        Route.EXPLORE -> Icons.Filled.Home
-        Route.CREATE -> Icons.Filled.AddCircle
-        Route.PROFILE -> Icons.Filled.Person
-        else -> Icons.Filled.AccountCircle
-    }
+  return when (route) {
+    Route.EVENTS -> Icons.Filled.DateRange
+    Route.TRENDS -> ImageVector.vectorResource(R.drawable.arrow_trending)
+    Route.EXPLORE -> Icons.Filled.Home
+    Route.CREATE -> Icons.Filled.AddCircle
+    Route.PROFILE -> Icons.Filled.Person
+    else -> Icons.Filled.AccountCircle
+  }
 }
