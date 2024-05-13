@@ -1,5 +1,6 @@
 package com.github.se.gomeet.ui.mainscreens.profile
 
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -94,6 +95,7 @@ fun FollowingFollowers(
       currentUser?.following?.forEach { uid ->
         val user = userViewModel.getUser(uid)
         if (user != null) {
+          Log.e("+", "1")
           following.add(user)
         }
       }
@@ -246,7 +248,8 @@ fun PageUsers(
                       userViewModel.unfollow(user.uid)
                       isFollowing = false
                     },
-                    modifier = Modifier.padding(start = 15.dp).width(110.dp).testTag("Unfollow"),
+                    modifier =
+                        Modifier.padding(start = 15.dp).width(110.dp).testTag("UnfollowButton"),
                     colors =
                         ButtonColors(
                             containerColor = MaterialTheme.colorScheme.primaryContainer,
