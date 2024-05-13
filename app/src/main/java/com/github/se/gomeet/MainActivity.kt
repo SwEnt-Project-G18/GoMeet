@@ -56,6 +56,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import io.getstream.chat.android.client.ChatClient
 import io.getstream.chat.android.client.logger.ChatLogLevel
+import io.getstream.chat.android.compose.ui.channels.ChannelsScreen
 import io.getstream.chat.android.compose.ui.messages.MessagesScreen
 import io.getstream.chat.android.compose.ui.theme.ChatTheme
 import io.getstream.chat.android.compose.viewmodel.messages.MessagesViewModelFactory
@@ -162,18 +163,19 @@ class MainActivity : ComponentActivity() {
               userIdState.value = Firebase.auth.currentUser!!.uid
               Create(navAction)
             }
-            composable(Route.PROFILE) {
-              Profile(navAction, userId = userIdState.value, userViewModel)
-            }
             composable(Route.NOTIFICATIONS) { Notifications(navAction) }
 
             composable(Route.PROFILE) {
-              Profile(navAction, userId = userIdState.value, userViewModel)
+              Profile(navAction, userId = userIdState.value, userViewModel, eventViewModel)
             }
             composable(
                 route = Route.OTHERS_PROFILE,
                 arguments = listOf(navArgument("uid") { type = NavType.StringType })) {
-                  OthersProfile(navAction, it.arguments?.getString("uid") ?: "", userViewModel)
+                  OthersProfile(
+                      navAction,
+                      it.arguments?.getString("uid") ?: "",
+                      userViewModel,
+                      eventViewModel)
                 }
             composable(Route.PRIVATE_CREATE) {
               CreateEvent(navAction, EventViewModel(Firebase.auth.currentUser!!.uid), true)
@@ -320,6 +322,35 @@ class MainActivity : ComponentActivity() {
                 route = Route.FOLLOWING,
                 arguments = listOf(navArgument("uid") { type = NavType.StringType })) {
                   Following(navAction, it.arguments?.getString("uid") ?: "", userViewModel)
+                }
+            composable(Route.MESSAGE_CHANNELS) {
+              ChatTheme {
+                ChannelsScreen(
+                    onBackPressed = { navAction.goBack() },
+                    onHeaderAvatarClick = { navAction.navigateToScreen(Route.PROFILE) },
+                    onHeaderActionClick = {
+                      navAction.navigateToScreen(
+                          Route.FOLLOWING.replace("{uid}", userIdState.value))
+                    },
+                    onItemClick = { c ->
+                      navAction.navigateToScreen(Route.CHANNEL.replace("{id}", c.id))
+                    })
+              }
+            }
+            composable(
+                route = Route.CHANNEL,
+                arguments = listOf(navArgument("id") { type = NavType.StringType })) {
+                  val id = it.arguments?.getString("id") ?: ""
+                  ChatTheme {
+                    Log.d("id is", id)
+                    MessagesScreen(
+                        viewModelFactory =
+                            MessagesViewModelFactory(
+                                context = applicationContext,
+                                channelId = "messaging:${id}",
+                                messageLimit = 30),
+                        onBackPressed = { NavigationActions(nav).goBack() })
+                  }
                 }
           }
         }

@@ -56,6 +56,8 @@ object Route {
   const val MESSAGE = "Message/{id}"
   const val FOLLOWERS = "Followers/{uid}"
   const val FOLLOWING = "Following/{uid}"
+  const val MESSAGE_CHANNELS = "MessageChannel"
+  const val CHANNEL = "Channel/{id}"
 }
 
 val CREATE_ITEMS =

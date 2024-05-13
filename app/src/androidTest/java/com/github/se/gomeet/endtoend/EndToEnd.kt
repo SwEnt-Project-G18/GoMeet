@@ -115,7 +115,7 @@ class EndToEndTest : TestCase() {
         }
         date {
           assertIsDisplayed()
-          performTextInput(LocalDate.now().toString())
+          performTextInput(LocalDate.of(2025, 3, 30).toString())
         }
         price {
           assertIsDisplayed()
