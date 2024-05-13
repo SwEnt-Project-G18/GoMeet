@@ -20,7 +20,8 @@ private val DarkColorScheme =
         tertiary = White,
         background = Color.Black,
         outline = DarkCyan,
-        primaryContainer = LightGray
+        primaryContainer = LightGray,
+        outlineVariant = DodgerBlue,
     )
 
 private val LightColorScheme =
@@ -30,8 +31,8 @@ private val LightColorScheme =
         tertiary = DarkGrey,
         background = White,
         primaryContainer = LightGray,
-        outline = Cyan
-
+        outline = Cyan,
+        outlineVariant = DodgerBlue,
 
         /* Other default colors to override
         background = Color(0xFFFFFBFE),
@@ -51,25 +52,25 @@ fun GoMeetTheme(
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    val colorScheme =
-        when {
-            darkTheme -> DarkColorScheme
-            else -> LightColorScheme
-        }
-    val view = LocalView.current
-    if (!view.isInEditMode) {
-        SideEffect {
-            val window = (view.context as Activity).window
-            window.statusBarColor = colorScheme.primary.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
-        }
+  val colorScheme =
+      when {
+        darkTheme -> DarkColorScheme
+        else -> LightColorScheme
+      }
+  val view = LocalView.current
+  if (!view.isInEditMode) {
+    SideEffect {
+      val window = (view.context as Activity).window
+      window.statusBarColor = colorScheme.primary.toArgb()
+      WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
     }
+  }
 
-    MaterialTheme(colorScheme = colorScheme, typography = Typography, content = content)
+  MaterialTheme(colorScheme = colorScheme, typography = Typography, content = content)
 }
 
 @Composable
 fun SetStatusBarColor(color: Color) {
-    val systemUiController = rememberSystemUiController()
-    SideEffect { systemUiController.setSystemBarsColor(color) }
+  val systemUiController = rememberSystemUiController()
+  SideEffect { systemUiController.setSystemBarsColor(color) }
 }

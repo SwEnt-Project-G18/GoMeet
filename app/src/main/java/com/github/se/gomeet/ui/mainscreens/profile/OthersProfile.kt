@@ -2,7 +2,6 @@ package com.github.se.gomeet.ui.mainscreens.profile
 
 import android.net.Uri
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,7 +10,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -20,15 +18,14 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -46,17 +43,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
-import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.repository.EventRepository
 import com.github.se.gomeet.model.repository.UserRepository
@@ -66,8 +58,6 @@ import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
-import com.github.se.gomeet.ui.theme.DarkCyan
-import com.github.se.gomeet.ui.theme.NavBarUnselected
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
@@ -99,6 +89,8 @@ fun OthersProfile(
   var isProfileLoaded by remember { mutableStateOf(false) }
   val myEventList = remember { mutableListOf<Event>() }
   val myHistoryList = remember { mutableListOf<Event>() }
+  val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+  val screenHeight = LocalConfiguration.current.screenHeightDp.dp
 
   LaunchedEffect(Unit) {
     coroutineScope.launch {
@@ -130,74 +122,38 @@ fun OthersProfile(
             selectedItem = "")
       },
       topBar = {
-        TopAppBar(
-            title = {},
-            backgroundColor = MaterialTheme.colorScheme.background,
-            elevation = 0.dp,
-            modifier = Modifier.height(50.dp).testTag("TopBar"),
-            actions = {
-              // Settings Icon
-              IconButton(onClick = { /* Handle settings icon click */}) {
-                Icon(
-                    imageVector = Icons.Filled.Notifications,
-                    contentDescription = "Notifications",
-                    modifier = Modifier.size(24.dp),
-                    tint = DarkCyan)
-              }
-
-              MoreActionsButton()
-            })
+        Row(verticalAlignment = Alignment.CenterVertically) {
+          IconButton(onClick = { nav.goBack() }) {
+            Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = "Go back")
+          }
+          Spacer(modifier = Modifier.weight(1F))
+          MoreActionsButton()
+        }
       }) { innerPadding ->
         if (isProfileLoaded) {
           Column(
               verticalArrangement = Arrangement.SpaceEvenly,
               horizontalAlignment = Alignment.CenterHorizontally,
               modifier = Modifier.padding(innerPadding).verticalScroll(rememberScrollState(0))) {
+                Spacer(modifier = Modifier.height(screenHeight / 60))
                 Row(
                     horizontalArrangement = Arrangement.Start,
                     verticalAlignment = Alignment.CenterVertically,
                     modifier =
                         Modifier.fillMaxWidth()
-                            .padding(start = 15.dp, end = 0.dp, top = 0.dp, bottom = 30.dp)
+                            .padding(start = screenWidth / 20)
                             .testTag("UserInfo")) {
                       ProfileImage(userId = uid)
-                      Column(
-                          horizontalAlignment =
-                              Alignment
-                                  .CenterHorizontally, // Center horizontally within this column
-                          modifier = Modifier.padding(0.dp)) {
-                            Row(
-                                horizontalArrangement = Arrangement.Start,
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.padding(start = 30.dp)) {
-                                  Text(
-                                      text = user?.username ?: "username",
-                                      textAlign = TextAlign.Center,
-                                      style =
-                                          TextStyle(
-                                              fontSize = 20.sp,
-                                              lineHeight = 16.sp,
-                                              fontFamily = FontFamily(Font(R.font.roboto)),
-                                              fontWeight = FontWeight(1000),
-                                              color = MaterialTheme.colorScheme.onBackground,
-                                              textAlign = TextAlign.Center,
-                                              letterSpacing = 0.5.sp,
-                                          ))
-                                }
-                            Text(
-                                text = "@usertag",
-                                style =
-                                    TextStyle(
-                                        fontSize = 15.sp,
-                                        lineHeight = 16.sp,
-                                        fontFamily = FontFamily(Font(R.font.roboto)),
-                                        fontWeight = FontWeight(600),
-                                        color = MaterialTheme.colorScheme.onBackground,
-                                        textAlign = TextAlign.Center,
-                                        letterSpacing = 0.5.sp,
-                                    ),
-                                modifier = Modifier)
-                          }
+                      Column(modifier = Modifier.padding(start = screenWidth / 20)) {
+                        Text(
+                            (user?.firstName ?: "First") + " " + (user?.lastName ?: " Last"),
+                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.titleLarge)
+
+                        Text(
+                            text = "@" + (user?.username ?: "username"),
+                            style = MaterialTheme.typography.bodyLarge)
+                      }
                     }
 
                 Row(
@@ -245,15 +201,14 @@ fun OthersProfile(
                               ButtonDefaults.buttonColors(containerColor = Color(0xFFECEFF1))) {
                             Text(text = "Message", color = Color.Black)
                           }
-
-                      Spacer(Modifier.width(5.dp))
                     }
 
-                Spacer(modifier = Modifier.height(30.dp))
+                Spacer(modifier = Modifier.height(screenHeight / 40))
+
                 Row(
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth().testTag("MoreUserInfo")) {
+                    modifier = Modifier.fillMaxWidth()) {
                       Column(
                           modifier =
                               Modifier.clickable {
@@ -261,153 +216,71 @@ fun OthersProfile(
                               }) {
                             Text(
                                 text = user?.myEvents?.size.toString(),
-                                style =
-                                    TextStyle(
-                                        fontSize = 20.sp,
-                                        lineHeight = 16.sp,
-                                        fontFamily = FontFamily(Font(R.font.roboto)),
-                                        fontWeight = FontWeight(1000),
-                                        color = Color(0xFF2F6673),
-                                        textAlign = TextAlign.Center,
-                                        letterSpacing = 0.5.sp,
-                                    ),
+                                style = MaterialTheme.typography.titleLarge,
                                 modifier = Modifier.align(Alignment.CenterHorizontally))
                             Text(
                                 text = "Events",
-                                style =
-                                    TextStyle(
-                                        fontSize = 13.sp,
-                                        lineHeight = 16.sp,
-                                        fontFamily = FontFamily(Font(R.font.roboto)),
-                                        fontWeight = FontWeight(1000),
-                                        color = Color(0xFF2F6673),
-                                        textAlign = TextAlign.Center,
-                                        letterSpacing = 0.5.sp,
-                                    ),
+                                style = MaterialTheme.typography.bodyMedium,
                                 modifier = Modifier.align(Alignment.CenterHorizontally))
                           }
-                      HorizontalDivider(
-                          modifier =
-                              Modifier
-                                  // .fillMaxHeight()
-                                  .height(40.dp)
-                                  .width(2.dp))
                       Column(
                           modifier =
                               Modifier.clickable {
-                                nav.navigateToScreen(Route.FOLLOWERS.replace("{uid}", uid))
+                                nav.navigateToScreen(Route.FOLLOWERS.replace("{uid}", user!!.uid))
                               }) {
                             Text(
-                                text = followerCount.toString(),
-                                style =
-                                    TextStyle(
-                                        fontSize = 20.sp,
-                                        lineHeight = 16.sp,
-                                        fontFamily = FontFamily(Font(R.font.roboto)),
-                                        fontWeight = FontWeight(1000),
-                                        color = Color(0xFF2F6673),
-                                        textAlign = TextAlign.Center,
-                                        letterSpacing = 0.5.sp,
-                                    ),
+                                text = user?.followers?.size.toString(),
+                                style = MaterialTheme.typography.titleLarge,
                                 modifier = Modifier.align(Alignment.CenterHorizontally))
                             Text(
                                 text = "Followers",
-                                style =
-                                    TextStyle(
-                                        fontSize = 13.sp,
-                                        lineHeight = 16.sp,
-                                        fontFamily = FontFamily(Font(R.font.roboto)),
-                                        fontWeight = FontWeight(1000),
-                                        color = Color(0xFF2F6673),
-                                        textAlign = TextAlign.Center,
-                                        letterSpacing = 0.5.sp,
-                                    ),
+                                style = MaterialTheme.typography.bodyMedium,
                                 modifier = Modifier.align(Alignment.CenterHorizontally))
                           }
-                      HorizontalDivider(
-                          modifier =
-                              Modifier
-                                  // .fillMaxHeight()
-                                  .height(40.dp)
-                                  .width(2.dp))
                       Column(
                           modifier =
                               Modifier.clickable {
-                                nav.navigateToScreen(Route.FOLLOWING.replace("{uid}", uid))
+                                nav.navigateToScreen(Route.FOLLOWING.replace("{uid}", user!!.uid))
                               }) {
                             Text(
                                 text = user?.following?.size.toString(),
-                                style =
-                                    TextStyle(
-                                        fontSize = 20.sp,
-                                        lineHeight = 16.sp,
-                                        fontFamily = FontFamily(Font(R.font.roboto)),
-                                        fontWeight = FontWeight(1000),
-                                        color = Color(0xFF2F6673),
-                                        textAlign = TextAlign.Center,
-                                        letterSpacing = 0.5.sp,
-                                    ),
+                                style = MaterialTheme.typography.titleLarge,
                                 modifier = Modifier.align(Alignment.CenterHorizontally))
                             Text(
                                 text = "Following",
-                                style =
-                                    TextStyle(
-                                        fontSize = 13.sp,
-                                        lineHeight = 16.sp,
-                                        fontFamily = FontFamily(Font(R.font.roboto)),
-                                        fontWeight = FontWeight(1000),
-                                        color = Color(0xFF2F6673),
-                                        textAlign = TextAlign.Center,
-                                        letterSpacing = 0.5.sp,
-                                    ),
+                                style = MaterialTheme.typography.bodyMedium,
                                 modifier = Modifier.align(Alignment.CenterHorizontally))
                           }
                     }
-                Spacer(modifier = Modifier.height(30.dp))
-                Text(
-                    text = "Tags",
-                    style =
-                        TextStyle(
-                            fontSize = 18.sp,
-                            lineHeight = 16.sp,
-                            fontFamily = FontFamily(Font(R.font.roboto)),
-                            fontWeight = FontWeight(1000),
-                            color = DarkCyan,
-                            textAlign = TextAlign.Start,
-                            letterSpacing = 0.5.sp,
-                        ),
-                    modifier =
-                        Modifier.width(74.dp)
-                            .height(21.dp)
-                            .align(Alignment.Start)
-                            .padding(start = 15.dp))
-                Column(
-                    modifier =
-                        Modifier.padding(start = 0.dp, end = 0.dp)
-                            .fillMaxWidth()
-                            .testTag("TagList")) {
-                      Spacer(modifier = Modifier.height(10.dp))
-                      LazyRow(
-                          verticalAlignment = Alignment.CenterVertically,
-                          horizontalArrangement = Arrangement.spacedBy(8.dp),
-                          contentPadding = PaddingValues(start = 15.dp, end = 15.dp),
-                          modifier = Modifier.heightIn(min = 56.dp)) {
-                            items(user!!.tags.size) { index ->
-                              Button(
-                                  onClick = {},
-                                  content = { Text(user!!.tags[index]) },
-                                  colors =
-                                      ButtonDefaults.buttonColors(
-                                          containerColor = NavBarUnselected,
-                                          contentColor = DarkCyan),
-                                  border = BorderStroke(1.dp, DarkCyan))
-                            }
-                          }
+
+                Spacer(modifier = Modifier.fillMaxWidth().height(screenHeight / 50))
+
+                LazyRow(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    contentPadding = PaddingValues(start = 15.dp, end = 15.dp)) {
+                      items(user!!.tags.size) { index ->
+                        Button(
+                            onClick = {},
+                            content = {
+                              Text(
+                                  text = user!!.tags[index],
+                                  style = MaterialTheme.typography.labelLarge)
+                            },
+                            colors =
+                                ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                    contentColor = MaterialTheme.colorScheme.outline),
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+                        )
+                      }
                     }
-                Spacer(modifier = Modifier.height(10.dp))
-                ProfileEventsList("My Events", rememberLazyListState(), myEventList, nav)
-                Spacer(modifier = Modifier.height(10.dp))
-                ProfileEventsList("History", rememberLazyListState(), myHistoryList, nav)
+                Spacer(modifier = Modifier.height(screenHeight / 40))
+                ProfileEventsList(
+                    (user!!.firstName) + "'s Events", rememberLazyListState(), myEventList, nav)
+                Spacer(modifier = Modifier.height(screenHeight / 40))
+                ProfileEventsList(
+                    (user!!.firstName) + "'s History", rememberLazyListState(), myHistoryList, nav)
               }
         } else {
           LoadingText()
@@ -424,8 +297,8 @@ fun MoreActionsButton() {
     Icon(
         imageVector = Icons.Default.MoreVert,
         contentDescription = "More",
-        modifier = Modifier.size(24.dp).rotate(90f), // Rotates the icon by 90 degrees
-        tint = DarkCyan)
+        modifier = Modifier.rotate(90f), // Rotates the icon by 90 degrees
+        tint = MaterialTheme.colorScheme.tertiary)
   }
 
   DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {

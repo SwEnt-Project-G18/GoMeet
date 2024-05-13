@@ -2,9 +2,9 @@ package com.github.se.gomeet.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-
 val DarkCyan = Color(0xFF2F6673)
 val Cyan = Color(0xFF127581)
+val DodgerBlue = Color(0xFF1E90FF)
 val TranslucentCyan = Color(0x03B3C7C9)
 val DarkerCyan = Color(0xFF073F57)
 val SomewhatWhite = Color(0xFFFEFBFF)

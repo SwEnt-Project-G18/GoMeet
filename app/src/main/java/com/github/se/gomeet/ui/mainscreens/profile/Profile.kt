@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -26,7 +25,6 @@ import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -49,15 +47,9 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.github.se.gomeet.R
@@ -71,11 +63,6 @@ import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.SECOND_LEVEL_DESTINATION
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
-import com.github.se.gomeet.ui.theme.Cyan
-import com.github.se.gomeet.ui.theme.DarkCyan
-import com.github.se.gomeet.ui.theme.Grey
-import com.github.se.gomeet.ui.theme.LightGray
-import com.github.se.gomeet.ui.theme.NavBarUnselected
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.firestore.FirebaseFirestore
@@ -98,223 +85,212 @@ fun Profile(
     userViewModel: UserViewModel,
     eventViewModel: EventViewModel
 ) {
-    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+  val screenWidth = LocalConfiguration.current.screenWidthDp.dp
 
-    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
-    val coroutineScope = rememberCoroutineScope()
-    var isProfileLoaded by remember { mutableStateOf(false) }
-    var currentUser by remember { mutableStateOf<GoMeetUser?>(null) }
-    val myEventList = remember { mutableListOf<Event>() }
-    val myHistoryList = remember { mutableListOf<Event>() }
+  val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+  val coroutineScope = rememberCoroutineScope()
+  var isProfileLoaded by remember { mutableStateOf(false) }
+  var currentUser by remember { mutableStateOf<GoMeetUser?>(null) }
+  val myEventList = remember { mutableListOf<Event>() }
+  val myHistoryList = remember { mutableListOf<Event>() }
 
-    LaunchedEffect(Unit) {
-        coroutineScope.launch {
-            currentUser = userViewModel.getUser(userId)
-            val allEvents =
-                eventViewModel.getAllEvents()!!.filter { e -> currentUser!!.myEvents.contains(e.uid) }
-            allEvents.forEach {
-                if (it.date.isAfter(LocalDate.now())) {
-                    myEventList.add(it)
-                } else {
-                    myHistoryList.add(it)
-                }
-            }
-            isProfileLoaded = true
+  LaunchedEffect(Unit) {
+    coroutineScope.launch {
+      currentUser = userViewModel.getUser(userId)
+      val allEvents =
+          eventViewModel.getAllEvents()!!.filter { e -> currentUser!!.myEvents.contains(e.uid) }
+      allEvents.forEach {
+        if (it.date.isAfter(LocalDate.now())) {
+          myEventList.add(it)
+        } else {
+          myHistoryList.add(it)
         }
+      }
+      isProfileLoaded = true
     }
-    Scaffold(
-        modifier = Modifier.testTag("Profile"),
-        bottomBar = {
-            BottomNavigationMenu(
-                onTabSelect = { selectedTab ->
-                    nav.navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == selectedTab })
-                },
-                tabList = TOP_LEVEL_DESTINATIONS,
-                selectedItem = Route.PROFILE)
-        },
-        topBar = {
-            Row {
-                Spacer(Modifier.weight(1f))
-                IconButton(
-                    modifier = Modifier.align(Alignment.CenterVertically),
-                    onClick = { nav.navigateToScreen(Route.NOTIFICATIONS) }) {
-                    Icon(
-                        Icons.Outlined.Notifications,
-                        contentDescription = "Notifications",
-                        modifier = Modifier
-                            .size(screenHeight / 28)
-                            .align(Alignment.CenterVertically),
-                        tint = MaterialTheme.colorScheme.onBackground)
-                }
+  }
+  Scaffold(
+      modifier = Modifier.testTag("Profile"),
+      bottomBar = {
+        BottomNavigationMenu(
+            onTabSelect = { selectedTab ->
+              nav.navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == selectedTab })
+            },
+            tabList = TOP_LEVEL_DESTINATIONS,
+            selectedItem = Route.PROFILE)
+      },
+      topBar = {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+          Spacer(Modifier.width(15.dp))
+          Text(text = "My Profile", style = MaterialTheme.typography.headlineMedium)
+          Spacer(Modifier.weight(1f))
+          IconButton(
+              modifier = Modifier.align(Alignment.CenterVertically),
+              onClick = { nav.navigateToScreen(Route.NOTIFICATIONS) }) {
+                Icon(
+                    Icons.Outlined.Notifications,
+                    contentDescription = "Notifications",
+                    modifier = Modifier.size(screenHeight / 28).align(Alignment.CenterVertically),
+                    tint = MaterialTheme.colorScheme.onBackground)
+              }
 
-                IconButton(
-                    modifier = Modifier
-                        .align(Alignment.CenterVertically)
-                        .padding(end = 15.dp),
-                    onClick = {
-                        nav.navigateTo(SECOND_LEVEL_DESTINATION.first { it.route == Route.SETTINGS })
-                    }) {
-                    Icon(
-                        Icons.Outlined.Settings,
-                        contentDescription = "Settings",
-                        modifier = Modifier
-                            .size(screenHeight / 28)
-                            .align(Alignment.CenterVertically),
-                        tint = MaterialTheme.colorScheme.onBackground)
-                }
-            }
-        }) { innerPadding ->
+          IconButton(
+              modifier = Modifier.align(Alignment.CenterVertically).padding(end = 15.dp),
+              onClick = {
+                nav.navigateTo(SECOND_LEVEL_DESTINATION.first { it.route == Route.SETTINGS })
+              }) {
+                Icon(
+                    Icons.Outlined.Settings,
+                    contentDescription = "Settings",
+                    modifier = Modifier.size(screenHeight / 28).align(Alignment.CenterVertically),
+                    tint = MaterialTheme.colorScheme.onBackground)
+              }
+        }
+      }) { innerPadding ->
         if (isProfileLoaded) {
-            Column(
-                verticalArrangement = Arrangement.SpaceEvenly,
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .padding(innerPadding)
-                    .verticalScroll(rememberScrollState(0))) {
+          Column(
+              verticalArrangement = Arrangement.SpaceEvenly,
+              horizontalAlignment = Alignment.CenterHorizontally,
+              modifier = Modifier.padding(innerPadding).verticalScroll(rememberScrollState(0))) {
+                Spacer(modifier = Modifier.height(screenHeight / 60))
                 Row(
                     horizontalArrangement = Arrangement.Start,
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(start = screenWidth / 20)) {
-                    ProfileImage(userId = userId, modifier = Modifier.testTag("Profile Picture"))
-                    Column(
-                        modifier = Modifier.padding(start = screenWidth/20)) {
+                    modifier = Modifier.fillMaxWidth().padding(start = screenWidth / 20)) {
+                      ProfileImage(userId = userId, modifier = Modifier.testTag("Profile Picture"))
+                      Column(modifier = Modifier.padding(start = screenWidth / 20)) {
                         Text(
                             (currentUser?.firstName + " " + currentUser?.lastName),
                             textAlign = TextAlign.Center,
-                            style =  MaterialTheme.typography.titleLarge)
+                            style = MaterialTheme.typography.titleLarge)
 
                         Text(
                             text = ("@" + currentUser?.username),
-                            style =  MaterialTheme.typography.bodyLarge)
+                            style = MaterialTheme.typography.bodyLarge)
+                      }
                     }
-                }
                 Spacer(modifier = Modifier.height(screenHeight / 40))
-Row(
-modifier = Modifier.padding(horizontal = 5.dp),
-horizontalArrangement = Arrangement.spacedBy(screenWidth/50),
-verticalAlignment = Alignment.CenterVertically) {
-    // Edit Profile button
-    Button(
-        onClick = { nav.navigateToScreen(Route.EDIT_PROFILE) },
-        modifier = Modifier
-            .height(screenHeight / 25)
-            .width(screenWidth * 4 / 11),
-        shape = RoundedCornerShape(10.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer)) {
-        Text(text = "Edit Profile", color = Color.Black)
-    }
+                Row(
+                    modifier = Modifier.padding(horizontal = 5.dp),
+                    horizontalArrangement = Arrangement.spacedBy(screenWidth / 50),
+                    verticalAlignment = Alignment.CenterVertically) {
+                      // Edit Profile button
+                      Button(
+                          onClick = { nav.navigateToScreen(Route.EDIT_PROFILE) },
+                          modifier = Modifier.height(screenHeight / 25).width(screenWidth * 4 / 11),
+                          shape = RoundedCornerShape(10.dp),
+                          colors =
+                              ButtonDefaults.buttonColors(
+                                  containerColor = MaterialTheme.colorScheme.primaryContainer)) {
+                            Text(text = "Edit Profile", color = Color.Black)
+                          }
 
-    Button(
-        onClick = { /*TODO*/},
-        modifier = Modifier
-            .height(screenHeight / 25)
-            .width(screenWidth * 4 / 11),
-        shape = RoundedCornerShape(10.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer)) {
-        Text(text = "Share Profile", color = Color.Black)
-    }
+                      Button(
+                          onClick = { /*TODO*/},
+                          modifier = Modifier.height(screenHeight / 25).width(screenWidth * 4 / 11),
+                          shape = RoundedCornerShape(10.dp),
+                          colors =
+                              ButtonDefaults.buttonColors(
+                                  containerColor = MaterialTheme.colorScheme.primaryContainer)) {
+                            Text(text = "Share Profile", color = Color.Black)
+                          }
 
+                      Button(
+                          onClick = { /*TODO*/},
+                          modifier = Modifier.height(screenHeight / 25),
+                          shape = RoundedCornerShape(10.dp),
+                          colors =
+                              ButtonDefaults.buttonColors(
+                                  containerColor = MaterialTheme.colorScheme.primaryContainer)) {
+                            Icon(
+                                imageVector = ImageVector.vectorResource(R.drawable.add_friend),
+                                contentDescription = "Settings",
+                                tint = Color.Black)
+                          }
+                    }
 
-    Button(
-        onClick = { /*TODO*/},
-        modifier = Modifier
-            .height(screenHeight/25),
-        shape = RoundedCornerShape(10.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer)) {
-        Icon(
-            imageVector = ImageVector.vectorResource(R.drawable.add_friend),
-            contentDescription = "Settings",
-            tint = Color.Black)
-    }
-}
+                Spacer(modifier = Modifier.height(screenHeight / 40))
 
-Spacer(modifier = Modifier.height(screenHeight/40))
+                Row(
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()) {
+                      Column(
+                          modifier =
+                              Modifier.clickable {
+                                // TODO
+                              }) {
+                            Text(
+                                text = currentUser?.myEvents?.size.toString(),
+                                style = MaterialTheme.typography.titleLarge,
+                                modifier = Modifier.align(Alignment.CenterHorizontally))
+                            Text(
+                                text = "Events",
+                                style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier.align(Alignment.CenterHorizontally))
+                          }
+                      Column(
+                          modifier =
+                              Modifier.clickable {
+                                nav.navigateToScreen(Route.FOLLOWERS.replace("{uid}", userId))
+                              }) {
+                            Text(
+                                text = currentUser?.followers?.size.toString(),
+                                style = MaterialTheme.typography.titleLarge,
+                                modifier = Modifier.align(Alignment.CenterHorizontally))
+                            Text(
+                                text = "Followers",
+                                style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier.align(Alignment.CenterHorizontally))
+                          }
+                      Column(
+                          modifier =
+                              Modifier.clickable {
+                                nav.navigateToScreen(Route.FOLLOWING.replace("{uid}", userId))
+                              }) {
+                            Text(
+                                text = currentUser?.following?.size.toString(),
+                                style = MaterialTheme.typography.titleLarge,
+                                modifier = Modifier.align(Alignment.CenterHorizontally))
+                            Text(
+                                text = "Following",
+                                style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier.align(Alignment.CenterHorizontally))
+                          }
+                    }
 
-Row(
-horizontalArrangement = Arrangement.SpaceEvenly,
-verticalAlignment = Alignment.CenterVertically,
-modifier = Modifier.fillMaxWidth()) {
-    Column(
-        modifier =
-        Modifier.clickable {
-            // TODO
-        }) {
-        Text(
-            text = currentUser?.myEvents?.size.toString(),
-            style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.align(Alignment.CenterHorizontally))
-        Text(
-            text = "Events",
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.align(Alignment.CenterHorizontally))
-    }
-    Column(
-        modifier =
-        Modifier.clickable {
-            nav.navigateToScreen(Route.FOLLOWERS.replace("{uid}", userId))
-        }) {
-        Text(
-            text = currentUser?.followers?.size.toString(),
-            style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.align(Alignment.CenterHorizontally))
-        Text(
-            text = "Followers",
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.align(Alignment.CenterHorizontally))
-    }
-    Column(
-modifier =
-Modifier.clickable {
-    nav.navigateToScreen(Route.FOLLOWING.replace("{uid}", userId))
-}) {
-    Text(
-        text = currentUser?.following?.size.toString(),
-        style = MaterialTheme.typography.titleLarge,
-        modifier = Modifier.align(Alignment.CenterHorizontally))
-    Text(
-        text = "Following",
-        style = MaterialTheme.typography.bodyMedium,
-        modifier = Modifier.align(Alignment.CenterHorizontally))
-}
-}
+                Spacer(modifier = Modifier.fillMaxWidth().height(screenHeight / 50))
 
-Spacer(modifier = Modifier
-.fillMaxWidth()
-.height(screenHeight / 50))
+                LazyRow(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    contentPadding = PaddingValues(start = 15.dp, end = 15.dp)) {
+                      items(currentUser!!.tags.size) { index ->
+                        Button(
+                            onClick = {},
+                            content = {
+                              Text(
+                                  text = currentUser!!.tags[index],
+                                  style = MaterialTheme.typography.labelLarge)
+                            },
+                            colors =
+                                ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                    contentColor = MaterialTheme.colorScheme.outline),
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+                        )
+                      }
+                    }
 
-LazyRow(
-verticalAlignment = Alignment.CenterVertically,
-horizontalArrangement = Arrangement.spacedBy(8.dp),
-contentPadding = PaddingValues(start = 15.dp, end = 15.dp)) {
-    items(currentUser!!.tags.size) { index ->
-        Button(
-            onClick = {},
-            content = {
-                Text(
-                    text = currentUser!!.tags[index],
-                    style = MaterialTheme.typography.labelLarge
-                )},
-            colors =
-            ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                contentColor = MaterialTheme.colorScheme.outline),
-            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
-        )
-    }
-}
-
-Spacer(modifier = Modifier.height(screenHeight/40))
-ProfileEventsList("My Events", rememberLazyListState(), myEventList, nav)
-Spacer(modifier = Modifier.height(screenHeight/30))
-ProfileEventsList("History", rememberLazyListState(), myHistoryList, nav)
-}
-} else {
-    LoadingText()
-}
-}
+                Spacer(modifier = Modifier.height(screenHeight / 40))
+                ProfileEventsList("Joined Events", rememberLazyListState(), myEventList, nav)
+                Spacer(modifier = Modifier.height(screenHeight / 30))
+                ProfileEventsList("My History", rememberLazyListState(), myHistoryList, nav)
+              }
+        } else {
+          LoadingText()
+        }
+      }
 }
 
 @Composable
@@ -323,41 +299,41 @@ fun ProfileImage(
     modifier: Modifier = Modifier,
     defaultImageResId: Int = R.drawable.gomeet_logo
 ) {
-    var profilePictureUrl by remember { mutableStateOf<String?>(null) }
+  var profilePictureUrl by remember { mutableStateOf<String?>(null) }
 
-    LaunchedEffect(userId) {
-        val db = FirebaseFirestore.getInstance()
-        val userDocRef = db.collection("users").document(userId)
-        try {
-            val snapshot = userDocRef.get().await()
-            profilePictureUrl = snapshot.getString("profilePicture")
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+  LaunchedEffect(userId) {
+    val db = FirebaseFirestore.getInstance()
+    val userDocRef = db.collection("users").document(userId)
+    try {
+      val snapshot = userDocRef.get().await()
+      profilePictureUrl = snapshot.getString("profilePicture")
+    } catch (e: Exception) {
+      e.printStackTrace()
     }
+  }
 
-    Image(
-        painter =
-        if (!profilePictureUrl.isNullOrEmpty()) {
+  Image(
+      painter =
+          if (!profilePictureUrl.isNullOrEmpty()) {
             rememberAsyncImagePainter(profilePictureUrl)
-        } else {
+          } else {
             painterResource(id = defaultImageResId)
-        },
-        contentDescription = "Profile picture",
-        modifier =
-        modifier
-            .size(101.dp)
-            .clip(CircleShape)
-            .background(color = MaterialTheme.colorScheme.background),
-        contentScale = ContentScale.Crop)
+          },
+      contentDescription = "Profile picture",
+      modifier =
+          modifier
+              .size(101.dp)
+              .clip(CircleShape)
+              .background(color = MaterialTheme.colorScheme.background),
+      contentScale = ContentScale.Crop)
 }
 
 @Preview
 @Composable
 fun ProfilePreview() {
-    Profile(
-        nav = NavigationActions(rememberNavController()),
-        "John",
-        UserViewModel(UserRepository(Firebase.firestore)),
-        EventViewModel("John", EventRepository(Firebase.firestore)))
+  Profile(
+      nav = NavigationActions(rememberNavController()),
+      "John",
+      UserViewModel(UserRepository(Firebase.firestore)),
+      EventViewModel("John", EventRepository(Firebase.firestore)))
 }

@@ -30,8 +30,7 @@ import com.github.se.gomeet.ui.mainscreens.create.ManageInvites
 import com.github.se.gomeet.ui.mainscreens.events.Events
 import com.github.se.gomeet.ui.mainscreens.events.MyEventInfo
 import com.github.se.gomeet.ui.mainscreens.profile.EditProfile
-import com.github.se.gomeet.ui.mainscreens.profile.Followers
-import com.github.se.gomeet.ui.mainscreens.profile.Following
+import com.github.se.gomeet.ui.mainscreens.profile.FollowingFollowers
 import com.github.se.gomeet.ui.mainscreens.profile.Notifications
 import com.github.se.gomeet.ui.mainscreens.profile.OthersProfile
 import com.github.se.gomeet.ui.mainscreens.profile.Profile
@@ -336,12 +335,12 @@ fun InitNavigation(
     composable(
         route = Route.FOLLOWERS,
         arguments = listOf(navArgument("uid") { type = NavType.StringType })) {
-          Followers(navAction, it.arguments?.getString("uid") ?: "", userViewModel)
+          FollowingFollowers(navAction, it.arguments?.getString("uid") ?: "", userViewModel, false)
         }
     composable(
         route = Route.FOLLOWING,
         arguments = listOf(navArgument("uid") { type = NavType.StringType })) {
-          Following(navAction, it.arguments?.getString("uid") ?: "", userViewModel)
+          FollowingFollowers(navAction, it.arguments?.getString("uid") ?: "", userViewModel, true)
         }
     composable(Route.MESSAGE_CHANNELS) {
       ChatTheme {
