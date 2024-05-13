@@ -16,7 +16,7 @@ class UserRepository(private val db: FirebaseFirestore) {
    * Companion object for the UserFirebaseConnection class. Contains the constants for the class.
    */
   companion object {
-    private const val TAG = "FirebaseConnection"
+    private const val TAG = "UserRepository"
     private const val USERS_COLLECTION = "users"
   }
 

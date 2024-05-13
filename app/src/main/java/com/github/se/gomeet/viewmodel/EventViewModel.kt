@@ -294,12 +294,20 @@ class EventViewModel(private val creatorId: String? = null, eventRepository: Eve
   }
 
   fun joinEvent(event: Event, userId: String) {
-    assert(!event.participants.contains(userId))
+    if (!event.participants.contains(userId)) {
+      Log.w(TAG, "User $userId is already in event ${event.eventID}")
+      return
+    }
+
     repository.updateEvent(event.copy(participants = event.participants.plus(userId)))
   }
 
   fun sendInvitation(event: Event, userId: String) {
-    assert(!event.pendingParticipants.contains(userId))
+    if (event.pendingParticipants.contains(userId)) {
+      Log.w(TAG, "User $userId is already invited to event ${event.eventID}")
+      return
+    }
+
     repository.updateEvent(event.copy(pendingParticipants = event.pendingParticipants.plus(userId)))
   }
 
@@ -323,6 +331,7 @@ class EventViewModel(private val creatorId: String? = null, eventRepository: Eve
 
   fun cancelInvitation(event: Event, userId: String) {
     assert(event.pendingParticipants.contains(userId))
+
     repository.updateEvent(
         event.copy(pendingParticipants = event.pendingParticipants.minus(userId)))
   }

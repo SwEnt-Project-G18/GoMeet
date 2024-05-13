@@ -25,7 +25,7 @@ class EventRepository(private val db: FirebaseFirestore) {
 
   /** This companion object contains the constants for the repository */
   companion object {
-    private const val TAG = "FirebaseConnection"
+    private const val TAG = "EventRepository"
     private const val EVENT_COLLECTION = "events"
   }
 
@@ -143,6 +143,7 @@ class EventRepository(private val db: FirebaseFirestore) {
         "date" to date.toString(),
         "price" to price,
         "url" to url,
+        "pendingParticipants" to pendingParticipants,
         "participants" to participants,
         "visibleToIfPrivate" to visibleToIfPrivate,
         "maxParticipants" to maxParticipants,
@@ -175,7 +176,7 @@ class EventRepository(private val db: FirebaseFirestore) {
         date = LocalDate.parse(this["date"] as? String ?: ""),
         price = this["price"] as? Double ?: 0.0,
         url = this["url"] as? String ?: "",
-        pendingParticipants = this["pendingInvitations"] as? List<String> ?: emptyList(),
+        pendingParticipants = this["pendingParticipants"] as? List<String> ?: emptyList(),
         participants = this["participants"] as? List<String> ?: emptyList(),
         visibleToIfPrivate = this["visibleToIfPrivate"] as? List<String> ?: emptyList(),
         maxParticipants = (this["maxParticipants"] as? String)?.toIntOrNull() ?: 0,
