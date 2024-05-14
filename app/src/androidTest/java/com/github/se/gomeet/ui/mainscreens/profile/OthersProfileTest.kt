@@ -2,6 +2,7 @@ package com.github.se.gomeet.ui.mainscreens.profile
 
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
@@ -31,7 +32,9 @@ class OthersProfileTest {
           EventViewModel("null", EventRepository(Firebase.firestore)))
     }
 
-    composeTestRule.waitForIdle()
+    composeTestRule.waitUntil(timeoutMillis = 10000) {
+      composeTestRule.onNodeWithTag("UserInfo").isDisplayed()
+    }
 
     composeTestRule.onNodeWithTag("TopBar").assertIsDisplayed()
     composeTestRule.onNodeWithTag("UserInfo").assertIsDisplayed()

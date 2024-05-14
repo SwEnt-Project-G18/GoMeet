@@ -1,6 +1,7 @@
 package com.github.se.gomeet.ui.mainscreens.profile
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
@@ -18,7 +19,9 @@ class EditProfileTest {
   fun testEditProfile() {
     composeTestRule.setContent { EditProfile(NavigationActions(rememberNavController())) }
 
-    composeTestRule.waitForIdle()
+    composeTestRule.waitUntil(timeoutMillis = 10000) {
+      composeTestRule.onNodeWithContentDescription("Profile Picture").isDisplayed()
+    }
 
     composeTestRule.onNodeWithContentDescription("Profile Picture").assertIsDisplayed()
     composeTestRule.onNodeWithText("First Name").performScrollTo().assertIsDisplayed()
