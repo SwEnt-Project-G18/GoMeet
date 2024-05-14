@@ -136,6 +136,8 @@ fun ManageInvites(
                                 invitation.status == InviteStatus.PENDING
                           }) {
                             eventViewModel.sendInvitation(event.value!!, user.uid)
+                          } else {
+                            eventViewModel.cancelInvitation(event.value!!, user.uid)
                           }
                         }
                         nav.goBack()

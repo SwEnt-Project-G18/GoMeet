@@ -331,7 +331,10 @@ class EventViewModel(private val creatorId: String? = null, eventRepository: Eve
   }
 
   fun cancelInvitation(event: Event, userId: String) {
-    assert(event.pendingParticipants.contains(userId))
+    if (!event.pendingParticipants.contains(userId)) {
+      Log.w(TAG, "Event doesn't have ${userId} as a pendingParticipant")
+      return
+    }
 
     repository.updateEvent(
         event.copy(pendingParticipants = event.pendingParticipants.minus(userId)))
