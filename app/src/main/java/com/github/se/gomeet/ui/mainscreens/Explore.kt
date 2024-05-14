@@ -12,7 +12,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -62,6 +61,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import coil.compose.rememberAsyncImagePainter
@@ -204,92 +204,88 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
     val backdropState = rememberBackdropScaffoldState(BackdropValue.Concealed)
     LaunchedEffect(backdropState) { backdropState.reveal() }
     val offset by backdropState.offset
-    val halfHeightDp = LocalConfiguration.current.screenHeightDp / 2.5
-    val halfHeightPx = with(LocalDensity.current) { halfHeightDp.dp.toPx() }
+    val halfHeight = (LocalConfiguration.current.screenHeightDp - 80) / 3
+    val halfHeightPx = with(LocalDensity.current) { halfHeight.dp.toPx() }
+    val rowAlpha = (offset / halfHeightPx).coerceIn(0f..1f)
 
-    BackdropScaffold(
-        frontLayerBackgroundColor = Color.Transparent,
-        backLayerBackgroundColor = MaterialTheme.colorScheme.background,
-        backLayerContentColor = MaterialTheme.colorScheme.background,
-        scaffoldState = backdropState,
-        frontLayerScrimColor = Color.Unspecified,
-        peekHeight = 0.dp,
-        headerHeight = halfHeightDp.dp,
-        modifier = Modifier
-            .testTag("ExploreScreen")
-            .padding(innerPadding),
-        appBar = {},
-        frontLayerContent = {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 16.dp)
-            ) {
-                val listState = rememberLazyListState()
-                Spacer(modifier = Modifier.height(8.dp))
-                Box(
-                    modifier = Modifier.fillMaxSize()
-                ) {
+    Box(
+        modifier =
+            Modifier.fillMaxSize()
+                .padding(bottom = innerPadding.calculateBottomPadding() * rowAlpha)) {
+          BackdropScaffold(
+              frontLayerBackgroundColor = Color.Transparent,
+              backLayerBackgroundColor = MaterialTheme.colorScheme.background,
+              backLayerContentColor = MaterialTheme.colorScheme.background,
+              scaffoldState = backdropState,
+              frontLayerScrimColor = Color.Unspecified,
+              headerHeight = halfHeight.dp,
+              peekHeight = 0.dp,
+              modifier = Modifier.testTag("ExploreScreen").padding(innerPadding),
+              appBar = {},
+              frontLayerContent = {
+                Column(modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
+                  val listState = rememberLazyListState()
+                  Spacer(modifier = Modifier.height(8.dp))
+                  Box(modifier = Modifier.fillMaxSize()) {
                     ContentInRow(
                         backdropState = backdropState,
                         halfHeightPx = halfHeightPx,
                         listState = listState,
                         eventList = eventList)
+
                     ContentInColumn(
                         backdropState = backdropState,
                         halfHeightPx = halfHeightPx,
                         listState = listState,
                         eventList = eventList)
-                }
-          }
-        },
-        backLayerContent = {
-          Scaffold(
-              modifier = Modifier
-                  .fillMaxSize()
-                  .alpha(offset / halfHeightPx),
-              floatingActionButton = {
-                if (locationPermitted.value == true && isButtonVisible.value) {
-                  FloatingActionButton(
-                      onClick = { moveToCurrentLocation.value = CameraAction.ANIMATE },
-                      modifier = Modifier
-                          .size(45.dp)
-                          .testTag("CurrentLocationButton"),
-                      containerColor = DarkCyan) {
-                        Icon(
-                            imageVector = ImageVector.vectorResource(R.drawable.location_icon),
-                            contentDescription = null,
-                            tint = Color.White)
-                      }
+                  }
                 }
               },
-              bottomBar = {}) { innerPadding ->
-                if (isMapLoaded) {
-                  moveToCurrentLocation.value = CameraAction.MOVE
+              backLayerContent = {
+                Scaffold(
+                    modifier = Modifier.fillMaxSize().alpha(offset / halfHeightPx),
+                    floatingActionButton = {
+                      if (locationPermitted.value == true && isButtonVisible.value) {
+                        FloatingActionButton(
+                            onClick = { moveToCurrentLocation.value = CameraAction.ANIMATE },
+                            modifier = Modifier.size(45.dp).testTag("CurrentLocationButton"),
+                            containerColor = DarkCyan) {
+                              Icon(
+                                  imageVector =
+                                      ImageVector.vectorResource(R.drawable.location_icon),
+                                  contentDescription = null,
+                                  tint = Color.White)
+                            }
+                      }
+                    },
+                    bottomBar = {}) { innerPadding ->
+                      if (isMapLoaded) {
+                        moveToCurrentLocation.value = CameraAction.MOVE
 
-                  Box(modifier = Modifier
-                      .padding(innerPadding)
-                      .fillMaxSize()) {
-                    GoogleMapView(
-                        currentPosition = currentPosition,
-                        events = eventList,
-                        modifier = Modifier.testTag("Map"),
-                        query = query,
-                        locationPermitted = locationPermitted.value!!,
-                        eventViewModel = eventViewModel)
-                  }
-                } else {
-                  Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
-                  }
-                }
-                GoMeetSearchBar(
-                    nav,
-                    query,
-                    MaterialTheme.colorScheme.background,
-                    MaterialTheme.colorScheme.tertiary)
-              }
-        }) {}
+                        Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
+                          GoogleMapView(
+                              currentPosition = currentPosition,
+                              events = eventList,
+                              modifier = Modifier.testTag("Map"),
+                              query = query,
+                              locationPermitted = locationPermitted.value!!,
+                              eventViewModel = eventViewModel)
+                        }
+                      } else {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center) {
+                              CircularProgressIndicator()
+                            }
+                      }
+                      GoMeetSearchBar(
+                          nav,
+                          query,
+                          MaterialTheme.colorScheme.background,
+                          MaterialTheme.colorScheme.tertiary)
+                    }
+              }) {}
+        }
   }
 }
 
@@ -316,7 +312,7 @@ private fun ContentInColumn(
 ) {
   val offset by backdropState.offset
 
-    val columnAlpha = ((halfHeightPx - offset) / halfHeightPx).coerceIn(0f..1f)
+  val columnAlpha = ((halfHeightPx - offset) / halfHeightPx).coerceIn(0f..1f)
   val events = eventList.value
   if (columnAlpha > 0) {
     Column {
@@ -328,10 +324,7 @@ private fun ContentInColumn(
             Card(
                 elevation = 4.dp,
                 modifier =
-                Modifier
-                    .size(width = 360.dp, height = 200.dp)
-                    .padding(8.dp)
-                    .clickable {}) {
+                    Modifier.size(width = 360.dp, height = 200.dp).padding(8.dp).clickable {}) {
                   val painter: Painter =
                       if (event.images.isNotEmpty()) {
                         rememberAsyncImagePainter(
@@ -355,15 +348,18 @@ private fun ContentInColumn(
                       contentScale = ContentScale.Crop)
                 }
             Spacer(Modifier.height(8.dp))
-              Column (modifier = Modifier.padding(8.dp)) {
-                  Text(
-                      text = event.title,
-                      style = MaterialTheme.typography.bodyLarge,
-                      color = MaterialTheme.colorScheme.tertiary)
-                  Text(text = eventDateToString(Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant())),
-                      style = MaterialTheme.typography.bodyMedium,
-                      color = MaterialTheme.colorScheme.tertiary)
-              }
+            Column(modifier = Modifier.padding(8.dp)) {
+              Text(
+                  text = event.title,
+                  style = MaterialTheme.typography.bodyLarge,
+                  color = MaterialTheme.colorScheme.tertiary)
+              Text(
+                  text =
+                      eventDateToString(
+                          Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant())),
+                  style = MaterialTheme.typography.bodyMedium,
+                  color = MaterialTheme.colorScheme.tertiary)
+            }
           }
           Divider(modifier = Modifier.padding(top = 16.dp, bottom = 16.dp))
         }
@@ -372,70 +368,66 @@ private fun ContentInColumn(
   }
 }
 
-
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ContentInRow(
     backdropState: BackdropScaffoldState,
     halfHeightPx: Float,
     listState: LazyListState,
-    eventList: MutableState<List<Event>>) {
+    eventList: MutableState<List<Event>>
+) {
 
-    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
-    val offset by backdropState.offset
-    val rowAlpha = (offset / halfHeightPx).coerceIn(0f..1f)
-    val events = eventList.value
-    if (rowAlpha > 0) {
-        Column (
-            Modifier
-                .fillMaxSize()) {
-            TopTitle(forColumn = false, alpha = rowAlpha)
-            LazyRow(modifier = Modifier.alpha(rowAlpha), state = listState) {
-                itemsIndexed(events) { _, event ->
-                    Column (modifier = Modifier
-                        .padding(8.dp)
-                        .fillMaxWidth()){
-                        Card(
-                            elevation = 4.dp,
-                            modifier =
-                            Modifier
-                                .size(width = 280.dp, height = screenHeight / 4)
-                                .clickable {}) {
-                            val painter: Painter =
-                                if (event.images.isNotEmpty()) {
-                                    rememberAsyncImagePainter(
-                                        ImageRequest.Builder(LocalContext.current)
-                                            .data(data = event.images[0])
-                                            .apply(
-                                                block =
-                                                fun ImageRequest.Builder.() {
-                                                    crossfade(true)
-                                                    placeholder(R.drawable.gomeet_logo)
-                                                })
-                                            .build())
-                                } else {
-                                    painterResource(id = R.drawable.gomeet_logo)
-                                }
-                            Image(
-                                painter = painter,
-                                contentDescription = "",
-                                alignment = Alignment.Center,
-                                contentScale = ContentScale.Crop)
-                        }
-                        Column (modifier = Modifier.padding(8.dp)) {
-                            Text(
-                                text = event.title,
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.tertiary)
-                            Text(text = eventDateToString(Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant())),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.tertiary)
-                        }
-                    }
+  val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+  val offset by backdropState.offset
+  val rowAlpha = (offset / halfHeightPx).coerceIn(0f..1f)
+  val events = eventList.value
+  if (rowAlpha > 0) {
+    Column {
+      TopTitle(forColumn = false, alpha = rowAlpha)
+      LazyRow(modifier = Modifier.alpha(rowAlpha), state = listState) {
+        itemsIndexed(events) { _, event ->
+          Column(modifier = Modifier.padding(8.dp).fillMaxWidth()) {
+            Card(
+                elevation = 4.dp,
+                modifier = Modifier.size(width = 280.dp, height = screenHeight / 4).clickable {}) {
+                  val painter: Painter =
+                      if (event.images.isNotEmpty()) {
+                        rememberAsyncImagePainter(
+                            ImageRequest.Builder(LocalContext.current)
+                                .data(data = event.images[0])
+                                .apply(
+                                    block =
+                                        fun ImageRequest.Builder.() {
+                                          crossfade(true)
+                                          placeholder(R.drawable.gomeet_logo)
+                                        })
+                                .build())
+                      } else {
+                        painterResource(id = R.drawable.gomeet_logo)
+                      }
+                  Image(
+                      painter = painter,
+                      contentDescription = "",
+                      alignment = Alignment.Center,
+                      contentScale = ContentScale.Crop)
                 }
+            Column(modifier = Modifier.padding(8.dp)) {
+              Text(
+                  text = event.title,
+                  style = MaterialTheme.typography.bodyLarge,
+                  color = MaterialTheme.colorScheme.tertiary)
+              Text(
+                  text =
+                      eventDateToString(
+                          Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant())),
+                  style = MaterialTheme.typography.bodyMedium,
+                  color = MaterialTheme.colorScheme.tertiary)
             }
+          }
         }
+      }
     }
+  }
 }
 
 @Composable
@@ -475,28 +467,25 @@ fun eventDateToString(eventDate: Date): String {
 
 @Composable
 private fun TopTitle(forColumn: Boolean, alpha: Float) {
+  var size by remember { mutableStateOf(IntSize.Zero) }
+  var isSizeCaptured by remember { mutableStateOf(false) }
   Column(
       modifier =
-      Modifier
-          .padding(
-              top = if (forColumn) 34.dp else 12.dp, start = 10.dp
-          ) // status bar 24dp in material guidance
-          .alpha(alpha = alpha)
-          .fillMaxWidth()) {
-          Box(
-              modifier =
-              Modifier
-                  .size(width = 48.dp, height = 3.dp)
-                  .clip(shape = RoundedCornerShape(12.dp))
-                  .background(color = Color.LightGray)
-                  .align(alignment = Alignment.CenterHorizontally))
-      Spacer(modifier = Modifier.height(LocalConfiguration.current.screenHeightDp.dp/80))
-        Text(
-            text = "Trending Around You",
-            style = MaterialTheme.typography.titleMedium
-        )
-      Spacer(modifier = Modifier.height(LocalConfiguration.current.screenHeightDp.dp/80))
-  }
+          Modifier.padding(
+                  top = if (forColumn) 34.dp else 12.dp,
+                  start = 10.dp) // status bar 24dp in material guidance
+              .alpha(alpha = alpha)
+              .fillMaxWidth()) {
+        Box(
+            modifier =
+                Modifier.size(width = 48.dp, height = 3.dp)
+                    .clip(shape = RoundedCornerShape(12.dp))
+                    .background(color = Color.LightGray)
+                    .align(alignment = Alignment.CenterHorizontally))
+        Spacer(modifier = Modifier.height(LocalConfiguration.current.screenHeightDp.dp / 80))
+        Text(text = "Trending Around You", style = MaterialTheme.typography.titleMedium)
+        Spacer(modifier = Modifier.height(LocalConfiguration.current.screenHeightDp.dp / 80))
+      }
 }
 
 /**
