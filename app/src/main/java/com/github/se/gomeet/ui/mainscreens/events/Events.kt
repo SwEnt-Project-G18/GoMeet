@@ -217,7 +217,7 @@ fun Events(
 
                         // Loop through and display events that match the joined events criteria
                         eventList
-                            .filter { e -> user.value!!.myEvents.contains(e.eventID) }
+                            .filter { e -> user.value!!.joinedEvents.contains(e.eventID) }
                             .forEach { event ->
                               if (event.title.contains(query.value, ignoreCase = true)) {
                                 val painter: Painter =
@@ -264,7 +264,7 @@ fun Events(
 
                         // Loop through and display events are marked favourites by the currentUser
                         eventList
-                            .filter { e -> user.value!!.myFavorites.contains(e.uid) }
+                            .filter { e -> user.value!!.myFavorites.contains(e.eventID) }
                             .forEach { event ->
                               if (event.title.contains(query.value, ignoreCase = true)) {
                                 val painter: Painter =
@@ -284,7 +284,7 @@ fun Events(
                                     }
                                 EventWidget(
                                     userName = event.creator,
-                                    eventId = event.uid,
+                                    eventId = event.eventID,
                                     eventName = event.title,
                                     eventDescription = event.description,
                                     eventDate =
