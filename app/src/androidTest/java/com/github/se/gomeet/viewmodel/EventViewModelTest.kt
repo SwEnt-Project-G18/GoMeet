@@ -34,6 +34,7 @@ class EventViewModelTest {
           "url",
           emptyList(),
           emptyList(),
+          emptyList(),
           0,
           false,
           emptyList(),
@@ -51,12 +52,12 @@ class EventViewModelTest {
     assert(events.isNotEmpty())
 
     // test getEvent
-    val uid = events[0].uid
+    val uid = events[0].eventID
     lateinit var event: Event
     event = eventViewModel.getEvent(uid)!!
 
     assert(event != null)
-    assert(event.uid == uid)
+    assert(event.eventID == uid)
     assert(event.title == title)
 
     assert(eventViewModel.getEvent("this_event_does_not_exist") == null)
@@ -65,7 +66,7 @@ class EventViewModelTest {
     val newTitle = "newtestevent"
     val newEvent =
         Event(
-            event.uid,
+            event.eventID,
             event.creator,
             newTitle,
             event.description,
@@ -73,6 +74,7 @@ class EventViewModelTest {
             event.date,
             event.price,
             event.url,
+            event.pendingParticipants,
             event.participants,
             event.visibleToIfPrivate,
             event.maxParticipants,
@@ -83,8 +85,7 @@ class EventViewModelTest {
     eventViewModel.editEvent(newEvent)
     event = eventViewModel.getEvent(uid)!!
 
-    assert(event != null)
-    assert(event.uid == uid)
+    assert(event.eventID == uid)
     assert(event.title == newTitle)
 
     // test removeEvent

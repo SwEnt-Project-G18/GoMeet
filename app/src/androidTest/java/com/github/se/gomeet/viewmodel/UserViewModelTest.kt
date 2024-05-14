@@ -50,7 +50,7 @@ class UserViewModelTest {
             user.country,
             emptyList(),
             emptyList(),
-            emptyList(),
+            emptySet(),
             emptyList(),
             emptyList(),
             emptyList(),

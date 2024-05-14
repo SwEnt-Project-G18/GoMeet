@@ -99,7 +99,7 @@ fun OthersProfile(
       followerCount = user?.followers?.size ?: 0
 
       val allEvents =
-          eventViewModel.getAllEvents()!!.filter { e -> user!!.myEvents.contains(e.uid) }
+          eventViewModel.getAllEvents()!!.filter { e -> user!!.myEvents.contains(e.eventID) }
       allEvents.forEach {
         if (it.date.isAfter(LocalDate.now())) {
           myEventList.add(it)
