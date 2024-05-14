@@ -10,6 +10,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -61,7 +62,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import coil.compose.rememberAsyncImagePainter
@@ -81,6 +81,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.maps.android.compose.GoogleMap
@@ -467,8 +468,6 @@ fun eventDateToString(eventDate: Date): String {
 
 @Composable
 private fun TopTitle(forColumn: Boolean, alpha: Float) {
-  var size by remember { mutableStateOf(IntSize.Zero) }
-  var isSizeCaptured by remember { mutableStateOf(false) }
   Column(
       modifier =
           Modifier.padding(
@@ -511,6 +510,7 @@ fun GoogleMapView(
     locationPermitted: Boolean,
     eventViewModel: EventViewModel
 ) {
+  val ctx = LocalContext.current
   val coroutineScope = rememberCoroutineScope()
 
   val eventLocations =
@@ -522,8 +522,15 @@ fun GoogleMapView(
         MapUiSettings(
             compassEnabled = false, zoomControlsEnabled = false, myLocationButtonEnabled = false))
   }
+  val isDarkTheme = isSystemInDarkTheme()
   val mapProperties by remember {
-    mutableStateOf(MapProperties(mapType = MapType.NORMAL, isMyLocationEnabled = locationPermitted))
+    mutableStateOf(
+        MapProperties(
+            mapType = MapType.NORMAL,
+            isMyLocationEnabled = locationPermitted,
+            mapStyleOptions =
+                MapStyleOptions.loadRawResourceStyle(
+                    ctx, if (isDarkTheme) R.raw.map_style_dark else R.raw.map_style_light)))
   }
   val mapVisible by remember { mutableStateOf(true) }
   val cameraPositionState = rememberCameraPositionState()
