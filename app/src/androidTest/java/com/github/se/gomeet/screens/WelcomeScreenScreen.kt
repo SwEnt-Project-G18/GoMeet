@@ -5,5 +5,4 @@ import io.github.kakaocup.compose.node.element.ComposeScreen
 
 class WelcomeScreenScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
     ComposeScreen<WelcomeScreenScreen>(
-        semanticsProvider = semanticsProvider,
-        viewBuilderAction = { hasTestTag("WelcomeScreen") }) {}
+        semanticsProvider = semanticsProvider, viewBuilderAction = { hasTestTag("WelcomeScreen") })
