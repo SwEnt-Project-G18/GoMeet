@@ -69,6 +69,8 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 import kotlinx.coroutines.launch
 
+private val currentUid = Firebase.auth.currentUser?.uid ?: "null"
+
 /**
  * EventHeader is a composable that displays the header of an event.
  *
@@ -249,7 +251,7 @@ fun EventButtons(
       horizontalArrangement = Arrangement.SpaceBetween) {
         TextButton(
             onClick = {
-              if (organizer.uid.contentEquals(Firebase.auth.currentUser!!.uid)) {
+              if (organizer.uid.contentEquals(currentUid)) {
                 // TODO: GO TO EDIT EVENT PARAMETERS SCREEN
               } else {
                 if (!isJoined.value) {
@@ -271,7 +273,7 @@ fun EventButtons(
             colors =
                 ButtonDefaults.textButtonColors(
                     containerColor = Color(0xFFECEFF1), contentColor = Color.Black)) {
-              if (organizer.uid.contentEquals(Firebase.auth.currentUser!!.uid)) {
+              if (organizer.uid.contentEquals(currentUid)) {
                 Text("Edit My Event")
               } else {
                 if (isJoined.value) {
@@ -281,7 +283,7 @@ fun EventButtons(
                 }
               }
             }
-        if (organizer.uid.contentEquals(Firebase.auth.currentUser!!.uid)) {
+        if (organizer.uid.contentEquals(currentUid)) {
           Spacer(modifier = Modifier.width(5.dp))
           TextButton(
               onClick = {
@@ -295,7 +297,7 @@ fun EventButtons(
                 Text("Add Participants")
               }
         }
-        if (organizer.uid != com.google.firebase.Firebase.auth.currentUser!!.uid) {
+        if (organizer.uid != currentUid) {
           IconButton(
               onClick = {
                 nav.navigateToScreen(Route.MESSAGE.replace("{id}", Uri.encode(organizer.uid)))

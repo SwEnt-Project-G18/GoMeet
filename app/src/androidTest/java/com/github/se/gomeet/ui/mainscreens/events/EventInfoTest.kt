@@ -11,13 +11,8 @@ import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.android.gms.maps.model.LatLng
-import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import java.util.concurrent.TimeUnit
-import kotlinx.coroutines.runBlocking
-import org.junit.AfterClass
-import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 
@@ -31,16 +26,16 @@ class EventInfoTest {
     composeTestRule.setContent {
       MyEventInfo(
           nav = NavigationActions(rememberNavController()),
-          title = eventTitle,
-          eventId = eventId,
-          date = eventDate,
-          time = eventTime,
-          organizerId = organiserId,
-          rating = eventRating,
-          description = eventDescription,
-          loc = eventLocation,
-          userViewModel = userVM,
-          eventViewModel = eventVM)
+          title = "title",
+          eventId = "eventId",
+          date = "date",
+          time = "time",
+          organizerId = "organizerId",
+          rating = 0.0,
+          description = "description",
+          loc = LatLng(0.0, 0.0),
+          userViewModel = UserViewModel(UserRepository(Firebase.firestore)),
+          eventViewModel = EventViewModel("organizerId", EventRepository(Firebase.firestore)))
     }
 
     assert(composeTestRule.onNodeWithTag("TopBar").isDisplayed(), { "TopBar not displayed" })
@@ -54,66 +49,11 @@ class EventInfoTest {
     assert(
         composeTestRule
             .onNodeWithTag("EventDescription")
-            .assertTextContains(eventDescription)
+            .assertTextContains("description")
             .isDisplayed(),
         { "EventDescription not displayed" })
     assert(
         composeTestRule.onNodeWithTag("EventButton").isDisplayed(), { "EventButton not displayed" })
     assert(composeTestRule.onNodeWithTag("MapView").isDisplayed(), { "MapView not displayed" })
-  }
-
-  companion object {
-
-    private val eventTitle = "Event Title"
-    private val eventId = "eventid"
-    private val eventDate = "2024-05-01"
-    private val organiserId = "organiserid"
-    private val eventTime = "00:00"
-    private val eventDescription = "Event Description"
-    private val eventLocation = LatLng(0.0, 0.0)
-    private val userVM = UserViewModel(UserRepository(Firebase.firestore))
-    private val eventVM = EventViewModel(organiserId, EventRepository(Firebase.firestore))
-    private val eventRating = 4.5
-    private lateinit var currentUserId: String
-
-    private val usr = "u@t.com"
-    private val pwd = "123456"
-
-    @BeforeClass
-    @JvmStatic
-    fun setUp() {
-      TimeUnit.SECONDS.sleep(3)
-
-      // Create a new user and sign in
-      var result = Firebase.auth.createUserWithEmailAndPassword(usr, pwd)
-      while (!result.isComplete) {
-        TimeUnit.SECONDS.sleep(1)
-      }
-      result = Firebase.auth.signInWithEmailAndPassword(usr, pwd)
-      while (!result.isComplete) {
-        TimeUnit.SECONDS.sleep(1)
-      }
-
-      // Set up the user view model
-      // Order is important here, since createUserIfNew sets current user to created user (so we
-      // need to create the current user last)
-      currentUserId = Firebase.auth.currentUser!!.uid
-      runBlocking {
-        userVM.createUserIfNew(
-            organiserId, "testorganiser", "test", "name", "test@email.com", "0123", "Afghanistan")
-      }
-      userVM.createUserIfNew(currentUserId, "a", "b", "c", usr, "4567", "Angola")
-      TimeUnit.SECONDS.sleep(3)
-    }
-
-    @AfterClass
-    @JvmStatic
-    fun tearDown() {
-      // Clean up the user view model
-      Firebase.auth.currentUser!!.delete()
-
-      userVM.deleteUser(organiserId)
-      userVM.deleteUser(currentUserId)
-    }
   }
 }

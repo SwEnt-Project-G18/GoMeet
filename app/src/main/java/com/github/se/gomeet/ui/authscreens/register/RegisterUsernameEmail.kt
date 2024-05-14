@@ -31,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -71,7 +72,7 @@ fun RegisterUsernameEmail(
       verticalArrangement = Arrangement.SpaceAround) {
         Text(
             text = "Welcome to GoMeet !\nPlease enter a username and an email.",
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().testTag("Text"),
             style = MaterialTheme.typography.titleMedium,
             textAlign = TextAlign.Center)
 
@@ -121,32 +122,34 @@ fun RegisterUsernameEmail(
 
         Spacer(modifier = Modifier.size(screenHeight / 15))
 
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-          LinearProgressIndicator(
-              modifier = Modifier.padding(top = 20.dp, end = 25.dp),
-              progress = { 0.2f },
-              color = MaterialTheme.colorScheme.tertiary,
-              trackColor = Color.LightGray,
-              strokeCap = ProgressIndicatorDefaults.CircularIndeterminateStrokeCap)
-          IconButton(
-              modifier = Modifier.padding(bottom = 2.5.dp, end = 3.dp).size(screenHeight / 19),
-              colors = IconButtonDefaults.outlinedIconButtonColors(),
-              onClick = {
-                firstClick = false
-                isValidUsername =
-                    !(allUsers!!.any { u -> u.username == username }) && username.isNotBlank()
-                isValidEmail = isValidEmail && !(allUsers!!.any { u -> u.email == username })
-                if (isValidUsername && isValidEmail) {
-                  callback(username, email)
-                }
-              }) {
-                Icon(
-                    Icons.AutoMirrored.Filled.ArrowForward,
-                    contentDescription = "Next",
-                    tint = MaterialTheme.colorScheme.tertiary,
-                    modifier = Modifier.size(60.dp))
-              }
-        }
+        Row(
+            modifier = Modifier.fillMaxWidth().testTag("BottomRow"),
+            horizontalArrangement = Arrangement.End) {
+              LinearProgressIndicator(
+                  modifier = Modifier.padding(top = 20.dp, end = 25.dp),
+                  progress = { 0.2f },
+                  color = MaterialTheme.colorScheme.tertiary,
+                  trackColor = Color.LightGray,
+                  strokeCap = ProgressIndicatorDefaults.CircularIndeterminateStrokeCap)
+              IconButton(
+                  modifier = Modifier.padding(bottom = 2.5.dp, end = 3.dp).size(screenHeight / 19),
+                  colors = IconButtonDefaults.outlinedIconButtonColors(),
+                  onClick = {
+                    firstClick = false
+                    isValidUsername =
+                        !(allUsers!!.any { u -> u.username == username }) && username.isNotBlank()
+                    isValidEmail = isValidEmail && !(allUsers!!.any { u -> u.email == username })
+                    if (isValidUsername && isValidEmail) {
+                      callback(username, email)
+                    }
+                  }) {
+                    Icon(
+                        Icons.AutoMirrored.Filled.ArrowForward,
+                        contentDescription = "Next",
+                        tint = MaterialTheme.colorScheme.tertiary,
+                        modifier = Modifier.size(60.dp))
+                  }
+            }
       }
 }
 

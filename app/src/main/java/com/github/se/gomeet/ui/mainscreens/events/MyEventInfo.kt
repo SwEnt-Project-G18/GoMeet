@@ -33,9 +33,11 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
+import com.github.se.gomeet.model.event.NULL_EVENT
 import com.github.se.gomeet.model.repository.EventRepository
 import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.model.user.GoMeetUser
+import com.github.se.gomeet.model.user.NULL_USER
 import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
@@ -45,6 +47,8 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
+
+private val currentUid = Firebase.auth.currentUser?.uid ?: "null"
 
 @Composable
 fun MyEventInfo(
@@ -70,9 +74,9 @@ fun MyEventInfo(
 
   LaunchedEffect(Unit) {
     coroutineScope.launch {
-      organizer.value = userViewModel.getUser(organizerId)
-      currentUser.value = userViewModel.getUser(Firebase.auth.currentUser!!.uid)
-      myEvent.value = eventViewModel.getEvent(eventId)
+      organizer.value = userViewModel.getUser(organizerId) ?: NULL_USER
+      currentUser.value = userViewModel.getUser(currentUid) ?: NULL_USER
+      myEvent.value = eventViewModel.getEvent(eventId) ?: NULL_EVENT
     }
   }
 

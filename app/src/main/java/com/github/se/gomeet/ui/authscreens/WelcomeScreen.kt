@@ -74,7 +74,7 @@ fun WelcomeScreen(
   Column(
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.Top,
-      modifier = Modifier.fillMaxSize().padding(25.dp).testTag("WelcomeScreenCol")) {
+      modifier = Modifier.fillMaxSize().padding(25.dp).testTag("WelcomeScreen")) {
         Spacer(modifier = Modifier.size(screenHeight / 30))
 
         Image(
@@ -96,10 +96,7 @@ fun WelcomeScreen(
 
         Button(
             onClick = { onNavToLogin() },
-            modifier =
-                Modifier.width((screenWidth / 1.5.dp).dp)
-                    .height(screenHeight / 17)
-                    .testTag("LogInButton"),
+            modifier = Modifier.width((screenWidth / 1.5.dp).dp).height(screenHeight / 17),
             shape = RoundedCornerShape(10.dp),
             enabled = true,
             colors =

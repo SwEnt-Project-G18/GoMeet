@@ -15,7 +15,7 @@ import org.junit.Rule
 import org.junit.Test
 
 class WelcomeScreenTest {
-  @get:Rule val rule = createAndroidComposeRule<ComponentActivity>()
+  @get:Rule val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
   @Before
   fun setup() {
@@ -32,12 +32,12 @@ class WelcomeScreenTest {
   @Test
   fun googleSignInButtonShouldLaunchIntent() {
 
-    rule.setContent { WelcomeScreen({}, {}, {}) }
+    composeTestRule.setContent { WelcomeScreen({}, {}, {}) }
 
-    rule.onNodeWithContentDescription("GoMeet Logo").assertIsDisplayed()
-    rule.onNodeWithText("Log In").assertExists().assertIsDisplayed()
-    rule.onNodeWithText("Sign Up").assertExists().assertIsDisplayed()
-    rule.onNodeWithContentDescription("Google logo").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithContentDescription("GoMeet Logo").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Log In").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Sign Up").assertIsDisplayed()
+    composeTestRule.onNodeWithContentDescription("Google logo").assertIsDisplayed().performClick()
     // Assert that an Intent to Google Mobile Services has been sent
     intended(toPackage("com.google.android.gms"))
   }

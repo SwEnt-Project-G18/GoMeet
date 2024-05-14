@@ -10,7 +10,6 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.model.repository.EventRepository
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
@@ -23,12 +22,10 @@ import org.junit.After
 import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
 
-@RunWith(AndroidJUnit4::class)
 class CreateEventTest {
 
-  @get:Rule val rule = createAndroidComposeRule<ComponentActivity>()
+  @get:Rule val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
   @After
   fun tearDown() {
@@ -38,82 +35,81 @@ class CreateEventTest {
   }
 
   @Test
-  fun testCreateEventScreen_InputFields() {
+  fun testCreatePrivateEvent() {
     lateinit var navController: NavHostController
 
-    rule.setContent {
+    composeTestRule.setContent {
       navController = rememberNavController()
       MapsInitializer.initialize(LocalContext.current)
       CreateEvent(NavigationActions(navController), eventViewModel, isPrivate = true)
     }
 
     // Enter text into the Title field
-    rule.onNodeWithText("Title").performTextInput("Sample Event 1")
+    composeTestRule.onNodeWithText("Title").performTextInput("Sample Event 1")
 
     // Enter text into the Location field
-    rule.onNodeWithText("Location").performTextInput("test")
+    composeTestRule.onNodeWithText("Location").performTextInput("test")
 
-    rule.onNodeWithTag("DropdownMenu").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("DropdownMenu").assertIsDisplayed()
 
     // Enter date
-    rule.onNodeWithText("Date").performTextInput(LocalDate.now().toString())
+    composeTestRule.onNodeWithText("Date").performTextInput(LocalDate.now().toString())
     // Enter a price
-    rule.onNodeWithText("Price").performTextInput("25.00")
+    composeTestRule.onNodeWithText("Price").performTextInput("25.00")
     // Enter a URL
-    rule.onNodeWithText("Link").performTextInput("http://example.com")
+    composeTestRule.onNodeWithText("Link").performTextInput("http://example.com")
 
-    rule.onNodeWithText("Add Tags").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Add Tags").assertIsDisplayed()
 
-    rule.onNodeWithText("Add Participants").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Add Participants").assertIsDisplayed()
 
-    rule.onNodeWithText("Add Image").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Add Image").assertIsDisplayed()
 
-    rule.onNodeWithText("Post").performClick()
+    composeTestRule.onNodeWithText("Post").performClick()
   }
 
   @Test
-  fun testPublicCreateEventScreen_InputFields() {
+  fun testCreatePublicEvent() {
     lateinit var navController: NavHostController
 
-    rule.setContent {
+    composeTestRule.setContent {
       navController = rememberNavController()
       CreateEvent(NavigationActions(navController), eventViewModel, isPrivate = false)
     }
 
     // Enter text into the Title field
-    rule.onNodeWithText("Title").performTextInput("Sample Event 2")
+    composeTestRule.onNodeWithText("Title").performTextInput("Sample Event 2")
 
     // Enter text into the Description field
-    rule.onNodeWithText("Description").performTextInput("This is a test event.")
+    composeTestRule.onNodeWithText("Description").performTextInput("This is a test event.")
 
     // Enter text into the Location field
-    rule.onNodeWithText("Location").performTextInput("test")
+    composeTestRule.onNodeWithText("Location").performTextInput("test")
 
-    rule.onNodeWithTag("DropdownMenu").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("DropdownMenu").assertIsDisplayed()
 
     // Enter date
-    rule.onNodeWithText("Date").performTextInput("invalid date")
+    composeTestRule.onNodeWithText("Date").performTextInput("invalid date")
     // Enter a price
-    rule.onNodeWithText("Price").performTextInput("25.00")
+    composeTestRule.onNodeWithText("Price").performTextInput("25.00")
     // Enter a URL
-    rule.onNodeWithText("Link").performTextInput("http://example.com")
+    composeTestRule.onNodeWithText("Link").performTextInput("http://example.com")
 
-    rule.onNodeWithText("Add Tags").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Add Tags").assertIsDisplayed()
 
-    rule.onNodeWithText("Add Image").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Add Image").assertIsDisplayed()
 
-    rule.onNodeWithText("Post").performClick()
+    composeTestRule.onNodeWithText("Post").performClick()
   }
 
   companion object {
 
     private lateinit var eventViewModel: EventViewModel
-    private val uid = "testuid"
 
     @JvmStatic
     @BeforeClass
     fun setup() {
-      eventViewModel = EventViewModel(uid, EventRepository(Firebase.firestore))
+      eventViewModel = EventViewModel("null", EventRepository(Firebase.firestore))
     }
   }
 }

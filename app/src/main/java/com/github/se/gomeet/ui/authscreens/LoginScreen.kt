@@ -69,9 +69,8 @@ fun LoginScreen(
           focusedLabelColor = MaterialTheme.colorScheme.tertiary,
           focusedIndicatorColor = MaterialTheme.colorScheme.tertiary)
 
-  Column(modifier = Modifier.fillMaxSize()) {
+  Column(modifier = Modifier.fillMaxSize().testTag("LoginScreen")) {
     TopAppBar(
-        modifier = Modifier.testTag("TopBar"),
         backgroundColor = MaterialTheme.colorScheme.background,
         elevation = 0.dp,
         title = {},
@@ -87,7 +86,7 @@ fun LoginScreen(
     Column(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxSize().padding(25.dp).testTag("LoginScreen")) {
+        modifier = Modifier.fillMaxSize().padding(25.dp)) {
           Image(
               painter = painterResource(id = R.drawable.gomeet_text),
               contentDescription = "GoMeet",
@@ -120,7 +119,7 @@ fun LoginScreen(
               value = signInState.value.email,
               singleLine = true,
               onValueChange = { newValue -> authViewModel.onEmailChange(newValue) },
-              modifier = Modifier.fillMaxWidth().testTag("EmailField"),
+              modifier = Modifier.fillMaxWidth(),
               label = { Text("Email") },
               isError = isError,
               colors = textFieldColors)
@@ -131,7 +130,7 @@ fun LoginScreen(
               value = signInState.value.password,
               singleLine = true,
               onValueChange = { newValue -> authViewModel.onPasswordChange(newValue) },
-              modifier = Modifier.fillMaxWidth().testTag("LogInField"),
+              modifier = Modifier.fillMaxWidth(),
               label = { Text("Password") },
               isError = isError,
               colors = textFieldColors,
@@ -141,7 +140,7 @@ fun LoginScreen(
 
           Button(
               onClick = { authViewModel.signInWithEmailPassword(context) },
-              modifier = Modifier.fillMaxWidth().testTag("LogInButton"),
+              modifier = Modifier.fillMaxWidth(),
               colors =
                   ButtonColors(
                       disabledContainerColor = MaterialTheme.colorScheme.primary,

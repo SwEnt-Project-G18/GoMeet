@@ -37,3 +37,21 @@ data class GoMeetUser(
     var tags: List<String>
     // can add more things later
 )
+
+val NULL_USER =
+    GoMeetUser(
+        "null",
+        "null",
+        "null",
+        "null",
+        "null",
+        "null",
+        "null",
+        emptyList(),
+        emptyList(),
+        emptySet(),
+        emptyList(),
+        emptyList(),
+        emptyList(),
+        "",
+        emptyList())

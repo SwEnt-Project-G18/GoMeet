@@ -57,6 +57,7 @@ import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.repository.EventRepository
 import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.model.user.GoMeetUser
+import com.github.se.gomeet.model.user.NULL_USER
 import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
@@ -96,7 +97,7 @@ fun Profile(
 
   LaunchedEffect(Unit) {
     coroutineScope.launch {
-      currentUser = userViewModel.getUser(userId)
+      currentUser = userViewModel.getUser(userId) ?: NULL_USER
       val allEvents =
           eventViewModel.getAllEvents()!!.filter { e -> currentUser!!.myEvents.contains(e.eventID) }
       allEvents.forEach {

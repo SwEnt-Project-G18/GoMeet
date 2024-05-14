@@ -6,31 +6,28 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
 
-@RunWith(AndroidJUnit4::class)
 class CreateTest {
 
-  @get:Rule val rule = createAndroidComposeRule<ComponentActivity>()
+  @get:Rule val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
   @Test
-  fun uiElementsDisplayed() {
+  fun testCreate() {
     lateinit var navController: NavHostController
 
-    rule.setContent {
+    composeTestRule.setContent {
       navController = rememberNavController()
       Create(NavigationActions(navController))
     }
 
     // Check that the text "Choose your audience" is displayed
-    rule.onNodeWithText("Choose your audience").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Choose your audience").assertIsDisplayed()
 
     // Check that the "Public" and "Private" buttons are displayed
-    rule.onNodeWithText("Public").assertIsDisplayed()
-    rule.onNodeWithText("Private").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Public").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Private").assertIsDisplayed()
   }
 }

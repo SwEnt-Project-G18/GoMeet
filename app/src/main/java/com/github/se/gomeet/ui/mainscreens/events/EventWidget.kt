@@ -115,7 +115,7 @@ fun EventWidget(
   Card(
       modifier =
           Modifier.fillMaxWidth()
-              .testTag("Card")
+              .testTag("EventWidget")
               .padding(start = 10.dp, top = 5.dp, end = 10.dp, bottom = 5.dp)
               .clickable {
                 nav.navigateToEventInfo(

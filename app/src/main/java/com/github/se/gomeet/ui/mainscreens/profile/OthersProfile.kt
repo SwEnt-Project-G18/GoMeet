@@ -53,6 +53,7 @@ import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.repository.EventRepository
 import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.model.user.GoMeetUser
+import com.github.se.gomeet.model.user.NULL_USER
 import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
@@ -67,7 +68,7 @@ import java.time.LocalDate
 import kotlinx.coroutines.launch
 
 private var user: GoMeetUser? = null
-private var currentUser = Firebase.auth.currentUser?.uid ?: ""
+private val currentUid = Firebase.auth.currentUser?.uid ?: "null"
 
 /**
  * Composable function for the OthersProfile screen.
@@ -94,8 +95,8 @@ fun OthersProfile(
 
   LaunchedEffect(Unit) {
     coroutineScope.launch {
-      user = userViewModel.getUser(uid)
-      isFollowing = user?.followers?.contains(currentUser) ?: false
+      user = userViewModel.getUser(uid) ?: NULL_USER
+      isFollowing = user?.followers?.contains(currentUid) ?: false
       followerCount = user?.followers?.size ?: 0
 
       val allEvents =

@@ -46,7 +46,6 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
@@ -59,6 +58,7 @@ import com.github.se.gomeet.R
 import com.github.se.gomeet.model.TagsSelector
 import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.model.user.GoMeetUser
+import com.github.se.gomeet.model.user.NULL_USER
 import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
@@ -67,11 +67,14 @@ import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.auth
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.io.InputStream
 import kotlinx.coroutines.tasks.await
+
+private val currentUid = Firebase.auth.currentUser?.uid ?: "null"
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -91,7 +94,7 @@ fun EditProfile(
   val showPopup = remember { mutableStateOf(false) }
 
   LaunchedEffect(Unit) {
-    currentUser.value = userViewModel.getUser(com.google.firebase.Firebase.auth.currentUser!!.uid)
+    currentUser.value = userViewModel.getUser(currentUid) ?: NULL_USER
     firstName.value = currentUser.value!!.firstName
     lastName.value = currentUser.value!!.lastName
     email.value = currentUser.value!!.email
@@ -228,7 +231,7 @@ fun EditProfile(
                         } else {
                           painterResource(id = R.drawable.gomeet_logo)
                         },
-                    contentDescription = "Profile picture",
+                    contentDescription = "Profile Picture",
                     modifier =
                         Modifier.padding(start = 15.dp, end = 15.dp, top = 30.dp, bottom = 15.dp)
                             .width(101.dp)
@@ -236,8 +239,7 @@ fun EditProfile(
                             .clickable { imagePickerLauncher.launch("image/*") }
                             .clip(CircleShape)
                             .background(color = MaterialTheme.colorScheme.background)
-                            .align(Alignment.CenterHorizontally)
-                            .testTag("Profile Picture"),
+                            .align(Alignment.CenterHorizontally),
                     contentScale = ContentScale.Crop)
 
                 Spacer(modifier = Modifier.size(16.dp))

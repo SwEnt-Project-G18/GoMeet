@@ -38,3 +38,21 @@ data class Event(
     val tags: List<String>, // Tags of the event
     val images: List<String> // Is it the right type?
 )
+
+val NULL_EVENT =
+    Event(
+        "null",
+        "null",
+        "null",
+        "null",
+        Location(0.0, 0.0, "null"),
+        LocalDate.of(1111, 11, 1),
+        0.0,
+        "null",
+        emptyList(),
+        emptyList(),
+        emptyList(),
+        0,
+        false,
+        emptyList(),
+        emptyList())
