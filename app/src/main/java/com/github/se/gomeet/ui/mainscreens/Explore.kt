@@ -213,7 +213,7 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
             Modifier.fillMaxSize()
                 .padding(bottom = innerPadding.calculateBottomPadding() * rowAlpha)) {
           BackdropScaffold(
-              frontLayerBackgroundColor = Color.Transparent,
+              frontLayerBackgroundColor = MaterialTheme.colorScheme.background,
               backLayerBackgroundColor = MaterialTheme.colorScheme.background,
               backLayerContentColor = MaterialTheme.colorScheme.background,
               scaffoldState = backdropState,
