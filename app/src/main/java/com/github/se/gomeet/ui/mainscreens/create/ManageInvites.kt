@@ -38,6 +38,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -165,8 +166,11 @@ fun ManageInvites(
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier =
-                        Modifier.weight(1f).height(screenHeight / 20).clickable {
-                          coroutineScope.launch { pagerState.animateScrollToPage(0) }
+                    Modifier
+                        .weight(1f)
+                        .height(screenHeight / 20)
+                        .clickable {
+                            coroutineScope.launch { pagerState.animateScrollToPage(0) }
                         }) {
                       Text(
                           text = "To Invite",
@@ -181,8 +185,11 @@ fun ManageInvites(
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier =
-                        Modifier.height(screenHeight / 20).weight(1f).clickable {
-                          coroutineScope.launch { pagerState.animateScrollToPage(1) }
+                    Modifier
+                        .height(screenHeight / 20)
+                        .weight(1f)
+                        .clickable {
+                            coroutineScope.launch { pagerState.animateScrollToPage(1) }
                         }) {
                       Text(
                           text = "Pending",
@@ -197,8 +204,11 @@ fun ManageInvites(
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier =
-                        Modifier.height(screenHeight / 20).weight(1f).clickable {
-                          coroutineScope.launch { pagerState.animateScrollToPage(2) }
+                    Modifier
+                        .height(screenHeight / 20)
+                        .weight(1f)
+                        .clickable {
+                            coroutineScope.launch { pagerState.animateScrollToPage(2) }
                         }) {
                       Text(
                           text = "Accepted",
@@ -213,8 +223,11 @@ fun ManageInvites(
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier =
-                        Modifier.height(screenHeight / 20).weight(1f).clickable {
-                          coroutineScope.launch { pagerState.animateScrollToPage(3) }
+                    Modifier
+                        .height(screenHeight / 20)
+                        .weight(1f)
+                        .clickable {
+                            coroutineScope.launch { pagerState.animateScrollToPage(3) }
                         }) {
                       Text(
                           text = "Refused",
@@ -227,8 +240,9 @@ fun ManageInvites(
               }
           Canvas(
               modifier =
-                  Modifier.fillMaxWidth() // Ensures the Canvas takes up full screen width
-                      .height(1.dp) // Sets the height of the Canvas to 1 dp
+              Modifier
+                  .fillMaxWidth() // Ensures the Canvas takes up full screen width
+                  .height(1.dp) // Sets the height of the Canvas to 1 dp
               ) {
                 val canvasWidth = size.width
                 drawLine(
@@ -264,7 +278,8 @@ fun ManageInvites(
                     },
                     event.value!!,
                     null,
-                    callback = { toUpdate.add(it) })
+                    callback = { toUpdate.add(it) },
+                    initialClicked = false)
               }
               1 -> {
                 PageUserInvites(
@@ -276,7 +291,8 @@ fun ManageInvites(
                     },
                     event.value!!,
                     InviteStatus.PENDING,
-                    callback = { toUpdate.add(it) })
+                    callback = { toUpdate.add(it) },
+                    initialClicked = false)
               }
               2 -> {
                 PageUserInvites(
@@ -288,7 +304,8 @@ fun ManageInvites(
                     },
                     event.value!!,
                     InviteStatus.ACCEPTED,
-                    callback = { toUpdate.add(it) })
+                    callback = { toUpdate.add(it) },
+                    initialClicked = false)
               }
               3 -> {
                 PageUserInvites(
@@ -300,7 +317,8 @@ fun ManageInvites(
                     },
                     event.value!!,
                     InviteStatus.REFUSED,
-                    callback = { toUpdate.add(it) })
+                    callback = { toUpdate.add(it) },
+                    initialClicked = false)
               }
             }
           }
@@ -317,14 +335,15 @@ fun PageUserInvites(
     list: List<GoMeetUser>,
     currentEvent: Event,
     status: InviteStatus?,
-    callback: (GoMeetUser) -> Unit
+    callback: (GoMeetUser) -> Unit,
+    initialClicked: Boolean
 ) {
 
   Column(
       verticalArrangement = Arrangement.Top,
       horizontalAlignment = Alignment.CenterHorizontally,
       modifier = Modifier.fillMaxSize()) {
-        list.forEach { follower -> UserInviteWidget(follower, currentEvent, status, callback) }
+        list.forEach { follower -> UserInviteWidget(follower, currentEvent, status, initialClicked, callback) }
       }
 }
 
@@ -333,20 +352,25 @@ fun UserInviteWidget(
     user: GoMeetUser,
     event: Event,
     status: InviteStatus?,
+    initialClicked: Boolean,
     callback: (GoMeetUser) -> Unit
 ) {
 
-  var clicked by remember { mutableStateOf(false) }
+    var clicked by rememberSaveable { mutableStateOf(initialClicked) }
   Row(
-      modifier = Modifier.fillMaxWidth().padding(start = 15.dp, end = 15.dp).height(50.dp),
+      modifier = Modifier
+          .fillMaxWidth()
+          .padding(start = 15.dp, end = 15.dp)
+          .height(50.dp),
       horizontalArrangement = Arrangement.SpaceBetween,
       verticalAlignment = Alignment.CenterVertically) {
         // Profile picture
         Image(
             modifier =
-                Modifier.size(40.dp)
-                    .clip(CircleShape)
-                    .background(color = MaterialTheme.colorScheme.background),
+            Modifier
+                .size(40.dp)
+                .clip(CircleShape)
+                .background(color = MaterialTheme.colorScheme.background),
             painter = painterResource(id = R.drawable.gomeet_logo),
             contentDescription = "profile picture",
             contentScale = ContentScale.None)
@@ -393,7 +417,9 @@ fun UserInviteWidget(
                               user.pendingRequests.minus(
                                   Invitation(event.eventID, status ?: InviteStatus.PENDING))))
             },
-            modifier = Modifier.height(26.dp).width(82.dp),
+            modifier = Modifier
+                .height(26.dp)
+                .width(82.dp),
             contentPadding = PaddingValues(vertical = 2.dp),
             shape = RoundedCornerShape(10.dp),
             colors =
