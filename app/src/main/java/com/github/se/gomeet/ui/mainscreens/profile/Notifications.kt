@@ -74,17 +74,19 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.text.SimpleDateFormat
 import java.time.LocalDate
+import java.time.ZoneId
+import java.util.Date
 import java.util.Locale
 import kotlinx.coroutines.launch
 
 @Composable
 fun Notifications(nav: NavigationActions, userId: String) {
-  val eventViewModel = EventViewModel(null, EventRepository(Firebase.firestore))
   val userViewModel = UserViewModel(UserRepository(Firebase.firestore))
+  val eventViewModel = EventViewModel(null, EventRepository(Firebase.firestore))
 
   var selectedFilter by remember { mutableStateOf("All") }
-  val event = remember { mutableStateOf<Event?>(null) }
   val user = remember { mutableStateOf<GoMeetUser?>(null) }
+  val event = remember { mutableStateOf<Event?>(null) }
   val coroutineScope = rememberCoroutineScope()
 
   LaunchedEffect(Unit) {
@@ -184,10 +186,10 @@ fun Notifications(nav: NavigationActions, userId: String) {
                         colors =
                             ButtonDefaults.buttonColors(
                                 containerColor =
-                                    if (selectedFilter == "MyEvents") DarkCyan
+                                    if (selectedFilter == "My events") DarkCyan
                                     else NavBarUnselected,
                                 contentColor =
-                                    if (selectedFilter == "MyEvents") Color.White else DarkCyan),
+                                    if (selectedFilter == "My events") Color.White else DarkCyan),
                         border = BorderStroke(1.dp, DarkCyan),
                         modifier = Modifier.testTag("MyEventsButton"))
                   }
@@ -215,13 +217,14 @@ fun Notifications(nav: NavigationActions, userId: String) {
                     }
                   }
 
-                  NotificationsWidget(
-                      userName = user.value?.username!!,
-                      eventName = event.value?.eventID!!,
-                      eventDate = event.value?.date!!,
-                      eventPicture = painter,
-                      organizerName = event.value?.creator!!,
-                      verified = true)
+                  event.value?.let { event ->
+                    NotificationsWidget(
+                        organizerName = event.creator,
+                        eventTitle = event.title,
+                        eventDate = event.date,
+                        eventPicture = painter,
+                        verified = true)
+                  }
 
                   Spacer(Modifier.height(10.dp))
                 }
@@ -232,9 +235,8 @@ fun Notifications(nav: NavigationActions, userId: String) {
 
 @Composable
 fun NotificationsWidget(
-    userName: String,
     organizerName: String,
-    eventName: String,
+    eventTitle: String,
     eventDate: LocalDate,
     eventPicture: Painter,
     verified: Boolean
@@ -249,7 +251,7 @@ fun NotificationsWidget(
   val bigTextSize = with(density) { screenWidth.toPx() / 60 }
   Row(Modifier.padding(start = 10.dp)) {
     Text(
-        text = userName,
+        text = organizerName,
         style =
             TextStyle(
                 fontSize = 11.sp,
@@ -289,7 +291,7 @@ fun NotificationsWidget(
                   horizontalAlignment = Alignment.Start, // Align text horizontally to center
                   verticalArrangement = Arrangement.Center) {
                     Text(
-                        text = eventName,
+                        text = eventTitle,
                         style =
                             TextStyle(
                                 fontSize = bigTextSize.sp,
@@ -352,7 +354,10 @@ fun NotificationsWidget(
                         }
 
                     // Convert the Date object to a formatted String
-                    val dateString = dateFormat.format(eventDate)
+                    val dateString =
+                        dateFormat.format(
+                            Date.from(eventDate.atStartOfDay(ZoneId.systemDefault()).toInstant()))
+
                     Column {
                       Text(
                           dateString,
