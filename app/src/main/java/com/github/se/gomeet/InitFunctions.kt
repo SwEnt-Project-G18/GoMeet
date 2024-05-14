@@ -194,7 +194,7 @@ fun InitNavigation(
       userIdState.value = Firebase.auth.currentUser!!.uid
       Create(navAction)
     }
-    composable(Route.NOTIFICATIONS) { Notifications(navAction, userId = userIdState.value) }
+    composable(Route.NOTIFICATIONS) { Notifications(navAction, currentUserID = userIdState.value) }
 
     composable(Route.PROFILE) {
       Profile(navAction, userId = userIdState.value, userViewModel, eventViewModel)

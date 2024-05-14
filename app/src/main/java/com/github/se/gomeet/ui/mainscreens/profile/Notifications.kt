@@ -80,7 +80,7 @@ import java.util.Locale
 import kotlinx.coroutines.launch
 
 @Composable
-fun Notifications(nav: NavigationActions, userId: String) {
+fun Notifications(nav: NavigationActions, currentUserID: String) {
   val userViewModel = UserViewModel(UserRepository(Firebase.firestore))
   val eventViewModel = EventViewModel(null, EventRepository(Firebase.firestore))
 
@@ -91,7 +91,7 @@ fun Notifications(nav: NavigationActions, userId: String) {
 
   LaunchedEffect(Unit) {
     coroutineScope.launch {
-      val currentUser = userViewModel.getUser(userId)
+      val currentUser = userViewModel.getUser(currentUserID)
 
       if (currentUser != null) {
         user.value = currentUser
@@ -432,5 +432,5 @@ fun NotificationsWidget(
 @Preview
 @Composable
 fun NotificationsPreview() {
-  Notifications(nav = NavigationActions(rememberNavController()), userId = "1234")
+  Notifications(nav = NavigationActions(rememberNavController()), currentUserID = "1234")
 }
