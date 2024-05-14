@@ -1,10 +1,12 @@
-package com.github.se.gomeet.ui.mainscreens.profile
+package com.github.se.gomeet.ui.mainscreens.profile.settings
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -105,15 +107,24 @@ fun SettingsScreen(
               SettingsSubtitle("Your app and media", Modifier.padding(15.dp).align(Alignment.Start))
 
               SettingsComposable(R.drawable.folder, "Suggested content")
-              SettingsComposable(R.drawable.mobile_friendly, "Device permissions")
+              SettingsComposable(
+                  R.drawable.mobile_friendly,
+                  "Device permissions",
+                  true,
+                  { nav.navigateToScreen(Route.PERMISSIONS) })
               SettingsComposable(R.drawable.check_icon, "Accessibility")
               SettingsComposable(R.drawable.language, "Language")
 
               SettingsSubtitle(
                   "More info and support", Modifier.padding(15.dp).align(Alignment.Start))
 
-              SettingsComposable(R.drawable.baseline_chat_bubble_outline_24, "Help")
-              SettingsComposable(R.drawable.gomeet_icon, "About")
+              SettingsComposable(
+                  R.drawable.baseline_chat_bubble_outline_24,
+                  "Help",
+                  true,
+                  { nav.navigateToScreen(Route.HELP) })
+              SettingsComposable(
+                  R.drawable.gomeet_icon, "About", true, { nav.navigateToScreen(Route.ABOUT) })
 
               Text(
                   text = "Log out",
@@ -145,15 +156,24 @@ fun SettingsScreen(
  * @param text The text for the item.
  */
 @Composable
-fun SettingsComposable(icon: Int, text: String) {
+fun SettingsComposable(
+    icon: Int,
+    text: String,
+    clickable: Boolean = false,
+    onClick: () -> Unit = {}
+) {
   Row(
-      modifier = Modifier.padding(start = 15.dp),
+      modifier =
+          Modifier.padding(start = 15.dp).let {
+            if (clickable) it.clickable(onClick = onClick) else it
+          }, // Add the clickable modifier here if clickable is true
       horizontalArrangement = Arrangement.Start,
       verticalAlignment = Alignment.CenterVertically) {
         Icon(
             painter = painterResource(id = icon),
             contentDescription = text + "icon",
-            tint = MaterialTheme.colorScheme.onBackground)
+            tint = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.size(24.dp))
 
         Text(
             text = text,

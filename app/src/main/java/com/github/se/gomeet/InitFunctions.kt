@@ -33,7 +33,10 @@ import com.github.se.gomeet.ui.mainscreens.profile.FollowingFollowers
 import com.github.se.gomeet.ui.mainscreens.profile.Notifications
 import com.github.se.gomeet.ui.mainscreens.profile.OthersProfile
 import com.github.se.gomeet.ui.mainscreens.profile.Profile
-import com.github.se.gomeet.ui.mainscreens.profile.SettingsScreen
+import com.github.se.gomeet.ui.mainscreens.profile.settings.SettingsAbout
+import com.github.se.gomeet.ui.mainscreens.profile.settings.SettingsHelp
+import com.github.se.gomeet.ui.mainscreens.profile.settings.SettingsPermissions
+import com.github.se.gomeet.ui.mainscreens.profile.settings.SettingsScreen
 import com.github.se.gomeet.ui.navigation.LOGIN_ITEMS
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
@@ -322,6 +325,9 @@ fun InitNavigation(
         }
 
     composable(Route.SETTINGS) { SettingsScreen(navAction) }
+    composable(Route.ABOUT) { SettingsAbout(navAction) }
+    composable(Route.HELP) { SettingsHelp(navAction) }
+    composable(Route.PERMISSIONS) { SettingsPermissions(navAction) }
     composable(Route.EDIT_PROFILE) { EditProfile(nav = navAction) }
     composable(
         route = Route.FOLLOWERS,
