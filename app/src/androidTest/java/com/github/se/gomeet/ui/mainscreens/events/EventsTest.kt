@@ -74,6 +74,7 @@ class EventsTest {
           date = LocalDate.now(), // Provide a valid date
           price = 10.0,
           url = "",
+          pendingParticipants = emptyList(),
           participants = emptyList(),
           visibleToIfPrivate = emptyList(),
           maxParticipants = 0,

@@ -21,7 +21,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.DropdownMenuItem
@@ -269,7 +269,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                         textAlign = TextAlign.Start,
                         style = MaterialTheme.typography.bodyMedium)
                     Icon(
-                        Icons.Default.KeyboardArrowRight,
+                        Icons.AutoMirrored.Filled.KeyboardArrowRight,
                         null,
                         modifier = Modifier.clickable { showPopup.value = true })
                   }
@@ -289,7 +289,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                           textAlign = TextAlign.Start,
                           style = MaterialTheme.typography.bodyMedium)
                       Icon(
-                          Icons.Default.KeyboardArrowRight,
+                          Icons.AutoMirrored.Filled.KeyboardArrowRight,
                           null,
                           modifier =
                               Modifier.clickable {
@@ -312,7 +312,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                         textAlign = TextAlign.Start,
                         style = MaterialTheme.typography.bodyMedium)
                     Icon(
-                        Icons.Default.KeyboardArrowRight,
+                        Icons.AutoMirrored.Filled.KeyboardArrowRight,
                         null,
                         modifier =
                             Modifier.clickable {
@@ -372,6 +372,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                                 url.value,
                                 listOf(),
                                 listOf(),
+                                listOf(),
                                 0,
                                 !isPrivateEvent.value,
                                 listOf(),
@@ -391,6 +392,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                             dateState!!,
                             price,
                             url.value,
+                            listOf(),
                             listOf(),
                             listOf(),
                             0,

@@ -95,7 +95,7 @@ fun Events(
   val coroutineScope = rememberCoroutineScope()
   val query = remember { mutableStateOf("") }
   val user = remember { mutableStateOf<GoMeetUser?>(null) }
-  var eventsLoaded = remember { mutableStateOf(false) }
+  val eventsLoaded = remember { mutableStateOf(false) }
 
   // Initial data loading using LaunchedEffect
   LaunchedEffect(Unit) {
@@ -103,9 +103,9 @@ fun Events(
       user.value = userViewModel.getUser(currentUser)
       val allEvents =
           eventViewModel.getAllEvents()!!.filter { e ->
-            (user.value!!.myEvents.contains(e.uid) ||
-                user.value!!.myFavorites.contains(e.uid) ||
-                user.value!!.joinedEvents.contains(e.uid)) && e.date.isAfter(LocalDate.now())
+            (user.value!!.myEvents.contains(e.eventID) ||
+                user.value!!.myFavorites.contains(e.eventID) ||
+                user.value!!.joinedEvents.contains(e.eventID)) && e.date.isAfter(LocalDate.now())
           }
       if (allEvents.isNotEmpty()) {
         eventList.addAll(allEvents)
@@ -217,7 +217,7 @@ fun Events(
 
                         // Loop through and display events that match the joined events criteria
                         eventList
-                            .filter { e -> user.value!!.myEvents.contains(e.uid) }
+                            .filter { e -> user.value!!.myEvents.contains(e.eventID) }
                             .forEach { event ->
                               if (event.title.contains(query.value, ignoreCase = true)) {
                                 val painter: Painter =
@@ -239,7 +239,7 @@ fun Events(
                                 EventWidget(
                                     userName = event.creator,
                                     eventName = event.title,
-                                    eventId = event.uid,
+                                    eventId = event.eventID,
                                     eventDescription = event.description,
                                     eventDate =
                                         Date.from(
@@ -303,7 +303,6 @@ fun Events(
                       // Display user's own events if 'All' or 'MyEvents' is selected
                       if (selectedFilter == "All" || selectedFilter == "MyEvents") {
                         Spacer(modifier = Modifier.height(screenHeight / 40))
-
                         Text(
                             text = "My Events",
                             style = MaterialTheme.typography.titleLarge,
@@ -331,7 +330,7 @@ fun Events(
                                     }
                                 EventWidget(
                                     userName = event.creator,
-                                    eventId = event.uid,
+                                    eventId = event.eventID,
                                     eventName = event.title,
                                     eventDescription = event.description,
                                     eventDate =

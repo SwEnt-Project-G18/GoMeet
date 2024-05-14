@@ -16,7 +16,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.github.se.gomeet.model.repository.EventRepository
-import com.github.se.gomeet.model.repository.InvitesRepository
 import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.ui.authscreens.LoginScreen
 import com.github.se.gomeet.ui.authscreens.WelcomeScreen
@@ -34,13 +33,15 @@ import com.github.se.gomeet.ui.mainscreens.profile.FollowingFollowers
 import com.github.se.gomeet.ui.mainscreens.profile.Notifications
 import com.github.se.gomeet.ui.mainscreens.profile.OthersProfile
 import com.github.se.gomeet.ui.mainscreens.profile.Profile
-import com.github.se.gomeet.ui.mainscreens.profile.SettingsScreen
+import com.github.se.gomeet.ui.mainscreens.profile.settings.SettingsAbout
+import com.github.se.gomeet.ui.mainscreens.profile.settings.SettingsHelp
+import com.github.se.gomeet.ui.mainscreens.profile.settings.SettingsPermissions
+import com.github.se.gomeet.ui.mainscreens.profile.settings.SettingsScreen
 import com.github.se.gomeet.ui.navigation.LOGIN_ITEMS
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.viewmodel.AuthViewModel
-import com.github.se.gomeet.viewmodel.EventInviteViewModel
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.android.gms.maps.model.LatLng
@@ -131,11 +132,9 @@ fun InitNavigation(
   val clientInitialisationState by client.clientState.initializationState.collectAsState()
   val eventRepository = EventRepository(db)
   val userRepository = UserRepository(db)
-  val invitesRepository = InvitesRepository(db)
   val authViewModel = AuthViewModel()
-  val eventViewModel = EventViewModel(null, eventRepository)
+  var eventViewModel = EventViewModel(null, eventRepository)
   val userViewModel = UserViewModel(userRepository)
-  val eventInviteViewModel = EventInviteViewModel(invitesRepository)
 
   return NavHost(navController = nav, startDestination = Route.WELCOME) {
     composable(Route.WELCOME) {
@@ -152,6 +151,7 @@ fun InitNavigation(
               val phoneNumber = authViewModel.signInState.value.phoneNumberRegister
               val country = authViewModel.signInState.value.countryRegister
               val username = authViewModel.signInState.value.usernameRegister
+              eventViewModel = EventViewModel(uid, eventRepository)
 
               userViewModel.createUserIfNew(
                   uid, username, firstName, lastName, email, phoneNumber, country)
@@ -196,7 +196,7 @@ fun InitNavigation(
       userIdState.value = Firebase.auth.currentUser!!.uid
       Create(navAction)
     }
-    composable(Route.NOTIFICATIONS) { Notifications(navAction) }
+    composable(Route.NOTIFICATIONS) { Notifications(navAction, currentUserID = userIdState.value) }
 
     composable(Route.PROFILE) {
       Profile(navAction, userId = userIdState.value, userViewModel, eventViewModel)
@@ -223,8 +223,7 @@ fun InitNavigation(
               nav = navAction,
               userId = userIdState.value,
               userViewModel = userViewModel,
-              eventId = eventId,
-              eventInviteViewModel = eventInviteViewModel)
+              eventId = eventId)
         }
 
     composable(
@@ -232,13 +231,7 @@ fun InitNavigation(
         arguments = listOf(navArgument("eventId") { type = NavType.StringType })) { entry ->
           val eventId = entry.arguments?.getString("eventId") ?: ""
 
-          ManageInvites(
-              userIdState.value,
-              eventId,
-              navAction,
-              userViewModel,
-              eventViewModel,
-              eventInviteViewModel)
+          ManageInvites(userIdState.value, eventId, navAction, userViewModel, eventViewModel)
         }
 
     composable(
@@ -277,7 +270,8 @@ fun InitNavigation(
               painterResource(id = R.drawable.gomeet_logo),
               description,
               loc,
-              userViewModel)
+              userViewModel,
+              eventViewModel)
         }
 
     composable(
@@ -331,6 +325,9 @@ fun InitNavigation(
         }
 
     composable(Route.SETTINGS) { SettingsScreen(navAction) }
+    composable(Route.ABOUT) { SettingsAbout(navAction) }
+    composable(Route.HELP) { SettingsHelp(navAction) }
+    composable(Route.PERMISSIONS) { SettingsPermissions(navAction) }
     composable(Route.EDIT_PROFILE) { EditProfile(nav = navAction) }
     composable(
         route = Route.FOLLOWERS,

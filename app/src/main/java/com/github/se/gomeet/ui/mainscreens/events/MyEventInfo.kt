@@ -32,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.R
+import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.repository.EventRepository
 import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.model.user.GoMeetUser
@@ -57,17 +58,22 @@ fun MyEventInfo(
     image: Painter = painterResource(id = R.drawable.gomeet_logo),
     description: String = "",
     loc: LatLng = LatLng(0.0, 0.0),
-    userViewModel: UserViewModel
+    userViewModel: UserViewModel,
+    eventViewModel: EventViewModel
 ) {
 
   val organizer = remember { mutableStateOf<GoMeetUser?>(null) }
   val currentUser = remember { mutableStateOf<GoMeetUser?>(null) }
+  val myEvent = remember { mutableStateOf<Event?>(null) }
 
   val coroutineScope = rememberCoroutineScope()
 
   LaunchedEffect(Unit) {
-    coroutineScope.launch { organizer.value = userViewModel.getUser(organizerId) }
-    currentUser.value = userViewModel.getUser(Firebase.auth.currentUser!!.uid)
+    coroutineScope.launch {
+      organizer.value = userViewModel.getUser(organizerId)
+      currentUser.value = userViewModel.getUser(Firebase.auth.currentUser!!.uid)
+      myEvent.value = eventViewModel.getEvent(eventId)
+    }
   }
 
   Log.d("EventInfo", "Organizer is $organizerId")
@@ -119,7 +125,13 @@ fun MyEventInfo(
                     date = date,
                     time = time)
                 Spacer(modifier = Modifier.height(20.dp))
-                EventButtons(currentUser.value!!, organizer.value!!, eventId, userViewModel, nav)
+                EventButtons(
+                    currentUser.value!!,
+                    organizer.value!!,
+                    eventId,
+                    userViewModel,
+                    eventViewModel,
+                    nav)
                 Spacer(modifier = Modifier.height(20.dp))
 
                 var imageUrl by remember { mutableStateOf<String?>(null) }
@@ -152,5 +164,8 @@ fun PreviewEventInfo() {
       time = "00:00",
       description = "Event Description",
       loc = LatLng(0.0, 0.0),
-      userViewModel = UserViewModel(userRepository = UserRepository(Firebase.firestore)))
+      userViewModel = UserViewModel(userRepository = UserRepository(Firebase.firestore)),
+      eventViewModel =
+          EventViewModel(
+              creatorId = "organiserid", eventRepository = EventRepository(Firebase.firestore)))
 }

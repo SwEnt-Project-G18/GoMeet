@@ -1,5 +1,7 @@
 package com.github.se.gomeet.model.user
 
+import com.github.se.gomeet.model.event.Invitation
+
 /**
  * This data class represents the user of the application. It contains the user's information.
  *
@@ -27,8 +29,8 @@ data class GoMeetUser(
     val country: String,
     val following: List<String>,
     val followers: List<String>,
-    val pendingRequests: List<String>,
-    val joinedEvents: List<String>,
+    val pendingRequests: Set<Invitation>, // For now, the requests are just invitations
+    var joinedEvents: List<String>,
     var myEvents: List<String>,
     var myFavorites: List<String>,
     var profilePicture: String = "",

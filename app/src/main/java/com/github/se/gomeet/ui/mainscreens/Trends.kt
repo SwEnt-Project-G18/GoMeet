@@ -151,7 +151,7 @@ fun Trends(
                       EventWidget(
                           userName = event.creator,
                           eventName = event.title,
-                          eventId = event.uid,
+                          eventId = event.eventID,
                           eventDescription = event.description,
                           eventDate =
                               Date.from(

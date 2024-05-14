@@ -5,8 +5,10 @@ import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.navigation.compose.rememberNavController
+import com.github.se.gomeet.model.repository.EventRepository
 import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.ui.navigation.NavigationActions
+import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.ktx.auth
@@ -37,7 +39,8 @@ class EventInfoTest {
           rating = eventRating,
           description = eventDescription,
           loc = eventLocation,
-          userViewModel = userVM)
+          userViewModel = userVM,
+          eventViewModel = eventVM)
     }
 
     assert(composeTestRule.onNodeWithTag("TopBar").isDisplayed(), { "TopBar not displayed" })
@@ -69,6 +72,7 @@ class EventInfoTest {
     private val eventDescription = "Event Description"
     private val eventLocation = LatLng(0.0, 0.0)
     private val userVM = UserViewModel(UserRepository(Firebase.firestore))
+    private val eventVM = EventViewModel(organiserId, EventRepository(Firebase.firestore))
     private val eventRating = 4.5
     private lateinit var currentUserId: String
 

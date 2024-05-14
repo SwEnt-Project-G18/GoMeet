@@ -98,7 +98,6 @@ import java.util.Locale
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import kotlinx.serialization.json.JsonNull.content
 
 private val defaultPosition = LatLng(46.51912357457158, 6.568023741881372)
 private const val defaultZoom = 16f
@@ -590,7 +589,7 @@ fun GoogleMapView(
                 val scaledPin = BitmapDescriptorFactory.fromBitmap(scaledBitmap)
 
                 val customPinBitmapDescriptor =
-                    if (isEventThisWeek) stablePins[event.uid] else scaledPin
+                    if (isEventThisWeek) stablePins[event.eventID] else scaledPin
 
                 MarkerInfoWindowContent(
                     state = eventStates[index],

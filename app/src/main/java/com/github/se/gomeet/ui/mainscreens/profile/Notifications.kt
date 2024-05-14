@@ -28,6 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -57,38 +58,46 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.github.se.gomeet.R
-import com.github.se.gomeet.model.event.InviteStatus
-import com.github.se.gomeet.model.event.UserInvitedToEvents
+import com.github.se.gomeet.model.event.Event
+import com.github.se.gomeet.model.repository.EventRepository
+import com.github.se.gomeet.model.repository.UserRepository
+import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.ui.theme.NavBarUnselected
+import com.github.se.gomeet.viewmodel.EventViewModel
+import com.github.se.gomeet.viewmodel.UserViewModel
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import java.text.SimpleDateFormat
-import java.util.Calendar
+import java.time.LocalDate
+import java.time.ZoneId
 import java.util.Date
 import java.util.Locale
+import kotlinx.coroutines.launch
 
 @Composable
-fun Notifications(nav: NavigationActions) {
+fun Notifications(nav: NavigationActions, currentUserID: String) {
+  val userViewModel = UserViewModel(UserRepository(Firebase.firestore))
+  val eventViewModel = EventViewModel(null, EventRepository(Firebase.firestore))
 
-  val initialState =
-      UserInvitedToEvents(user = "", invitedToEvents = mutableListOf("" to InviteStatus.PENDING))
   var selectedFilter by remember { mutableStateOf("All") }
-  val inviteList = remember { mutableStateOf(initialState) }
+  val user = remember { mutableStateOf<GoMeetUser?>(null) }
+  val event = remember { mutableStateOf<Event?>(null) }
   val coroutineScope = rememberCoroutineScope()
 
-  /*
   LaunchedEffect(Unit) {
-      coroutineScope.launch {
-          val allInvitedEvents = inviteViewModel.getUsersInvitedToEvent(userId)
-          if (allInvitedEvents != null) {
-              inviteList.value = allInvitedEvents
-          }
+    coroutineScope.launch {
+      val currentUser = userViewModel.getUser(currentUserID)
+
+      if (currentUser != null) {
+        user.value = currentUser
       }
+    }
   }
-  */
 
   // Define a function to handle button clicks
   fun onFilterButtonClick(filterType: String) {
@@ -124,8 +133,7 @@ fun Notifications(nav: NavigationActions) {
               Row(
                   verticalAlignment = Alignment.CenterVertically,
                   horizontalArrangement = Arrangement.Start,
-                  modifier =
-                      Modifier.testTag("Back").clickable { nav.navigateToScreen(Route.PROFILE) }) {
+                  modifier = Modifier.testTag("Back").clickable { nav.goBack() }) {
                     Icon(
                         painter = painterResource(id = R.drawable.arrow_back_24px),
                         contentDescription = "image description",
@@ -178,10 +186,10 @@ fun Notifications(nav: NavigationActions) {
                         colors =
                             ButtonDefaults.buttonColors(
                                 containerColor =
-                                    if (selectedFilter == "MyEvents") DarkCyan
+                                    if (selectedFilter == "My events") DarkCyan
                                     else NavBarUnselected,
                                 contentColor =
-                                    if (selectedFilter == "MyEvents") Color.White else DarkCyan),
+                                    if (selectedFilter == "My events") Color.White else DarkCyan),
                         border = BorderStroke(1.dp, DarkCyan),
                         modifier = Modifier.testTag("MyEventsButton"))
                   }
@@ -198,14 +206,28 @@ fun Notifications(nav: NavigationActions) {
                                       placeholder(R.drawable.gomeet_logo)
                                     })
                             .build())
-                NotificationsWidget(
-                    userName = "Bill Clinton",
-                    eventName = "Chess night",
-                    eventDate = Date(),
-                    eventPicture = painter,
-                    organizerName = "EPFL Chess Club",
-                    verified = true)
-                Spacer(Modifier.height(10.dp))
+
+                user.value?.pendingRequests?.forEach { invitation ->
+                  val eventName = invitation.eventId
+                  coroutineScope.launch {
+                    val currentEvent = eventViewModel.getEvent(eventName)
+
+                    if (currentEvent != null) {
+                      event.value = currentEvent
+                    }
+                  }
+
+                  event.value?.let { event ->
+                    NotificationsWidget(
+                        organizerName = event.creator,
+                        eventTitle = event.title,
+                        eventDate = event.date,
+                        eventPicture = painter,
+                        verified = true)
+                  }
+
+                  Spacer(Modifier.height(10.dp))
+                }
               }
             }
       }
@@ -213,10 +235,9 @@ fun Notifications(nav: NavigationActions) {
 
 @Composable
 fun NotificationsWidget(
-    userName: String,
     organizerName: String,
-    eventName: String,
-    eventDate: Date,
+    eventTitle: String,
+    eventDate: LocalDate,
     eventPicture: Painter,
     verified: Boolean
 ) {
@@ -230,7 +251,7 @@ fun NotificationsWidget(
   val bigTextSize = with(density) { screenWidth.toPx() / 60 }
   Row(Modifier.padding(start = 10.dp)) {
     Text(
-        text = userName,
+        text = organizerName,
         style =
             TextStyle(
                 fontSize = 11.sp,
@@ -270,7 +291,7 @@ fun NotificationsWidget(
                   horizontalAlignment = Alignment.Start, // Align text horizontally to center
                   verticalArrangement = Arrangement.Center) {
                     Text(
-                        text = eventName,
+                        text = eventTitle,
                         style =
                             TextStyle(
                                 fontSize = bigTextSize.sp,
@@ -308,16 +329,21 @@ fun NotificationsWidget(
                           }
                         }
 
-                    val currentDate = Calendar.getInstance()
-                    val startOfWeek = currentDate.clone() as Calendar
-                    startOfWeek[Calendar.DAY_OF_WEEK] = startOfWeek.firstDayOfWeek
-                    val endOfWeek = startOfWeek.clone() as Calendar
-                    endOfWeek.add(Calendar.DAY_OF_WEEK, 6)
+                    // Get the current date and time
+                    val currentDate = LocalDate.now()
 
-                    val eventCalendar = Calendar.getInstance().apply { time = eventDate }
+                    // Get the start of the week
+                    val startOfWeek = currentDate.with(java.time.DayOfWeek.MONDAY)
+
+                    // Get the end of the week
+                    val endOfWeek = startOfWeek.plusDays(6)
+
+                    // Convert eventDate to LocalDateTime (assuming eventDate has both date and
+                    // time)
+                    val eventDateTime = eventDate.atStartOfDay()
 
                     // Determine if the event date is within this week
-                    val isThisWeek = eventCalendar >= startOfWeek && eventCalendar <= endOfWeek
+                    val isThisWeek = eventDateTime.toLocalDate() in startOfWeek..endOfWeek
 
                     // Format based on whether the date is in the current week
                     val dateFormat =
@@ -328,7 +354,10 @@ fun NotificationsWidget(
                         }
 
                     // Convert the Date object to a formatted String
-                    val dateString = dateFormat.format(eventDate)
+                    val dateString =
+                        dateFormat.format(
+                            Date.from(eventDate.atStartOfDay(ZoneId.systemDefault()).toInstant()))
+
                     Column {
                       Text(
                           dateString,
@@ -346,7 +375,7 @@ fun NotificationsWidget(
                         Button(
                             onClick = {},
                             content = {
-                              Row() {
+                              Row {
                                 /*Icon(
                                 painter = painterResource(id = R.drawable.check_circle),
                                 contentDescription = "Accept",
@@ -403,5 +432,5 @@ fun NotificationsWidget(
 @Preview
 @Composable
 fun NotificationsPreview() {
-  Notifications(nav = NavigationActions(rememberNavController()))
+  Notifications(nav = NavigationActions(rememberNavController()), currentUserID = "1234")
 }
