@@ -62,7 +62,6 @@ import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
-import com.github.se.gomeet.ui.theme.NavBarUnselected
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.firestore.ktx.firestore
@@ -148,7 +147,11 @@ fun Events(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(innerPadding)) {
               Spacer(modifier = Modifier.height(5.dp))
-              GoMeetSearchBar(nav, query, MaterialTheme.colorScheme.tertiaryContainer, MaterialTheme.colorScheme.secondary)
+              GoMeetSearchBar(
+                  nav,
+                  query,
+                  MaterialTheme.colorScheme.tertiaryContainer,
+                  MaterialTheme.colorScheme.secondary)
               Spacer(modifier = Modifier.height(5.dp))
               Row(
                   verticalAlignment = Alignment.CenterVertically,
