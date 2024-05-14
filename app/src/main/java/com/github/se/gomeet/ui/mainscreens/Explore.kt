@@ -12,6 +12,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -200,47 +201,60 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
     }
   }
   Scaffold(bottomBar = { BottomNavigationFun(nav) }) { innerPadding ->
-    print(innerPadding)
     val backdropState = rememberBackdropScaffoldState(BackdropValue.Concealed)
     LaunchedEffect(backdropState) { backdropState.reveal() }
     val offset by backdropState.offset
-    val value = backdropState.currentValue
-    val halfHeightDp = LocalConfiguration.current.screenHeightDp / 2
+    val halfHeightDp = LocalConfiguration.current.screenHeightDp / 2.5
     val halfHeightPx = with(LocalDensity.current) { halfHeightDp.dp.toPx() }
 
     BackdropScaffold(
-        frontLayerBackgroundColor = MaterialTheme.colorScheme.background,
+        frontLayerBackgroundColor = Color.Transparent,
         backLayerBackgroundColor = MaterialTheme.colorScheme.background,
         backLayerContentColor = MaterialTheme.colorScheme.background,
         scaffoldState = backdropState,
         frontLayerScrimColor = Color.Unspecified,
         peekHeight = 0.dp,
         headerHeight = halfHeightDp.dp,
-        modifier = Modifier.testTag("ExploreScreen"),
+        modifier = Modifier
+            .testTag("ExploreScreen")
+            .padding(innerPadding),
         appBar = {},
         frontLayerContent = {
-          Box(modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp)) {
-            val listState = rememberLazyListState()
-            ContentInRow(
-                backdropState = backdropState,
-                halfHeightPx = halfHeightPx,
-                listState = listState,
-                eventList = eventList)
-            ContentInColumn(
-                backdropState = backdropState,
-                halfHeightPx = halfHeightPx,
-                listState = listState,
-                eventList = eventList)
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp)
+            ) {
+                val listState = rememberLazyListState()
+                Spacer(modifier = Modifier.height(8.dp))
+                Box(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    ContentInRow(
+                        backdropState = backdropState,
+                        halfHeightPx = halfHeightPx,
+                        listState = listState,
+                        eventList = eventList)
+                    ContentInColumn(
+                        backdropState = backdropState,
+                        halfHeightPx = halfHeightPx,
+                        listState = listState,
+                        eventList = eventList)
+                }
           }
         },
         backLayerContent = {
           Scaffold(
-              modifier = Modifier.fillMaxSize().alpha(offset / halfHeightPx),
+              modifier = Modifier
+                  .fillMaxSize()
+                  .alpha(offset / halfHeightPx),
               floatingActionButton = {
                 if (locationPermitted.value == true && isButtonVisible.value) {
                   FloatingActionButton(
                       onClick = { moveToCurrentLocation.value = CameraAction.ANIMATE },
-                      modifier = Modifier.size(45.dp).testTag("CurrentLocationButton"),
+                      modifier = Modifier
+                          .size(45.dp)
+                          .testTag("CurrentLocationButton"),
                       containerColor = DarkCyan) {
                         Icon(
                             imageVector = ImageVector.vectorResource(R.drawable.location_icon),
@@ -253,7 +267,9 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
                 if (isMapLoaded) {
                   moveToCurrentLocation.value = CameraAction.MOVE
 
-                  Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
+                  Box(modifier = Modifier
+                      .padding(innerPadding)
+                      .fillMaxSize()) {
                     GoogleMapView(
                         currentPosition = currentPosition,
                         events = eventList,
@@ -299,7 +315,8 @@ private fun ContentInColumn(
     eventList: MutableState<List<Event>>
 ) {
   val offset by backdropState.offset
-  val columnAlpha = ((halfHeightPx - offset) / halfHeightPx).coerceIn(0f..1f)
+
+    val columnAlpha = ((halfHeightPx - offset) / halfHeightPx).coerceIn(0f..1f)
   val events = eventList.value
   if (columnAlpha > 0) {
     Column {
@@ -311,7 +328,10 @@ private fun ContentInColumn(
             Card(
                 elevation = 4.dp,
                 modifier =
-                    Modifier.size(width = 360.dp, height = 200.dp).padding(8.dp).clickable {}) {
+                Modifier
+                    .size(width = 360.dp, height = 200.dp)
+                    .padding(8.dp)
+                    .clickable {}) {
                   val painter: Painter =
                       if (event.images.isNotEmpty()) {
                         rememberAsyncImagePainter(
@@ -335,14 +355,15 @@ private fun ContentInColumn(
                       contentScale = ContentScale.Crop)
                 }
             Spacer(Modifier.height(8.dp))
-            Text(
-                text =
-                    event.title +
-                        " - " +
-                        EventDateToString(
-                            Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant())),
-                modifier = Modifier.padding(start = 8.dp))
-            Text(text = event.description, modifier = Modifier.padding(start = 12.dp, top = 8.dp))
+              Column (modifier = Modifier.padding(8.dp)) {
+                  Text(
+                      text = event.title,
+                      style = MaterialTheme.typography.bodyLarge,
+                      color = MaterialTheme.colorScheme.tertiary)
+                  Text(text = eventDateToString(Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant())),
+                      style = MaterialTheme.typography.bodyMedium,
+                      color = MaterialTheme.colorScheme.tertiary)
+              }
           }
           Divider(modifier = Modifier.padding(top = 16.dp, bottom = 16.dp))
         }
@@ -351,74 +372,74 @@ private fun ContentInColumn(
   }
 }
 
+
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ContentInRow(
     backdropState: BackdropScaffoldState,
     halfHeightPx: Float,
     listState: LazyListState,
-    eventList: MutableState<List<Event>>
-) {
+    eventList: MutableState<List<Event>>) {
 
-  val offset by backdropState.offset
-  val rowAlpha = (offset / halfHeightPx).coerceIn(0f..1f)
-  val events = eventList.value
-  if (rowAlpha > 0) {
-    Column {
-      TopTitle(forColumn = false, alpha = rowAlpha)
-      LazyRow(modifier = Modifier.alpha(rowAlpha), state = listState) {
-        itemsIndexed(events) { _, event ->
-          Column {
-            Card(
-                elevation = 4.dp,
-                modifier =
-                    Modifier.size(width = 280.dp, height = 200.dp).padding(8.dp).clickable {}) {
-                  val painter: Painter =
-                      if (event.images.isNotEmpty()) {
-                        rememberAsyncImagePainter(
-                            ImageRequest.Builder(LocalContext.current)
-                                .data(data = event.images[0])
-                                .apply(
-                                    block =
-                                        fun ImageRequest.Builder.() {
-                                          crossfade(true)
-                                          placeholder(R.drawable.gomeet_logo)
-                                        })
-                                .build())
-                      } else {
-                        painterResource(id = R.drawable.gomeet_logo)
-                      }
-                  Image(
-                      painter = painter,
-                      contentDescription = "",
-                      modifier = Modifier.fillMaxSize(),
-                      alignment = Alignment.Center,
-                      contentScale = ContentScale.Crop)
+    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+    val offset by backdropState.offset
+    val rowAlpha = (offset / halfHeightPx).coerceIn(0f..1f)
+    val events = eventList.value
+    if (rowAlpha > 0) {
+        Column (
+            Modifier
+                .fillMaxSize()) {
+            TopTitle(forColumn = false, alpha = rowAlpha)
+            LazyRow(modifier = Modifier.alpha(rowAlpha), state = listState) {
+                itemsIndexed(events) { _, event ->
+                    Column (modifier = Modifier
+                        .padding(8.dp)
+                        .fillMaxWidth()){
+                        Card(
+                            elevation = 4.dp,
+                            modifier =
+                            Modifier
+                                .size(width = 280.dp, height = screenHeight / 4)
+                                .clickable {}) {
+                            val painter: Painter =
+                                if (event.images.isNotEmpty()) {
+                                    rememberAsyncImagePainter(
+                                        ImageRequest.Builder(LocalContext.current)
+                                            .data(data = event.images[0])
+                                            .apply(
+                                                block =
+                                                fun ImageRequest.Builder.() {
+                                                    crossfade(true)
+                                                    placeholder(R.drawable.gomeet_logo)
+                                                })
+                                            .build())
+                                } else {
+                                    painterResource(id = R.drawable.gomeet_logo)
+                                }
+                            Image(
+                                painter = painter,
+                                contentDescription = "",
+                                alignment = Alignment.Center,
+                                contentScale = ContentScale.Crop)
+                        }
+                        Column (modifier = Modifier.padding(8.dp)) {
+                            Text(
+                                text = event.title,
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.tertiary)
+                            Text(text = eventDateToString(Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant())),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.tertiary)
+                        }
+                    }
                 }
-            Spacer(Modifier.height(8.dp))
-            Text(
-                text =
-                    event.title +
-                        " - " +
-                        EventDateToString(
-                            Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant())),
-                modifier = Modifier.padding(start = 8.dp))
-            Text(text = event.description, modifier = Modifier.padding(start = 12.dp, top = 8.dp))
-          }
+            }
         }
-      }
     }
-  }
 }
 
 @Composable
-fun EventDateToString(eventDate: Date): String {
-  val configuration = LocalConfiguration.current
-  val screenWidth = configuration.screenWidthDp.dp
-  val density = LocalDensity.current
-
-  val smallTextSize = with(density) { screenWidth.toPx() / 85 }
-  val bigTextSize = with(density) { screenWidth.toPx() / 60 }
+fun eventDateToString(eventDate: Date): String {
 
   val currentDate = Calendar.getInstance()
   val startOfWeek = currentDate.clone() as Calendar
@@ -456,22 +477,26 @@ fun EventDateToString(eventDate: Date): String {
 private fun TopTitle(forColumn: Boolean, alpha: Float) {
   Column(
       modifier =
-          Modifier.padding(
-                  top = if (forColumn) 34.dp else 12.dp) // status bar 24dp in material guidance
-              .alpha(alpha = alpha)) {
-        Box(modifier = Modifier.fillMaxWidth()) {
+      Modifier
+          .padding(
+              top = if (forColumn) 34.dp else 12.dp, start = 10.dp
+          ) // status bar 24dp in material guidance
+          .alpha(alpha = alpha)
+          .fillMaxWidth()) {
           Box(
               modifier =
-                  Modifier.size(width = 48.dp, height = 3.dp)
-                      .clip(shape = RoundedCornerShape(12.dp))
-                      .background(color = Color.LightGray)
-                      .align(alignment = Alignment.Center))
-        }
+              Modifier
+                  .size(width = 48.dp, height = 3.dp)
+                  .clip(shape = RoundedCornerShape(12.dp))
+                  .background(color = Color.LightGray)
+                  .align(alignment = Alignment.CenterHorizontally))
+      Spacer(modifier = Modifier.height(LocalConfiguration.current.screenHeightDp.dp/80))
         Text(
-            modifier = Modifier.padding(top = 16.dp, bottom = 8.dp, start = 4.dp),
             text = "Trending Around You",
+            style = MaterialTheme.typography.titleMedium
         )
-      }
+      Spacer(modifier = Modifier.height(LocalConfiguration.current.screenHeightDp.dp/80))
+  }
 }
 
 /**
