@@ -1,7 +1,6 @@
 package com.github.se.gomeet.ui.mainscreens.create
 
 import android.util.Log
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -21,10 +20,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material3.Button
@@ -51,10 +48,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.se.gomeet.R
@@ -67,12 +61,8 @@ import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
-import com.github.se.gomeet.ui.theme.NavBarUnselected
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
-import java.util.concurrent.TimeUnit
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 /**
@@ -89,17 +79,16 @@ fun ManageInvites(
     eventViewModel: EventViewModel
 ) {
 
-    val pagerState = rememberPagerState(pageCount = {4})
-    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+  val pagerState = rememberPagerState(pageCount = { 4 })
+  val screenHeight = LocalConfiguration.current.screenHeightDp.dp
   val coroutineScope = rememberCoroutineScope()
   val user = remember { mutableStateOf<GoMeetUser?>(null) }
-  var isLoaded by remember {mutableStateOf(false)}
+  var isLoaded by remember { mutableStateOf(false) }
   val event = remember { mutableStateOf<Event?>(null) }
   val followersFollowingList = remember { mutableListOf<GoMeetUser>() }
-    val toUpdate = remember { mutableListOf<GoMeetUser>()}
+  val toUpdate = remember { mutableListOf<GoMeetUser>() }
 
-
-    LaunchedEffect(Unit) {
+  LaunchedEffect(Unit) {
     coroutineScope.launch {
       user.value = userViewModel.getUser(currentUser)
       event.value = eventViewModel.getEvent(currentEvent)
@@ -107,18 +96,18 @@ fun ManageInvites(
       val followers = user.value!!.followers
       if (followers.isNotEmpty()) {
         followers.forEach {
-            val followerUser = userViewModel.getUser(it)
-            followersFollowingList.add(followerUser!!)
+          val followerUser = userViewModel.getUser(it)
+          followersFollowingList.add(followerUser!!)
         }
       }
-        val following = user.value!!.following
-        if (following.isNotEmpty()) {
-            following.forEach {
-                val followingUser = userViewModel.getUser(it)
-                followersFollowingList.add(followingUser!!)
-            }
+      val following = user.value!!.following
+      if (following.isNotEmpty()) {
+        following.forEach {
+          val followingUser = userViewModel.getUser(it)
+          followersFollowingList.add(followingUser!!)
         }
-        isLoaded = true
+      }
+      isLoaded = true
     }
   }
 
@@ -133,202 +122,208 @@ fun ManageInvites(
             selectedItem = Route.EVENTS)
       },
       topBar = {
-          Column {
-              Box(contentAlignment = Alignment.Center) {
-                  Row(
-                      modifier = Modifier.fillMaxWidth(),
-                      verticalAlignment = Alignment.CenterVertically) {
-                      IconButton(onClick = {
-                          toUpdate.forEach{userViewModel.editUser(it)}
-                          nav.goBack()
-                      }) {
-                          Icon(
-                              Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = "Go back")
-                      }
-                  }
-                  Row(
-                      modifier = Modifier.fillMaxWidth(),
-                      verticalAlignment = Alignment.CenterVertically,
-                      horizontalArrangement = Arrangement.Center) {
-                      Text(
-                          text = "Manage Invites",
-                          style =
-                          MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold))
-                  }
-              }
-
-              Row(
-                  modifier = Modifier.fillMaxWidth(),
-                  verticalAlignment = Alignment.CenterVertically,
-                  horizontalArrangement = Arrangement.SpaceAround) {
-                  Box(
-                      contentAlignment = Alignment.Center,
-                      modifier =
-                      Modifier
-                          .weight(1f)
-                          .height(screenHeight / 20)
-                          .clickable {
-                              coroutineScope.launch { pagerState.animateScrollToPage(0) }
+        Column {
+          Box(contentAlignment = Alignment.Center) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically) {
+                  IconButton(
+                      onClick = {
+                        toUpdate.forEach { user ->
+                          userViewModel.editUser(user)
+                          if (user.pendingRequests.any { invitation ->
+                            invitation.eventId == event.value!!.eventID &&
+                                invitation.status == InviteStatus.PENDING
                           }) {
+                            eventViewModel.sendInvitation(event.value!!, user.uid)
+                          }
+                        }
+                        nav.goBack()
+                      }) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                            contentDescription = "Go back")
+                      }
+                }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center) {
+                  Text(
+                      text = "Manage Invites",
+                      style =
+                          MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold))
+                }
+          }
+
+          Row(
+              modifier = Modifier.fillMaxWidth(),
+              verticalAlignment = Alignment.CenterVertically,
+              horizontalArrangement = Arrangement.SpaceAround) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier =
+                        Modifier.weight(1f).height(screenHeight / 20).clickable {
+                          coroutineScope.launch { pagerState.animateScrollToPage(0) }
+                        }) {
                       Text(
                           text = "To Invite",
                           style =
-                          MaterialTheme.typography.bodyMedium.copy(
-                              fontWeight =
-                              if (pagerState.currentPage == 0) FontWeight.Bold
-                              else FontWeight.Normal))
-                  }
+                              MaterialTheme.typography.bodyMedium.copy(
+                                  fontWeight =
+                                      if (pagerState.currentPage == 0) FontWeight.Bold
+                                      else FontWeight.Normal))
+                    }
 
-                  // Right half of the screen
-                  Box(
-                      contentAlignment = Alignment.Center,
-                      modifier =
-                      Modifier
-                          .height(screenHeight / 20)
-                          .weight(1f)
-                          .clickable {
-                              coroutineScope.launch { pagerState.animateScrollToPage(1) }
-                          }) {
+                // Pending invitations
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier =
+                        Modifier.height(screenHeight / 20).weight(1f).clickable {
+                          coroutineScope.launch { pagerState.animateScrollToPage(1) }
+                        }) {
                       Text(
                           text = "Pending",
                           style =
-                          MaterialTheme.typography.bodyMedium.copy(
-                              fontWeight =
-                              if (pagerState.currentPage == 1) FontWeight.Bold
-                              else FontWeight.Normal))
-                  }
-                  Box(
-                      contentAlignment = Alignment.Center,
-                      modifier =
-                      Modifier
-                          .height(screenHeight / 20)
-                          .weight(1f)
-                          .clickable {
-                              coroutineScope.launch { pagerState.animateScrollToPage(2) }
-                          }) {
+                              MaterialTheme.typography.bodyMedium.copy(
+                                  fontWeight =
+                                      if (pagerState.currentPage == 1) FontWeight.Bold
+                                      else FontWeight.Normal))
+                    }
+
+                // Accepted invitations
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier =
+                        Modifier.height(screenHeight / 20).weight(1f).clickable {
+                          coroutineScope.launch { pagerState.animateScrollToPage(2) }
+                        }) {
                       Text(
                           text = "Accepted",
                           style =
-                          MaterialTheme.typography.bodyMedium.copy(
-                              fontWeight =
-                              if (pagerState.currentPage == 2) FontWeight.Bold
-                              else FontWeight.Normal))
-                  }
-                  Box(
-                      contentAlignment = Alignment.Center,
-                      modifier =
-                      Modifier
-                          .height(screenHeight / 20)
-                          .weight(1f)
-                          .clickable {
-                              coroutineScope.launch { pagerState.animateScrollToPage(3) }
-                          }) {
+                              MaterialTheme.typography.bodyMedium.copy(
+                                  fontWeight =
+                                      if (pagerState.currentPage == 2) FontWeight.Bold
+                                      else FontWeight.Normal))
+                    }
+
+                // Refused invitations
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier =
+                        Modifier.height(screenHeight / 20).weight(1f).clickable {
+                          coroutineScope.launch { pagerState.animateScrollToPage(3) }
+                        }) {
                       Text(
-                          text = "Rejected",
+                          text = "Refused",
                           style =
-                          MaterialTheme.typography.bodyMedium.copy(
-                              fontWeight =
-                              if (pagerState.currentPage == 3) FontWeight.Bold
-                              else FontWeight.Normal))
-                  }
+                              MaterialTheme.typography.bodyMedium.copy(
+                                  fontWeight =
+                                      if (pagerState.currentPage == 3) FontWeight.Bold
+                                      else FontWeight.Normal))
+                    }
               }
-              Canvas(
-                  modifier =
-                  Modifier
-                      .fillMaxWidth() // Ensures the Canvas takes up full screen width
+          Canvas(
+              modifier =
+                  Modifier.fillMaxWidth() // Ensures the Canvas takes up full screen width
                       .height(1.dp) // Sets the height of the Canvas to 1 dp
               ) {
-                  val canvasWidth = size.width
-                  drawLine(
-                      color = Color.Black,
-                      start =
-                      when (pagerState.currentPage) {
+                val canvasWidth = size.width
+                drawLine(
+                    color = Color.Black,
+                    start =
+                        when (pagerState.currentPage) {
                           0 -> Offset(x = 0f, y = 0f)
                           1 -> Offset(x = canvasWidth / 4, y = 0f)
                           2 -> Offset(x = canvasWidth / 2, y = 0f)
-                          else -> Offset(x = canvasWidth*3 / 4, y = 0f)
-                      },
-                      end =
-                      when (pagerState.currentPage) {
+                          else -> Offset(x = canvasWidth * 3 / 4, y = 0f)
+                        },
+                    end =
+                        when (pagerState.currentPage) {
                           0 -> Offset(x = canvasWidth / 4, y = 0f)
                           1 -> Offset(x = canvasWidth / 2, y = 0f)
-                          2 -> Offset(x = canvasWidth*3 / 4, y = 0f)
+                          2 -> Offset(x = canvasWidth * 3 / 4, y = 0f)
                           else -> Offset(x = canvasWidth, y = 0f)
-                      },
-                      strokeWidth = 5f)
+                        },
+                    strokeWidth = 5f)
               }
-              Spacer(modifier = Modifier.height(screenHeight / 30))
-          }
+          Spacer(modifier = Modifier.height(screenHeight / 30))
+        }
       }) { innerPadding ->
-      if (isLoaded){
-          HorizontalPager(state = pagerState, modifier = Modifier.padding(innerPadding)) {page ->
-                when (page) {
-                    0 -> {
-                        PageUserInvites(
-                            followersFollowingList.filter {
-                                u -> !u.pendingRequests.any {
-                                    invitation -> invitation.eventId == event.value!!.eventID}},
-                            event.value!!, null, callback = {
-                                toUpdate.add(it)
-                            })
-                    }
-                    1 -> {
-                        PageUserInvites(followersFollowingList.filter {
-                                u -> u.pendingRequests.any {
-                                invitation -> (invitation.eventId == event.value!!.eventID) && (invitation.status == InviteStatus.PENDING)}},
-                            event.value!!, InviteStatus.PENDING, callback = {
-                                toUpdate.add(it)
-                            })
-                    }
-                    2 -> {
-                        PageUserInvites(followersFollowingList.filter {
-                                u -> u.pendingRequests.any {
-                                invitation -> (invitation.eventId == event.value!!.eventID) && (invitation.status == InviteStatus.ACCEPTED)}},
-                            event.value!!, InviteStatus.ACCEPTED, callback = {
-                                toUpdate.add(it)
-                            })
-                    }
-                    3 -> {
-                        PageUserInvites(followersFollowingList.filter {
-                                u -> u.pendingRequests.any {
-                                invitation -> (invitation.eventId == event.value!!.eventID) && (invitation.status == InviteStatus.REFUSED)}},
-                            event.value!!, InviteStatus.REFUSED, callback = {
-                                toUpdate.add(it)
-                            })
-                    }
-                }
+        if (isLoaded) {
+          HorizontalPager(state = pagerState, modifier = Modifier.padding(innerPadding)) { page ->
+            when (page) {
+              0 -> {
+                PageUserInvites(
+                    followersFollowingList.filter { u ->
+                      !u.pendingRequests.any { invitation ->
+                        invitation.eventId == event.value!!.eventID
+                      }
+                    },
+                    event.value!!,
+                    null,
+                    callback = { toUpdate.add(it) })
+              }
+              1 -> {
+                PageUserInvites(
+                    followersFollowingList.filter { u ->
+                      u.pendingRequests.any { invitation ->
+                        (invitation.eventId == event.value!!.eventID) &&
+                            (invitation.status == InviteStatus.PENDING)
+                      }
+                    },
+                    event.value!!,
+                    InviteStatus.PENDING,
+                    callback = { toUpdate.add(it) })
+              }
+              2 -> {
+                PageUserInvites(
+                    followersFollowingList.filter { u ->
+                      u.pendingRequests.any { invitation ->
+                        (invitation.eventId == event.value!!.eventID) &&
+                            (invitation.status == InviteStatus.ACCEPTED)
+                      }
+                    },
+                    event.value!!,
+                    InviteStatus.ACCEPTED,
+                    callback = { toUpdate.add(it) })
+              }
+              3 -> {
+                PageUserInvites(
+                    followersFollowingList.filter { u ->
+                      u.pendingRequests.any { invitation ->
+                        (invitation.eventId == event.value!!.eventID) &&
+                            (invitation.status == InviteStatus.REFUSED)
+                      }
+                    },
+                    event.value!!,
+                    InviteStatus.REFUSED,
+                    callback = { toUpdate.add(it) })
+              }
+            }
           }
-      }else{
+        } else {
           Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-              CircularProgressIndicator()
+            CircularProgressIndicator()
           }
-      }
-
+        }
       }
 }
 
-
-
-
 @Composable
-fun PageUserInvites(list: List<GoMeetUser>,
-                    currentEvent: Event,
-                    status: InviteStatus?,
-                    callback : (GoMeetUser) -> Unit){
+fun PageUserInvites(
+    list: List<GoMeetUser>,
+    currentEvent: Event,
+    status: InviteStatus?,
+    callback: (GoMeetUser) -> Unit
+) {
 
-    Column(
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .fillMaxSize()) {
-        list.forEach { follower ->
-            UserInviteWidget(
-                follower,
-                currentEvent,
-                status,
-                callback)
-        }
-    }
+  Column(
+      verticalArrangement = Arrangement.Top,
+      horizontalAlignment = Alignment.CenterHorizontally,
+      modifier = Modifier.fillMaxSize()) {
+        list.forEach { follower -> UserInviteWidget(follower, currentEvent, status, callback) }
+      }
 }
 
 @Composable
@@ -336,24 +331,20 @@ fun UserInviteWidget(
     user: GoMeetUser,
     event: Event,
     status: InviteStatus?,
-    callback : (GoMeetUser) -> Unit
+    callback: (GoMeetUser) -> Unit
 ) {
 
-    var clicked by remember { mutableStateOf(false) }
+  var clicked by remember { mutableStateOf(false) }
   Row(
-      modifier = Modifier
-          .fillMaxWidth()
-          .padding(start = 15.dp, end = 15.dp)
-          .height(50.dp),
+      modifier = Modifier.fillMaxWidth().padding(start = 15.dp, end = 15.dp).height(50.dp),
       horizontalArrangement = Arrangement.SpaceBetween,
       verticalAlignment = Alignment.CenterVertically) {
         // Profile picture
         Image(
             modifier =
-            Modifier
-                .size(40.dp)
-                .clip(CircleShape)
-                .background(color = MaterialTheme.colorScheme.background),
+                Modifier.size(40.dp)
+                    .clip(CircleShape)
+                    .background(color = MaterialTheme.colorScheme.background),
             painter = painterResource(id = R.drawable.gomeet_logo),
             contentDescription = "profile picture",
             contentScale = ContentScale.None)
@@ -374,7 +365,9 @@ fun UserInviteWidget(
             color =
                 when (status) {
                   null -> MaterialTheme.colorScheme.onBackground
-                  InviteStatus.PENDING -> if (clicked) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.primary
+                  InviteStatus.PENDING ->
+                      if (clicked) MaterialTheme.colorScheme.onBackground
+                      else MaterialTheme.colorScheme.primary
                   InviteStatus.ACCEPTED -> Color.Green
                   InviteStatus.REFUSED -> Color.Red
                 })
@@ -382,22 +375,23 @@ fun UserInviteWidget(
         // Button to invite or cancel invitation
         Button(
             onClick = {
-                clicked = !clicked
-                val toAdd = (clicked && (status == null || status == InviteStatus.REFUSED)) ||
-                    (!clicked && (status == InviteStatus.PENDING || status == InviteStatus.ACCEPTED))
-                Log.d("ManageInvites", "toAdd: $toAdd, clicked: $clicked, status: $status")
-                callback(
-                    user.copy(
-                        pendingRequests =
-                        if (toAdd)
-                            user.pendingRequests.plus(Invitation(event.eventID, status?: InviteStatus.PENDING))
-                        else
-                            user.pendingRequests.minus(Invitation(event.eventID, status?: InviteStatus.PENDING))))
-
+              clicked = !clicked
+              val toAdd =
+                  (clicked && (status == null || status == InviteStatus.REFUSED)) ||
+                      (!clicked &&
+                          (status == InviteStatus.PENDING || status == InviteStatus.ACCEPTED))
+              Log.d("ManageInvites", "toAdd: $toAdd, clicked: $clicked, status: $status")
+              callback(
+                  user.copy(
+                      pendingRequests =
+                          if (toAdd)
+                              user.pendingRequests.plus(
+                                  Invitation(event.eventID, status ?: InviteStatus.PENDING))
+                          else
+                              user.pendingRequests.minus(
+                                  Invitation(event.eventID, status ?: InviteStatus.PENDING))))
             },
-            modifier = Modifier
-                .height(26.dp)
-                .width(82.dp),
+            modifier = Modifier.height(26.dp).width(82.dp),
             contentPadding = PaddingValues(vertical = 2.dp),
             shape = RoundedCornerShape(10.dp),
             colors =

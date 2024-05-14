@@ -64,15 +64,15 @@ fun MyEventInfo(
 
   val organizer = remember { mutableStateOf<GoMeetUser?>(null) }
   val currentUser = remember { mutableStateOf<GoMeetUser?>(null) }
-    val myEvent = remember { mutableStateOf<Event?>(null) }
+  val myEvent = remember { mutableStateOf<Event?>(null) }
 
   val coroutineScope = rememberCoroutineScope()
 
   LaunchedEffect(Unit) {
     coroutineScope.launch {
-        organizer.value = userViewModel.getUser(organizerId)
-        currentUser.value = userViewModel.getUser(Firebase.auth.currentUser!!.uid)
-        myEvent.value = eventViewModel.getEvent(eventId)
+      organizer.value = userViewModel.getUser(organizerId)
+      currentUser.value = userViewModel.getUser(Firebase.auth.currentUser!!.uid)
+      myEvent.value = eventViewModel.getEvent(eventId)
     }
   }
 
@@ -125,7 +125,13 @@ fun MyEventInfo(
                     date = date,
                     time = time)
                 Spacer(modifier = Modifier.height(20.dp))
-                EventButtons(currentUser.value!!, organizer.value!!, eventId, userViewModel, eventViewModel, nav)
+                EventButtons(
+                    currentUser.value!!,
+                    organizer.value!!,
+                    eventId,
+                    userViewModel,
+                    eventViewModel,
+                    nav)
                 Spacer(modifier = Modifier.height(20.dp))
 
                 var imageUrl by remember { mutableStateOf<String?>(null) }
@@ -159,7 +165,7 @@ fun PreviewEventInfo() {
       description = "Event Description",
       loc = LatLng(0.0, 0.0),
       userViewModel = UserViewModel(userRepository = UserRepository(Firebase.firestore)),
-      eventViewModel = EventViewModel(
-          creatorId = "organiserid",
-          eventRepository = EventRepository(Firebase.firestore)))
+      eventViewModel =
+          EventViewModel(
+              creatorId = "organiserid", eventRepository = EventRepository(Firebase.firestore)))
 }

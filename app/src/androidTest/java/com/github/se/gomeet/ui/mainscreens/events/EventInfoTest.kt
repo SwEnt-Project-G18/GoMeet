@@ -72,7 +72,7 @@ class EventInfoTest {
     private val eventDescription = "Event Description"
     private val eventLocation = LatLng(0.0, 0.0)
     private val userVM = UserViewModel(UserRepository(Firebase.firestore))
-      private val eventVM = EventViewModel(organiserId, EventRepository(Firebase.firestore))
+    private val eventVM = EventViewModel(organiserId, EventRepository(Firebase.firestore))
     private val eventRating = 4.5
     private lateinit var currentUserId: String
 

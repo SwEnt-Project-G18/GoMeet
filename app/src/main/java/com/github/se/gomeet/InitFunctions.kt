@@ -229,12 +229,7 @@ fun InitNavigation(
         arguments = listOf(navArgument("eventId") { type = NavType.StringType })) { entry ->
           val eventId = entry.arguments?.getString("eventId") ?: ""
 
-          ManageInvites(
-              userIdState.value,
-              eventId,
-              navAction,
-              userViewModel,
-              eventViewModel)
+          ManageInvites(userIdState.value, eventId, navAction, userViewModel, eventViewModel)
         }
 
     composable(

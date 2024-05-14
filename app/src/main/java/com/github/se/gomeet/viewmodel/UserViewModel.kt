@@ -201,8 +201,7 @@ class UserViewModel(userRepository: UserRepository) : ViewModel() {
       editUser(
           goMeetUser.copy(
               pendingRequests =
-                  goMeetUser.pendingRequests.plus(
-                      Invitation(eventId, InviteStatus.PENDING))))
+                  goMeetUser.pendingRequests.plus(Invitation(eventId, InviteStatus.PENDING))))
     } catch (e: Exception) {
       Log.w(ContentValues.TAG, "Couldn't get the invitation", e)
     }

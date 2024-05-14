@@ -90,9 +90,7 @@ fun EventHeader(
     time: String
 ) {
   Row(
-      modifier = Modifier
-          .fillMaxWidth()
-          .testTag("EventHeader"),
+      modifier = Modifier.fillMaxWidth().testTag("EventHeader"),
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.SpaceBetween) {
         Column {
@@ -107,15 +105,14 @@ fun EventHeader(
           Spacer(modifier = Modifier.height(5.dp))
           Text(
               modifier =
-              Modifier
-                  .clickable {
-                      if (organizer.uid == currentUser.uid) {
+                  Modifier.clickable {
+                        if (organizer.uid == currentUser.uid) {
                           nav.navigateToScreen(Route.PROFILE)
-                      } else {
+                        } else {
                           nav.navigateToScreen(Route.OTHERS_PROFILE.replace("{uid}", organizer.uid))
+                        }
                       }
-                  }
-                  .testTag("Username"),
+                      .testTag("Username"),
               text = organizer.username,
               style =
                   TextStyle(
@@ -184,16 +181,12 @@ fun EventImage(imageUrl: String?) {
                 .build())
       } else defaultImagePainter
 
-  Column(modifier = Modifier
-      .fillMaxWidth()
-      .testTag("EventImage")) {
+  Column(modifier = Modifier.fillMaxWidth().testTag("EventImage")) {
     Image(
         painter = imagePainter,
         contentDescription = "Event Image",
         contentScale = ContentScale.Crop,
-        modifier = Modifier
-            .aspectRatio(3f / 1.75f)
-            .clip(RoundedCornerShape(20.dp)))
+        modifier = Modifier.aspectRatio(3f / 1.75f).clip(RoundedCornerShape(20.dp)))
   }
 }
 
@@ -237,25 +230,22 @@ fun EventButtons(
     eventViewModel: EventViewModel,
     nav: NavigationActions
 ) {
-    val coroutineScope = rememberCoroutineScope()
-    val isFavorite = remember { mutableStateOf(currentUser.myFavorites.contains(eventId)) }
-    val currentEvent = remember { mutableStateOf<Event?>(null) }
-    val isJoined = remember { mutableStateOf(false) }
+  val coroutineScope = rememberCoroutineScope()
+  val isFavorite = remember { mutableStateOf(currentUser.myFavorites.contains(eventId)) }
+  val currentEvent = remember { mutableStateOf<Event?>(null) }
+  val isJoined = remember { mutableStateOf(false) }
 
-
-    LaunchedEffect(Unit) {
-        coroutineScope.launch {
-            currentEvent.value = eventViewModel.getEvent(eventId)
-            isJoined.value = currentUser.joinedEvents.contains(eventId) &&
-                    currentEvent.value!!.participants.contains(currentUser.uid)
-        }
+  LaunchedEffect(Unit) {
+    coroutineScope.launch {
+      currentEvent.value = eventViewModel.getEvent(eventId)
+      isJoined.value =
+          currentUser.joinedEvents.contains(eventId) &&
+              currentEvent.value!!.participants.contains(currentUser.uid)
     }
-
+  }
 
   Row(
-      modifier = Modifier
-          .fillMaxWidth()
-          .testTag("EventButton"),
+      modifier = Modifier.fillMaxWidth().testTag("EventButton"),
       horizontalArrangement = Arrangement.SpaceBetween) {
         TextButton(
             onClick = {
@@ -264,10 +254,12 @@ fun EventButtons(
               } else {
                 if (!isJoined.value) {
                   currentUser.joinedEvents = currentUser.joinedEvents.plus(eventId)
-                    currentEvent.value!!.participants = currentEvent.value!!.participants.plus(currentUser.uid)
+                  currentEvent.value!!.participants =
+                      currentEvent.value!!.participants.plus(currentUser.uid)
                 } else {
                   currentUser.joinedEvents = currentUser.joinedEvents.minus(eventId)
-                    currentEvent.value!!.participants = currentEvent.value!!.participants.minus(currentUser.uid)
+                  currentEvent.value!!.participants =
+                      currentEvent.value!!.participants.minus(currentUser.uid)
                 }
                 userViewModel.editUser(currentUser)
                 eventViewModel.editEvent(currentEvent.value!!)
@@ -363,11 +355,7 @@ fun MapViewComposable(
   // Set up the GoogleMap composable
   GoogleMap(
       modifier =
-      Modifier
-          .testTag("MapView")
-          .fillMaxWidth()
-          .height(200.dp)
-          .clip(RoundedCornerShape(20.dp)),
+          Modifier.testTag("MapView").fillMaxWidth().height(200.dp).clip(RoundedCornerShape(20.dp)),
       cameraPositionState = cameraPositionState) {
         Marker(
             state = markerState,
