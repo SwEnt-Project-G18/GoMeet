@@ -349,7 +349,11 @@ fun UserInviteWidget(
 
   var clicked by rememberSaveable { mutableStateOf(initialClicked) }
   Row(
-      modifier = Modifier.fillMaxWidth().padding(start = 15.dp, end = 15.dp).height(50.dp),
+      modifier =
+          Modifier.fillMaxWidth()
+              .padding(start = 15.dp, end = 15.dp)
+              .height(50.dp)
+              .testTag("UserInviteWidget"),
       horizontalArrangement = Arrangement.SpaceBetween,
       verticalAlignment = Alignment.CenterVertically) {
         // Profile picture

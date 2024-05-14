@@ -161,6 +161,7 @@ class EndToEndTest2 : TestCase() {
     @JvmStatic
     @BeforeClass
     fun setup() {
+      TimeUnit.SECONDS.sleep(3)
       runBlocking {
         // create two new users
         var result = Firebase.auth.createUserWithEmailAndPassword(email1, pwd1)

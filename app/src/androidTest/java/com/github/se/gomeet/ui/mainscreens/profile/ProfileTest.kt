@@ -4,7 +4,6 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
-import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.navigation.compose.rememberNavController
@@ -33,7 +32,7 @@ class ProfileTest {
     }
 
     composeTestRule.waitUntil(timeoutMillis = 10000) {
-      composeTestRule.onNodeWithContentDescription("Profile Picture").isDisplayed()
+      composeTestRule.onNodeWithTag("Profile Picture").isDisplayed()
     }
 
     composeTestRule.onNodeWithText("My Profile").assertIsDisplayed()

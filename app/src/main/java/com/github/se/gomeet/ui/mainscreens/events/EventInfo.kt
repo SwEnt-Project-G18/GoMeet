@@ -246,95 +246,91 @@ fun EventButtons(
     }
   }
 
-  Row(
-      modifier = Modifier.fillMaxWidth().testTag("EventButton"),
-      horizontalArrangement = Arrangement.SpaceBetween) {
-        TextButton(
-            onClick = {
-              if (organizer.uid.contentEquals(currentUid)) {
-                // TODO: GO TO EDIT EVENT PARAMETERS SCREEN
-              } else {
-                if (!isJoined.value) {
-                  currentUser.joinedEvents = currentUser.joinedEvents.plus(eventId)
-                  currentEvent.value!!.participants =
-                      currentEvent.value!!.participants.plus(currentUser.uid)
-                } else {
-                  currentUser.joinedEvents = currentUser.joinedEvents.minus(eventId)
-                  currentEvent.value!!.participants =
-                      currentEvent.value!!.participants.minus(currentUser.uid)
-                }
-                userViewModel.editUser(currentUser)
-                eventViewModel.editEvent(currentEvent.value!!)
-                isJoined.value = !isJoined.value
-              }
-            },
-            shape = RoundedCornerShape(20.dp),
-            modifier = Modifier.weight(1f),
-            colors =
-                ButtonDefaults.textButtonColors(
-                    containerColor = Color(0xFFECEFF1), contentColor = Color.Black)) {
-              if (organizer.uid.contentEquals(currentUid)) {
-                Text("Edit My Event")
-              } else {
-                if (isJoined.value) {
-                  Text("LeaveEvent")
-                } else {
-                  Text("JoinEvent")
-                }
-              }
+  Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+    TextButton(
+        onClick = {
+          if (organizer.uid.contentEquals(currentUid)) {
+            // TODO: GO TO EDIT EVENT PARAMETERS SCREEN
+          } else {
+            if (!isJoined.value) {
+              currentUser.joinedEvents = currentUser.joinedEvents.plus(eventId)
+              currentEvent.value!!.participants =
+                  currentEvent.value!!.participants.plus(currentUser.uid)
+            } else {
+              currentUser.joinedEvents = currentUser.joinedEvents.minus(eventId)
+              currentEvent.value!!.participants =
+                  currentEvent.value!!.participants.minus(currentUser.uid)
             }
-        if (organizer.uid.contentEquals(currentUid)) {
-          Spacer(modifier = Modifier.width(5.dp))
-          TextButton(
-              onClick = {
-                nav.navigateToScreen(Route.MANAGE_INVITES.replace("{eventId}", eventId))
-              },
-              shape = RoundedCornerShape(20.dp),
-              modifier = Modifier.weight(1f),
-              colors =
-                  ButtonDefaults.textButtonColors(
-                      containerColor = Color(0xFFECEFF1), contentColor = Color.Black)) {
-                Text("Add Participants")
-              }
-        }
-        if (organizer.uid != currentUid) {
-          IconButton(
-              onClick = {
-                nav.navigateToScreen(Route.MESSAGE.replace("{id}", Uri.encode(organizer.uid)))
-              }) {
-                Icon(
-                    imageVector =
-                        ImageVector.vectorResource(id = R.drawable.baseline_chat_bubble_outline_24),
-                    contentDescription = "Chat",
-                    modifier = Modifier.size(24.dp),
-                    tint = MaterialTheme.colorScheme.onBackground)
-              }
-        }
-        IconButton(
-            onClick = {
-              if (!isFavorite.value) {
-                currentUser.myFavorites = currentUser.myFavorites.plus(eventId)
-              } else {
-                currentUser.myFavorites = currentUser.myFavorites.minus(eventId)
-              }
-              userViewModel.editUser(currentUser)
-              isFavorite.value = !isFavorite.value
-            }) {
-              if (!isFavorite.value) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.heart),
-                    contentDescription = "Add to Favorites",
-                    modifier = Modifier.size(30.dp),
-                    tint = DarkCyan)
-              } else {
-                Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.redheart),
-                    contentDescription = "Remove from favorites",
-                    modifier = Modifier.size(30.dp),
-                    tint = DarkCyan)
-              }
+            userViewModel.editUser(currentUser)
+            eventViewModel.editEvent(currentEvent.value!!)
+            isJoined.value = !isJoined.value
+          }
+        },
+        shape = RoundedCornerShape(20.dp),
+        modifier = Modifier.weight(1f).testTag("EventButton"),
+        colors =
+            ButtonDefaults.textButtonColors(
+                containerColor = Color(0xFFECEFF1), contentColor = Color.Black)) {
+          if (organizer.uid.contentEquals(currentUid)) {
+            Text("Edit My Event")
+          } else {
+            if (isJoined.value) {
+              Text("LeaveEvent")
+            } else {
+              Text("JoinEvent")
             }
-      }
+          }
+        }
+    if (organizer.uid.contentEquals(currentUid)) {
+      Spacer(modifier = Modifier.width(5.dp))
+      TextButton(
+          onClick = { nav.navigateToScreen(Route.MANAGE_INVITES.replace("{eventId}", eventId)) },
+          shape = RoundedCornerShape(20.dp),
+          modifier = Modifier.weight(1f),
+          colors =
+              ButtonDefaults.textButtonColors(
+                  containerColor = Color(0xFFECEFF1), contentColor = Color.Black)) {
+            Text("Add Participants")
+          }
+    }
+    if (organizer.uid != currentUid) {
+      IconButton(
+          onClick = {
+            nav.navigateToScreen(Route.MESSAGE.replace("{id}", Uri.encode(organizer.uid)))
+          }) {
+            Icon(
+                imageVector =
+                    ImageVector.vectorResource(id = R.drawable.baseline_chat_bubble_outline_24),
+                contentDescription = "Chat",
+                modifier = Modifier.size(24.dp),
+                tint = MaterialTheme.colorScheme.onBackground)
+          }
+    }
+    IconButton(
+        onClick = {
+          if (!isFavorite.value) {
+            currentUser.myFavorites = currentUser.myFavorites.plus(eventId)
+          } else {
+            currentUser.myFavorites = currentUser.myFavorites.minus(eventId)
+          }
+          userViewModel.editUser(currentUser)
+          isFavorite.value = !isFavorite.value
+        }) {
+          if (!isFavorite.value) {
+            Icon(
+                imageVector = ImageVector.vectorResource(id = R.drawable.heart),
+                contentDescription = "Add to Favorites",
+                modifier = Modifier.size(30.dp),
+                tint = DarkCyan)
+          } else {
+            Icon(
+                imageVector = ImageVector.vectorResource(id = R.drawable.redheart),
+                contentDescription = "Remove from favorites",
+                modifier = Modifier.size(30.dp),
+                tint = DarkCyan)
+          }
+        }
+  }
 }
 
 /**
