@@ -150,8 +150,8 @@ fun Events(
               GoMeetSearchBar(
                   nav,
                   query,
-                  MaterialTheme.colorScheme.tertiaryContainer,
-                  MaterialTheme.colorScheme.secondary)
+                  MaterialTheme.colorScheme.primaryContainer,
+                  MaterialTheme.colorScheme.tertiary)
               Spacer(modifier = Modifier.height(5.dp))
               Row(
                   verticalAlignment = Alignment.CenterVertically,
@@ -159,7 +159,7 @@ fun Events(
                   modifier = Modifier.heightIn(min = 56.dp).fillMaxWidth()) {
                     Button(
                         onClick = { onFilterButtonClick("Joined") },
-                        content = { Text("JoinedEvents") },
+                        content = { Text("Joined Events") },
                         shape = RoundedCornerShape(10.dp),
                         colors =
                             if (selectedFilter == "Joined")
@@ -168,8 +168,8 @@ fun Events(
                                     contentColor = Color.White)
                             else
                                 ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                    contentColor = MaterialTheme.colorScheme.primary))
+                                    MaterialTheme.colorScheme.primaryContainer,
+                                    MaterialTheme.colorScheme.tertiary))
 
                     Button(
                         onClick = { onFilterButtonClick("Favourites") },
@@ -182,11 +182,11 @@ fun Events(
                                     contentColor = Color.White)
                             else
                                 ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                    contentColor = MaterialTheme.colorScheme.primary))
+                                    MaterialTheme.colorScheme.primaryContainer,
+                                    MaterialTheme.colorScheme.tertiary))
                     Button(
                         onClick = { onFilterButtonClick("MyEvents") },
-                        content = { Text("My events") },
+                        content = { Text("My Events") },
                         shape = RoundedCornerShape(10.dp),
                         colors =
                             if (selectedFilter == "MyEvents")
@@ -195,8 +195,8 @@ fun Events(
                                     contentColor = Color.White)
                             else
                                 ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                    contentColor = MaterialTheme.colorScheme.primary))
+                                    MaterialTheme.colorScheme.primaryContainer,
+                                    MaterialTheme.colorScheme.tertiary))
                   }
 
               if (!eventsLoaded.value) {
@@ -402,7 +402,7 @@ fun GoMeetSearchBar(
                     TextFieldDefaults.colors(
                         focusedTextColor = contentColor,
                         unfocusedTextColor = contentColor,
-                        cursorColor = DarkCyan,
+                        cursorColor = MaterialTheme.colorScheme.outlineVariant,
                     ),
             ),
         onActiveChange = {},
