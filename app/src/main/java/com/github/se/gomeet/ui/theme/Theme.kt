@@ -21,16 +21,20 @@ private val DarkColorScheme =
         background = Color.Black,
         outline = DarkCyan,
         primaryContainer = LightGray,
-        outlineVariant = DodgerBlue,
+        secondaryContainer = DarkCyan,
+        tertiaryContainer = Color(0xFFEEEEEE),
+        outlineVariant = DarkCyan,
     )
 
 private val LightColorScheme =
     lightColorScheme(
         primary = Grey,
-        secondary = NavBarUnselected,
+        secondary = DarkGrey,
         tertiary = DarkGrey,
         background = White,
         primaryContainer = LightGray,
+        secondaryContainer = LightGray,
+        tertiaryContainer = Color(0xFFEEEEEE),
         outline = Cyan,
         outlineVariant = DodgerBlue,
 

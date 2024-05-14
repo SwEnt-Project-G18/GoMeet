@@ -148,7 +148,7 @@ fun Events(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(innerPadding)) {
               Spacer(modifier = Modifier.height(5.dp))
-              GoMeetSearchBar(nav, query, NavBarUnselected, MaterialTheme.colorScheme.tertiary)
+              GoMeetSearchBar(nav, query, MaterialTheme.colorScheme.tertiaryContainer, MaterialTheme.colorScheme.secondary)
               Spacer(modifier = Modifier.height(5.dp))
               Row(
                   verticalAlignment = Alignment.CenterVertically,

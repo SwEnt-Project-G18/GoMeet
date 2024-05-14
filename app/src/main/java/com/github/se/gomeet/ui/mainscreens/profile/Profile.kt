@@ -185,7 +185,7 @@ fun Profile(
                       // Edit Profile button
                       Button(
                           onClick = { nav.navigateToScreen(Route.EDIT_PROFILE) },
-                          modifier = Modifier.height(screenHeight / 25).width(screenWidth * 4 / 11),
+                          modifier = Modifier.height(37.dp).width(screenWidth * 4 / 11),
                           shape = RoundedCornerShape(10.dp),
                           colors =
                               ButtonDefaults.buttonColors(
@@ -195,7 +195,7 @@ fun Profile(
 
                       Button(
                           onClick = { /*TODO*/},
-                          modifier = Modifier.height(screenHeight / 25).width(screenWidth * 4 / 11),
+                          modifier = Modifier.height(37.dp).width(screenWidth * 4 / 11),
                           shape = RoundedCornerShape(10.dp),
                           colors =
                               ButtonDefaults.buttonColors(
@@ -205,7 +205,7 @@ fun Profile(
 
                       Button(
                           onClick = { /*TODO*/},
-                          modifier = Modifier.height(screenHeight / 25),
+                          modifier = Modifier.height(37.dp),
                           shape = RoundedCornerShape(10.dp),
                           colors =
                               ButtonDefaults.buttonColors(

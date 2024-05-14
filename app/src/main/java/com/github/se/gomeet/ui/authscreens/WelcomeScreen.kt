@@ -24,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -77,6 +78,7 @@ fun WelcomeScreen(
         Spacer(modifier = Modifier.size(screenHeight / 30))
 
         Image(
+            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.tertiary),
             painter = painterResource(id = R.drawable.gomeet_text),
             contentDescription = "GoMeet Logo")
 
@@ -111,7 +113,7 @@ fun WelcomeScreen(
 
         Spacer(modifier = Modifier.size(10.dp))
         OutlinedButton(
-            onClick = { onNavToLogin() },
+            onClick = { onNavToRegister() },
             modifier = Modifier.width((screenWidth / 1.5.dp).dp).height(screenHeight / 17),
             shape = RoundedCornerShape(10.dp),
             border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),

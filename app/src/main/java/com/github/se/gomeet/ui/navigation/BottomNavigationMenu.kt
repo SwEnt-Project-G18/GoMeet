@@ -61,7 +61,7 @@ fun BottomNavigationMenu(
           colors =
               NavigationBarItemDefaults.colors(
                   unselectedIconColor = MaterialTheme.colorScheme.primary,
-                  unselectedTextColor = MaterialTheme.colorScheme.onBackground,
+                  unselectedTextColor = MaterialTheme.colorScheme.primary,
                   selectedTextColor = MaterialTheme.colorScheme.tertiary,
                   selectedIconColor = MaterialTheme.colorScheme.tertiary,
                   indicatorColor = TranslucentCyan))
