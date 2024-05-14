@@ -130,7 +130,8 @@ fun EventWidget(
                     // TODO: add image
                     )
               },
-      colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
+      colors =
+          CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
   ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
