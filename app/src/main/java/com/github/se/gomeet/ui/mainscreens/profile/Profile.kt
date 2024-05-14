@@ -40,7 +40,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
@@ -190,7 +189,7 @@ fun Profile(
                           colors =
                               ButtonDefaults.buttonColors(
                                   containerColor = MaterialTheme.colorScheme.primaryContainer)) {
-                            Text(text = "Edit Profile", color = Color.Black)
+                            Text(text = "Edit Profile", color = MaterialTheme.colorScheme.tertiary)
                           }
 
                       Button(
@@ -200,7 +199,7 @@ fun Profile(
                           colors =
                               ButtonDefaults.buttonColors(
                                   containerColor = MaterialTheme.colorScheme.primaryContainer)) {
-                            Text(text = "Share Profile", color = Color.Black)
+                            Text(text = "Share Profile", color = MaterialTheme.colorScheme.tertiary)
                           }
 
                       Button(
@@ -213,7 +212,7 @@ fun Profile(
                             Icon(
                                 imageVector = ImageVector.vectorResource(R.drawable.add_friend),
                                 contentDescription = "Settings",
-                                tint = Color.Black)
+                                tint = MaterialTheme.colorScheme.tertiary)
                           }
                     }
 
