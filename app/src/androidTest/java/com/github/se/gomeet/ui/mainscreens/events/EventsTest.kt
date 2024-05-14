@@ -36,12 +36,12 @@ class EventsTest {
           eventViewModel = EventViewModel("test", EventRepository(Firebase.firestore)))
     }
 
-    composeTestRule.onNode(hasText("My events")).assertIsDisplayed()
     composeTestRule.onAllNodesWithText("Favourites")[0].assertIsDisplayed()
     composeTestRule.onAllNodesWithText("Favourites")[1].assertIsDisplayed()
     composeTestRule.onAllNodesWithText("Joined Events")[0].assertIsDisplayed()
-    composeTestRule.onAllNodesWithText("Joined Events")[0].assertIsDisplayed()
-    composeTestRule.onAllNodesWithText("My events")[0].assertIsDisplayed()
+    composeTestRule.onAllNodesWithText("Joined Events")[1].assertIsDisplayed()
+    composeTestRule.onAllNodesWithText("My Events")[0].assertIsDisplayed()
+    composeTestRule.onAllNodesWithText("My Events")[1].assertIsDisplayed()
   }
 
   @Test
@@ -56,9 +56,9 @@ class EventsTest {
               EventViewModel("NEEGn5cbkJZDXaezeGdfd2D4u6b2", EventRepository(Firebase.firestore)))
     }
 
-    composeTestRule.onNodeWithText("JoinedEvents").performClick()
-    composeTestRule.onNodeWithText("Favourites").performClick()
-    composeTestRule.onNodeWithText("My events").performClick()
+    composeTestRule.onAllNodesWithText("Joined Events")[0].performClick()
+    composeTestRule.onAllNodesWithText("Favourites")[0].performClick()
+    composeTestRule.onAllNodesWithText("My Events")[0].performClick()
   }
 
   @Test

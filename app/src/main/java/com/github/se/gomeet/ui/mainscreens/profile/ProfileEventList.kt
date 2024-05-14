@@ -29,6 +29,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
@@ -56,7 +57,9 @@ fun ProfileEventsList(
 ) {
   Column(Modifier.fillMaxWidth().padding(start = 15.dp)) {
     Row(Modifier.testTag("EventsListHeader"), verticalAlignment = Alignment.CenterVertically) {
-      Text(text = title, style = MaterialTheme.typography.titleLarge)
+      Text(
+          text = title,
+          style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.W400))
       Spacer(modifier = Modifier.width(10.dp))
       ClickableText(
           style =
@@ -65,7 +68,9 @@ fun ProfileEventsList(
           },
           text = AnnotatedString(text = "View All >"))
     }
+
     Spacer(modifier = Modifier.height(5.dp))
+
     LazyRow(
         state = listState,
         verticalAlignment = Alignment.CenterVertically,
@@ -146,11 +151,7 @@ fun ProfileEventsList(
                               .clip(RoundedCornerShape(size = 10.dp)))
                   Spacer(modifier = Modifier.height(2.dp))
 
-                  Text(
-                      text = event.title,
-                      style =
-                          MaterialTheme.typography.bodyLarge.copy(
-                              color = MaterialTheme.colorScheme.outline))
+                  Text(text = event.title, style = MaterialTheme.typography.bodyLarge)
                   Text(
                       text = event.date.toString(),
                       style =

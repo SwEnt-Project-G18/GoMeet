@@ -1,7 +1,7 @@
 package com.github.se.gomeet.ui.authscreens
 
 import androidx.activity.ComponentActivity
-import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
@@ -34,15 +34,10 @@ class WelcomeScreenTest {
 
     rule.setContent { WelcomeScreen({}, {}, {}) }
 
-    rule.onNodeWithContentDescription("GoMeet Logo").assertExists()
-
-    rule.onNodeWithText("Log in").assertExists().assertIsEnabled()
-
-    rule.onNodeWithText("Create account").assertExists().assertIsEnabled()
-
-    // Directly interact with the UI elements
-    rule.onNodeWithText("Continue with Google").assertExists().performClick()
-
+    rule.onNodeWithContentDescription("GoMeet Logo").assertIsDisplayed()
+    rule.onNodeWithText("Log In").assertExists().assertIsDisplayed()
+    rule.onNodeWithText("Sign Up").assertExists().assertIsDisplayed()
+    rule.onNodeWithContentDescription("Google logo").assertIsDisplayed().performClick()
     // Assert that an Intent to Google Mobile Services has been sent
     intended(toPackage("com.google.android.gms"))
   }

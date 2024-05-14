@@ -40,13 +40,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -120,32 +120,39 @@ fun Profile(
             selectedItem = Route.PROFILE)
       },
       topBar = {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-          Spacer(Modifier.width(15.dp))
-          Text(text = "My Profile", style = MaterialTheme.typography.headlineMedium)
-          Spacer(Modifier.weight(1f))
-          IconButton(
-              modifier = Modifier.align(Alignment.CenterVertically),
-              onClick = { nav.navigateToScreen(Route.NOTIFICATIONS) }) {
-                Icon(
-                    Icons.Outlined.Notifications,
-                    contentDescription = "Notifications",
-                    modifier = Modifier.size(screenHeight / 28).align(Alignment.CenterVertically),
-                    tint = MaterialTheme.colorScheme.onBackground)
-              }
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(start = screenWidth / 15, top = screenHeight / 30)) {
+              Text(
+                  text = "My Profile",
+                  style =
+                      MaterialTheme.typography.headlineMedium.copy(
+                          fontWeight = FontWeight.SemiBold))
+              Spacer(Modifier.weight(1f))
+              IconButton(
+                  modifier = Modifier.align(Alignment.CenterVertically),
+                  onClick = { nav.navigateToScreen(Route.NOTIFICATIONS) }) {
+                    Icon(
+                        Icons.Outlined.Notifications,
+                        contentDescription = "Notifications",
+                        modifier =
+                            Modifier.size(screenHeight / 28).align(Alignment.CenterVertically),
+                        tint = MaterialTheme.colorScheme.onBackground)
+                  }
 
-          IconButton(
-              modifier = Modifier.align(Alignment.CenterVertically).padding(end = 15.dp),
-              onClick = {
-                nav.navigateTo(SECOND_LEVEL_DESTINATION.first { it.route == Route.SETTINGS })
-              }) {
-                Icon(
-                    Icons.Outlined.Settings,
-                    contentDescription = "Settings",
-                    modifier = Modifier.size(screenHeight / 28).align(Alignment.CenterVertically),
-                    tint = MaterialTheme.colorScheme.onBackground)
-              }
-        }
+              IconButton(
+                  modifier = Modifier.align(Alignment.CenterVertically).padding(end = 15.dp),
+                  onClick = {
+                    nav.navigateTo(SECOND_LEVEL_DESTINATION.first { it.route == Route.SETTINGS })
+                  }) {
+                    Icon(
+                        Icons.Outlined.Settings,
+                        contentDescription = "Settings",
+                        modifier =
+                            Modifier.size(screenHeight / 28).align(Alignment.CenterVertically),
+                        tint = MaterialTheme.colorScheme.onBackground)
+                  }
+            }
       }) { innerPadding ->
         if (isProfileLoaded) {
           Column(
@@ -177,27 +184,27 @@ fun Profile(
                       // Edit Profile button
                       Button(
                           onClick = { nav.navigateToScreen(Route.EDIT_PROFILE) },
-                          modifier = Modifier.height(screenHeight / 25).width(screenWidth * 4 / 11),
+                          modifier = Modifier.height(37.dp).width(screenWidth * 4 / 11),
                           shape = RoundedCornerShape(10.dp),
                           colors =
                               ButtonDefaults.buttonColors(
                                   containerColor = MaterialTheme.colorScheme.primaryContainer)) {
-                            Text(text = "Edit Profile", color = Color.Black)
+                            Text(text = "Edit Profile", color = MaterialTheme.colorScheme.tertiary)
                           }
 
                       Button(
                           onClick = { /*TODO*/},
-                          modifier = Modifier.height(screenHeight / 25).width(screenWidth * 4 / 11),
+                          modifier = Modifier.height(37.dp).width(screenWidth * 4 / 11),
                           shape = RoundedCornerShape(10.dp),
                           colors =
                               ButtonDefaults.buttonColors(
                                   containerColor = MaterialTheme.colorScheme.primaryContainer)) {
-                            Text(text = "Share Profile", color = Color.Black)
+                            Text(text = "Share Profile", color = MaterialTheme.colorScheme.tertiary)
                           }
 
                       Button(
                           onClick = { /*TODO*/},
-                          modifier = Modifier.height(screenHeight / 25),
+                          modifier = Modifier.height(37.dp),
                           shape = RoundedCornerShape(10.dp),
                           colors =
                               ButtonDefaults.buttonColors(
@@ -205,7 +212,7 @@ fun Profile(
                             Icon(
                                 imageVector = ImageVector.vectorResource(R.drawable.add_friend),
                                 contentDescription = "Settings",
-                                tint = Color.Black)
+                                tint = MaterialTheme.colorScheme.tertiary)
                           }
                     }
 
@@ -276,8 +283,8 @@ fun Profile(
                             colors =
                                 ButtonDefaults.buttonColors(
                                     containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                    contentColor = MaterialTheme.colorScheme.outline),
-                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+                                    contentColor = MaterialTheme.colorScheme.outlineVariant),
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
                         )
                       }
                     }
