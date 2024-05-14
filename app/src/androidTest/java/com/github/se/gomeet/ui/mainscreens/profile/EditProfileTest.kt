@@ -18,6 +18,8 @@ class EditProfileTest {
   fun testEditProfile() {
     composeTestRule.setContent { EditProfile(NavigationActions(rememberNavController())) }
 
+    composeTestRule.waitForIdle()
+
     composeTestRule.onNodeWithContentDescription("Profile Picture").assertIsDisplayed()
     composeTestRule.onNodeWithText("First Name").performScrollTo().assertIsDisplayed()
     composeTestRule.onNodeWithText("Last Name").performScrollTo().assertIsDisplayed()

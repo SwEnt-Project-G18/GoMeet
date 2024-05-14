@@ -55,6 +55,8 @@ class LoginScreenTest {
       LoginScreen(authViewModel, NavigationActions(rememberNavController())) {}
     }
 
+    composeTestRule.waitForIdle()
+
     // Test the UI elements
     composeTestRule.onNodeWithContentDescription("GoMeet").assertIsDisplayed()
     composeTestRule.onNodeWithText("Login").assertIsDisplayed()

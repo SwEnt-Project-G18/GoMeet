@@ -99,7 +99,8 @@ fun Profile(
     coroutineScope.launch {
       currentUser = userViewModel.getUser(userId) ?: NULL_USER
       val allEvents =
-          eventViewModel.getAllEvents()!!.filter { e -> currentUser!!.myEvents.contains(e.eventID) }
+          eventViewModel.getAllEvents()
+              ?: emptyList<Event>().filter { e -> currentUser!!.myEvents.contains(e.eventID) }
       allEvents.forEach {
         if (it.date.isAfter(LocalDate.now())) {
           myEventList.add(it)

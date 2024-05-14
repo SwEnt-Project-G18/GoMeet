@@ -27,6 +27,8 @@ class EventsTest {
           EventViewModel("null", EventRepository(Firebase.firestore)))
     }
 
+    composeTestRule.waitForIdle()
+
     composeTestRule.onNodeWithText("Search").assertIsDisplayed()
     composeTestRule.onNodeWithTag("JoinedButton").assertIsDisplayed().performClick().performClick()
     composeTestRule

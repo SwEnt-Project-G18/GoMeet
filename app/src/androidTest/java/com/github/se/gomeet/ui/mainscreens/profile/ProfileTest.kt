@@ -30,6 +30,8 @@ class ProfileTest {
           EventViewModel("null", EventRepository(Firebase.firestore)))
     }
 
+    composeTestRule.waitForIdle()
+
     composeTestRule.onNodeWithText("My Profile").assertIsDisplayed()
     composeTestRule.onNodeWithTag("Profile Picture").assertIsDisplayed()
     composeTestRule.onNodeWithText("Edit Profile").assertIsDisplayed()

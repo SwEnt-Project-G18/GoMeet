@@ -118,10 +118,7 @@ fun TagsSelector(title: String, tags: MutableState<List<String>>, onSave: () -> 
                   if (tags.value.contains(tag.name)) {
                     Button(
                         onClick = { tags.value = tags.value.minus(tag.name) },
-                        modifier =
-                            Modifier.padding(end = 15.dp, bottom = 5.dp)
-                                .wrapContentSize()
-                                .testTag("Tag"),
+                        modifier = Modifier.padding(end = 15.dp, bottom = 5.dp).wrapContentSize(),
                         colors =
                             ButtonDefaults.buttonColors(
                                 containerColor = DarkCyan, contentColor = Color.White),

@@ -18,6 +18,8 @@ class NotificationsTest {
     // Test the Notifications screen
     composeTestRule.setContent { Notifications(NavigationActions(rememberNavController()), "1234") }
 
+    composeTestRule.waitForIdle()
+
     composeTestRule.onNodeWithTag("TopBar").assertIsDisplayed()
     composeTestRule.onNodeWithTag("Back").assertIsDisplayed()
     composeTestRule.onNodeWithTag("AllButton").assertIsDisplayed().assertIsEnabled()

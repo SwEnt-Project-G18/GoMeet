@@ -52,6 +52,7 @@ import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.model.user.GoMeetUser
+import com.github.se.gomeet.model.user.NULL_USER
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.viewmodel.UserViewModel
@@ -89,7 +90,7 @@ fun FollowingFollowers(
 
   LaunchedEffect(Unit) {
     coroutineScope.launch {
-      currentUser = userViewModel.getUser(uid)
+      currentUser = userViewModel.getUser(uid) ?: NULL_USER
       username = currentUser!!.username
       currentUser?.following?.forEach { uid ->
         val user = userViewModel.getUser(uid)

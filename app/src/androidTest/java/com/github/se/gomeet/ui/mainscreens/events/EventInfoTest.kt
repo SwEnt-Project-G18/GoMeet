@@ -38,6 +38,8 @@ class EventInfoTest {
           eventViewModel = EventViewModel("organizerId", EventRepository(Firebase.firestore)))
     }
 
+    composeTestRule.waitForIdle()
+
     assert(composeTestRule.onNodeWithTag("TopBar").isDisplayed(), { "TopBar not displayed" })
     composeTestRule.waitUntil(timeoutMillis = 10000) {
       composeTestRule.onNodeWithTag("EventHeader").isDisplayed()

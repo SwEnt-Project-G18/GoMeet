@@ -4,7 +4,6 @@ import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import org.junit.Rule
@@ -16,12 +15,9 @@ class CreateTest {
 
   @Test
   fun testCreate() {
-    lateinit var navController: NavHostController
+    composeTestRule.setContent { Create(NavigationActions(rememberNavController())) }
 
-    composeTestRule.setContent {
-      navController = rememberNavController()
-      Create(NavigationActions(navController))
-    }
+    composeTestRule.waitForIdle()
 
     // Check that the text "Choose your audience" is displayed
     composeTestRule.onNodeWithText("Choose your audience").assertIsDisplayed()

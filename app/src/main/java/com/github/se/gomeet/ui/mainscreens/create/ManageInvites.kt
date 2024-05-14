@@ -56,7 +56,9 @@ import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.Invitation
 import com.github.se.gomeet.model.event.InviteStatus
+import com.github.se.gomeet.model.event.NULL_EVENT
 import com.github.se.gomeet.model.user.GoMeetUser
+import com.github.se.gomeet.model.user.NULL_USER
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
@@ -91,8 +93,8 @@ fun ManageInvites(
 
   LaunchedEffect(Unit) {
     coroutineScope.launch {
-      user.value = userViewModel.getUser(currentUser)
-      event.value = eventViewModel.getEvent(currentEvent)
+      user.value = userViewModel.getUser(currentUser) ?: NULL_USER
+      event.value = eventViewModel.getEvent(currentEvent) ?: NULL_EVENT
 
       val followers = user.value!!.followers
       if (followers.isNotEmpty()) {

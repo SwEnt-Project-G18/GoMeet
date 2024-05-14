@@ -271,7 +271,8 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                     Icon(
                         Icons.AutoMirrored.Filled.KeyboardArrowRight,
                         null,
-                        modifier = Modifier.clickable { showPopup.value = true })
+                        modifier =
+                            Modifier.testTag("TagsButton").clickable { showPopup.value = true })
                   }
 
               Spacer(modifier = Modifier.height(16.dp))

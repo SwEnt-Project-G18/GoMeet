@@ -34,7 +34,10 @@ class WelcomeScreenTest {
 
     composeTestRule.setContent { WelcomeScreen({}, {}, {}) }
 
+    composeTestRule.waitForIdle()
+
     composeTestRule.onNodeWithContentDescription("GoMeet Logo").assertIsDisplayed()
+    composeTestRule.onNodeWithContentDescription("Welcome Image").assertIsDisplayed()
     composeTestRule.onNodeWithText("Log In").assertIsDisplayed()
     composeTestRule.onNodeWithText("Sign Up").assertIsDisplayed()
     composeTestRule.onNodeWithContentDescription("Google logo").assertIsDisplayed().performClick()

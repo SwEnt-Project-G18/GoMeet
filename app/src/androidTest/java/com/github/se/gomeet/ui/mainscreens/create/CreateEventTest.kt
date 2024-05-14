@@ -39,10 +39,11 @@ class CreateEventTest {
     lateinit var navController: NavHostController
 
     composeTestRule.setContent {
-      navController = rememberNavController()
       MapsInitializer.initialize(LocalContext.current)
-      CreateEvent(NavigationActions(navController), eventViewModel, isPrivate = true)
+      CreateEvent(NavigationActions(rememberNavController()), eventViewModel, isPrivate = true)
     }
+
+    composeTestRule.waitForIdle()
 
     // Enter text into the Title field
     composeTestRule.onNodeWithText("Title").performTextInput("Sample Event 1")
@@ -63,7 +64,7 @@ class CreateEventTest {
 
     composeTestRule.onNodeWithText("Add Participants").assertIsDisplayed()
 
-    composeTestRule.onNodeWithText("Add Image").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Add Image").assertIsDisplayed().performClick()
 
     composeTestRule.onNodeWithText("Post").performClick()
   }
@@ -96,6 +97,10 @@ class CreateEventTest {
     composeTestRule.onNodeWithText("Link").performTextInput("http://example.com")
 
     composeTestRule.onNodeWithText("Add Tags").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("TagsButton").performClick()
+    composeTestRule.onNodeWithTag("TagList").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithText("Save").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithText("Edit Tags").assertIsDisplayed()
 
     composeTestRule.onNodeWithText("Add Image").assertIsDisplayed()
 

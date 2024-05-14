@@ -28,6 +28,9 @@ class TrendsTest {
           userViewModel = UserViewModel(UserRepository(Firebase.firestore)),
           eventViewModel = EventViewModel("null", EventRepository(Firebase.firestore)))
     }
+
+    composeTestRule.waitForIdle()
+
     composeTestRule.onNodeWithText("Search").assertIsDisplayed()
   }
 }
