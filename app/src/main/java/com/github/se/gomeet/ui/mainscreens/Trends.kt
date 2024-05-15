@@ -256,14 +256,19 @@ fun EventCarousel(events: List<Event>, nav: NavigationActions) {
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop)
-            Text(
-                text = event.title,
-                color = Color.White,
-                fontSize = 17.sp,
-                modifier =
-                    Modifier.align(Alignment.BottomCenter)
-                        .background(Color.Black.copy(alpha = 0.5f))
-                        .padding(8.dp))
+            Box(modifier = Modifier.align(Alignment.BottomCenter).padding(8.dp)) {
+              Box(
+                  modifier =
+                      Modifier.clip(RoundedCornerShape(8.dp))
+                          .background(Color.Black.copy(alpha = 0.5f))
+                          .padding(horizontal = 8.dp, vertical = 4.dp)) {
+                    Text(
+                        text = event.title,
+                        color = Color.White,
+                        fontSize = 17.sp,
+                    )
+                  }
+            }
           }
     }
 
