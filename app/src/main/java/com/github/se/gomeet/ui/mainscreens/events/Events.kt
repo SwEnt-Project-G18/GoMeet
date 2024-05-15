@@ -13,8 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
@@ -28,7 +26,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
@@ -53,7 +50,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
@@ -74,10 +70,10 @@ import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.Date
+import kotlinx.coroutines.launch
 
 /**
  * Composable function to display the Events screen.
@@ -110,7 +106,7 @@ fun Events(
     coroutineScope.launch {
       user.value = userViewModel.getUser(currentUser)
       val allEvents =
-          (eventViewModel.getAllEvents()?: emptyList()).filter { e ->
+          (eventViewModel.getAllEvents() ?: emptyList()).filter { e ->
             (user.value!!.myEvents.contains(e.eventID) ||
                 user.value!!.myFavorites.contains(e.eventID) ||
                 user.value!!.joinedEvents.contains(e.eventID)) && e.date.isAfter(LocalDate.now())
@@ -131,15 +127,16 @@ fun Events(
   // Scaffold is a structure that supports top bar, content area, and bottom navigation
   Scaffold(
       floatingActionButton = {
-          Box (modifier = Modifier.padding(8.dp)) {
-         IconButton(modifier = Modifier.background(color = MaterialTheme.colorScheme.outlineVariant, shape = RoundedCornerShape(10.dp)), onClick = {nav.navigateToScreen(Route.CREATE)}) {
-             Icon(
-                 Icons.Filled.Add,
-                 contentDescription = "Create Event",
-                 tint  = Color.White
-             )
-         }
-          }
+        Box(modifier = Modifier.padding(8.dp)) {
+          IconButton(
+              modifier =
+                  Modifier.background(
+                      color = MaterialTheme.colorScheme.outlineVariant,
+                      shape = RoundedCornerShape(10.dp)),
+              onClick = { nav.navigateToScreen(Route.CREATE) }) {
+                Icon(Icons.Filled.Add, contentDescription = "Create Event", tint = Color.White)
+              }
+        }
       },
       topBar = {
         Row(
@@ -175,9 +172,7 @@ fun Events(
               Row(
                   verticalAlignment = Alignment.CenterVertically,
                   horizontalArrangement = Arrangement.SpaceEvenly,
-                  modifier = Modifier
-                      .heightIn(min = 56.dp)
-                      .fillMaxWidth()) {
+                  modifier = Modifier.heightIn(min = 56.dp).fillMaxWidth()) {
                     Button(
                         onClick = { onFilterButtonClick("Joined") },
                         content = { Text("Joined Events") },
@@ -226,9 +221,7 @@ fun Events(
 
                 // Display events based on the selected filter
                 Column(
-                    modifier = Modifier
-                        .verticalScroll(rememberScrollState())
-                        .fillMaxSize(),
+                    modifier = Modifier.verticalScroll(rememberScrollState()).fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally) {
                       // Display joined events if 'All' or 'Joined' is selected
                       if (selectedFilter == "All" || selectedFilter == "Joined") {
@@ -397,9 +390,7 @@ fun GoMeetSearchBar(
         query = query.value,
         onQueryChange = { query.value = it },
         active = false,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 10.dp),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
         placeholder = { Text("Search", color = contentColor) },
         leadingIcon = {
           IconButton(onClick = { nav.navigateToScreen(Route.MESSAGE_CHANNELS) }) {
@@ -454,4 +445,3 @@ fun EventPreview() {
       UserViewModel(UserRepository(Firebase.firestore)),
       EventViewModel("", EventRepository(Firebase.firestore)))
 }
-

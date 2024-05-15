@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.util.Patterns.PHONE
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,7 +14,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -25,7 +23,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -37,9 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -98,9 +93,9 @@ fun RegisterNameCountryPhone(
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
             modifier = Modifier.fillMaxWidth())
 
-      if (!validFirstName && !firstClick) {
+        if (!validFirstName && !firstClick) {
           Text(text = "First Name is not valid", color = Color.Red)
-      }
+        }
 
         Spacer(modifier = Modifier.size(screenHeight / 60))
 
@@ -113,75 +108,73 @@ fun RegisterNameCountryPhone(
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
             modifier = Modifier.fillMaxWidth())
 
-      if (!validLastName && !firstClick) {
+        if (!validLastName && !firstClick) {
           Text(text = "Last Name is not valid", color = Color.Red)
-      }
+        }
 
         Spacer(modifier = Modifier.size(screenHeight / 60))
-      /*Column {
-          TextField(
-              value = country,
-              onValueChange = {
-                  country = it
-                  filteredCountries =
-                      if (it.isEmpty()) {
-                          countries.value
-                      } else {
-                          countries.value.filter { c ->
-                              c.lowercase(Locale.getDefault())
-                                  .startsWith(it.lowercase(Locale.getDefault()))
-                          }
-                      }
-                  expanded = true
-              },
-              label = { Text("Select Country") },
-              singleLine = true,
-              colors = textFieldColors,
-              readOnly = false,
-              modifier = Modifier.fillMaxWidth())
-          DropdownMenu(
-              expanded = expanded,
-              onDismissRequest = { expanded = false },
-              offset =
-              DpOffset(
-                  x = 20.dp, y = 20.dp), // Adjusts the position directly below the TextField
-              modifier =
-              Modifier.fillMaxWidth()
-                  .heightIn(max = 200.dp) // Limits the height to display around 5 items
-          ) {
-              for (c in filteredCountries) {
-                  DropdownMenuItem(
-                      text = { Text(c) },
-                      onClick = {
-                          country = c
-                          expanded = false
-                      })
-              }
-          }
-      }*/
-      TextField(
-          value = phoneNumber,
-          onValueChange = { phoneNumber = it },
-          label = { Text("Phone Number") },
-          singleLine = true,
-          colors = textFieldColors,
-          keyboardOptions =
-          KeyboardOptions.Default.copy(
-              imeAction = ImeAction.Done, keyboardType = KeyboardType.Phone),
-          modifier = Modifier.fillMaxWidth())
+        /*Column {
+            TextField(
+                value = country,
+                onValueChange = {
+                    country = it
+                    filteredCountries =
+                        if (it.isEmpty()) {
+                            countries.value
+                        } else {
+                            countries.value.filter { c ->
+                                c.lowercase(Locale.getDefault())
+                                    .startsWith(it.lowercase(Locale.getDefault()))
+                            }
+                        }
+                    expanded = true
+                },
+                label = { Text("Select Country") },
+                singleLine = true,
+                colors = textFieldColors,
+                readOnly = false,
+                modifier = Modifier.fillMaxWidth())
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                offset =
+                DpOffset(
+                    x = 20.dp, y = 20.dp), // Adjusts the position directly below the TextField
+                modifier =
+                Modifier.fillMaxWidth()
+                    .heightIn(max = 200.dp) // Limits the height to display around 5 items
+            ) {
+                for (c in filteredCountries) {
+                    DropdownMenuItem(
+                        text = { Text(c) },
+                        onClick = {
+                            country = c
+                            expanded = false
+                        })
+                }
+            }
+        }*/
+        TextField(
+            value = phoneNumber,
+            onValueChange = { phoneNumber = it },
+            label = { Text("Phone Number") },
+            singleLine = true,
+            colors = textFieldColors,
+            keyboardOptions =
+                KeyboardOptions.Default.copy(
+                    imeAction = ImeAction.Done, keyboardType = KeyboardType.Phone),
+            modifier = Modifier.fillMaxWidth())
 
-      if (!validPhoneNumber && !firstClick) {
+        if (!validPhoneNumber && !firstClick) {
           Text(text = "Phone Number is not valid", color = Color.Red)
-      }
-
+        }
 
         Spacer(modifier = Modifier.size(screenHeight / 60))
-      CountrySuggestionTextField(countries.value, textFieldColors)
+        CountrySuggestionTextField(countries.value, textFieldColors)
 
-      if (!countryValid && !firstClick) {
+        if (!countryValid && !firstClick) {
           Text(text = "Country is not valid", color = Color.Red)
-      }
-
+        }
 
         Spacer(modifier = Modifier.size(screenHeight / 15))
 
@@ -193,9 +186,7 @@ fun RegisterNameCountryPhone(
               trackColor = Color.LightGray,
               strokeCap = ProgressIndicatorDefaults.CircularIndeterminateStrokeCap)
           IconButton(
-              modifier = Modifier
-                  .padding(bottom = 2.5.dp, end = 3.dp)
-                  .size(screenHeight / 19),
+              modifier = Modifier.padding(bottom = 2.5.dp, end = 3.dp).size(screenHeight / 19),
               colors = IconButtonDefaults.outlinedIconButtonColors(),
               onClick = {
                 validLastName = lastName.isNotEmpty() && lastName.length <= 20
@@ -239,54 +230,38 @@ fun getCountries(): ArrayList<String> {
   return countriesWithEmojis
 }
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CountrySuggestionTextField(total: List<String>, textFieldColors: TextFieldColors) {
-    var expanded by remember { mutableStateOf(false) }
-    var selectedOptionText by remember { mutableStateOf(total[0]) }
-    val countries = remember { mutableStateOf(total) }
+  var expanded by remember { mutableStateOf(false) }
+  var selectedOptionText by remember { mutableStateOf(total[0]) }
+  val countries = remember { mutableStateOf(total) }
 
-    ExposedDropdownMenuBox(
-        modifier = Modifier.fillMaxWidth(),
-        expanded = expanded,
-        onExpandedChange = {
-            expanded = !expanded
-        }
-    ) {
+  ExposedDropdownMenuBox(
+      modifier = Modifier.fillMaxWidth(),
+      expanded = expanded,
+      onExpandedChange = { expanded = !expanded }) {
         TextField(
-            modifier = Modifier
-                .menuAnchor(),
+            modifier = Modifier.menuAnchor(),
             readOnly = true,
             value = selectedOptionText,
-            onValueChange = { },
+            onValueChange = {},
             label = { Text("Label") },
-            trailingIcon = {
-                ExposedDropdownMenuDefaults.TrailingIcon(
-                    expanded = expanded
-                )
-            },
-            colors = textFieldColors.copy(
-                focusedTrailingIconColor = MaterialTheme.colorScheme.tertiary
-            )
-        )
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            colors =
+                textFieldColors.copy(focusedTrailingIconColor = MaterialTheme.colorScheme.tertiary))
         ExposedDropdownMenu(
             modifier = Modifier.background(color = MaterialTheme.colorScheme.primaryContainer),
             expanded = expanded,
-            onDismissRequest = {
-                expanded = false
-            }
-        ) {
-            countries.value.forEach { selectionOption ->
+            onDismissRequest = { expanded = false }) {
+              countries.value.forEach { selectionOption ->
                 DropdownMenuItem(
                     text = { Text(text = selectionOption) },
                     onClick = {
-                        selectedOptionText = selectionOption
-                        expanded = false
-                    }
-                )
+                      selectedOptionText = selectionOption
+                      expanded = false
+                    })
+              }
             }
-        }
-    }
-
+      }
 }

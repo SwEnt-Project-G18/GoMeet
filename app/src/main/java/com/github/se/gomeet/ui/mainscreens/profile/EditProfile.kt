@@ -84,31 +84,31 @@ fun EditProfile(
     userViewModel: UserViewModel = UserViewModel(UserRepository(Firebase.firestore))
 ) {
 
-    val countries = getCountries()
+  val countries = getCountries()
   val currentUser = remember { mutableStateOf<GoMeetUser?>(null) }
   val firstName = remember { mutableStateOf("") }
   var firstNameValid by remember { mutableStateOf(false) }
   val lastName = remember { mutableStateOf("") }
   var lastNameValid by remember { mutableStateOf(false) }
-    var allUsers by remember { mutableStateOf<List<GoMeetUser>?>(null) }
+  var allUsers by remember { mutableStateOf<List<GoMeetUser>?>(null) }
 
-    val username = remember { mutableStateOf("") }
-    var usernameValid by remember { mutableStateOf(false) }
+  val username = remember { mutableStateOf("") }
+  var usernameValid by remember { mutableStateOf(false) }
 
-    val phoneNumber = remember { mutableStateOf("") }
-    var phoneNumberValid by remember { mutableStateOf(false) }
+  val phoneNumber = remember { mutableStateOf("") }
+  var phoneNumberValid by remember { mutableStateOf(false) }
 
-    val country = remember { mutableStateOf("") }
-    var countryValid by remember { mutableStateOf(false) }
-    val tags = remember { mutableStateOf(emptyList<String>()) }
+  val country = remember { mutableStateOf("") }
+  var countryValid by remember { mutableStateOf(false) }
+  val tags = remember { mutableStateOf(emptyList<String>()) }
   var isLoaded by remember { mutableStateOf(false) }
   val showPopup = remember { mutableStateOf(false) }
 
-    var firstClick by remember {  mutableStateOf(true) }
+  var firstClick by remember { mutableStateOf(true) }
 
   LaunchedEffect(Unit) {
     allUsers = userViewModel.getAllUsers()
-    currentUser.value = allUsers!!.first{it.uid == Firebase.auth.currentUser!!.uid}
+    currentUser.value = allUsers!!.first { it.uid == Firebase.auth.currentUser!!.uid }
     allUsers!!.minus(currentUser.value!!)
     firstName.value = currentUser.value!!.firstName
     lastName.value = currentUser.value!!.lastName
@@ -180,70 +180,60 @@ fun EditProfile(
               text = "Done",
               style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
               modifier =
-              Modifier
-                  .padding(2.dp)
-                  .clickable {
-                      firstNameValid = firstName.value.isNotEmpty() && firstName.value.length <= 20
-                      lastNameValid = lastName.value.isNotEmpty() && lastName.value.length <= 20
-                      phoneNumberValid =
-                          phoneNumber.value.isEmpty() ||
-                                  (Patterns.PHONE
-                                      .matcher(phoneNumber.value)
-                                      .matches() &&
-                                          (phoneNumber.value.startsWith('0') || phoneNumber.value.startsWith(
-                                              '+'
-                                          )) &&
-                                          phoneNumber.value.length >= 10 &&
-                                          phoneNumber.value.length <= 14)
+                  Modifier.padding(2.dp).clickable {
+                    firstNameValid = firstName.value.isNotEmpty() && firstName.value.length <= 20
+                    lastNameValid = lastName.value.isNotEmpty() && lastName.value.length <= 20
+                    phoneNumberValid =
+                        phoneNumber.value.isEmpty() ||
+                            (Patterns.PHONE.matcher(phoneNumber.value).matches() &&
+                                (phoneNumber.value.startsWith('0') ||
+                                    phoneNumber.value.startsWith('+')) &&
+                                phoneNumber.value.length >= 10 &&
+                                phoneNumber.value.length <= 14)
 
-                      countryValid = country.value.isEmpty() || countries.contains(country.value)
-                      usernameValid =
-                          !(allUsers!!.any { u -> u.username == username.value }) &&
-                                  username.value.isNotBlank() &&
-                                  username.value.length <= 26
-                      firstClick = false
-                      if (imageUri != null) {
-                          userViewModel.uploadImageAndGetUrl(
-                              userId = currentUser.value!!.uid,
-                              imageUri = imageUri!!,
-                              onSuccess = { imageUrl ->
-                                  val updatedUser =
-                                      currentUser.value!!.copy(
-                                          firstName = firstName.value,
-                                          lastName = lastName.value,
-                                          username = username.value,
-                                          phoneNumber = phoneNumber.value,
-                                          country = country.value,
-                                          profilePicture = imageUrl
-                                      )
-                                  userViewModel.editUser(updatedUser)
-                                  nav.goBack()
-                              },
-                              onError = { exception ->
-                                  Log.e(
-                                      "ProfileUpdate",
-                                      "Failed to upload new image: ${exception.message}"
-                                  )
-                              })
-                      } else if (firstNameValid &&
-                          lastNameValid &&
-                          usernameValid &&
-                          phoneNumberValid &&
-                          countryValid
-                      ) {
-                          val updatedUser =
-                              currentUser.value!!.copy(
-                                  firstName = firstName.value,
-                                  lastName = lastName.value,
-                                  username = username.value,
-                                  phoneNumber = phoneNumber.value,
-                                  country = country.value,
-                                  profilePicture = profilePictureUrl ?: ""
-                              )
-                          userViewModel.editUser(updatedUser)
-                          nav.goBack()
-                          Log.e("ProfileUpdate", "No image selected")
-                      }
+                    countryValid = country.value.isEmpty() || countries.contains(country.value)
+                    usernameValid =
+                        !(allUsers!!.any { u -> u.username == username.value }) &&
+                            username.value.isNotBlank() &&
+                            username.value.length <= 26
+                    firstClick = false
+                    if (imageUri != null) {
+                      userViewModel.uploadImageAndGetUrl(
+                          userId = currentUser.value!!.uid,
+                          imageUri = imageUri!!,
+                          onSuccess = { imageUrl ->
+                            val updatedUser =
+                                currentUser.value!!.copy(
+                                    firstName = firstName.value,
+                                    lastName = lastName.value,
+                                    username = username.value,
+                                    phoneNumber = phoneNumber.value,
+                                    country = country.value,
+                                    profilePicture = imageUrl)
+                            userViewModel.editUser(updatedUser)
+                            nav.goBack()
+                          },
+                          onError = { exception ->
+                            Log.e(
+                                "ProfileUpdate", "Failed to upload new image: ${exception.message}")
+                          })
+                    } else if (firstNameValid &&
+                        lastNameValid &&
+                        usernameValid &&
+                        phoneNumberValid &&
+                        countryValid) {
+                      val updatedUser =
+                          currentUser.value!!.copy(
+                              firstName = firstName.value,
+                              lastName = lastName.value,
+                              username = username.value,
+                              phoneNumber = phoneNumber.value,
+                              country = country.value,
+                              profilePicture = profilePictureUrl ?: "")
+                      userViewModel.editUser(updatedUser)
+                      nav.goBack()
+                      Log.e("ProfileUpdate", "No image selected")
+                    }
                   })
         }
       },
@@ -259,10 +249,9 @@ fun EditProfile(
         if (isLoaded) {
           Column(
               modifier =
-              Modifier
-                  .padding(innerPadding)
-                  .verticalScroll(rememberScrollState(0))
-                  .fillMaxSize(),
+                  Modifier.padding(innerPadding)
+                      .verticalScroll(rememberScrollState(0))
+                      .fillMaxSize(),
               verticalArrangement = Arrangement.Top,
               horizontalAlignment = Alignment.CenterHorizontally) {
                 Image(
@@ -276,15 +265,14 @@ fun EditProfile(
                         },
                     contentDescription = "Profile picture",
                     modifier =
-                    Modifier
-                        .padding(start = 15.dp, end = 15.dp, top = 30.dp, bottom = 15.dp)
-                        .width(101.dp)
-                        .height(101.dp)
-                        .clickable { imagePickerLauncher.launch("image/*") }
-                        .clip(CircleShape)
-                        .background(color = MaterialTheme.colorScheme.background)
-                        .align(Alignment.CenterHorizontally)
-                        .testTag("Profile Picture"),
+                        Modifier.padding(start = 15.dp, end = 15.dp, top = 30.dp, bottom = 15.dp)
+                            .width(101.dp)
+                            .height(101.dp)
+                            .clickable { imagePickerLauncher.launch("image/*") }
+                            .clip(CircleShape)
+                            .background(color = MaterialTheme.colorScheme.background)
+                            .align(Alignment.CenterHorizontally)
+                            .testTag("Profile Picture"),
                     contentScale = ContentScale.Crop)
 
                 Spacer(modifier = Modifier.size(16.dp))
@@ -296,13 +284,13 @@ fun EditProfile(
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                     colors = textFieldColors)
-              if (!firstNameValid && !firstClick) {
+                if (!firstNameValid && !firstClick) {
                   Text(text = "First Name is not valid", color = Color.Red)
-              }
+                }
                 Spacer(modifier = Modifier.size(16.dp))
-              if (!lastNameValid && !firstClick) {
+                if (!lastNameValid && !firstClick) {
                   Text(text = "Last Name is not valid", color = Color.Red)
-              }
+                }
                 TextField(
                     value = lastName.value,
                     onValueChange = { newValue -> lastName.value = newValue },
@@ -321,9 +309,9 @@ fun EditProfile(
                     modifier = Modifier.fillMaxWidth(),
                     colors = textFieldColors)
 
-              if (!firstClick && !usernameValid) {
+                if (!firstClick && !usernameValid) {
                   Text(text = "The Username is not valid or already taken", color = Color.Red)
-              }
+                }
 
                 Spacer(modifier = Modifier.size(16.dp))
 
@@ -335,23 +323,21 @@ fun EditProfile(
                     modifier = Modifier.fillMaxWidth(),
                     colors = textFieldColors)
 
-              if (!phoneNumberValid && !firstClick) {
+                if (!phoneNumberValid && !firstClick) {
                   Text(text = "Phone Number is not valid", color = Color.Red)
-              }
+                }
                 Spacer(modifier = Modifier.size(16.dp))
 
-              CountrySuggestionTextField(countries, textFieldColors)
+                CountrySuggestionTextField(countries, textFieldColors)
 
-              if (!countryValid && !firstClick) {
+                if (!countryValid && !firstClick) {
                   Text(text = "Country is not valid", color = Color.Red)
-              }
+                }
 
                 Spacer(modifier = Modifier.size(16.dp))
 
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 15.dp, bottom = 10.dp),
+                    modifier = Modifier.fillMaxWidth().padding(top = 15.dp, bottom = 10.dp),
                     verticalAlignment = Alignment.CenterVertically) {
                       Text(
                           text = "Edit Tags",
