@@ -1,5 +1,6 @@
 package com.github.se.gomeet.ui.mainscreens
 
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.isDisplayed
@@ -12,16 +13,12 @@ import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
 import com.github.se.gomeet.model.repository.EventRepository
-import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
-import com.github.se.gomeet.viewmodel.UserViewModel
-import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import java.util.concurrent.TimeUnit
-import org.junit.AfterClass
-import org.junit.BeforeClass
+import com.google.type.Date
+import java.time.Instant
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -48,54 +45,14 @@ class ExploreTest {
     rule.onNodeWithTag("Map").assertIsDisplayed()
     rule.onNodeWithText("Search").assertIsDisplayed()
     rule.onNodeWithTag("CurrentLocationButton").assertIsDisplayed().performClick()
+    rule.onNodeWithTag("MapSlider").assertIsDisplayed()
   }
 
-  companion object {
-
-    private lateinit var eventVM: EventViewModel
-    private val userVM = UserViewModel(UserRepository(Firebase.firestore))
-
-    private const val email = "user@exploretest.com"
-    private const val pwd = "123456"
-    private var uid = ""
-
-    @JvmStatic
-    @BeforeClass
-    fun setup() {
-      TimeUnit.SECONDS.sleep(3)
-
-      // create a new user
-      var result = Firebase.auth.createUserWithEmailAndPassword(email, pwd)
-      while (!result.isComplete) {
-        TimeUnit.SECONDS.sleep(1)
-      }
-      uid = result.result.user!!.uid
-
-      userVM.createUserIfNew(
-          uid,
-          "explore_test_user",
-          "testfirstname",
-          "testlastname",
-          email,
-          "testphonenumber",
-          "testcountry")
-      TimeUnit.SECONDS.sleep(3)
-
-      // sign in as the new user
-      result = Firebase.auth.signInWithEmailAndPassword(email, pwd)
-      while (!result.isComplete) {
-        TimeUnit.SECONDS.sleep(1)
-      }
-
-      eventVM = EventViewModel(uid, EventRepository(Firebase.firestore))
-    }
-
-    @AfterClass
-    @JvmStatic
-    fun tearDown() {
-      // clean up the user
-      userVM.deleteUser(uid)
-      Firebase.auth.currentUser?.delete()
-    }
+  @Test
+  fun eventDateToStringTest() {
+    val date = java.util.Date.from(Instant.parse("9999-03-30T10:15:00Z"))
+    assert(date != null)
+    Log.e("wqeq", eventDateToString(date))
+    assert(eventDateToString(eventDate = date) == "30/03/99 at 11:15")
   }
 }
