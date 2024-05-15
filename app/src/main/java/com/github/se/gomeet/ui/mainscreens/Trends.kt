@@ -329,7 +329,7 @@ fun SortButton(eventList: MutableList<Event>) {
                               MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
                           else Color.Transparent))
               DropdownMenuItem(
-                  text = { Text("Alphabetical") },
+                  text = { Text("Name") },
                   onClick = {
                     selectedOption = SortOption.ALPHABETICAL
                     eventList.sortBy { it.title }
