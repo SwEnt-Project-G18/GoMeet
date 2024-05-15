@@ -35,6 +35,7 @@ import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.time.LocalTime
 
 /**
  * This end to end test tests that a user can (after logging in) click on an event in Trends, view
@@ -216,6 +217,7 @@ class EndToEndTest2 : TestCase() {
           "description",
           Location(0.0, 0.0, "location"),
           LocalDate.of(2025, 3, 30),
+          LocalTime.now(),
           0.0,
           "url",
           emptyList(),

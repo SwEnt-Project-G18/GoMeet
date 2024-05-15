@@ -55,8 +55,6 @@ class CreateEventTest {
 
     rule.onNodeWithTag("DropdownMenu").assertIsDisplayed()
 
-    // Enter date
-    rule.onNodeWithText("Date").performTextInput(LocalDate.now().toString())
     // Enter a price
     rule.onNodeWithText("Price").performTextInput("25.00")
     // Enter a URL
@@ -90,9 +88,6 @@ class CreateEventTest {
     rule.onNodeWithText("Location").performTextInput("test")
 
     rule.onNodeWithTag("DropdownMenu").assertIsDisplayed()
-
-    // Enter date
-    rule.onNodeWithText("Date").performTextInput("invalid date")
     // Enter a price
     rule.onNodeWithText("Price").performTextInput("25.00")
     // Enter a URL

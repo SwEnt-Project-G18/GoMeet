@@ -35,6 +35,7 @@ import java.time.format.DateTimeFormatter
 
 /**
  * Composable function for the DateTimePicker.
+ * This date picker doesn't allow for past dates to be picked.
  *
  * @param pickedTime The picked time.
  * @param pickedDate The picked date.

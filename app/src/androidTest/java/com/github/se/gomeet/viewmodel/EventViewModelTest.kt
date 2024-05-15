@@ -12,6 +12,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.time.LocalTime
 
 @RunWith(AndroidJUnit4::class)
 class EventViewModelTest {
@@ -30,6 +31,7 @@ class EventViewModelTest {
           "description",
           Location(0.0, 0.0, "name"),
           LocalDate.of(2024, 4, 29),
+          LocalTime.now(),
           0.0,
           "url",
           emptyList(),
@@ -72,6 +74,7 @@ class EventViewModelTest {
             event.description,
             event.location,
             event.date,
+            event.time,
             event.price,
             event.url,
             event.pendingParticipants,

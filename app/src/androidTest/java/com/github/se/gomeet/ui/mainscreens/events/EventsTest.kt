@@ -20,6 +20,7 @@ import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
+import java.time.LocalTime
 
 class EventsTest {
 
@@ -72,6 +73,7 @@ class EventsTest {
           description = "Test description",
           location = Location(46.5190557, 6.5555216, "EPFL Campus"), // Provide a valid location
           date = LocalDate.now(), // Provide a valid date
+          time = LocalTime.now(), // Provide a valid time as well :)
           price = 10.0,
           url = "",
           pendingParticipants = emptyList(),
