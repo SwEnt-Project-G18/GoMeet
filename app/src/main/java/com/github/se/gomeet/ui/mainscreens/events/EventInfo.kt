@@ -269,14 +269,15 @@ fun EventButtons(
             modifier = Modifier.weight(1f),
             colors =
                 ButtonDefaults.textButtonColors(
-                    containerColor = Color(0xFFECEFF1), contentColor = Color.Black)) {
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.tertiary)) {
               if (organizer.uid.contentEquals(Firebase.auth.currentUser!!.uid)) {
                 Text("Edit My Event")
               } else {
                 if (isJoined.value) {
-                  Text("LeaveEvent")
+                  Text("Leave Event")
                 } else {
-                  Text("JoinEvent")
+                  Text("Join Event")
                 }
               }
             }
@@ -290,7 +291,8 @@ fun EventButtons(
               modifier = Modifier.weight(1f),
               colors =
                   ButtonDefaults.textButtonColors(
-                      containerColor = Color(0xFFECEFF1), contentColor = Color.Black)) {
+                      containerColor = MaterialTheme.colorScheme.primaryContainer,
+                      contentColor = MaterialTheme.colorScheme.tertiary)) {
                 Text("Add Participants")
               }
         }
