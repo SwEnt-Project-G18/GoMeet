@@ -14,9 +14,8 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.time.LocalDate
 import java.util.concurrent.TimeUnit
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import org.junit.AfterClass
+import org.junit.After
 import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
@@ -25,114 +24,103 @@ class EventsTest {
 
   @get:Rule val composeTestRule = createComposeRule()
 
-  @Test
-  fun eventsScreen_RenderingCorrectness() {
-    // Test rendering correctness with events available
-    composeTestRule.setContent {
-      Events(
-          currentUser = currentUserId,
-          nav = NavigationActions(rememberNavController()),
-          userViewModel = UserViewModel(UserRepository(Firebase.firestore)),
-          eventViewModel = EventViewModel("test", EventRepository(Firebase.firestore)))
-    }
+  @After
+  fun tearDown() {
+    // clean up the event
+    runBlocking { eventVM.getAllEvents()?.forEach { eventVM.removeEvent(it.eventID) } }
 
-    composeTestRule.onAllNodesWithText("Favourites")[0].assertIsDisplayed()
-    composeTestRule.onAllNodesWithText("Favourites")[1].assertIsDisplayed()
-    composeTestRule.onAllNodesWithText("Joined Events")[0].assertIsDisplayed()
-    composeTestRule.onAllNodesWithText("Joined Events")[1].assertIsDisplayed()
-    composeTestRule.onAllNodesWithText("My Events")[0].assertIsDisplayed()
-    composeTestRule.onAllNodesWithText("My Events")[1].assertIsDisplayed()
+    // clean up the users
+    runBlocking {
+      Firebase.auth.currentUser?.delete()
+      userVM.deleteUser(uid)
+    }
   }
 
   @Test
-  fun eventsScreen_FilterButtonClick() {
-    // Test button click handling
+  fun testEvents() {
     composeTestRule.setContent {
       Events(
-          currentUser = currentUserId,
-          nav = NavigationActions(rememberNavController()),
-          userViewModel = UserViewModel(UserRepository(Firebase.firestore)),
-          eventViewModel =
-              EventViewModel("NEEGn5cbkJZDXaezeGdfd2D4u6b2", EventRepository(Firebase.firestore)))
+          uid,
+          NavigationActions(rememberNavController()),
+          UserViewModel(UserRepository(Firebase.firestore)),
+          EventViewModel("null", EventRepository(Firebase.firestore)))
     }
 
-    composeTestRule.onAllNodesWithText("Joined Events")[0].performClick()
-    composeTestRule.onAllNodesWithText("Favourites")[0].performClick()
-    composeTestRule.onAllNodesWithText("My Events")[0].performClick()
-  }
+    composeTestRule.waitUntil { composeTestRule.onAllNodesWithText("title")[0].isDisplayed() }
 
-  @Test
-  fun eventsScreen_AsyncBehavior() {
-    // Test asynchronous behavior of fetching events
-    val eventViewModel = EventViewModel(null, EventRepository(Firebase.firestore))
-    runBlocking(Dispatchers.IO) {
-      // Add a mock event to the view model
-      eventViewModel.createEvent(
-          title = "Test Event",
-          description = "Test description",
-          location = Location(46.5190557, 6.5555216, "EPFL Campus"), // Provide a valid location
-          date = LocalDate.now(), // Provide a valid date
-          price = 10.0,
-          url = "",
-          pendingParticipants = emptyList(),
-          participants = emptyList(),
-          visibleToIfPrivate = emptyList(),
-          maxParticipants = 0,
-          public = true,
-          tags = emptyList(),
-          images = emptyList(),
-          imageUri = null,
-          userViewModel = UserViewModel(UserRepository(Firebase.firestore)),
-          uid = "")
-      TimeUnit.SECONDS.sleep(3)
-    }
-
-    composeTestRule.setContent {
-      Events(
-          currentUser = currentUserId,
-          nav = NavigationActions(rememberNavController()),
-          userViewModel = UserViewModel(UserRepository(Firebase.firestore)),
-          eventViewModel =
-              EventViewModel("NEEGn5cbkJZDXaezeGdfd2D4u6b2", EventRepository(Firebase.firestore)))
+    composeTestRule.onNodeWithText("Search").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("JoinedButton").assertIsDisplayed().performClick().performClick()
+    composeTestRule
+        .onNodeWithTag("FavouritesButton")
+        .assertIsDisplayed()
+        .performClick()
+        .performClick()
+    composeTestRule
+        .onNodeWithTag("MyEventsButton")
+        .assertIsDisplayed()
+        .performClick()
+        .performClick()
+    composeTestRule.onNodeWithTag("JoinedTitle").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("FavouritesTitle").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("MyEventsTitle").assertIsDisplayed()
+    composeTestRule.onAllNodesWithText("title").assertCountEquals(3)
+    for (i in 0..2) {
+      composeTestRule.onAllNodesWithText("title")[i].assertIsDisplayed()
     }
   }
 
   companion object {
+
+    private const val email = "user@eventstest.com"
+    private const val pwd = "123456"
+    private var uid = ""
+    private const val username = "null"
+
     private val userVM = UserViewModel(UserRepository(Firebase.firestore))
-    private lateinit var currentUserId: String
+    private lateinit var eventVM: EventViewModel
 
-    private val usr = "u@eventstest.com"
-    private val pwd = "123456"
-
+    @JvmStatic
     @BeforeClass
-    @JvmStatic
-    fun setUp() {
+    fun setup() {
       TimeUnit.SECONDS.sleep(3)
+      runBlocking {
+        // create two new users
+        var result = Firebase.auth.createUserWithEmailAndPassword(email, pwd)
+        while (!result.isComplete) {
+          TimeUnit.SECONDS.sleep(1)
+        }
+        uid = result.result.user!!.uid
 
-      // Create a new user and sign in
-      var result = Firebase.auth.createUserWithEmailAndPassword(usr, pwd)
-      while (!result.isComplete) {
-        TimeUnit.SECONDS.sleep(1)
-      }
-      result = Firebase.auth.signInWithEmailAndPassword(usr, pwd)
-      while (!result.isComplete) {
-        TimeUnit.SECONDS.sleep(1)
+        userVM.createUserIfNew(
+            uid, username, "testfirstname", "testlastname", email, "testphonenumber", "testcountry")
+        TimeUnit.SECONDS.sleep(3)
+
+        result = Firebase.auth.signInWithEmailAndPassword(email, pwd)
+        while (!result.isComplete) {
+          TimeUnit.SECONDS.sleep(1)
+        }
+        eventVM = EventViewModel(uid, EventRepository(Firebase.firestore))
+        eventVM.createEvent(
+            "title",
+            "description",
+            Location(0.0, 0.0, "location"),
+            LocalDate.of(2026, 1, 1),
+            0.0,
+            "url",
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            1,
+            true,
+            emptyList(),
+            emptyList(),
+            null,
+            userVM,
+            "uid")
+        userVM.editUser(userVM.getUser(uid)!!.copy(myFavorites = listOf("uid")))
       }
 
-      // Set up the user view model
-      // Order is important here, since createUserIfNew sets current user to created user (so we
-      // need to create the current user last)
-      currentUserId = Firebase.auth.currentUser!!.uid
-      userVM.createUserIfNew(currentUserId, "a", "b", "c", usr, "4567", "Angola")
       TimeUnit.SECONDS.sleep(3)
-    }
-
-    @AfterClass
-    @JvmStatic
-    fun tearDown() {
-      // Clean up the user view model
-      Firebase.auth.currentUser!!.delete()
-      userVM.deleteUser(currentUserId)
     }
   }
 }

@@ -43,6 +43,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
@@ -152,6 +153,7 @@ fun Events(
                   horizontalArrangement = Arrangement.SpaceEvenly,
                   modifier = Modifier.heightIn(min = 56.dp).fillMaxWidth()) {
                     Button(
+                        modifier = Modifier.testTag("JoinedButton"),
                         onClick = { onFilterButtonClick("Joined") },
                         content = { Text("Joined Events") },
                         shape = RoundedCornerShape(10.dp),
@@ -166,6 +168,7 @@ fun Events(
                                     MaterialTheme.colorScheme.tertiary))
 
                     Button(
+                        modifier = Modifier.testTag("FavouritesButton"),
                         onClick = { onFilterButtonClick("Favourites") },
                         content = { Text("Favourites") },
                         shape = RoundedCornerShape(10.dp),
@@ -179,6 +182,7 @@ fun Events(
                                     MaterialTheme.colorScheme.primaryContainer,
                                     MaterialTheme.colorScheme.tertiary))
                     Button(
+                        modifier = Modifier.testTag("MyEventsButton"),
                         onClick = { onFilterButtonClick("MyEvents") },
                         content = { Text("My Events") },
                         shape = RoundedCornerShape(10.dp),
@@ -207,7 +211,9 @@ fun Events(
                         Text(
                             text = "Joined Events",
                             style = MaterialTheme.typography.titleLarge,
-                            modifier = Modifier.padding(horizontal = screenWidth / 15))
+                            modifier =
+                                Modifier.padding(horizontal = screenWidth / 15)
+                                    .testTag("JoinedTitle"))
 
                         // Loop through and display events that match the joined events criteria
                         eventList
@@ -254,7 +260,9 @@ fun Events(
                         Text(
                             text = "Favourites",
                             style = MaterialTheme.typography.titleLarge,
-                            modifier = Modifier.padding(horizontal = screenWidth / 15))
+                            modifier =
+                                Modifier.padding(horizontal = screenWidth / 15)
+                                    .testTag("FavouritesTitle"))
 
                         // Loop through and display events are marked favourites by the currentUser
                         eventList
@@ -300,7 +308,9 @@ fun Events(
                         Text(
                             text = "My Events",
                             style = MaterialTheme.typography.titleLarge,
-                            modifier = Modifier.padding(horizontal = screenWidth / 15))
+                            modifier =
+                                Modifier.padding(horizontal = screenWidth / 15)
+                                    .testTag("MyEventsTitle"))
 
                         // Loop through and display events created by currentUser
                         eventList
