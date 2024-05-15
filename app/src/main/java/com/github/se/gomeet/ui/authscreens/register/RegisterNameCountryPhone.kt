@@ -62,6 +62,7 @@ fun RegisterNameCountryPhone(
     callback: (String, String, String, String) -> Unit,
     textFieldColors: TextFieldColors
 ) {
+
   val screenHeight = LocalConfiguration.current.screenHeightDp.dp
 
   var firstName by remember { mutableStateOf("") }
@@ -97,6 +98,10 @@ fun RegisterNameCountryPhone(
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
             modifier = Modifier.fillMaxWidth())
 
+      if (!validFirstName && !firstClick) {
+          Text(text = "First Name is not valid", color = Color.Red)
+      }
+
         Spacer(modifier = Modifier.size(screenHeight / 60))
 
         TextField(
@@ -108,8 +113,52 @@ fun RegisterNameCountryPhone(
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
             modifier = Modifier.fillMaxWidth())
 
-        Spacer(modifier = Modifier.size(screenHeight / 60))
+      if (!validLastName && !firstClick) {
+          Text(text = "Last Name is not valid", color = Color.Red)
+      }
 
+        Spacer(modifier = Modifier.size(screenHeight / 60))
+      /*Column {
+          TextField(
+              value = country,
+              onValueChange = {
+                  country = it
+                  filteredCountries =
+                      if (it.isEmpty()) {
+                          countries.value
+                      } else {
+                          countries.value.filter { c ->
+                              c.lowercase(Locale.getDefault())
+                                  .startsWith(it.lowercase(Locale.getDefault()))
+                          }
+                      }
+                  expanded = true
+              },
+              label = { Text("Select Country") },
+              singleLine = true,
+              colors = textFieldColors,
+              readOnly = false,
+              modifier = Modifier.fillMaxWidth())
+          DropdownMenu(
+              expanded = expanded,
+              onDismissRequest = { expanded = false },
+              offset =
+              DpOffset(
+                  x = 20.dp, y = 20.dp), // Adjusts the position directly below the TextField
+              modifier =
+              Modifier.fillMaxWidth()
+                  .heightIn(max = 200.dp) // Limits the height to display around 5 items
+          ) {
+              for (c in filteredCountries) {
+                  DropdownMenuItem(
+                      text = { Text(c) },
+                      onClick = {
+                          country = c
+                          expanded = false
+                      })
+              }
+          }
+      }*/
       TextField(
           value = phoneNumber,
           onValueChange = { phoneNumber = it },
@@ -174,7 +223,7 @@ fun RegisterNameCountryPhone(
       }
 }
 
-private fun getCountries(): ArrayList<String> {
+fun getCountries(): ArrayList<String> {
   val isoCountryCodes: Array<String> = Locale.getISOCountries()
   val countriesWithEmojis: ArrayList<String> = arrayListOf()
   for (countryCode in isoCountryCodes) {
@@ -193,7 +242,7 @@ private fun getCountries(): ArrayList<String> {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun CountrySuggestionTextField(total: List<String>, textFieldColors: TextFieldColors) {
+fun CountrySuggestionTextField(total: List<String>, textFieldColors: TextFieldColors) {
     var expanded by remember { mutableStateOf(false) }
     var selectedOptionText by remember { mutableStateOf(total[0]) }
     val countries = remember { mutableStateOf(total) }
