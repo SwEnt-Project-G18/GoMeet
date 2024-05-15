@@ -31,8 +31,7 @@ class ProfileSettingsTest {
     }
 
     rule.onNodeWithText("Settings").assertIsDisplayed()
-    rule.onNodeWithContentDescription("Back button").assertIsDisplayed()
-    rule.onNodeWithText("Back").assertIsDisplayed()
+    rule.onNodeWithContentDescription("Back").assertIsDisplayed()
     rule.onNodeWithText("Who can see your content").assertIsDisplayed()
     rule.onNodeWithText("Account privacy").assertIsDisplayed()
     rule.onNodeWithText("Close friends").assertIsDisplayed()
