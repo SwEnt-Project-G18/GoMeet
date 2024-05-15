@@ -36,6 +36,7 @@ import androidx.compose.material3.MenuItemColors
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -141,14 +142,16 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
   var tagsButtonText by remember { mutableStateOf("Add Tags") }
 
   val textFieldColors =
-      androidx.compose.material3.TextFieldDefaults.colors(
+      TextFieldDefaults.colors(
           focusedTextColor = MaterialTheme.colorScheme.onBackground,
           unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
           unfocusedContainerColor = Color.Transparent,
           focusedContainerColor = Color.Transparent,
           cursorColor = MaterialTheme.colorScheme.outlineVariant,
           focusedLabelColor = MaterialTheme.colorScheme.tertiary,
-          focusedIndicatorColor = MaterialTheme.colorScheme.tertiary)
+          unfocusedLabelColor = MaterialTheme.colorScheme.tertiary,
+          focusedIndicatorColor = MaterialTheme.colorScheme.tertiary,
+          unfocusedIndicatorColor = MaterialTheme.colorScheme.tertiary)
 
   Scaffold(
       topBar = {
@@ -481,14 +484,16 @@ fun LocationField(
             placeholder = { Text("Enter an address") },
             singleLine = true,
             colors =
-                androidx.compose.material3.TextFieldDefaults.colors(
+                TextFieldDefaults.colors(
                     focusedTextColor = MaterialTheme.colorScheme.onBackground,
                     unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
                     unfocusedContainerColor = Color.Transparent,
                     focusedContainerColor = Color.Transparent,
                     cursorColor = MaterialTheme.colorScheme.outlineVariant,
                     focusedLabelColor = MaterialTheme.colorScheme.tertiary,
-                    focusedIndicatorColor = MaterialTheme.colorScheme.tertiary),
+                    unfocusedLabelColor = MaterialTheme.colorScheme.tertiary,
+                    focusedIndicatorColor = MaterialTheme.colorScheme.tertiary,
+                    unfocusedIndicatorColor = MaterialTheme.colorScheme.tertiary),
             modifier = Modifier.fillMaxWidth().menuAnchor())
         ExposedDropdownMenu(
             expanded = expanded,

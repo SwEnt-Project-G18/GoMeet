@@ -111,7 +111,9 @@ fun EditProfile(
           focusedContainerColor = Color.Transparent,
           cursorColor = MaterialTheme.colorScheme.outlineVariant,
           focusedLabelColor = MaterialTheme.colorScheme.tertiary,
-          focusedIndicatorColor = MaterialTheme.colorScheme.tertiary)
+          unfocusedLabelColor = MaterialTheme.colorScheme.tertiary,
+          focusedIndicatorColor = MaterialTheme.colorScheme.tertiary,
+          unfocusedIndicatorColor = MaterialTheme.colorScheme.tertiary)
 
   var imageUri by remember { mutableStateOf<Uri?>(null) }
   var imageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }

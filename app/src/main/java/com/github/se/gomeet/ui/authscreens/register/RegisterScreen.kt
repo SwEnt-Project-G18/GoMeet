@@ -73,7 +73,9 @@ fun RegisterScreen(
           focusedContainerColor = Color.Transparent,
           cursorColor = MaterialTheme.colorScheme.outlineVariant,
           focusedLabelColor = MaterialTheme.colorScheme.tertiary,
-          focusedIndicatorColor = MaterialTheme.colorScheme.tertiary)
+          unfocusedLabelColor = MaterialTheme.colorScheme.tertiary,
+          focusedIndicatorColor = MaterialTheme.colorScheme.tertiary,
+          unfocusedIndicatorColor = MaterialTheme.colorScheme.tertiary)
 
   var state by remember { mutableIntStateOf(1) }
 

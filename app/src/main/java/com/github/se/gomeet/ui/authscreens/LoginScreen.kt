@@ -73,7 +73,9 @@ fun LoginScreen(
           focusedContainerColor = Color.Transparent,
           cursorColor = MaterialTheme.colorScheme.outlineVariant,
           focusedLabelColor = MaterialTheme.colorScheme.tertiary,
-          focusedIndicatorColor = MaterialTheme.colorScheme.tertiary)
+          unfocusedLabelColor = MaterialTheme.colorScheme.tertiary,
+          focusedIndicatorColor = MaterialTheme.colorScheme.tertiary,
+          unfocusedIndicatorColor = MaterialTheme.colorScheme.tertiary)
 
   Column(modifier = Modifier.fillMaxSize()) {
     TopAppBar(
