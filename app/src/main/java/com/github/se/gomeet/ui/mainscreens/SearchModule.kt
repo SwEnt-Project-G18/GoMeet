@@ -40,7 +40,6 @@ fun SearchModule() {
   val searchText by viewModel.searchText.collectAsState()
   val persons by viewModel.searchQuery.collectAsState()
   val isSearching by viewModel.isSearching.collectAsState()
-  val isFocused = remember { mutableStateOf(false) }
 
   println("### Persons: ${persons.toString()}")
 
@@ -106,7 +105,7 @@ fun SearchModuleSnippet(item: SearchViewModel.SearchableItem) {
         Column {
           Text(
               text = "${item.event.title} - ${item.event.date.toString()}", modifier = Modifier.fillMaxWidth())
-            Text(item.event.description, color = Color.Gray)
+            Text("${item.event.description}", color = Color.Gray)
         }
       }
     }

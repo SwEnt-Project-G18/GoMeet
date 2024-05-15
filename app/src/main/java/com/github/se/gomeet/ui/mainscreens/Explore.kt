@@ -41,6 +41,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -61,8 +62,11 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.github.se.gomeet.R
@@ -74,6 +78,7 @@ import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.viewmodel.EventViewModel
+import com.github.se.gomeet.viewmodel.SearchViewModel
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority.PRIORITY_BALANCED_POWER_ACCURACY
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -157,7 +162,8 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
   val locationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
 
   val eventList = remember { mutableStateOf<List<Event>>(emptyList()) }
-  val query = remember { mutableStateOf("") }
+  val viewModel = viewModel<SearchViewModel>()
+  val query by viewModel.searchText.collectAsState()
   val currentPosition = remember { mutableStateOf(defaultPosition) }
   var isMapLoaded by remember { mutableStateOf(false) }
 
@@ -491,7 +497,7 @@ fun GoogleMapView(
     onMapLoaded: () -> Unit = {},
     content: @Composable () -> Unit = {},
     events: MutableState<List<Event>>,
-    query: MutableState<String>,
+    query: String,
     locationPermitted: Boolean,
     eventViewModel: EventViewModel
 ) {
@@ -597,7 +603,7 @@ fun GoogleMapView(
                             ?: BitmapDescriptorFactory.defaultMarker(
                                 BitmapDescriptorFactory.HUE_RED),
                     onClick = markerClick,
-                    visible = event.title.contains(query.value, ignoreCase = true)) {
+                    visible = event.title.contains(query, ignoreCase = true)) {
                       Text(it.title!!, color = Color.Black)
                     }
               }
@@ -606,4 +612,10 @@ fun GoogleMapView(
       }
     }
   }
+}
+
+@Preview
+@Composable
+fun PreviewExplore() {
+  Explore(nav = NavigationActions(rememberNavController()), eventViewModel = EventViewModel())
 }

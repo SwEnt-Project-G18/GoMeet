@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.TextSelectionColors
@@ -36,6 +37,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -63,6 +65,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
@@ -70,6 +73,7 @@ import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.LoadingText
+import com.github.se.gomeet.ui.mainscreens.SearchModuleSnippet
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
@@ -77,6 +81,7 @@ import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.ui.theme.NavBarUnselected
 import com.github.se.gomeet.viewmodel.EventViewModel
+import com.github.se.gomeet.viewmodel.SearchViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.android.gms.maps.model.LatLng
 import java.text.SimpleDateFormat
@@ -107,7 +112,8 @@ fun Events(
   var selectedFilter by remember { mutableStateOf("All") }
   val eventList = remember { mutableListOf<Event>() }
   val coroutineScope = rememberCoroutineScope()
-  val query = remember { mutableStateOf("") }
+  val viewModel = viewModel<SearchViewModel>()
+  val query by viewModel.searchText.collectAsState()
   val user = remember { mutableStateOf<GoMeetUser?>(null) }
   var eventsLoaded = remember { mutableStateOf(false) }
 
@@ -228,7 +234,7 @@ fun Events(
                     eventList
                         .filter { e -> user.value!!.myEvents.contains(e.uid) }
                         .forEach { event ->
-                          if (event.title.contains(query.value, ignoreCase = true)) {
+                          if (event.title.contains(query, ignoreCase = true)) {
                             val painter: Painter =
                                 if (event.images.isNotEmpty()) {
                                   rememberAsyncImagePainter(
@@ -283,7 +289,7 @@ fun Events(
                     eventList
                         .filter { e -> user.value!!.myFavorites.contains(e.uid) }
                         .forEach { event ->
-                          if (event.title.contains(query.value, ignoreCase = true)) {
+                          if (event.title.contains(query, ignoreCase = true)) {
                             val painter: Painter =
                                 if (event.images.isNotEmpty()) {
                                   rememberAsyncImagePainter(
@@ -336,7 +342,7 @@ fun Events(
                     eventList
                         .filter { e -> e.creator == user.value!!.uid }
                         .forEach { event ->
-                          if (event.title.contains(query.value, ignoreCase = true)) {
+                          if (event.title.contains(query, ignoreCase = true)) {
                             val painter: Painter =
                                 if (event.images.isNotEmpty()) {
                                   rememberAsyncImagePainter(
@@ -551,14 +557,26 @@ fun EventWidget(
  */
 @ExperimentalMaterial3Api
 @Composable
-fun GoMeetSearchBar(query: MutableState<String>, backgroundColor: Color, contentColor: Color) {
+fun GoMeetSearchBar(query: String, backgroundColor: Color, contentColor: Color) {
+  val isFocused = remember { mutableStateOf(false) }
+  val viewModel = viewModel<SearchViewModel>()
+  //val searchText by viewModel.searchText.collectAsState()
+  val persons by viewModel.searchQuery.collectAsState()
+  val isSearching by viewModel.isSearching.collectAsState()
+
   val customTextSelectionColors =
-      TextSelectionColors(handleColor = DarkCyan, backgroundColor = DarkCyan.copy(alpha = 0.4f))
+      TextSelectionColors(handleColor = DarkCyan, backgroundColor = Color.White)
   CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
     androidx.compose.material3.SearchBar(
-        query = query.value,
-        onQueryChange = { query.value = it },
-        active = false,
+        query = query,
+        onQueryChange = {
+          viewModel::onSearchTextChange
+          if (!isFocused.value) {
+            isFocused.value = true
+          }
+          //query = it
+        },
+        active = isFocused.value,
         modifier = Modifier.fillMaxWidth().padding(start = 5.dp, end = 5.dp),
         placeholder = { Text("Search", color = contentColor) },
         leadingIcon = {
@@ -588,7 +606,12 @@ fun GoMeetSearchBar(query: MutableState<String>, backgroundColor: Color, content
                     ),
             ),
         onActiveChange = {},
-        onSearch = {}) {}
+        onSearch = {},
+        content = {
+          LazyColumn(modifier = Modifier.fillMaxWidth().weight(1f)) {
+            item { persons.forEach { person -> SearchModuleSnippet(person) } }
+          }
+        })
   }
 }
 
