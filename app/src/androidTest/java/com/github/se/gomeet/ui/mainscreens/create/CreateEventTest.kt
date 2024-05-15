@@ -63,6 +63,9 @@ class CreateEventTest {
     rule.onNodeWithText("Link").performTextInput("http://example.com")
 
     rule.onNodeWithText("Add Tags").assertIsDisplayed()
+    rule.onNodeWithTag("TagsButton").performClick()
+    rule.onNodeWithTag("TagList").assertIsDisplayed().performClick()
+    rule.onNodeWithText("Save").assertIsDisplayed().performClick()
 
     rule.onNodeWithText("Add Participants").assertIsDisplayed()
 
