@@ -208,8 +208,7 @@ fun UserItem(
         Button(
             colors =
                 ButtonDefaults.buttonColors(
-                    if (isFollowing) MaterialTheme.colorScheme.secondary
-                    else MaterialTheme.colorScheme.primaryContainer,
+                    if (isFollowing) MaterialTheme.colorScheme.outlineVariant else Color.White,
                     if (isFollowing) MaterialTheme.colorScheme.onSecondary
                     else MaterialTheme.colorScheme.tertiary),
             onClick = { onFollowButtonClick(user.uid, isFollowing) }) {
