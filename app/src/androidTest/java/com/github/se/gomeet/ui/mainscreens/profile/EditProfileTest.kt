@@ -31,7 +31,7 @@ class EditProfileTest {
     composeTestRule.onNodeWithText("Last Name").performScrollTo().assertIsDisplayed()
     composeTestRule.onNodeWithText("Username").performScrollTo().assertIsDisplayed()
     composeTestRule.onNodeWithText("Phone Number").performScrollTo().assertIsDisplayed()
-    composeTestRule.onNodeWithText("Country").performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("Country").performScrollTo().assertIsDisplayed()
     composeTestRule.onNodeWithText("Edit Tags").performScrollTo().assertIsDisplayed()
   }
 
