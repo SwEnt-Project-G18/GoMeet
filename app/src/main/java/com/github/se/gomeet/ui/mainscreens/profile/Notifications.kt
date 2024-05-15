@@ -414,14 +414,15 @@ fun InvitationsNotificationsWidget(
                     Row {
                         Button(
                             onClick = {
-                                clicked = true
+                                clicked = !clicked
                                 callback(event.copy(pendingParticipants = event.pendingParticipants.minus(currentUserId), participants = event.participants.plus(currentUserId)))
                             },
                             content = {
                                 Text("Accept")
                             },
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = DarkCyan, contentColor = Color.White
+                                containerColor = Color.Green,
+                                contentColor = Color.White
                             ),
                             border = BorderStroke(1.dp, DarkCyan),
                             enabled = !clicked,
@@ -430,18 +431,18 @@ fun InvitationsNotificationsWidget(
                         Spacer(modifier = Modifier.width(10.dp))
                         Button(
                             onClick = {
-                                clicked = true
+                                clicked = !clicked
                                 callback(event.copy(pendingParticipants = event.pendingParticipants.minus(currentUserId)))
                             },
                             content = {
-                                Text("Reject")
+                                Text("Decline")
                             },
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = DarkCyan, contentColor = Color.White
+                                containerColor = Color.Red, contentColor = Color.White
                             ),
                             border = BorderStroke(1.dp, DarkCyan),
                             enabled = !clicked,
-                            modifier = Modifier.testTag("RejectButton")
+                            modifier = Modifier.testTag("DeclineButton")
                         )
                     }
                 }
