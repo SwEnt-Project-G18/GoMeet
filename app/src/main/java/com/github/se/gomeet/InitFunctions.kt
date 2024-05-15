@@ -128,135 +128,116 @@ fun InitNavigation(
     client: ChatClient,
     applicationContext: Context
 ) {
-    val navAction = NavigationActions(nav)
-    val userIdState = remember { mutableStateOf("") }
-    val clientInitialisationState by client.clientState.initializationState.collectAsState()
-    val eventRepository = EventRepository(db)
-    val userRepository = UserRepository(db)
-    val authViewModel = AuthViewModel()
-    var eventViewModel = EventViewModel(null, eventRepository)
-    val userViewModel = UserViewModel(userRepository)
+  val navAction = NavigationActions(nav)
+  val userIdState = remember { mutableStateOf("") }
+  val clientInitialisationState by client.clientState.initializationState.collectAsState()
+  val eventRepository = EventRepository(db)
+  val userRepository = UserRepository(db)
+  val authViewModel = AuthViewModel()
+  var eventViewModel = EventViewModel(null, eventRepository)
+  val userViewModel = UserViewModel(userRepository)
 
-    return NavHost(navController = nav, startDestination = Route.WELCOME) {
-        composable(Route.WELCOME) {
-            WelcomeScreen(
-                onNavToLogin = { NavigationActions(nav).navigateTo(LOGIN_ITEMS[1]) },
-                onNavToRegister = { NavigationActions(nav).navigateTo(LOGIN_ITEMS[2]) },
-                onSignInSuccess = { userId: String ->
-                    val currentUser = Firebase.auth.currentUser
-                    if (currentUser != null) {
-                        val uid = currentUser.uid
-                        val email = currentUser.email ?: ""
-                        val firstName = authViewModel.signInState.value.firstNameRegister
-                        val lastName = authViewModel.signInState.value.lastNameRegister
-                        val phoneNumber = authViewModel.signInState.value.phoneNumberRegister
-                        val country = authViewModel.signInState.value.countryRegister
-                        val username = authViewModel.signInState.value.usernameRegister
-                        eventViewModel = EventViewModel(uid, eventRepository)
+  return NavHost(navController = nav, startDestination = Route.WELCOME) {
+    composable(Route.WELCOME) {
+      WelcomeScreen(
+          onNavToLogin = { NavigationActions(nav).navigateTo(LOGIN_ITEMS[1]) },
+          onNavToRegister = { NavigationActions(nav).navigateTo(LOGIN_ITEMS[2]) },
+          onSignInSuccess = { userId: String ->
+            val currentUser = Firebase.auth.currentUser
+            if (currentUser != null) {
+              val uid = currentUser.uid
+              val email = currentUser.email ?: ""
+              val firstName = authViewModel.signInState.value.firstNameRegister
+              val lastName = authViewModel.signInState.value.lastNameRegister
+              val phoneNumber = authViewModel.signInState.value.phoneNumberRegister
+              val country = authViewModel.signInState.value.countryRegister
+              val username = authViewModel.signInState.value.usernameRegister
+              eventViewModel = EventViewModel(uid, eventRepository)
 
-                        userViewModel.createUserIfNew(
-                            uid, username, firstName, lastName, email, phoneNumber, country
-                        )
-                    }
-                    val user =
-                        User(
-                            id = Firebase.auth.currentUser!!.uid,
-                            name = Firebase.auth.currentUser!!.email!!
-                        )
-
-                    client.connectUser(user = user, token = client.devToken(userId))
-                        .enqueue { result ->
-                            if (result.isSuccess) {
-                                NavigationActions(nav)
-                                    .navigateTo(
-                                        TOP_LEVEL_DESTINATIONS.first { it.route == Route.CREATE },
-                                        clearBackStack = true
-                                    )
-                            } else {
-                                // Handle connection failure
-                                Log.e("ChatClient", "Failed to connect user: $userId")
-                            }
-                        }
-                })
-        }
-        composable(Route.LOGIN) {
-            LoginScreen(authViewModel = authViewModel, nav = NavigationActions(nav)) {
-                NavigationActions(nav).navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == Route.CREATE })
+              userViewModel.createUserIfNew(
+                  uid, username, firstName, lastName, email, phoneNumber, country)
             }
-        }
-        composable(Route.REGISTER) {
-            RegisterScreen(client, NavigationActions(nav), authViewModel, userViewModel) {
-                NavigationActions(nav).navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == Route.CREATE })
+            val user =
+                User(
+                    id = Firebase.auth.currentUser!!.uid,
+                    name = Firebase.auth.currentUser!!.email!!)
+
+            client.connectUser(user = user, token = client.devToken(userId)).enqueue { result ->
+              if (result.isSuccess) {
+                NavigationActions(nav)
+                    .navigateTo(
+                        TOP_LEVEL_DESTINATIONS.first { it.route == Route.CREATE },
+                        clearBackStack = true)
+              } else {
+                // Handle connection failure
+                Log.e("ChatClient", "Failed to connect user: $userId")
+              }
             }
+          })
+    }
+    composable(Route.LOGIN) {
+      LoginScreen(authViewModel = authViewModel, nav = NavigationActions(nav)) {
+        NavigationActions(nav).navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == Route.CREATE })
+      }
+    }
+    composable(Route.REGISTER) {
+      RegisterScreen(client, NavigationActions(nav), authViewModel, userViewModel) {
+        NavigationActions(nav).navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == Route.CREATE })
+      }
+    }
+    composable(Route.EXPLORE) { Explore(navAction, eventViewModel) }
+    composable(Route.EVENTS) {
+      userIdState.value = Firebase.auth.currentUser!!.uid
+      Events(userIdState.value, navAction, UserViewModel(userRepository), eventViewModel)
+    }
+    composable(Route.TRENDS) {
+      Trends(userIdState.value, navAction, UserViewModel(userRepository), eventViewModel)
+    }
+    composable(Route.CREATE) {
+      userIdState.value = Firebase.auth.currentUser!!.uid
+      Create(navAction)
+    }
+    composable(Route.NOTIFICATIONS) { Notifications(navAction, currentUserID = userIdState.value) }
+
+    composable(Route.PROFILE) {
+      Profile(navAction, userId = userIdState.value, userViewModel, eventViewModel)
+    }
+    composable(
+        route = Route.OTHERS_PROFILE,
+        arguments = listOf(navArgument("uid") { type = NavType.StringType })) {
+          OthersProfile(
+              navAction, it.arguments?.getString("uid") ?: "", userViewModel, eventViewModel)
         }
-        composable(Route.EXPLORE) { Explore(navAction, eventViewModel) }
-        composable(Route.EVENTS) {
-            userIdState.value = Firebase.auth.currentUser!!.uid
-            Events(userIdState.value, navAction, UserViewModel(userRepository), eventViewModel)
-        }
-        composable(Route.TRENDS) {
-            Trends(userIdState.value, navAction, UserViewModel(userRepository), eventViewModel)
-        }
-        composable(Route.CREATE) {
-            userIdState.value = Firebase.auth.currentUser!!.uid
-            Create(navAction)
-        }
-        composable(Route.NOTIFICATIONS) {
-            Notifications(
-                navAction,
-                currentUserID = userIdState.value
-            )
+    composable(Route.PRIVATE_CREATE) {
+      CreateEvent(navAction, EventViewModel(Firebase.auth.currentUser!!.uid, eventRepository), true)
+    }
+    composable(Route.PUBLIC_CREATE) {
+      CreateEvent(
+          navAction, EventViewModel(Firebase.auth.currentUser!!.uid, eventRepository), false)
+    }
+
+    composable(
+        route = Route.ADD_PARTICIPANTS,
+        arguments = listOf(navArgument("eventId") { type = NavType.StringType })) { entry ->
+          val eventId = entry.arguments?.getString("eventId") ?: ""
+          AddParticipants(
+              nav = navAction,
+              userId = userIdState.value,
+              userViewModel = userViewModel,
+              eventId = eventId)
         }
 
-        composable(Route.PROFILE) {
-            Profile(navAction, userId = userIdState.value, userViewModel, eventViewModel)
-        }
-        composable(
-            route = Route.OTHERS_PROFILE,
-            arguments = listOf(navArgument("uid") { type = NavType.StringType })
-        ) {
-            OthersProfile(
-                navAction, it.arguments?.getString("uid") ?: "", userViewModel, eventViewModel
-            )
-        }
-        composable(Route.PRIVATE_CREATE) {
-            CreateEvent(
-                navAction,
-                EventViewModel(Firebase.auth.currentUser!!.uid, eventRepository),
-                true
-            )
-        }
-        composable(Route.PUBLIC_CREATE) {
-            CreateEvent(
-                navAction, EventViewModel(Firebase.auth.currentUser!!.uid, eventRepository), false
-            )
+    composable(
+        route = Route.MANAGE_INVITES,
+        arguments = listOf(navArgument("eventId") { type = NavType.StringType })) { entry ->
+          val eventId = entry.arguments?.getString("eventId") ?: ""
+
+          ManageInvites(userIdState.value, eventId, navAction, userViewModel, eventViewModel)
         }
 
-        composable(
-            route = Route.ADD_PARTICIPANTS,
-            arguments = listOf(navArgument("eventId") { type = NavType.StringType })
-        ) { entry ->
-            val eventId = entry.arguments?.getString("eventId") ?: ""
-            AddParticipants(
-                nav = navAction,
-                userId = userIdState.value,
-                userViewModel = userViewModel,
-                eventId = eventId
-            )
-        }
-
-        composable(
-            route = Route.MANAGE_INVITES,
-            arguments = listOf(navArgument("eventId") { type = NavType.StringType })
-        ) { entry ->
-            val eventId = entry.arguments?.getString("eventId") ?: ""
-
-            ManageInvites(userIdState.value, eventId, navAction, userViewModel, eventViewModel)
-        }
-
-        composable(
-            route = Route.EVENT_INFO,
-            arguments =
+    composable(
+        route = Route.EVENT_INFO,
+        arguments =
             listOf(
                 navArgument("eventId") { type = NavType.StringType },
                 navArgument("title") { type = NavType.StringType },
@@ -267,162 +248,124 @@ fun InitNavigation(
                 navArgument("description") { type = NavType.StringType },
                 navArgument("latitude") { type = NavType.FloatType }, // Change to DoubleType
                 navArgument("longitude") { type = NavType.FloatType } // Change to DoubleType
-            )) { entry ->
-            val eventId = entry.arguments?.getString("eventId") ?: ""
-            val title = entry.arguments?.getString("title") ?: ""
-            val date = entry.arguments?.getString("date") ?: ""
-            val time = entry.arguments?.getString("time") ?: ""
-            val organizer = entry.arguments?.getString("organizer") ?: ""
-            val rating = entry.arguments?.getFloat("rating") ?: 0.0
-            val description = entry.arguments?.getString("description") ?: ""
-            val latitude = entry.arguments?.getFloat("latitude") ?: 0.0
-            val longitude = entry.arguments?.getFloat("longitude") ?: 0.0
-            val loc = LatLng(latitude.toDouble(), longitude.toDouble())
+                )) { entry ->
+          val eventId = entry.arguments?.getString("eventId") ?: ""
+          val title = entry.arguments?.getString("title") ?: ""
+          val date = entry.arguments?.getString("date") ?: ""
+          val time = entry.arguments?.getString("time") ?: ""
+          val organizer = entry.arguments?.getString("organizer") ?: ""
+          val rating = entry.arguments?.getFloat("rating") ?: 0.0
+          val description = entry.arguments?.getString("description") ?: ""
+          val latitude = entry.arguments?.getFloat("latitude") ?: 0.0
+          val longitude = entry.arguments?.getFloat("longitude") ?: 0.0
+          val loc = LatLng(latitude.toDouble(), longitude.toDouble())
 
-            MyEventInfo(
-                NavigationActions(nav),
-                title,
-                eventId,
-                date,
-                time,
-                organizer,
-                rating.toDouble(),
-                painterResource(id = R.drawable.gomeet_logo),
-                description,
-                loc,
-                userViewModel,
-                eventViewModel
-            )
+          MyEventInfo(
+              NavigationActions(nav),
+              title,
+              eventId,
+              date,
+              time,
+              organizer,
+              rating.toDouble(),
+              painterResource(id = R.drawable.gomeet_logo),
+              description,
+              loc,
+              userViewModel,
+              eventViewModel)
         }
 
-        composable(
-            route = Route.MESSAGE,
-            arguments = listOf(navArgument("id") { type = NavType.StringType })
-        ) {
-            val id = it.arguments?.getString("id") ?: ""
-            val success = remember { mutableStateOf(false) }
-            val channelId = remember { mutableStateOf("") }
+    composable(
+        route = Route.MESSAGE,
+        arguments = listOf(navArgument("id") { type = NavType.StringType })) {
+          val id = it.arguments?.getString("id") ?: ""
+          val success = remember { mutableStateOf(false) }
+          val channelId = remember { mutableStateOf("") }
 
-            when (clientInitialisationState) {
-                InitializationState.COMPLETE -> {
-                    Log.d(
-                        "Sign in",
-                        "Sign in to chat works, $id, and ${Firebase.auth.currentUser!!.uid}"
-                    )
-                    client
-                        .createChannel(
-                            channelType = "messaging",
-                            channelId = "", // Let the API generate an ID
-                            memberIds = listOf(id, Firebase.auth.currentUser!!.uid),
-                            extraData = emptyMap()
-                        )
-                        .enqueue { res ->
-                            res.onError { error ->
-                                Log.d(
-                                    "Creating channel",
-                                    "Failed, Error: $error"
-                                )
-                            }
-                            res.onSuccess { result ->
-                                Log.d("Creating channel", "Success !")
-                                success.value = true
-                                channelId.value =
-                                    "messaging:${result.id}" // Correct format "channelType:channelId"
-                            }
-                        }
-
-                    if (success.value) {
-                        ChatTheme {
-                            MessagesScreen(
-                                viewModelFactory =
-                                MessagesViewModelFactory(
-                                    context = applicationContext,
-                                    channelId = channelId.value, // Make sure this is in
-                                    // "channelType:channelId" format
-                                    messageLimit = 30
-                                ),
-                                onBackPressed = { NavigationActions(nav).goBack() })
-                        }
+          when (clientInitialisationState) {
+            InitializationState.COMPLETE -> {
+              Log.d("Sign in", "Sign in to chat works, $id, and ${Firebase.auth.currentUser!!.uid}")
+              client
+                  .createChannel(
+                      channelType = "messaging",
+                      channelId = "", // Let the API generate an ID
+                      memberIds = listOf(id, Firebase.auth.currentUser!!.uid),
+                      extraData = emptyMap())
+                  .enqueue { res ->
+                    res.onError { error -> Log.d("Creating channel", "Failed, Error: $error") }
+                    res.onSuccess { result ->
+                      Log.d("Creating channel", "Success !")
+                      success.value = true
+                      channelId.value =
+                          "messaging:${result.id}" // Correct format "channelType:channelId"
                     }
-                }
+                  }
 
-                InitializationState.INITIALIZING -> {
-                    Log.d("Initializing", "Sign in to Chat is initializing")
-                    Text(text = "Initializing...")
+              if (success.value) {
+                ChatTheme {
+                  MessagesScreen(
+                      viewModelFactory =
+                          MessagesViewModelFactory(
+                              context = applicationContext,
+                              channelId = channelId.value, // Make sure this is in
+                              // "channelType:channelId" format
+                              messageLimit = 30),
+                      onBackPressed = { NavigationActions(nav).goBack() })
                 }
-
-                InitializationState.NOT_INITIALIZED -> {
-                    Log.d("Not initialized", "Sign in to Chat doesn't work, not initialized")
-                    Text(text = "Not initialized...")
-                }
+              }
             }
+            InitializationState.INITIALIZING -> {
+              Log.d("Initializing", "Sign in to Chat is initializing")
+              Text(text = "Initializing...")
+            }
+            InitializationState.NOT_INITIALIZED -> {
+              Log.d("Not initialized", "Sign in to Chat doesn't work, not initialized")
+              Text(text = "Not initialized...")
+            }
+          }
         }
 
-        composable(Route.SETTINGS) { SettingsScreen(navAction) }
-        composable(Route.ABOUT) { SettingsAbout(navAction) }
-        composable(Route.HELP) { SettingsHelp(navAction) }
-        composable(Route.PERMISSIONS) { SettingsPermissions(navAction) }
-        composable(Route.EDIT_PROFILE) { EditProfile(nav = navAction) }
-        composable(
-            route = Route.FOLLOWERS,
-            arguments = listOf(navArgument("uid") { type = NavType.StringType })
-        ) {
-            FollowingFollowers(
-                navAction,
-                it.arguments?.getString("uid") ?: "",
-                userViewModel,
-                false
-            )
+    composable(Route.SETTINGS) { SettingsScreen(navAction) }
+    composable(Route.ABOUT) { SettingsAbout(navAction) }
+    composable(Route.HELP) { SettingsHelp(navAction) }
+    composable(Route.PERMISSIONS) { SettingsPermissions(navAction) }
+    composable(Route.EDIT_PROFILE) { EditProfile(nav = navAction) }
+    composable(
+        route = Route.FOLLOWERS,
+        arguments = listOf(navArgument("uid") { type = NavType.StringType })) {
+          FollowingFollowers(navAction, it.arguments?.getString("uid") ?: "", userViewModel, false)
         }
-        composable(
-            route = Route.FOLLOWING,
-            arguments = listOf(navArgument("uid") { type = NavType.StringType })
-        ) {
-            FollowingFollowers(navAction, it.arguments?.getString("uid") ?: "", userViewModel, true)
+    composable(
+        route = Route.FOLLOWING,
+        arguments = listOf(navArgument("uid") { type = NavType.StringType })) {
+          FollowingFollowers(navAction, it.arguments?.getString("uid") ?: "", userViewModel, true)
         }
-        composable(Route.MESSAGE_CHANNELS) {
-            ChatTheme {
-                ChannelsScreen(
-                    onBackPressed = { navAction.goBack() },
-                    onHeaderAvatarClick = { navAction.navigateToScreen(Route.PROFILE) },
-                    onHeaderActionClick = {
-                        navAction.navigateToScreen(
-                            Route.FOLLOWING.replace(
-                                "{uid}",
-                                userIdState.value
-                            )
-                        )
-                    },
-                    onItemClick = { c ->
-                        navAction.navigateToScreen(
-                            Route.CHANNEL.replace(
-                                "{id}",
-                                c.id
-                            )
-                        )
-                    })
-            }
-        }
-        composable(
-            route = Route.CHANNEL,
-            arguments = listOf(navArgument("id") { type = NavType.StringType })
-        ) {
-            val id = it.arguments?.getString("id") ?: ""
-            ChatTheme {
-                Log.d("id is", id)
-                MessagesScreen(
-                    viewModelFactory =
+    composable(Route.MESSAGE_CHANNELS) {
+      ChatTheme {
+        ChannelsScreen(
+            onBackPressed = { navAction.goBack() },
+            onHeaderAvatarClick = { navAction.navigateToScreen(Route.PROFILE) },
+            onHeaderActionClick = {
+              navAction.navigateToScreen(Route.FOLLOWING.replace("{uid}", userIdState.value))
+            },
+            onItemClick = { c -> navAction.navigateToScreen(Route.CHANNEL.replace("{id}", c.id)) })
+      }
+    }
+    composable(
+        route = Route.CHANNEL,
+        arguments = listOf(navArgument("id") { type = NavType.StringType })) {
+          val id = it.arguments?.getString("id") ?: ""
+          ChatTheme {
+            Log.d("id is", id)
+            MessagesScreen(
+                viewModelFactory =
                     MessagesViewModelFactory(
                         context = applicationContext,
                         channelId = "messaging:${id}",
-                        messageLimit = 30
-                    ),
-                    onBackPressed = { NavigationActions(nav).goBack() })
-            }
-
+                        messageLimit = 30),
+                onBackPressed = { NavigationActions(nav).goBack() })
+          }
         }
-        composable(route = Route.ADD_FRIEND) {
-            AddFriend(navAction, userViewModel)
-        }
-    }
+    composable(route = Route.ADD_FRIEND) { AddFriend(navAction, userViewModel) }
+  }
 }
