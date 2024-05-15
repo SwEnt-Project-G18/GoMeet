@@ -4,7 +4,9 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performTextInput
 import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.ui.navigation.NavigationActions
@@ -27,13 +29,36 @@ class EditProfileTest {
     composeTestRule.setContent { EditProfile(NavigationActions(rememberNavController())) }
 
     composeTestRule.onNodeWithTag("Profile Picture").assertIsDisplayed()
-    composeTestRule.onNodeWithText("First Name").performScrollTo().assertIsDisplayed()
-    composeTestRule.onNodeWithText("Last Name").performScrollTo().assertIsDisplayed()
-    composeTestRule.onNodeWithText("Email Address").performScrollTo().assertIsDisplayed()
-    composeTestRule.onNodeWithText("Username").performScrollTo().assertIsDisplayed()
-    composeTestRule.onNodeWithText("Phone Number").performScrollTo().assertIsDisplayed()
-    composeTestRule.onNodeWithText("Country").performScrollTo().assertIsDisplayed()
+    composeTestRule
+        .onNodeWithText("First Name")
+        .performScrollTo()
+        .assertIsDisplayed()
+        .performTextInput("firstname")
+    composeTestRule
+        .onNodeWithText("Last Name")
+        .performScrollTo()
+        .assertIsDisplayed()
+        .performTextInput("lastname")
+    composeTestRule
+        .onNodeWithText("Username")
+        .performScrollTo()
+        .assertIsDisplayed()
+        .performTextInput("usesrname")
+    composeTestRule
+        .onNodeWithText("Phone Number")
+        .performScrollTo()
+        .assertIsDisplayed()
+        .performTextInput("+1234567890")
+    composeTestRule
+        .onNodeWithText("Country")
+        .performScrollTo()
+        .assertIsDisplayed()
+        .performTextInput("fakecountry")
     composeTestRule.onNodeWithText("Edit Tags").performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("EditTagsButton").performScrollTo().performClick()
+    composeTestRule.onNodeWithTag("TagList").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithText("Save").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithText("Done").assertIsDisplayed().performClick()
   }
 
   companion object {
