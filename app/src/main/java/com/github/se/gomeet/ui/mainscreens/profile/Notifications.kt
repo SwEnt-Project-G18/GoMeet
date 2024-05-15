@@ -1,6 +1,8 @@
 package com.github.se.gomeet.ui.mainscreens.profile
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -13,17 +15,22 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -33,10 +40,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
@@ -48,9 +57,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -67,11 +74,11 @@ import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
-import com.github.se.gomeet.ui.theme.NavBarUnselected
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.CoroutineScope
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.ZoneId
@@ -79,179 +86,248 @@ import java.util.Date
 import java.util.Locale
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Notifications(nav: NavigationActions, currentUserID: String) {
-  val userViewModel = UserViewModel(UserRepository(Firebase.firestore))
-  val eventViewModel = EventViewModel(null, EventRepository(Firebase.firestore))
+    val pagerState = rememberPagerState(pageCount = { 2 })
+    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
 
-  var selectedFilter by remember { mutableStateOf("All") }
-  val user = remember { mutableStateOf<GoMeetUser?>(null) }
-  val event = remember { mutableStateOf<Event?>(null) }
-  val coroutineScope = rememberCoroutineScope()
+    val userViewModel = UserViewModel(UserRepository(Firebase.firestore))
+    val eventViewModel = EventViewModel(null, EventRepository(Firebase.firestore))
 
-  LaunchedEffect(Unit) {
-    coroutineScope.launch {
-      val currentUser = userViewModel.getUser(currentUserID)
+    var isLoaded by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
 
-      if (currentUser != null) {
-        user.value = currentUser
-      }
-    }
-  }
+    val toUpdate = remember { mutableListOf<Event>() }
+    val user = remember { mutableStateOf<GoMeetUser?>(null) }
+    val eventsList =
+        remember { mutableListOf<Event>() } // list of events for which the user has received an invitation
 
-  // Define a function to handle button clicks
-  fun onFilterButtonClick(filterType: String) {
-    selectedFilter = if (selectedFilter == filterType) "All" else filterType
-  }
+    LaunchedEffect(Unit) {
+        coroutineScope.launch {
+            val currentUser = userViewModel.getUser(currentUserID)
 
-  Scaffold(
-      topBar = {
-        Text(
-            text = "Notifications",
-            modifier =
-                Modifier.padding(start = 15.dp, top = 15.dp, end = 15.dp, bottom = 0.dp)
-                    .testTag("TopBar"),
-            color = DarkCyan,
-            fontStyle = FontStyle.Normal,
-            fontWeight = FontWeight.SemiBold,
-            fontFamily = FontFamily.Default,
-            textAlign = TextAlign.Start,
-            style = MaterialTheme.typography.headlineLarge)
-      },
-      bottomBar = {
-        BottomNavigationMenu(
-            onTabSelect = { selectedTab ->
-              nav.navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == selectedTab })
-            },
-            tabList = TOP_LEVEL_DESTINATIONS,
-            selectedItem = Route.NOTIFICATIONS)
-      }) { innerPadding ->
-        Column(
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.Start,
-            modifier = Modifier.padding(innerPadding)) {
-              Row(
-                  verticalAlignment = Alignment.CenterVertically,
-                  horizontalArrangement = Arrangement.Start,
-                  modifier = Modifier.testTag("Back").clickable { nav.goBack() }) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.arrow_back_24px),
-                        contentDescription = "image description",
-                        modifier = Modifier.padding(10.dp))
-                    Text(
-                        text = "Back",
-                        style =
-                            TextStyle(
-                                fontSize = 12.sp,
-                                lineHeight = 16.sp,
-                                fontFamily = FontFamily(Font(R.font.roboto)),
-                                fontWeight = FontWeight(600),
-                                color = Color(0xFF1D1B20),
-                                letterSpacing = 0.5.sp,
-                            ))
-                  }
-              Spacer(modifier = Modifier.height(10.dp))
-              Row(
-                  verticalAlignment = Alignment.CenterVertically,
-                  horizontalArrangement = Arrangement.SpaceEvenly,
-                  modifier = Modifier.heightIn(min = 56.dp).fillMaxWidth()) {
-                    Button(
-                        onClick = { onFilterButtonClick("All") },
-                        content = { Text("All") },
-                        colors =
-                            ButtonDefaults.buttonColors(
-                                containerColor =
-                                    if (selectedFilter == "All") DarkCyan else NavBarUnselected,
-                                contentColor =
-                                    if (selectedFilter == "All") Color.White else DarkCyan),
-                        border = BorderStroke(1.dp, DarkCyan),
-                        modifier = Modifier.testTag("AllButton"))
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Button(
-                        onClick = { onFilterButtonClick("Invitations") },
-                        content = { Text("Invitations") },
-                        colors =
-                            ButtonDefaults.buttonColors(
-                                containerColor =
-                                    if (selectedFilter == "Invitations") DarkCyan
-                                    else NavBarUnselected,
-                                contentColor =
-                                    if (selectedFilter == "Invitations") Color.White else DarkCyan),
-                        border = BorderStroke(1.dp, DarkCyan),
-                        modifier = Modifier.testTag("InvitationsButton"))
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Button(
-                        onClick = { onFilterButtonClick("My events") },
-                        content = { Text("My events") },
-                        colors =
-                            ButtonDefaults.buttonColors(
-                                containerColor =
-                                    if (selectedFilter == "My events") DarkCyan
-                                    else NavBarUnselected,
-                                contentColor =
-                                    if (selectedFilter == "My events") Color.White else DarkCyan),
-                        border = BorderStroke(1.dp, DarkCyan),
-                        modifier = Modifier.testTag("MyEventsButton"))
-                  }
+            if (currentUser != null) {
+                user.value = currentUser
 
-              Column(modifier = Modifier.verticalScroll(rememberScrollState()).fillMaxSize()) {
-                val painter: Painter =
-                    rememberAsyncImagePainter(
-                        ImageRequest.Builder(LocalContext.current)
-                            .data(data = R.drawable.gomeet_logo)
-                            .apply(
-                                block =
-                                    fun ImageRequest.Builder.() {
-                                      crossfade(true)
-                                      placeholder(R.drawable.gomeet_logo)
-                                    })
-                            .build())
-
-                user.value?.pendingRequests?.forEach { invitation ->
-                  val eventName = invitation.eventId
-                  coroutineScope.launch {
-                    val currentEvent = eventViewModel.getEvent(eventName)
-
-                    if (currentEvent != null) {
-                      event.value = currentEvent
+                currentUser.pendingRequests.forEach { request ->
+                    val invitedEvent = eventViewModel.getEvent(request.eventId)
+                    if (invitedEvent != null) {
+                        eventsList.add(invitedEvent)
                     }
-                  }
-
-                  event.value?.let { event ->
-                    NotificationsWidget(
-                        organizerName = event.creator,
-                        eventTitle = event.title,
-                        eventDate = event.date,
-                        eventPicture = painter,
-                        verified = true)
-                  }
-
-                  Spacer(Modifier.height(10.dp))
                 }
-              }
             }
-      }
+
+            isLoaded = true
+        }
+    }
+
+    Scaffold(
+        modifier = Modifier.testTag("NotificationsScreen"),
+        topBar = {
+            Column {
+                Box(contentAlignment = Alignment.Center) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        IconButton(
+                            onClick = {
+                                toUpdate.forEach {
+                                    // TODO: Update the user in the database userViewModel.updateUser(it)
+                                }
+                                nav.goBack()
+                            }) {
+                            Icon(
+                                Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                                contentDescription = "Go back"
+                            )
+                        }
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "Notifications",
+                            style =
+                            MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
+                        )
+                    }
+                }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceAround
+                ) {
+                    // Invitations notifications
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier =
+                        Modifier
+                            .weight(1f)
+                            .height(screenHeight / 20)
+                            .clickable {
+                                coroutineScope.launch { pagerState.animateScrollToPage(0) }
+                            }) {
+                        Text(
+                            text = "Invitations",
+                            style =
+                            MaterialTheme.typography.bodyMedium.copy(
+                                fontWeight =
+                                if (pagerState.currentPage == 0) FontWeight.Bold
+                                else FontWeight.Normal
+                            )
+                        )
+                    }
+
+                    // Messages notifications
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier =
+                        Modifier
+                            .height(screenHeight / 20)
+                            .weight(1f)
+                            .clickable {
+                                coroutineScope.launch { pagerState.animateScrollToPage(1) }
+                            }) {
+                        Text(
+                            text = "Messages",
+                            style =
+                            MaterialTheme.typography.bodyMedium.copy(
+                                fontWeight =
+                                if (pagerState.currentPage == 1) FontWeight.Bold
+                                else FontWeight.Normal
+                            )
+                        )
+                    }
+                }
+                Canvas(
+                    modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(1.dp)
+                ) {
+                    val canvasWidth = size.width
+                    drawLine(
+                        color = Color.Black,
+                        start =
+                        when (pagerState.currentPage) {
+                            0 -> Offset(x = 0f, y = 0f)
+                            else -> Offset(x = canvasWidth / 2, y = 0f)
+                        },
+                        end =
+                        when (pagerState.currentPage) {
+                            0 -> Offset(x = canvasWidth / 2, y = 0f)
+                            else -> Offset(x = canvasWidth, y = 0f)
+                        },
+                        strokeWidth = 5f
+                    )
+                }
+                Spacer(modifier = Modifier.height(screenHeight / 30))
+            }
+        },
+        bottomBar = {
+            BottomNavigationMenu(
+                onTabSelect = { selectedTab ->
+                    nav.navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == selectedTab })
+                },
+                tabList = TOP_LEVEL_DESTINATIONS,
+                selectedItem = Route.NOTIFICATIONS
+            )
+        }) { innerPadding ->
+
+        if (isLoaded) {
+            HorizontalPager(state = pagerState, modifier = Modifier.padding(innerPadding)) { page ->
+                when (page) {
+                    0 -> {
+                        PageInvitationsNotifications(
+                            listEvent = eventsList,
+                            userViewModel = userViewModel,
+                            coroutineScope = coroutineScope,
+                            initialClicked = false,
+                            callback = { user ->
+                                toUpdate.add(user)
+                            }
+                        )
+                    }
+
+                    1 -> {
+                        // TODO: Implement the page for messages notifications
+                    }
+                }
+            }
+
+        } else {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }
+        }
+    }
 }
 
 @Composable
-fun NotificationsWidget(
-    organizerName: String,
+fun PageInvitationsNotifications(
+    listEvent: List<Event>,
+    userViewModel: UserViewModel,
+    coroutineScope: CoroutineScope,
+    initialClicked: Boolean,
+    callback: (Event) -> Unit
+) {
+    val eventToCreatorMap = mutableMapOf<Event, String>()
+
+    LaunchedEffect(Unit) {
+        coroutineScope.launch {
+            listEvent.forEach { event ->
+                eventToCreatorMap[event] = userViewModel.getUser(event.creator)?.username ?: "GoMeetUser"
+            }
+        }
+    }
+
+    Column(
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())) {
+        listEvent.forEach { event ->
+            eventToCreatorMap[event]?.let {
+                InvitationsNotificationsWidget(creatorID = it,
+                    eventTitle = event.title,
+                    eventDate = event.date,
+                    eventPicture = painterResource(id = R.drawable.gomeet_logo), // TODO: Later, need to use the event's image
+                    verified = false,
+                    initialClicked = initialClicked,
+                    callback = callback)
+            }
+        }
+    }
+}
+
+@Composable
+fun InvitationsNotificationsWidget(
+    creatorID: String,
     eventTitle: String,
     eventDate: LocalDate,
     eventPicture: Painter,
-    verified: Boolean
+    verified: Boolean,
+    initialClicked: Boolean,
+    callback: (Event) -> Unit
 ) {
+    var clicked by rememberSaveable { mutableStateOf(initialClicked) }
 
-  val configuration = LocalConfiguration.current
-  val screenWidth = configuration.screenWidthDp.dp
+  val screenWidth = LocalConfiguration.current.screenWidthDp.dp
   val density = LocalDensity.current
 
   // Example logic to calculate text size based on screen width
   val smallTextSize = with(density) { screenWidth.toPx() / 85 }
   val bigTextSize = with(density) { screenWidth.toPx() / 60 }
+
   Row(Modifier.padding(start = 10.dp)) {
     Text(
-        text = organizerName,
+        text = creatorID,
         style =
             TextStyle(
                 fontSize = 11.sp,
@@ -264,7 +340,7 @@ fun NotificationsWidget(
         modifier = Modifier.testTag("InviterUserName"))
     Spacer(modifier = Modifier.width(2.5.dp))
     Text(
-        text = "invited you to attend",
+        text = "invited you to attend ",
         style =
             TextStyle(
                 fontSize = 11.sp,
@@ -277,9 +353,10 @@ fun NotificationsWidget(
   }
   Card(
       modifier =
-          Modifier.fillMaxWidth()
-              .padding(start = 10.dp, top = 5.dp, end = 10.dp, bottom = 5.dp)
-              .testTag("EventCard"),
+      Modifier
+          .fillMaxWidth()
+          .padding(start = 10.dp, top = 5.dp, end = 10.dp, bottom = 5.dp)
+          .testTag("EventCard"),
       colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
       border = BorderStroke(2.dp, DarkCyan)) {
         Row(
@@ -287,7 +364,9 @@ fun NotificationsWidget(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceAround) {
               Column(
-                  modifier = Modifier.weight(4f).padding(10.dp),
+                  modifier = Modifier
+                      .weight(4f)
+                      .padding(10.dp),
                   horizontalAlignment = Alignment.Start, // Align text horizontally to center
                   verticalArrangement = Arrangement.Center) {
                     Text(
@@ -306,7 +385,7 @@ fun NotificationsWidget(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center) {
                           Text(
-                              organizerName,
+                              creatorID,
                               style =
                                   TextStyle(
                                       fontSize = smallTextSize.sp,
@@ -320,7 +399,9 @@ fun NotificationsWidget(
                           if (verified) {
                             Box(
                                 contentAlignment = Alignment.Center,
-                                modifier = Modifier.padding(5.dp).size(smallTextSize.dp * (1.4f))) {
+                                modifier = Modifier
+                                    .padding(5.dp)
+                                    .size(smallTextSize.dp * (1.4f))) {
                                   Image(
                                       painter = painterResource(id = R.drawable.verified),
                                       contentDescription = "Verified",
@@ -413,16 +494,19 @@ fun NotificationsWidget(
                   painter = eventPicture,
                   contentDescription = "Event Picture",
                   modifier =
-                      Modifier.weight(
-                              2f) // Take 1/3 of the card space because of the total weight of 4
-                          // (3
-                          // for the column and 1 for this image)
-                          .fillMaxHeight() // Fill the height of the Row
-                          .aspectRatio(
-                              3f / 1.75f) // Maintain an aspect ratio of 3:2, change it as needed
-                          .clipToBounds()
-                          .padding(0.dp)
-                          .testTag("EventImage"), // Clip the image if it overflows its bounds
+                  Modifier
+                      .weight(
+                          2f
+                      ) // Take 1/3 of the card space because of the total weight of 4
+                      // (3
+                      // for the column and 1 for this image)
+                      .fillMaxHeight() // Fill the height of the Row
+                      .aspectRatio(
+                          3f / 1.75f
+                      ) // Maintain an aspect ratio of 3:2, change it as needed
+                      .clipToBounds()
+                      .padding(0.dp)
+                      .testTag("EventImage"), // Clip the image if it overflows its bounds
                   contentScale = ContentScale.Crop, // Crop the image to fit the aspect ratio
               )
             }
