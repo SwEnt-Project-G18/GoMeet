@@ -223,7 +223,7 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
                   frontLayerScrimColor = Color.Unspecified,
                   headerHeight = halfHeight.dp,
                   peekHeight = 0.dp,
-                  modifier = Modifier.testTag("ExploreScreen").padding(innerPadding),
+                  modifier = Modifier.testTag("MapSlider").padding(innerPadding),
                   appBar = {},
                   frontLayerContent = {
                     Column(modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
