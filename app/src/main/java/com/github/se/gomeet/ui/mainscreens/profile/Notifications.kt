@@ -23,10 +23,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -84,7 +82,7 @@ fun Notifications(nav: NavigationActions, currentUserID: String) {
 
     Scaffold(
         modifier = Modifier.testTag("NotificationsScreen"),
-        topBar = { NotificationsTopBar(pagerState, coroutineScope, screenHeight, nav, toUpdate) },
+        topBar = { NotificationsTopBar(pagerState, coroutineScope, screenHeight, nav, currentUserID, eventViewModel, userViewModel, toUpdate) },
         bottomBar = { BottomNavigation(nav) }
     ) { innerPadding ->
         if (isLoaded) {
@@ -93,9 +91,7 @@ fun Notifications(nav: NavigationActions, currentUserID: String) {
                     0 -> PageInvitationsNotifications(
                         listEvent = eventsList,
                         userViewModel = userViewModel,
-                        eventViewModel = eventViewModel,
                         currentUserId = currentUserID,
-                        coroutineScope = coroutineScope,
                         initialClicked = false,
                         callback = { event -> toUpdate.add(event) }
                     )
@@ -150,16 +146,19 @@ fun NotificationsTopBar(
     coroutineScope: CoroutineScope,
     screenHeight: Dp,
     nav: NavigationActions,
+    currentUserID: String,
+    eventViewModel: EventViewModel,
+    userViewModel: UserViewModel,
     toUpdate: List<Event>
 ) {
     Column {
-        TopAppBar(nav, toUpdate)
+        TopAppBar(nav, currentUserID, eventViewModel, userViewModel, toUpdate)
         TabRow(pagerState, coroutineScope, screenHeight)
     }
 }
 
 @Composable
-fun TopAppBar(nav: NavigationActions, toUpdate: List<Event>) {
+fun TopAppBar(nav: NavigationActions, currentUserID: String, eventViewModel: EventViewModel, userViewModel: UserViewModel, toUpdate: List<Event>) {
     Box(contentAlignment = Alignment.Center) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -168,7 +167,14 @@ fun TopAppBar(nav: NavigationActions, toUpdate: List<Event>) {
             IconButton(
                 onClick = {
                     toUpdate.forEach {
-                        // TODO: Update the user in the database userViewModel.updateUser(it)
+                        event ->
+                        eventViewModel.editEvent(event)
+
+                        if (event.participants.contains(currentUserID)) {
+                            userViewModel.userAcceptsInvitation(event.eventID, currentUserID)
+                        } else {
+                            userViewModel.userRefusesInvitation(event.eventID, currentUserID)
+                        }
                     }
                     nav.goBack()
                 }
@@ -258,9 +264,7 @@ fun BottomNavigation(nav: NavigationActions) {
 fun PageInvitationsNotifications(
     listEvent: List<Event>,
     userViewModel: UserViewModel,
-    eventViewModel: EventViewModel,
     currentUserId: String,
-    coroutineScope: CoroutineScope,
     initialClicked: Boolean,
     callback: (Event) -> Unit
 ) {
@@ -275,9 +279,7 @@ fun PageInvitationsNotifications(
             InvitationsNotificationsWidget(
                 event = event,
                 userViewModel = userViewModel,
-                eventViewModel = eventViewModel,
                 currentUserId = currentUserId,
-                coroutineScope = coroutineScope,
                 initialClicked = initialClicked,
                 callback = callback
             )
@@ -290,9 +292,7 @@ fun PageInvitationsNotifications(
 fun InvitationsNotificationsWidget(
     event: Event,
     userViewModel: UserViewModel,
-    eventViewModel: EventViewModel,
     currentUserId: String,
-    coroutineScope: CoroutineScope,
     initialClicked: Boolean,
     callback: (Event) -> Unit
 ) {
@@ -414,9 +414,8 @@ fun InvitationsNotificationsWidget(
                     Row {
                         Button(
                             onClick = {
-                                clicked = !clicked
-
-                                callback(event.copy(pendingParticipants = event.pendingParticipants.minus(currentUserId)))
+                                clicked = true
+                                callback(event.copy(pendingParticipants = event.pendingParticipants.minus(currentUserId), participants = event.participants.plus(currentUserId)))
                             },
                             content = {
                                 Text("Accept")
@@ -425,12 +424,13 @@ fun InvitationsNotificationsWidget(
                                 containerColor = DarkCyan, contentColor = Color.White
                             ),
                             border = BorderStroke(1.dp, DarkCyan),
+                            enabled = !clicked,
                             modifier = Modifier.testTag("AcceptButton")
                         )
                         Spacer(modifier = Modifier.width(10.dp))
                         Button(
                             onClick = {
-                                clicked = !clicked
+                                clicked = true
                                 callback(event.copy(pendingParticipants = event.pendingParticipants.minus(currentUserId)))
                             },
                             content = {
@@ -440,6 +440,7 @@ fun InvitationsNotificationsWidget(
                                 containerColor = DarkCyan, contentColor = Color.White
                             ),
                             border = BorderStroke(1.dp, DarkCyan),
+                            enabled = !clicked,
                             modifier = Modifier.testTag("RejectButton")
                         )
                     }

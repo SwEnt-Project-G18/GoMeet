@@ -232,37 +232,39 @@ class UserViewModel(userRepository: UserRepository) : ViewModel() {
     }
   }
 
-  suspend fun userAcceptsInvitation(eventId: String, userId: String) {
-    val possibleInvitation =
-        getUser(userId)!!.pendingRequests.find {
-          it.eventId == eventId && it.status == InviteStatus.PENDING
-        }
-    try {
-      val goMeetUser = getUser(userId)!!
-      if (possibleInvitation != null) {
-        editUser(
-            goMeetUser.copy(pendingRequests = goMeetUser.pendingRequests.minus(possibleInvitation)))
+  fun userAcceptsInvitation(eventId: String, userId: String) {
+      CoroutineScope(Dispatchers.IO).launch {
+          val goMeetUser = getUser(userId)!!
+          val possibleInvitation =
+              goMeetUser.pendingRequests.find {
+                  it.eventId == eventId && it.status == InviteStatus.PENDING
+              }
+
+          if (possibleInvitation != null) {
+              editUser(
+                  goMeetUser.copy(pendingRequests = goMeetUser.pendingRequests.minus(possibleInvitation),
+                      joinedEvents = goMeetUser.joinedEvents.plus(eventId)))
+          } else {
+                Log.w(ContentValues.TAG, "Couldn't accept the invitation")
+
+          }
       }
-      editUser(goMeetUser.copy(joinedEvents = goMeetUser.joinedEvents.plus(eventId)))
-    } catch (e: Exception) {
-      Log.w(ContentValues.TAG, "Couldn't accept the invitation", e)
-    }
   }
 
-  suspend fun userRefusesInvitation(eventId: String, userId: String) {
-    val possibleInvitation =
-        getUser(userId)!!.pendingRequests.find {
-          it.eventId == eventId && it.status == InviteStatus.PENDING
-        }
-
-    try {
+  fun userRefusesInvitation(eventId: String, userId: String) {
+    CoroutineScope(Dispatchers.IO).launch {
       val goMeetUser = getUser(userId)!!
+      val possibleInvitation =
+          goMeetUser.pendingRequests.find {
+            it.eventId == eventId && it.status == InviteStatus.PENDING
+          }
+
       if (possibleInvitation != null) {
         editUser(
             goMeetUser.copy(pendingRequests = goMeetUser.pendingRequests.minus(possibleInvitation)))
+      } else {
+        Log.w(ContentValues.TAG, "Couldn't refuse the invitation")
       }
-    } catch (e: Exception) {
-      Log.w(ContentValues.TAG, "Couldn't refuse the invitation", e)
     }
   }
 
