@@ -203,7 +203,7 @@ fun Profile(
                           }
 
                       Button(
-                          onClick = { /*TODO*/},
+                          onClick = { nav.navigateToScreen(Route.ADD_FRIEND)},
                           modifier = Modifier.height(37.dp),
                           shape = RoundedCornerShape(10.dp),
                           colors =
