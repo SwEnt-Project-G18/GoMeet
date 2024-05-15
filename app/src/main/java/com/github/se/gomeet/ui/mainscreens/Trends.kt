@@ -315,7 +315,10 @@ fun SortButton(eventList: MutableList<Event>) {
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            modifier = Modifier.align(Alignment.Center).fillMaxWidth()) {
+            modifier =
+                Modifier.align(Alignment.Center)
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.primaryContainer)) {
               DropdownMenuItem(
                   text = { Text("Popularity") },
                   onClick = {
