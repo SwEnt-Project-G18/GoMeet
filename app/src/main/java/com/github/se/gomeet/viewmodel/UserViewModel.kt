@@ -23,7 +23,6 @@ import kotlinx.coroutines.launch
  */
 class UserViewModel() : ViewModel() {
   private val currentUser = mutableStateOf<GoMeetUser?>(null)
-  private val repository = UserRepository()
 
   /**
    * Create a new user if the user is new.
@@ -65,7 +64,7 @@ class UserViewModel() : ViewModel() {
                   myFavorites = emptyList(),
                   tags = emptyList())
           currentUser.value = user
-          repository.addUser(user)
+          UserRepository.addUser(user)
         } catch (e: Exception) {
           Log.w(ContentValues.TAG, "Error adding user", e)
         }
@@ -75,7 +74,7 @@ class UserViewModel() : ViewModel() {
 
   suspend fun getFollowers(uid: String): List<GoMeetUser> {
     val followers = mutableListOf<GoMeetUser>()
-    repository.getAllUsers { users ->
+    UserRepository.getAllUsers { users ->
       for (user in users) {
         if (user.uid != uid && user.following.contains(uid)) {
           followers.add(user)
@@ -93,7 +92,7 @@ class UserViewModel() : ViewModel() {
   ) {
     viewModelScope.launch {
       try {
-        val imageUrl = repository.uploadUserProfileImageAndGetUrl(userId, imageUri)
+        val imageUrl = UserRepository.uploadUserProfileImageAndGetUrl(userId, imageUri)
         onSuccess(imageUrl)
       } catch (e: Exception) {
         onError(e)
@@ -111,7 +110,7 @@ class UserViewModel() : ViewModel() {
     return try {
       Log.d("UID IS", "User id is $uid")
       val event = CompletableDeferred<GoMeetUser?>()
-      repository.getUser(uid) { t -> event.complete(t) }
+      UserRepository.getUser(uid) { t -> event.complete(t) }
       event.await()
     } catch (e: Exception) {
       null
@@ -126,7 +125,7 @@ class UserViewModel() : ViewModel() {
   suspend fun getAllUsers(): List<GoMeetUser>? {
     return try {
       val users = CompletableDeferred<List<GoMeetUser>?>()
-      repository.getAllUsers { t -> users.complete(t) }
+      UserRepository.getAllUsers { t -> users.complete(t) }
       users.await()
     } catch (e: Exception) {
       emptyList()
@@ -139,7 +138,7 @@ class UserViewModel() : ViewModel() {
    * @param user the user to edit
    */
   fun editUser(user: GoMeetUser) {
-    repository.updateUser(user)
+    UserRepository.updateUser(user)
   }
 
   /**
@@ -148,7 +147,7 @@ class UserViewModel() : ViewModel() {
    * @param uid the user id
    */
   fun deleteUser(uid: String) {
-    repository.removeUser(uid)
+    UserRepository.removeUser(uid)
   }
 
   /**

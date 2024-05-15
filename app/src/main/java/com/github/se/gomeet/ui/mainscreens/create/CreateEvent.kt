@@ -90,8 +90,7 @@ private const val NUMBER_OF_SUGGESTIONS = 3
 @Composable
 fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivate: Boolean) {
 
-  val eventRepository = EventRepository()
-  val uid = eventRepository.getNewId()
+  val uid = EventRepository.getNewId()
   val titleState = remember { mutableStateOf("") }
   val descriptionState = remember { mutableStateOf("") }
   val locationState = remember { mutableStateOf("") }
