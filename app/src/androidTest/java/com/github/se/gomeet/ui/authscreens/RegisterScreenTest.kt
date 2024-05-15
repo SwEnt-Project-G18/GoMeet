@@ -1,0 +1,94 @@
+package com.github.se.gomeet.ui.authscreens
+
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
+import com.github.se.gomeet.MainActivity
+import com.github.se.gomeet.screens.RegisterScreenScreen
+import com.github.se.gomeet.screens.WelcomeScreenScreen
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
+import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
+import io.github.kakaocup.compose.node.element.ComposeScreen
+import org.junit.After
+import org.junit.Rule
+import org.junit.Test
+
+class RegisterScreenTest : TestCase() {
+
+  @get:Rule val composeTestRule = createAndroidComposeRule<MainActivity>()
+
+  @After
+  fun tearDown() {
+    // Clean up the user
+    Firebase.auth.currentUser?.delete()
+  }
+
+  @Test
+  fun registerScreenTest() = run {
+    val email = "registerscreen@test.com"
+
+    ComposeScreen.onComposeScreen<WelcomeScreenScreen>(composeTestRule) {
+      composeTestRule.onNodeWithText("Sign Up").performClick()
+    }
+
+    ComposeScreen.onComposeScreen<RegisterScreenScreen>(composeTestRule) {
+      // RegisterUsernameEmail
+      composeTestRule.onNodeWithContentDescription("GoMeet").assertIsDisplayed()
+      composeTestRule.onNodeWithContentDescription("Back").assertIsDisplayed()
+      composeTestRule.onNodeWithTag("Text").assertIsDisplayed()
+      composeTestRule
+          .onNodeWithText("Username")
+          .assertIsDisplayed()
+          .performTextInput("RegisterScreenTestUser")
+      composeTestRule.onNodeWithText("Email").assertIsDisplayed().performTextInput(email)
+      composeTestRule.onNodeWithTag("BottomRow").assertIsDisplayed()
+      composeTestRule.onNodeWithContentDescription("Next").assertIsDisplayed().performClick()
+
+      composeTestRule.waitForIdle()
+
+      // RegisterPassword
+      composeTestRule.onNodeWithContentDescription("GoMeet").assertIsDisplayed()
+      composeTestRule.onNodeWithContentDescription("Back").assertIsDisplayed()
+      composeTestRule.onNodeWithTag("Text").assertIsDisplayed()
+      composeTestRule.onNodeWithText("Password").assertIsDisplayed().performTextInput("123456")
+      composeTestRule
+          .onNodeWithText("Confirm Password")
+          .assertIsDisplayed()
+          .performTextInput("123456")
+      composeTestRule.onNodeWithTag("BottomRow").assertIsDisplayed()
+      composeTestRule.onNodeWithContentDescription("Next").assertIsDisplayed().performClick()
+
+      composeTestRule.waitForIdle()
+
+      // RegisterNameCountryPhone
+      composeTestRule.onNodeWithContentDescription("GoMeet").assertIsDisplayed()
+      composeTestRule.onNodeWithContentDescription("Back").assertIsDisplayed()
+      composeTestRule.onNodeWithTag("Text").assertIsDisplayed()
+      composeTestRule.onNodeWithText("First Name").assertIsDisplayed().performTextInput("firstname")
+      composeTestRule.onNodeWithText("Last Name").assertIsDisplayed().performTextInput("lastname")
+      composeTestRule.onNodeWithText("Select Country").assertIsDisplayed().performTextInput("q")
+      composeTestRule.onNodeWithTag("CountryDropdownMenu").assertIsDisplayed().performClick()
+      composeTestRule
+          .onNodeWithText("Phone Number")
+          .assertIsDisplayed()
+          .performTextInput("+1234567890")
+      composeTestRule.onNodeWithTag("BottomRow").assertIsDisplayed()
+      composeTestRule.onNodeWithContentDescription("Next").assertIsDisplayed().performClick()
+
+      composeTestRule.waitForIdle()
+
+      // RegisterPfp
+      composeTestRule.onNodeWithContentDescription("GoMeet").assertIsDisplayed()
+      composeTestRule.onNodeWithContentDescription("Back").assertIsDisplayed()
+      composeTestRule.onNodeWithTag("Text").assertIsDisplayed()
+      composeTestRule.onNodeWithContentDescription("Profile Picture").assertIsDisplayed()
+      composeTestRule.onNodeWithTag("BottomRow").assertIsDisplayed()
+      composeTestRule.onNodeWithContentDescription("Next").assertIsDisplayed().performClick()
+    }
+  }
+}
