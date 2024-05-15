@@ -201,93 +201,95 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
       delay(5000) // map is updated every 5s
     }
   }
-  Scaffold(bottomBar = { BottomNavigationFun(nav) }, modifier = Modifier.testTag("ExploreScreen")) { innerPadding ->
-    val backdropState = rememberBackdropScaffoldState(BackdropValue.Concealed)
-    LaunchedEffect(backdropState) { backdropState.reveal() }
-    val offset by backdropState.offset
-    val halfHeight = (LocalConfiguration.current.screenHeightDp - 80) / 3
-    val halfHeightPx = with(LocalDensity.current) { halfHeight.dp.toPx() }
-    val rowAlpha = (offset / halfHeightPx).coerceIn(0f..1f)
+  Scaffold(
+      bottomBar = { BottomNavigationFun(nav) }, modifier = Modifier.testTag("ExploreScreen")) {
+          innerPadding ->
+        val backdropState = rememberBackdropScaffoldState(BackdropValue.Concealed)
+        LaunchedEffect(backdropState) { backdropState.reveal() }
+        val offset by backdropState.offset
+        val halfHeight = (LocalConfiguration.current.screenHeightDp - 80) / 3
+        val halfHeightPx = with(LocalDensity.current) { halfHeight.dp.toPx() }
+        val rowAlpha = (offset / halfHeightPx).coerceIn(0f..1f)
 
-    Box(
-        modifier =
-            Modifier.fillMaxSize()
-                .padding(bottom = innerPadding.calculateBottomPadding() * rowAlpha)) {
-          BackdropScaffold(
-              frontLayerBackgroundColor = MaterialTheme.colorScheme.background,
-              backLayerBackgroundColor = MaterialTheme.colorScheme.background,
-              backLayerContentColor = MaterialTheme.colorScheme.background,
-              scaffoldState = backdropState,
-              frontLayerScrimColor = Color.Unspecified,
-              headerHeight = halfHeight.dp,
-              peekHeight = 0.dp,
-              modifier = Modifier.testTag("ExploreScreen").padding(innerPadding),
-              appBar = {},
-              frontLayerContent = {
-                Column(modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
-                  val listState = rememberLazyListState()
-                  Spacer(modifier = Modifier.height(8.dp))
-                  Box(modifier = Modifier.fillMaxSize()) {
-                    ContentInRow(
-                        backdropState = backdropState,
-                        halfHeightPx = halfHeightPx,
-                        listState = listState,
-                        eventList = eventList)
+        Box(
+            modifier =
+                Modifier.fillMaxSize()
+                    .padding(bottom = innerPadding.calculateBottomPadding() * rowAlpha)) {
+              BackdropScaffold(
+                  frontLayerBackgroundColor = MaterialTheme.colorScheme.background,
+                  backLayerBackgroundColor = MaterialTheme.colorScheme.background,
+                  backLayerContentColor = MaterialTheme.colorScheme.background,
+                  scaffoldState = backdropState,
+                  frontLayerScrimColor = Color.Unspecified,
+                  headerHeight = halfHeight.dp,
+                  peekHeight = 0.dp,
+                  modifier = Modifier.testTag("ExploreScreen").padding(innerPadding),
+                  appBar = {},
+                  frontLayerContent = {
+                    Column(modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
+                      val listState = rememberLazyListState()
+                      Spacer(modifier = Modifier.height(8.dp))
+                      Box(modifier = Modifier.fillMaxSize()) {
+                        ContentInRow(
+                            backdropState = backdropState,
+                            halfHeightPx = halfHeightPx,
+                            listState = listState,
+                            eventList = eventList)
 
-                    ContentInColumn(
-                        backdropState = backdropState,
-                        halfHeightPx = halfHeightPx,
-                        listState = listState,
-                        eventList = eventList)
-                  }
-                }
-              },
-              backLayerContent = {
-                Scaffold(
-                    modifier = Modifier.fillMaxSize().alpha(offset / halfHeightPx),
-                    floatingActionButton = {
-                      if (locationPermitted.value == true && isButtonVisible.value) {
-                        FloatingActionButton(
-                            onClick = { moveToCurrentLocation.value = CameraAction.ANIMATE },
-                            modifier = Modifier.size(45.dp).testTag("CurrentLocationButton"),
-                            containerColor = DarkCyan) {
-                              Icon(
-                                  imageVector =
-                                      ImageVector.vectorResource(R.drawable.location_icon),
-                                  contentDescription = null,
-                                  tint = Color.White)
-                            }
+                        ContentInColumn(
+                            backdropState = backdropState,
+                            halfHeightPx = halfHeightPx,
+                            listState = listState,
+                            eventList = eventList)
                       }
-                    },
-                    bottomBar = {}) { innerPadding ->
-                      if (isMapLoaded) {
-                        moveToCurrentLocation.value = CameraAction.MOVE
-
-                        Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
-                          GoogleMapView(
-                              currentPosition = currentPosition,
-                              events = eventList,
-                              modifier = Modifier.testTag("Map"),
-                              query = query,
-                              locationPermitted = locationPermitted.value!!,
-                              eventViewModel = eventViewModel)
-                        }
-                      } else {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center) {
-                              CircularProgressIndicator()
-                            }
-                      }
-                      GoMeetSearchBar(
-                          nav,
-                          query,
-                          MaterialTheme.colorScheme.background,
-                          MaterialTheme.colorScheme.tertiary)
                     }
-              }) {}
-        }
-  }
+                  },
+                  backLayerContent = {
+                    Scaffold(
+                        modifier = Modifier.fillMaxSize().alpha(offset / halfHeightPx),
+                        floatingActionButton = {
+                          if (locationPermitted.value == true && isButtonVisible.value) {
+                            FloatingActionButton(
+                                onClick = { moveToCurrentLocation.value = CameraAction.ANIMATE },
+                                modifier = Modifier.size(45.dp).testTag("CurrentLocationButton"),
+                                containerColor = DarkCyan) {
+                                  Icon(
+                                      imageVector =
+                                          ImageVector.vectorResource(R.drawable.location_icon),
+                                      contentDescription = null,
+                                      tint = Color.White)
+                                }
+                          }
+                        },
+                        bottomBar = {}) { innerPadding ->
+                          if (isMapLoaded) {
+                            moveToCurrentLocation.value = CameraAction.MOVE
+
+                            Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
+                              GoogleMapView(
+                                  currentPosition = currentPosition,
+                                  events = eventList,
+                                  modifier = Modifier.testTag("Map"),
+                                  query = query,
+                                  locationPermitted = locationPermitted.value!!,
+                                  eventViewModel = eventViewModel)
+                            }
+                          } else {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center) {
+                                  CircularProgressIndicator()
+                                }
+                          }
+                          GoMeetSearchBar(
+                              nav,
+                              query,
+                              MaterialTheme.colorScheme.background,
+                              MaterialTheme.colorScheme.tertiary)
+                        }
+                  }) {}
+            }
+      }
 }
 
 @Composable
