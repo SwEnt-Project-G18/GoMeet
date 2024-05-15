@@ -10,8 +10,6 @@ import kotlinx.coroutines.tasks.await
 /**
  * This class represents the repository for the authentication of the user. A repository is a class
  * that communicates with the data source.
- *
- * @param fAuth The firebase authentication instance
  */
 class AuthRepository private constructor() {
 

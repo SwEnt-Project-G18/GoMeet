@@ -18,14 +18,16 @@ class EventRepository private constructor() {
   /** This companion object contains the functions in the repository */
   companion object {
 
-    /** This function initializes the repository by starting to listen for events */
-    fun init() {
+    /** This function initialises the repository by starting to listen for events */
+    fun init(cid: String) {
       startListeningForEvents()
+      creatorId = cid
     }
 
     private val localEventsList: MutableList<Event> = mutableListOf()
     private const val TAG = "EventRepository"
     private const val EVENT_COLLECTION = "events"
+    private lateinit var creatorId: String
 
     /**
      * This function retrieves an event ID stored in the database

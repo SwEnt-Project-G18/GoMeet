@@ -6,7 +6,7 @@ import java.time.LocalDate
 /**
  * This data class represents an event. An event is the main entity of the application.
  *
- * @param eventID Event's uid
+ * @param eventID Event's id
  * @param creator Creator of the event
  * @param title Title of the event
  * @param description Description of the event

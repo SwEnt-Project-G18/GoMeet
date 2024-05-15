@@ -32,8 +32,8 @@ class EventsTest {
       Events(
           currentUser = currentUserId,
           nav = NavigationActions(rememberNavController()),
-          userViewModel = UserViewModel(UserRepository(Firebase.firestore)),
-          eventViewModel = EventViewModel("test", EventRepository(Firebase.firestore)))
+          userViewModel = UserViewModel(),
+          eventViewModel = EventViewModel("test"))
     }
 
     composeTestRule.onAllNodesWithText("Favourites")[0].assertIsDisplayed()

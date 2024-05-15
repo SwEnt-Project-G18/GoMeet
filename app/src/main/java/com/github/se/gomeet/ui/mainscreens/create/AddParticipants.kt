@@ -28,6 +28,9 @@ import kotlinx.coroutines.launch
  * Composable function for the AddParticipants screen.
  *
  * @param nav The navigation actions.
+ * @param userId The user id.
+ * @param userViewModel The user view model.
+ * @param eventId The event id.
  */
 @Composable
 fun AddParticipants(

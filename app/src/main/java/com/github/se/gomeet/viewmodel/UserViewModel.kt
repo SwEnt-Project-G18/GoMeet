@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
  * ViewModel for the user. The viewModel is responsible for handling the logic that comes from the
  * UI and the repository.
  */
-class UserViewModel() : ViewModel() {
+class UserViewModel : ViewModel() {
   private val currentUser = mutableStateOf<GoMeetUser?>(null)
 
   /**

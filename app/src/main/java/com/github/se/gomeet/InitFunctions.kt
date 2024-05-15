@@ -44,8 +44,8 @@ import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.memoryCacheSettings
 import com.google.firebase.firestore.persistentCacheSettings
 import com.google.firebase.ktx.Firebase
@@ -66,7 +66,7 @@ import io.getstream.chat.android.state.plugin.factory.StreamStatePluginFactory
  *
  * @param db The Firestore databse.
  */
-fun initCache(db: FirebaseFirestore) {
+fun initCache() {
   val cacheSize = 1024L * 1024L * 100L
 
   // Initialize Firestore settings
@@ -79,10 +79,10 @@ fun initCache(db: FirebaseFirestore) {
                 setSizeBytes(cacheSize)
               })
           .build()
-  db.firestoreSettings = firestoreSettings
+  Firebase.firestore.firestoreSettings = firestoreSettings
 
   // Enable indexing for persistent cache
-  db.persistentCacheIndexManager?.apply {
+  Firebase.firestore.persistentCacheIndexManager?.apply {
     // Indexing is disabled by default
     enableIndexAutoCreation()
   } ?: println("indexManager is null")
@@ -119,12 +119,7 @@ fun initChatClient(applicationContext: Context): ChatClient {
  * @param applicationContext The application text.
  */
 @Composable
-fun InitNavigation(
-    nav: NavHostController,
-    db: FirebaseFirestore,
-    client: ChatClient,
-    applicationContext: Context
-) {
+fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContext: Context) {
   val navAction = NavigationActions(nav)
   val userIdState = remember { mutableStateOf("") }
   val clientInitialisationState by client.clientState.initializationState.collectAsState()
