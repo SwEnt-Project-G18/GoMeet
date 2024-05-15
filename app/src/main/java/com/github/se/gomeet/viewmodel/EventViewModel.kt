@@ -44,9 +44,8 @@ import org.json.JSONArray
  *
  * @param creatorId the id of the creator of the event
  */
-class EventViewModel(private val creatorId: String? = null, eventRepository: EventRepository) :
-    ViewModel() {
-  private val repository = eventRepository
+class EventViewModel(private val creatorId: String? = null) : ViewModel() {
+  private val repository = EventRepository()
   private val _bitmapDescriptors = mutableStateMapOf<String, BitmapDescriptor>()
   val bitmapDescriptors: MutableMap<String, BitmapDescriptor> = _bitmapDescriptors
 

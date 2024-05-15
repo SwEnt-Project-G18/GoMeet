@@ -5,16 +5,13 @@ import android.util.Log
 import com.github.se.gomeet.model.event.Invitation
 import com.github.se.gomeet.model.event.InviteStatus
 import com.github.se.gomeet.model.user.GoMeetUser
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
 
-/**
- * Class that connects to the Firebase Firestore database to get, add, update and remove users.
- *
- * @param db the Firestore database
- */
-class UserRepository(private val db: FirebaseFirestore) {
+/** Class that connects to the Firebase Firestore database to get, add, update and remove users. */
+class UserRepository() {
   /**
    * Companion object for the UserFirebaseConnection class. Contains the constants for the class.
    */
@@ -22,6 +19,8 @@ class UserRepository(private val db: FirebaseFirestore) {
     private const val TAG = "UserRepository"
     private const val USERS_COLLECTION = "users"
   }
+
+  private val db = Firebase.firestore
 
   /**
    * This function retrieves all users from the database

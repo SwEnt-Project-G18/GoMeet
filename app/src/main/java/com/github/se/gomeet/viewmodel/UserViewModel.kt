@@ -21,9 +21,9 @@ import kotlinx.coroutines.launch
  * ViewModel for the user. The viewModel is responsible for handling the logic that comes from the
  * UI and the repository.
  */
-class UserViewModel(userRepository: UserRepository) : ViewModel() {
+class UserViewModel() : ViewModel() {
   private val currentUser = mutableStateOf<GoMeetUser?>(null)
-  private val repository = userRepository
+  private val repository = UserRepository()
 
   /**
    * Create a new user if the user is new.

@@ -36,12 +36,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.location.Location
-import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.android.gms.maps.model.LatLng
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -158,10 +155,7 @@ fun EventWidget(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center) {
                       var username by remember { mutableStateOf<String?>("Loading...") }
-                      LaunchedEffect(userName) {
-                        username =
-                            UserViewModel(UserRepository(Firebase.firestore)).getUsername(userName)
-                      }
+                      LaunchedEffect(userName) { username = UserViewModel().getUsername(userName) }
 
                       username?.let {
                         Text(

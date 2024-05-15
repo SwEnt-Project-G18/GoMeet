@@ -4,18 +4,17 @@ import android.util.Log
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.location.Location
 import com.google.firebase.firestore.DocumentChange
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.MetadataChanges
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import java.time.LocalDate
 
 /**
  * This class represents the repository for the events. A repository is a class that communicates
  * with the data source.
- *
- * @param db The database firebase instance
  */
-class EventRepository(private val db: FirebaseFirestore) {
-
+class EventRepository {
+  private val db = Firebase.firestore
   private val localEventsList: MutableList<Event> = mutableListOf()
 
   /** This function initializes the repository by starting to listen for events */

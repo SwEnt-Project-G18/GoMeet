@@ -15,8 +15,6 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.github.se.gomeet.model.repository.EventRepository
-import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.ui.authscreens.LoginScreen
 import com.github.se.gomeet.ui.authscreens.WelcomeScreen
 import com.github.se.gomeet.ui.authscreens.register.RegisterScreen
@@ -130,11 +128,9 @@ fun InitNavigation(
   val navAction = NavigationActions(nav)
   val userIdState = remember { mutableStateOf("") }
   val clientInitialisationState by client.clientState.initializationState.collectAsState()
-  val eventRepository = EventRepository(db)
-  val userRepository = UserRepository(db)
   val authViewModel = AuthViewModel()
-  var eventViewModel = EventViewModel(null, eventRepository)
-  val userViewModel = UserViewModel(userRepository)
+  var eventViewModel = EventViewModel(null)
+  val userViewModel = UserViewModel()
 
   return NavHost(navController = nav, startDestination = Route.WELCOME) {
     composable(Route.WELCOME) {
@@ -151,7 +147,7 @@ fun InitNavigation(
               val phoneNumber = authViewModel.signInState.value.phoneNumberRegister
               val country = authViewModel.signInState.value.countryRegister
               val username = authViewModel.signInState.value.usernameRegister
-              eventViewModel = EventViewModel(uid, eventRepository)
+              eventViewModel = EventViewModel(uid)
 
               userViewModel.createUserIfNew(
                   uid, username, firstName, lastName, email, phoneNumber, country)
@@ -187,10 +183,10 @@ fun InitNavigation(
     composable(Route.EXPLORE) { Explore(navAction, eventViewModel) }
     composable(Route.EVENTS) {
       userIdState.value = Firebase.auth.currentUser!!.uid
-      Events(userIdState.value, navAction, UserViewModel(userRepository), eventViewModel)
+      Events(userIdState.value, navAction, UserViewModel(), eventViewModel)
     }
     composable(Route.TRENDS) {
-      Trends(userIdState.value, navAction, UserViewModel(userRepository), eventViewModel)
+      Trends(userIdState.value, navAction, UserViewModel(), eventViewModel)
     }
     composable(Route.CREATE) {
       userIdState.value = Firebase.auth.currentUser!!.uid
@@ -208,11 +204,10 @@ fun InitNavigation(
               navAction, it.arguments?.getString("uid") ?: "", userViewModel, eventViewModel)
         }
     composable(Route.PRIVATE_CREATE) {
-      CreateEvent(navAction, EventViewModel(Firebase.auth.currentUser!!.uid, eventRepository), true)
+      CreateEvent(navAction, EventViewModel(Firebase.auth.currentUser!!.uid), true)
     }
     composable(Route.PUBLIC_CREATE) {
-      CreateEvent(
-          navAction, EventViewModel(Firebase.auth.currentUser!!.uid, eventRepository), false)
+      CreateEvent(navAction, EventViewModel(Firebase.auth.currentUser!!.uid), false)
     }
 
     composable(

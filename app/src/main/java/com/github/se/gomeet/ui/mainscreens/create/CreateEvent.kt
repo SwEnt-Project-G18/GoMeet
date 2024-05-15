@@ -63,7 +63,6 @@ import com.github.se.gomeet.R
 import com.github.se.gomeet.model.TagsSelector
 import com.github.se.gomeet.model.event.location.Location
 import com.github.se.gomeet.model.repository.EventRepository
-import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
@@ -72,8 +71,6 @@ import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.ui.theme.Grey
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import java.io.InputStream
 import java.time.LocalDate
 import java.time.LocalTime
@@ -93,8 +90,7 @@ private const val NUMBER_OF_SUGGESTIONS = 3
 @Composable
 fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivate: Boolean) {
 
-  val eventRepository = EventRepository(Firebase.firestore)
-  val userRepository = UserRepository(Firebase.firestore)
+  val eventRepository = EventRepository()
   val uid = eventRepository.getNewId()
   val titleState = remember { mutableStateOf("") }
   val descriptionState = remember { mutableStateOf("") }
@@ -378,7 +374,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                                 listOf(),
                                 listOf(),
                                 imageUri,
-                                UserViewModel(userRepository),
+                                UserViewModel(),
                                 uid)
 
                             nav.goBack()
@@ -400,7 +396,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                             tags.value,
                             listOf(),
                             imageUri,
-                            UserViewModel(userRepository),
+                            UserViewModel(),
                             uid)
 
                         nav.goBack()
