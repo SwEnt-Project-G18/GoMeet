@@ -1,13 +1,15 @@
 package com.github.se.gomeet.ui.authscreens.register
 
+import android.annotation.SuppressLint
 import android.util.Patterns.PHONE
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
@@ -15,11 +17,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -31,12 +37,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import java.util.Locale
 
@@ -49,6 +56,7 @@ import java.util.Locale
  *   and phone number).
  * @param textFieldColors Custom colors for the TextField components used in this Composable.
  */
+@SuppressLint("MutableCollectionMutableState")
 @Composable
 fun RegisterNameCountryPhone(
     callback: (String, String, String, String) -> Unit,
@@ -59,10 +67,8 @@ fun RegisterNameCountryPhone(
   var firstName by remember { mutableStateOf("") }
   var lastName by remember { mutableStateOf("") }
   var phoneNumber by remember { mutableStateOf("") }
-  var expanded by remember { mutableStateOf(false) }
-  var country by remember { mutableStateOf("") }
+  val country by remember { mutableStateOf("") }
   val countries = remember { mutableStateOf(getCountries()) }
-  var filteredCountries by remember { mutableStateOf(listOf<String>()) }
 
   var firstClick by remember { mutableStateOf(true) }
   var countryValid by remember { mutableStateOf(false) }
@@ -104,68 +110,29 @@ fun RegisterNameCountryPhone(
 
         Spacer(modifier = Modifier.size(screenHeight / 60))
 
-        Column {
-          TextField(
-              value = country,
-              onValueChange = {
-                country = it
-                filteredCountries =
-                    if (it.isEmpty()) {
-                      countries.value
-                    } else {
-                      countries.value.filter { c ->
-                        c.lowercase(Locale.getDefault())
-                            .startsWith(it.lowercase(Locale.getDefault()))
-                      }
-                    }
-                expanded = true
-              },
-              label = { Text("Select Country") },
-              singleLine = true,
-              colors = textFieldColors,
-              readOnly = false,
-              modifier = Modifier.fillMaxWidth())
-          DropdownMenu(
-              expanded = expanded,
-              onDismissRequest = { expanded = false },
-              offset =
-                  DpOffset(
-                      x = 20.dp, y = 20.dp), // Adjusts the position directly below the TextField
-              modifier =
-                  Modifier.fillMaxWidth()
-                      .heightIn(max = 200.dp) // Limits the height to display around 5 items
-              ) {
-                for (c in filteredCountries) {
-                  DropdownMenuItem(
-                      text = { Text(c) },
-                      onClick = {
-                        country = c
-                        expanded = false
-                      })
-                }
-              }
-        }
+      TextField(
+          value = phoneNumber,
+          onValueChange = { phoneNumber = it },
+          label = { Text("Phone Number") },
+          singleLine = true,
+          colors = textFieldColors,
+          keyboardOptions =
+          KeyboardOptions.Default.copy(
+              imeAction = ImeAction.Done, keyboardType = KeyboardType.Phone),
+          modifier = Modifier.fillMaxWidth())
 
-        if (!countryValid && !firstClick) {
-          Text(text = "Country is not valid", color = Color.Red)
-        }
+      if (!validPhoneNumber && !firstClick) {
+          Text(text = "Phone Number is not valid", color = Color.Red)
+      }
+
 
         Spacer(modifier = Modifier.size(screenHeight / 60))
+      CountrySuggestionTextField(countries.value, textFieldColors)
 
-        TextField(
-            value = phoneNumber,
-            onValueChange = { phoneNumber = it },
-            label = { Text("Phone Number") },
-            singleLine = true,
-            colors = textFieldColors,
-            keyboardOptions =
-                KeyboardOptions.Default.copy(
-                    imeAction = ImeAction.Done, keyboardType = KeyboardType.Number),
-            modifier = Modifier.fillMaxWidth())
+      if (!countryValid && !firstClick) {
+          Text(text = "Country is not valid", color = Color.Red)
+      }
 
-        if (!validPhoneNumber && !firstClick) {
-          Text(text = "Phone Number is not valid", color = Color.Red)
-        }
 
         Spacer(modifier = Modifier.size(screenHeight / 15))
 
@@ -177,7 +144,9 @@ fun RegisterNameCountryPhone(
               trackColor = Color.LightGray,
               strokeCap = ProgressIndicatorDefaults.CircularIndeterminateStrokeCap)
           IconButton(
-              modifier = Modifier.padding(bottom = 2.5.dp, end = 3.dp).size(screenHeight / 19),
+              modifier = Modifier
+                  .padding(bottom = 2.5.dp, end = 3.dp)
+                  .size(screenHeight / 19),
               colors = IconButtonDefaults.outlinedIconButtonColors(),
               onClick = {
                 validLastName = lastName.isNotEmpty() && lastName.length <= 20
@@ -219,4 +188,56 @@ private fun getCountries(): ArrayList<String> {
     countriesWithEmojis.add("$countryName $flag")
   }
   return countriesWithEmojis
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun CountrySuggestionTextField(total: List<String>, textFieldColors: TextFieldColors) {
+    var expanded by remember { mutableStateOf(false) }
+    var selectedOptionText by remember { mutableStateOf(total[0]) }
+    val countries = remember { mutableStateOf(total) }
+
+    ExposedDropdownMenuBox(
+        modifier = Modifier.fillMaxWidth(),
+        expanded = expanded,
+        onExpandedChange = {
+            expanded = !expanded
+        }
+    ) {
+        TextField(
+            modifier = Modifier
+                .menuAnchor(),
+            readOnly = true,
+            value = selectedOptionText,
+            onValueChange = { },
+            label = { Text("Label") },
+            trailingIcon = {
+                ExposedDropdownMenuDefaults.TrailingIcon(
+                    expanded = expanded
+                )
+            },
+            colors = textFieldColors.copy(
+                focusedTrailingIconColor = MaterialTheme.colorScheme.tertiary
+            )
+        )
+        ExposedDropdownMenu(
+            modifier = Modifier.background(color = MaterialTheme.colorScheme.primaryContainer),
+            expanded = expanded,
+            onDismissRequest = {
+                expanded = false
+            }
+        ) {
+            countries.value.forEach { selectionOption ->
+                DropdownMenuItem(
+                    text = { Text(text = selectionOption) },
+                    onClick = {
+                        selectedOptionText = selectionOption
+                        expanded = false
+                    }
+                )
+            }
+        }
+    }
+
 }
