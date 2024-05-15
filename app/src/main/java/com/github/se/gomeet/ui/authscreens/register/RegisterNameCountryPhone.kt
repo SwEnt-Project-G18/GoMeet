@@ -36,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -238,7 +239,7 @@ fun CountrySuggestionTextField(total: List<String>, textFieldColors: TextFieldCo
   val countries = remember { mutableStateOf(total) }
 
   ExposedDropdownMenuBox(
-      modifier = Modifier.fillMaxWidth(),
+      modifier = Modifier.fillMaxWidth().testTag("Country"),
       expanded = expanded,
       onExpandedChange = { expanded = !expanded }) {
         TextField(

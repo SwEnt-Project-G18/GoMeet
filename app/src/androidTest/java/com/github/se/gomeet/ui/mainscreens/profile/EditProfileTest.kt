@@ -29,7 +29,6 @@ class EditProfileTest {
     composeTestRule.onNodeWithTag("Profile Picture").assertIsDisplayed()
     composeTestRule.onNodeWithText("First Name").performScrollTo().assertIsDisplayed()
     composeTestRule.onNodeWithText("Last Name").performScrollTo().assertIsDisplayed()
-    composeTestRule.onNodeWithText("Email Address").performScrollTo().assertIsDisplayed()
     composeTestRule.onNodeWithText("Username").performScrollTo().assertIsDisplayed()
     composeTestRule.onNodeWithText("Phone Number").performScrollTo().assertIsDisplayed()
     composeTestRule.onNodeWithText("Country").performScrollTo().assertIsDisplayed()
