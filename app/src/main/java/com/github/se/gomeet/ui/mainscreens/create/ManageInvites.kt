@@ -317,6 +317,15 @@ fun ManageInvites(
       }
 }
 
+/**
+ * This composable function represents the list of users that can be invited to an event.
+ *
+ * @param list the list of users that can be invited
+ * @param currentEvent the event for which the users are invited
+ * @param status the status of the invitation
+ * @param callback the callback function to update the list of users to invite
+ * @param initialClicked the initial state of the button
+ */
 @Composable
 fun PageUserInvites(
     list: List<GoMeetUser>,
@@ -336,6 +345,16 @@ fun PageUserInvites(
       }
 }
 
+/**
+ * This composable function represents the user invite widget when the user can be invited to an
+ * event.
+ *
+ * @param user the user that can be invited
+ * @param event the event for which the user is invited
+ * @param status the status of the invitation
+ * @param initialClicked the initial state of the button
+ * @param callback the callback function to update the list of users to invite
+ */
 @Composable
 fun UserInviteWidget(
     user: GoMeetUser,
