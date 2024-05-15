@@ -172,6 +172,7 @@ fun Trends(
                           eventDate =
                               Date.from(
                                   event.date.atStartOfDay(ZoneId.systemDefault()).toInstant()),
+                          eventTime = event.time,
                           eventPicture = painter,
                           eventLocation = event.location,
                           verified = false,

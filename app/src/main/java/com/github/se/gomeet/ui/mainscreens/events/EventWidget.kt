@@ -43,6 +43,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.text.SimpleDateFormat
+import java.time.LocalTime
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
@@ -69,6 +70,7 @@ fun EventWidget(
     eventName: String,
     eventDescription: String,
     eventDate: Date,
+    eventTime: LocalTime,
     eventPicture: Painter,
     eventLocation: Location,
     verified: Boolean,
@@ -110,7 +112,10 @@ fun EventWidget(
       } else {
         dayFormat.format(eventDate)
       }
-  val timeString = timeFormat.format(eventDate)
+
+  val minutes = if (eventTime.minute > 9) eventTime.minute.toString() else "0${eventTime.minute}"
+  val hours = if (eventTime.hour > 9) eventTime.hour.toString() else "0${eventTime.hour}"
+  val timeString = "${hours}:${minutes}"
 
   Card(
       modifier =

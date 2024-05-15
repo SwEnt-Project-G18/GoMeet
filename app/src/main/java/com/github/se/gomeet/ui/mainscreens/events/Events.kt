@@ -246,6 +246,7 @@ fun Events(
                                             event.date
                                                 .atStartOfDay(ZoneId.systemDefault())
                                                 .toInstant()),
+                                    eventTime = event.time,
                                     eventPicture = painter,
                                     eventLocation = event.location,
                                     verified = false,
@@ -290,8 +291,10 @@ fun Events(
                                     eventDate =
                                         Date.from(
                                             event.date
-                                                .atStartOfDay(ZoneId.systemDefault())
+                                                .atTime(event.time)
+                                                .atZone(ZoneId.systemDefault())
                                                 .toInstant()),
+                                    eventTime = event.time,
                                     eventPicture = painter,
                                     eventLocation = event.location,
                                     verified = false,
@@ -338,6 +341,7 @@ fun Events(
                                             event.date
                                                 .atStartOfDay(ZoneId.systemDefault())
                                                 .toInstant()),
+                                    eventTime = event.time,
                                     eventPicture = painter,
                                     eventLocation = event.location,
                                     verified = false,

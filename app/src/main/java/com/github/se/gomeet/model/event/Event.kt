@@ -2,6 +2,7 @@ package com.github.se.gomeet.model.event
 
 import com.github.se.gomeet.model.event.location.Location
 import java.time.LocalDate
+import java.time.LocalTime
 
 /**
  * This data class represents an event. An event is the main entity of the application.
@@ -12,6 +13,7 @@ import java.time.LocalDate
  * @param description Description of the event
  * @param location Location of the event
  * @param date Date of the event
+ * @param time Time of the event
  * @param price Price of the Event
  * @param url Website of the event (can be ticketLink)
  * @param participants People participating to the event
@@ -28,6 +30,7 @@ data class Event(
     val description: String, // Description of the event
     val location: Location, // Location of the event
     val date: LocalDate, // Date of the event
+    val time: LocalTime, // Time of the event
     val price: Double, // price of the Event
     val url: String, // Website of the event (can be ticketLink)
     val pendingParticipants: List<String>, // Pending users invitations to the event

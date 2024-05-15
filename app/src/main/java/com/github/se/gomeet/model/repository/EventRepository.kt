@@ -7,6 +7,7 @@ import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.MetadataChanges
 import java.time.LocalDate
+import java.time.LocalTime
 
 /**
  * This class represents the repository for the events. A repository is a class that communicates
@@ -141,6 +142,7 @@ class EventRepository(private val db: FirebaseFirestore) {
         "description" to description,
         "location" to location.toMap(),
         "date" to date.toString(),
+        "time" to time.toString(),
         "price" to price,
         "url" to url,
         "pendingParticipants" to pendingParticipants,
@@ -174,6 +176,7 @@ class EventRepository(private val db: FirebaseFirestore) {
         description = this["description"] as? String ?: "",
         location = (this["location"] as? Map<String, Any>)?.toLocation() ?: Location(.0, .0, ""),
         date = LocalDate.parse(this["date"] as? String ?: ""),
+        time = LocalTime.parse(this["time"] as? String ?: "00:00"),
         price = this["price"] as? Double ?: 0.0,
         url = this["url"] as? String ?: "",
         pendingParticipants = this["pendingParticipants"] as? List<String> ?: emptyList(),

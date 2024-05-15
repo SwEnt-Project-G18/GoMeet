@@ -64,6 +64,7 @@ import com.github.se.gomeet.model.TagsSelector
 import com.github.se.gomeet.model.event.location.Location
 import com.github.se.gomeet.model.repository.EventRepository
 import com.github.se.gomeet.model.repository.UserRepository
+import com.github.se.gomeet.ui.mainscreens.DateTimePicker
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
@@ -77,8 +78,6 @@ import com.google.firebase.ktx.Firebase
 import java.io.InputStream
 import java.time.LocalDate
 import java.time.LocalTime
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeParseException
 import kotlinx.coroutines.delay
 
 private const val NUMBER_OF_SUGGESTIONS = 3
@@ -99,13 +98,13 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
   val titleState = remember { mutableStateOf("") }
   val descriptionState = remember { mutableStateOf("") }
   val locationState = remember { mutableStateOf("") }
-  val textDate = remember { mutableStateOf("") }
-  var dateState by remember { mutableStateOf<LocalDate?>(null) }
-  var dateFormatError by remember { mutableStateOf(false) }
   var price by remember { mutableDoubleStateOf(0.0) }
   var priceText by remember { mutableStateOf("") }
   val url = remember { mutableStateOf("") }
   val isPrivateEvent = remember { mutableStateOf(false) }
+
+  val pickedTime = remember { mutableStateOf(LocalTime.now()) }
+  val pickedDate = remember { mutableStateOf(LocalDate.now()) }
 
   val customPins = remember { CustomPins() }
 
@@ -218,22 +217,8 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                   colors = textFieldColors,
                   modifier = Modifier.fillMaxWidth().padding(start = 15.dp, end = 15.dp))
               LocationField(selectedLocation, locationState, eventViewModel)
-              TextField(
-                  value = textDate.value,
-                  onValueChange = { newText ->
-                    textDate.value = newText
-                    try {
-                      dateState = LocalDate.parse(newText, DateTimeFormatter.ISO_LOCAL_DATE)
-                      dateFormatError = false
-                    } catch (e: DateTimeParseException) {
-                      dateFormatError = true
-                    }
-                  },
-                  label = { Text("Date") },
-                  placeholder = { Text("Enter a date (yyyy-mm-dd)") },
-                  singleLine = true,
-                  colors = textFieldColors,
-                  modifier = Modifier.fillMaxWidth().padding(start = 15.dp, end = 15.dp))
+
+              DateTimePicker(pickedTime = pickedTime, pickedDate = pickedDate)
 
               TextField(
                   value = priceText,
@@ -359,7 +344,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
               Button(
                   modifier = Modifier.width(250.dp),
                   onClick = {
-                    if (titleState.value.isNotEmpty() && !dateFormatError && dateState != null) {
+                    if (titleState.value.isNotEmpty()) {
                       if (selectedLocation.value == null) {
                         eventViewModel.location(locationState.value, 1) { locations ->
                           if (locations.isNotEmpty()) {
@@ -367,7 +352,8 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                                 titleState.value,
                                 descriptionState.value,
                                 locations[0],
-                                dateState!!,
+                                pickedDate.value,
+                                pickedTime.value,
                                 price,
                                 url.value,
                                 listOf(),
@@ -389,7 +375,8 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                             titleState.value,
                             descriptionState.value,
                             selectedLocation.value!!,
-                            dateState!!,
+                            pickedDate.value,
+                            pickedTime.value,
                             price,
                             url.value,
                             listOf(),
@@ -407,14 +394,12 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                       }
                     }
 
-                    dateState?.let {
-                      customPins.createCustomPin(context, it, LocalTime.MIDNIGHT) {
-                          bitmapDescriptor,
-                          bitmap ->
-                        // Handle the bitmap descriptor and bitmap as needed
-                        val byteArray = customPins.bitmapToByteArray(bitmap)
-                        customPins.uploadEventIcon(context, byteArray, uid)
-                      }
+                    customPins.createCustomPin(context, pickedDate.value, pickedTime.value) {
+                        _,
+                        bitmap ->
+                      // Handle the bitmap descriptor and bitmap as needed
+                      val byteArray = customPins.bitmapToByteArray(bitmap)
+                      customPins.uploadEventIcon(context, byteArray, uid)
                     }
                   },
                   shape = RoundedCornerShape(10.dp),
@@ -423,7 +408,6 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                           titleState.value,
                           descriptionState.value,
                           locationState.value,
-                          textDate.value,
                           priceText,
                           url.value),
                   colors =
@@ -434,11 +418,6 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                           contentColor = Color.White),
               ) {
                 Text(text = "Post")
-              }
-
-              if (dateFormatError) {
-                Spacer(modifier = Modifier.height(8.dp))
-                Text("Error: Date Format Error", color = Color.Red)
               }
             }
         if (showPopup.value) {
@@ -544,18 +523,26 @@ fun LocationField(
       }
 }
 
+/**
+ * Function to determine whether all fields have been filled.
+ *
+ * @param title The title of the event.
+ * @param desc The description of the event.
+ * @param loc The location of the event.
+ * @param price The price of the event.
+ * @param url The url of the event.
+ * @return true if all fields are filled, false otherwise.
+ */
 private fun fieldsAreFull(
     title: String,
     desc: String,
     loc: String,
-    date: String,
     price: String,
     url: String
 ): Boolean {
   return title.isNotEmpty() &&
       desc.isNotEmpty() &&
       loc.isNotEmpty() &&
-      date.isNotEmpty() &&
       price.isNotEmpty() &&
       url.isNotEmpty()
 }

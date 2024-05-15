@@ -163,7 +163,7 @@ fun EventDateTime(day: String, time: String) {
 /**
  * EventImage is a composable that displays the image of an event.
  *
- * @param painter Painter object for the image
+ * @param imageUrl URL of the image
  */
 @Composable
 fun EventImage(imageUrl: String?) {
