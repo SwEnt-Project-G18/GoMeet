@@ -3,7 +3,8 @@ package com.github.se.gomeet.ui.mainscreens
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -37,8 +38,11 @@ class TrendsTest {
               EventViewModel("NEEGn5cbkJZDXaezeGdfd2D4u6b2", EventRepository(Firebase.firestore)))
     }
 
-    rule.onAllNodesWithText("Trends").apply {
-      fetchSemanticsNodes().forEachIndexed { i, _ -> get(i).assertIsDisplayed() }
-    }
+    rule.onNodeWithText("Sort").assertIsDisplayed().performClick()
+    rule.onNodeWithText("Popularity").assertIsDisplayed().performClick()
+    rule.onNodeWithText("Sort").performClick()
+    rule.onNodeWithText("Name").assertIsDisplayed().performClick()
+    rule.onNodeWithText("Sort").performClick()
+    rule.onNodeWithText("Date").assertIsDisplayed().performClick()
   }
 }
