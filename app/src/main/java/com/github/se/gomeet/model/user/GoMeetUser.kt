@@ -38,6 +38,7 @@ data class GoMeetUser(
     // can add more things later
 )
 
+/** User returned when an error occurred (mainly for testing purposes) */
 val NULL_USER =
     GoMeetUser(
         "null",

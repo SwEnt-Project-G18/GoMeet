@@ -39,6 +39,7 @@ data class Event(
     val images: List<String> // Is it the right type?
 )
 
+/** Event returned when an error occurred (mainly for testing purposes) */
 val NULL_EVENT =
     Event(
         "null",
@@ -46,7 +47,7 @@ val NULL_EVENT =
         "null",
         "null",
         Location(0.0, 0.0, "null"),
-        LocalDate.of(1111, 11, 1),
+        LocalDate.of(2025, 11, 1),
         0.0,
         "null",
         emptyList(),

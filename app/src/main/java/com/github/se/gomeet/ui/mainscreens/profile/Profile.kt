@@ -287,6 +287,7 @@ fun Profile(
                                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                                     contentColor = MaterialTheme.colorScheme.outlineVariant),
                             border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                            modifier = Modifier.testTag("Tag"),
                         )
                       }
                     }

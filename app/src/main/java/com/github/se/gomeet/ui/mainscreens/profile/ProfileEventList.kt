@@ -76,57 +76,59 @@ fun ProfileEventsList(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         contentPadding = PaddingValues(end = 15.dp),
-        modifier = Modifier.heightIn(min = 56.dp).testTag("EventsListItems")) {
+        modifier = Modifier.heightIn(min = 56.dp)) {
           itemsIndexed(eventList) { _, event ->
             Column(
                 modifier =
-                    Modifier.width(170.dp).clickable {
-                      val eventDate =
-                          Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant())
-                      val currentDate = Calendar.getInstance()
-                      val startOfWeek = currentDate.clone() as Calendar
-                      startOfWeek.set(Calendar.DAY_OF_WEEK, startOfWeek.firstDayOfWeek)
-                      val endOfWeek = startOfWeek.clone() as Calendar
-                      endOfWeek.add(Calendar.DAY_OF_WEEK, 6)
+                    Modifier.width(170.dp)
+                        .clickable {
+                          val eventDate =
+                              Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant())
+                          val currentDate = Calendar.getInstance()
+                          val startOfWeek = currentDate.clone() as Calendar
+                          startOfWeek.set(Calendar.DAY_OF_WEEK, startOfWeek.firstDayOfWeek)
+                          val endOfWeek = startOfWeek.clone() as Calendar
+                          endOfWeek.add(Calendar.DAY_OF_WEEK, 6)
 
-                      val eventCalendar = Calendar.getInstance().apply { time = eventDate }
+                          val eventCalendar = Calendar.getInstance().apply { time = eventDate }
 
-                      val isThisWeek =
-                          eventCalendar.after(currentDate) && eventCalendar.before(endOfWeek)
-                      val isToday =
-                          currentDate.get(Calendar.YEAR) == eventCalendar.get(Calendar.YEAR) &&
-                              currentDate.get(Calendar.DAY_OF_YEAR) ==
-                                  eventCalendar.get(Calendar.DAY_OF_YEAR)
+                          val isThisWeek =
+                              eventCalendar.after(currentDate) && eventCalendar.before(endOfWeek)
+                          val isToday =
+                              currentDate.get(Calendar.YEAR) == eventCalendar.get(Calendar.YEAR) &&
+                                  currentDate.get(Calendar.DAY_OF_YEAR) ==
+                                      eventCalendar.get(Calendar.DAY_OF_YEAR)
 
-                      val dayFormat =
-                          if (isThisWeek) {
-                            SimpleDateFormat("EEEE", Locale.getDefault())
-                          } else {
-                            SimpleDateFormat("dd/MM/yy", Locale.getDefault())
-                          }
+                          val dayFormat =
+                              if (isThisWeek) {
+                                SimpleDateFormat("EEEE", Locale.getDefault())
+                              } else {
+                                SimpleDateFormat("dd/MM/yy", Locale.getDefault())
+                              }
 
-                      val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+                          val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
 
-                      val dayString =
-                          if (isToday) {
-                            "Today"
-                          } else {
-                            dayFormat.format(eventDate)
-                          }
-                      val timeString = timeFormat.format(eventDate)
+                          val dayString =
+                              if (isToday) {
+                                "Today"
+                              } else {
+                                dayFormat.format(eventDate)
+                              }
+                          val timeString = timeFormat.format(eventDate)
 
-                      nav.navigateToEventInfo(
-                          eventId = event.eventID,
-                          title = event.title,
-                          date = dayString,
-                          time = timeString,
-                          description = event.description,
-                          organizer = event.creator,
-                          loc = LatLng(event.location.latitude, event.location.longitude),
-                          rating = 0.0 // TODO: replace with actual rating
-                          // TODO: add image
-                          )
-                    }) {
+                          nav.navigateToEventInfo(
+                              eventId = event.eventID,
+                              title = event.title,
+                              date = dayString,
+                              time = timeString,
+                              description = event.description,
+                              organizer = event.creator,
+                              loc = LatLng(event.location.latitude, event.location.longitude),
+                              rating = 0.0 // TODO: replace with actual rating
+                              // TODO: add image
+                              )
+                        }
+                        .testTag("EventListItem")) {
                   Image(
                       painter =
                           if (event.images.isNotEmpty()) {
