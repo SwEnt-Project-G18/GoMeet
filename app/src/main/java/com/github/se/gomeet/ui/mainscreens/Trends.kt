@@ -1,13 +1,20 @@
 package com.github.se.gomeet.ui.mainscreens
 
 import EventWidget
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -20,8 +27,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -45,10 +55,19 @@ import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.ui.theme.NavBarUnselected
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.HorizontalPagerIndicator
+import com.google.accompanist.pager.rememberPagerState
+import com.google.android.gms.maps.model.LatLng
+import kotlinx.coroutines.delay
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.Date
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 // TODO : This class has only been implemented for testing purposes!
 //  It is showing ALL EVENTS IN FIREBASE,
@@ -72,6 +91,8 @@ fun Trends(
   val coroutineScope = rememberCoroutineScope()
   val query = remember { mutableStateOf("") }
   var eventsLoaded = remember { mutableStateOf(false) }
+    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
 
   LaunchedEffect(Unit) {
     coroutineScope.launch {
@@ -85,15 +106,16 @@ fun Trends(
 
   Scaffold(
       topBar = {
-        Text(
-            text = "Trends",
-            modifier = Modifier.padding(start = 15.dp, top = 15.dp, end = 15.dp, bottom = 0.dp),
-            color = DarkCyan,
-            fontStyle = FontStyle.Normal,
-            fontWeight = FontWeight.SemiBold,
-            fontFamily = FontFamily.Default,
-            textAlign = TextAlign.Start,
-            style = MaterialTheme.typography.headlineLarge)
+          Row(
+              verticalAlignment = Alignment.CenterVertically,
+              modifier = Modifier.padding(start = screenWidth / 15, top = screenHeight / 30)) {
+              Text(
+                  text = "Trends",
+                  style =
+                  MaterialTheme.typography.headlineMedium.copy(
+                      fontWeight = FontWeight.SemiBold))
+              Spacer(Modifier.weight(1f))
+          }
       },
       bottomBar = {
         BottomNavigationMenu(
@@ -103,67 +125,186 @@ fun Trends(
             tabList = TOP_LEVEL_DESTINATIONS,
             selectedItem = Route.TRENDS)
       }) { innerPadding ->
-        Column(
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(innerPadding)) {
+      Column(
+          verticalArrangement = Arrangement.Top,
+          horizontalAlignment = Alignment.CenterHorizontally,
+          modifier = Modifier
+              .padding(innerPadding)
+              .verticalScroll(rememberScrollState())
+      ) {
+          Spacer(modifier = Modifier.height(5.dp))
+          GoMeetSearchBar(
+              nav,
+              query,
+              MaterialTheme.colorScheme.primaryContainer,
+              MaterialTheme.colorScheme.tertiary
+          )
+          Spacer(modifier = Modifier.height(5.dp))
+
+          if (!eventsLoaded.value) {
+              LoadingText()
+          } else {
               Spacer(modifier = Modifier.height(5.dp))
-              GoMeetSearchBar(nav, query, NavBarUnselected, Color.DarkGray)
-              Spacer(modifier = Modifier.height(5.dp))
+              // TODO: Use the top 5 events instead
+              EventCarousel(eventList.take(5), nav)
 
-              if (!eventsLoaded.value) {
-                LoadingText()
-              } else {
-
-                Column(modifier = Modifier.verticalScroll(rememberScrollState()).fillMaxSize()) {
-                  Text(
-                      text = "All Events",
-                      style =
-                          TextStyle(
-                              fontSize = 20.sp,
-                              lineHeight = 16.sp,
-                              fontFamily = FontFamily(Font(R.font.roboto)),
-                              fontWeight = FontWeight(1000),
-                              color = DarkCyan,
-                              textAlign = TextAlign.Center,
-                              letterSpacing = 0.5.sp,
-                          ),
-                      modifier = Modifier.padding(10.dp).align(Alignment.Start))
-
+              Column(
+                  modifier = Modifier
+                      .fillMaxSize()
+              ) {
+                  // TODO: Remove the top 5 events from the list
                   eventList.forEach { event ->
-                    if (event.title.contains(query.value, ignoreCase = true)) {
-                      val painter: Painter =
-                          if (event.images.isNotEmpty()) {
-                            rememberAsyncImagePainter(
-                                ImageRequest.Builder(LocalContext.current)
-                                    .data(data = event.images[0])
-                                    .apply(
-                                        block =
-                                            fun ImageRequest.Builder.() {
+                      if (event.title.contains(query.value, ignoreCase = true)) {
+                          val painter: Painter =
+                              if (event.images.isNotEmpty()) {
+                                  rememberAsyncImagePainter(
+                                      ImageRequest.Builder(LocalContext.current)
+                                          .data(data = event.images[0])
+                                          .apply {
                                               crossfade(true)
                                               placeholder(R.drawable.gomeet_logo)
-                                            })
-                                    .build())
-                          } else {
-                            painterResource(id = R.drawable.gomeet_logo)
-                          }
+                                          }
+                                          .build()
+                                  )
+                              } else {
+                                  painterResource(id = R.drawable.gomeet_logo)
+                              }
 
-                      EventWidget(
-                          userName = event.creator,
-                          eventName = event.title,
-                          eventId = event.eventID,
-                          eventDescription = event.description,
-                          eventDate =
-                              Date.from(
-                                  event.date.atStartOfDay(ZoneId.systemDefault()).toInstant()),
-                          eventPicture = painter,
-                          eventLocation = event.location,
-                          verified = false,
-                          nav = nav) // verification to be done using user details
-                    }
+                          EventWidget(
+                              userName = event.creator,
+                              eventName = event.title,
+                              eventId = event.eventID,
+                              eventDescription = event.description,
+                              eventDate = Date.from(
+                                  event.date.atStartOfDay(ZoneId.systemDefault()).toInstant()
+                              ),
+                              eventPicture = painter,
+                              eventLocation = event.location,
+                              verified = false,
+                              nav = nav
+                          )
+                      }
                   }
-                }
               }
-            }
+          }
       }
+  }
+}
+
+@OptIn(ExperimentalPagerApi::class)
+@Composable
+fun EventCarousel(events: List<Event>, nav: NavigationActions) {
+    val pagerState = rememberPagerState()
+
+    LaunchedEffect(pagerState) {
+        launch {
+            while (true) {
+                delay(10000) // Wait for 10 seconds
+                val nextPage = (pagerState.currentPage + 1) % events.size
+                pagerState.animateScrollToPage(nextPage)
+            }
+        }
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(250.dp)
+    ) {
+        HorizontalPager(
+            count = events.size,
+            state = pagerState,
+            modifier = Modifier.weight(1f)
+        ) { page ->
+            val event = events[page]
+            val painter = if (event.images.isNotEmpty()) {
+                rememberAsyncImagePainter(event.images[0])
+            } else {
+                painterResource(id = R.drawable.gomeet_logo)
+            }
+
+            val eventDate =
+                Date.from(
+                    event.date
+                        .atStartOfDay(ZoneId.systemDefault())
+                        .toInstant()
+                )
+
+            val currentDate = Calendar.getInstance()
+            val startOfWeek = currentDate.clone() as Calendar
+            startOfWeek.set(Calendar.DAY_OF_WEEK, startOfWeek.firstDayOfWeek)
+            val endOfWeek = startOfWeek.clone() as Calendar
+            endOfWeek.add(Calendar.DAY_OF_WEEK, 6)
+
+            val eventCalendar = Calendar.getInstance().apply { time = eventDate }
+
+            val isThisWeek = eventCalendar.after(currentDate) && eventCalendar.before(endOfWeek)
+            val isToday =
+                currentDate.get(Calendar.YEAR) == eventCalendar.get(Calendar.YEAR) &&
+                        currentDate.get(Calendar.DAY_OF_YEAR) == eventCalendar.get(Calendar.DAY_OF_YEAR)
+
+            val dayFormat =
+                if (isThisWeek) {
+                    SimpleDateFormat("EEEE", Locale.getDefault())
+                } else {
+                    SimpleDateFormat("dd/MM/yy", Locale.getDefault())
+                }
+
+            val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+
+            val dayString =
+                if (isToday) {
+                    "Today"
+                } else {
+                    dayFormat.format(eventDate)
+                }
+            val timeString = timeFormat.format(eventDate)
+
+            Box(
+                modifier = Modifier
+                    .padding(8.dp)
+                    .background(Color.Gray, shape = RoundedCornerShape(16.dp))
+                    .fillMaxSize()
+                    .clickable {
+                        nav.navigateToEventInfo(
+                            eventId = event.eventID,
+                            title = event.title,
+                            date = dayString,
+                            time = timeString,
+                            organizer = event.creator,
+                            rating = 0.0,
+                            description = event.description,
+                            loc = LatLng(event.location.latitude, event.location.longitude)
+                        )
+                    }
+                    .clip(RoundedCornerShape(16.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                Image(
+                    painter = painter,
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+                Text(
+                    text = event.title,
+                    color = Color.White,
+                    fontSize = 17.sp,
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .background(Color.Black.copy(alpha = 0.5f))
+                        .padding(8.dp)
+                )
+            }
+        }
+
+        HorizontalPagerIndicator(
+            pagerState = pagerState,
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(16.dp),
+            inactiveColor = MaterialTheme.colorScheme.inverseOnSurface,
+            activeColor = MaterialTheme.colorScheme.onSurface
+        )
+    }
 }
