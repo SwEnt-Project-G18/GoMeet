@@ -21,14 +21,16 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuItemColors
 import androidx.compose.material3.Scaffold
@@ -47,6 +49,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
@@ -68,8 +71,6 @@ import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
-import com.github.se.gomeet.ui.theme.DarkCyan
-import com.github.se.gomeet.ui.theme.Grey
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.firestore.ktx.firestore
@@ -92,6 +93,8 @@ private const val NUMBER_OF_SUGGESTIONS = 3
  */
 @Composable
 fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivate: Boolean) {
+  val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+  val screenWidth = LocalConfiguration.current.screenWidthDp.dp
 
   val eventRepository = EventRepository(Firebase.firestore)
   val userRepository = UserRepository(Firebase.firestore)
@@ -143,47 +146,27 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
           unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
           unfocusedContainerColor = Color.Transparent,
           focusedContainerColor = Color.Transparent,
-          cursorColor = DarkCyan,
+          cursorColor = MaterialTheme.colorScheme.outlineVariant,
           focusedLabelColor = MaterialTheme.colorScheme.tertiary,
           focusedIndicatorColor = MaterialTheme.colorScheme.tertiary)
 
   Scaffold(
       topBar = {
-        Column {
-          Text(
-              text = "Create",
-              modifier = Modifier.padding(top = 15.dp, start = 15.dp, end = 18.dp),
-              color = DarkCyan,
-              fontStyle = FontStyle.Normal,
-              fontWeight = FontWeight.SemiBold,
-              fontFamily = FontFamily.Default,
-              textAlign = TextAlign.Start,
-              style = MaterialTheme.typography.headlineLarge)
-
-          if (isPrivate) {
-            isPrivateEvent.value = true
-            Text(
-                text = "Private",
-                modifier = Modifier.padding(start = 18.dp, end = 18.dp, bottom = 15.dp),
-                color = Grey,
-                fontStyle = FontStyle.Normal,
-                fontWeight = FontWeight.SemiBold,
-                fontFamily = FontFamily.Default,
-                textAlign = TextAlign.Start,
-                style = MaterialTheme.typography.titleSmall)
-          } else {
-            isPrivateEvent.value = false
-            Text(
-                text = "Public",
-                modifier = Modifier.padding(start = 18.dp, end = 18.dp, bottom = 15.dp),
-                color = Grey,
-                fontStyle = FontStyle.Normal,
-                fontWeight = FontWeight.SemiBold,
-                fontFamily = FontFamily.Default,
-                textAlign = TextAlign.Start,
-                style = MaterialTheme.typography.titleSmall)
-          }
-        }
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(top = screenHeight / 40)) {
+              IconButton(onClick = { nav.goBack() }) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back",
+                    tint = MaterialTheme.colorScheme.onBackground)
+              }
+              Text(
+                  text = "Create",
+                  style =
+                      MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.SemiBold))
+            }
+        Spacer(modifier = Modifier.height(screenHeight / 50))
       },
       bottomBar = {
         BottomNavigationMenu(
@@ -357,7 +340,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
               Spacer(modifier = Modifier.height(16.dp))
 
               Button(
-                  modifier = Modifier.width(250.dp),
+                  modifier = Modifier.width((screenWidth / 1.5.dp).dp).height(screenHeight / 17),
                   onClick = {
                     if (titleState.value.isNotEmpty() && !dateFormatError && dateState != null) {
                       if (selectedLocation.value == null) {
@@ -427,11 +410,11 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                           priceText,
                           url.value),
                   colors =
-                      ButtonColors(
-                          disabledContainerColor = MaterialTheme.colorScheme.primary,
-                          containerColor = DarkCyan,
-                          disabledContentColor = Color.White,
-                          contentColor = Color.White),
+                      ButtonDefaults.buttonColors(
+                          containerColor = MaterialTheme.colorScheme.outlineVariant,
+                          contentColor = Color.White,
+                          disabledContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                          disabledContentColor = MaterialTheme.colorScheme.onBackground),
               ) {
                 Text(text = "Post")
               }
@@ -503,7 +486,7 @@ fun LocationField(
                     unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
                     unfocusedContainerColor = Color.Transparent,
                     focusedContainerColor = Color.Transparent,
-                    cursorColor = DarkCyan,
+                    cursorColor = MaterialTheme.colorScheme.outlineVariant,
                     focusedLabelColor = MaterialTheme.colorScheme.tertiary,
                     focusedIndicatorColor = MaterialTheme.colorScheme.tertiary),
             modifier = Modifier.fillMaxWidth().menuAnchor())

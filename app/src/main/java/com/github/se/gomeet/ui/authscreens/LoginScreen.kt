@@ -7,13 +7,16 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -27,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -37,7 +41,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.github.se.gomeet.R
 import com.github.se.gomeet.ui.navigation.NavigationActions
-import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.viewmodel.AuthViewModel
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -56,6 +59,9 @@ fun LoginScreen(
     nav: NavigationActions,
     onNavToExplore: () -> Unit,
 ) {
+  val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+  val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+
   val signInState = authViewModel.signInState.collectAsState()
   val isError = signInState.value.signInError != null
   val context = LocalContext.current
@@ -65,7 +71,7 @@ fun LoginScreen(
           unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
           unfocusedContainerColor = Color.Transparent,
           focusedContainerColor = Color.Transparent,
-          cursorColor = DarkCyan,
+          cursorColor = MaterialTheme.colorScheme.outlineVariant,
           focusedLabelColor = MaterialTheme.colorScheme.tertiary,
           focusedIndicatorColor = MaterialTheme.colorScheme.tertiary)
 
@@ -100,7 +106,7 @@ fun LoginScreen(
           Text(
               text = "Login",
               modifier = Modifier.padding(bottom = 16.dp),
-              color = DarkCyan,
+              color = MaterialTheme.colorScheme.tertiary,
               fontStyle = FontStyle.Normal,
               fontWeight = FontWeight.SemiBold,
               textAlign = TextAlign.Center,
@@ -141,13 +147,17 @@ fun LoginScreen(
 
           Button(
               onClick = { authViewModel.signInWithEmailPassword(context) },
-              modifier = Modifier.fillMaxWidth().testTag("LogInButton"),
+              modifier =
+                  Modifier.width((screenWidth / 1.5.dp).dp)
+                      .height(screenHeight / 17)
+                      .testTag("LogInButton"),
+              shape = RoundedCornerShape(10.dp),
               colors =
-                  ButtonColors(
-                      disabledContainerColor = MaterialTheme.colorScheme.primary,
-                      containerColor = DarkCyan,
-                      disabledContentColor = Color.White,
-                      contentColor = Color.White),
+                  ButtonDefaults.buttonColors(
+                      containerColor = MaterialTheme.colorScheme.outlineVariant,
+                      contentColor = Color.White,
+                      disabledContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                      disabledContentColor = MaterialTheme.colorScheme.onBackground),
               enabled =
                   signInState.value.email.isNotEmpty() && signInState.value.password.isNotEmpty()) {
                 Text("Log in")

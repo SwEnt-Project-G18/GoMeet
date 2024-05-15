@@ -73,7 +73,6 @@ import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
-import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority.PRIORITY_BALANCED_POWER_ACCURACY
@@ -250,7 +249,7 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
                         FloatingActionButton(
                             onClick = { moveToCurrentLocation.value = CameraAction.ANIMATE },
                             modifier = Modifier.size(45.dp).testTag("CurrentLocationButton"),
-                            containerColor = DarkCyan) {
+                            containerColor = MaterialTheme.colorScheme.outlineVariant) {
                               Icon(
                                   imageVector =
                                       ImageVector.vectorResource(R.drawable.location_icon),

@@ -10,7 +10,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -19,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
@@ -33,7 +37,6 @@ import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
-import com.github.se.gomeet.ui.theme.DarkCyan
 
 /**
  * Composable function for the profile Settings screen.
@@ -44,42 +47,26 @@ import com.github.se.gomeet.ui.theme.DarkCyan
 fun SettingsScreen(
     nav: NavigationActions, /*userViewModel: UserViewModel*/
 ) {
+  val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+  val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+
   Scaffold(
       modifier = Modifier.testTag("SettingsScreen"),
       topBar = {
-        Column {
-          Text(
-              text = "Settings",
-              modifier = Modifier.padding(top = 15.dp, start = 15.dp, end = 18.dp, bottom = 0.dp),
-              color = DarkCyan,
-              fontStyle = FontStyle.Normal,
-              fontWeight = FontWeight.SemiBold,
-              fontFamily = FontFamily.Default,
-              textAlign = TextAlign.Start,
-              style = MaterialTheme.typography.headlineLarge)
-
-          Row(
-              horizontalArrangement = Arrangement.Start,
-              verticalAlignment = Alignment.CenterVertically,
-          ) {
-            Surface(onClick = { nav.goBack() }, shape = CircleShape, color = Color.Transparent) {
-              Icon(
-                  painter = painterResource(id = R.drawable.arrow_back),
-                  contentDescription = "Back button",
-                  modifier = Modifier.padding(15.dp),
-                  tint = MaterialTheme.colorScheme.onBackground)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(top = screenHeight / 40)) {
+              IconButton(onClick = { nav.goBack() }) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back",
+                    tint = MaterialTheme.colorScheme.onBackground)
+              }
+              Text(
+                  text = "Settings",
+                  style =
+                      MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.SemiBold))
             }
-
-            Text(
-                text = "Back",
-                color = MaterialTheme.colorScheme.onBackground,
-                fontStyle = FontStyle.Normal,
-                fontWeight = FontWeight.SemiBold,
-                fontFamily = FontFamily.Default,
-                textAlign = TextAlign.Start,
-                style = MaterialTheme.typography.titleSmall)
-          }
-        }
       },
       bottomBar = {
         BottomNavigationMenu(

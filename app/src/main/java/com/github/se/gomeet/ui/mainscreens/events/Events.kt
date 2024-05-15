@@ -374,7 +374,7 @@ fun GoMeetSearchBar(
         query = query.value,
         onQueryChange = { query.value = it },
         active = false,
-        modifier = Modifier.fillMaxWidth().padding(start = 5.dp, end = 5.dp),
+        modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp),
         placeholder = { Text("Search", color = contentColor) },
         leadingIcon = {
           IconButton(onClick = { nav.navigateToScreen(Route.MESSAGE_CHANNELS) }) {
