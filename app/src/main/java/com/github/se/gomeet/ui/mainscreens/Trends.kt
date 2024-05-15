@@ -16,15 +16,22 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -80,7 +87,7 @@ fun Trends(
     eventViewModel: EventViewModel
 ) {
 
-  val eventList = remember { mutableListOf<Event>() }
+  val eventList = remember { mutableStateListOf<Event>() }
   val coroutineScope = rememberCoroutineScope()
   val query = remember { mutableStateOf("") }
   var eventsLoaded = remember { mutableStateOf(false) }
@@ -129,6 +136,8 @@ fun Trends(
                   MaterialTheme.colorScheme.primaryContainer,
                   MaterialTheme.colorScheme.tertiary)
               Spacer(modifier = Modifier.height(5.dp))
+
+              SortButton(eventList)
 
               if (!eventsLoaded.value) {
                 LoadingText()
@@ -278,4 +287,71 @@ fun EventCarousel(events: List<Event>, nav: NavigationActions) {
         inactiveColor = MaterialTheme.colorScheme.inverseOnSurface,
         activeColor = MaterialTheme.colorScheme.onSurface)
   }
+}
+
+enum class SortOption {
+  DEFAULT,
+  ALPHABETICAL,
+  DATE
+}
+
+@Composable
+fun SortButton(eventList: MutableList<Event>) {
+  var expanded by remember { mutableStateOf(false) }
+  var selectedOption by remember { mutableStateOf(SortOption.DEFAULT) }
+
+  Box(
+      contentAlignment = Alignment.Center,
+      modifier = Modifier.fillMaxWidth().padding(top = 10.dp, start = 10.dp, end = 10.dp)) {
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            colors =
+                ButtonDefaults.buttonColors(
+                    MaterialTheme.colorScheme.primaryContainer, MaterialTheme.colorScheme.tertiary),
+            onClick = { expanded = true }) {
+              Text("Sort")
+            }
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.align(Alignment.Center).fillMaxWidth()) {
+              DropdownMenuItem(
+                  text = { Text("Popularity") },
+                  onClick = {
+                    // TODO: Implement popularity sorting
+                    selectedOption = SortOption.DEFAULT
+                    expanded = false
+                  },
+                  modifier =
+                      Modifier.background(
+                          if (selectedOption == SortOption.DEFAULT)
+                              MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+                          else Color.Transparent))
+              DropdownMenuItem(
+                  text = { Text("Alphabetical") },
+                  onClick = {
+                    selectedOption = SortOption.ALPHABETICAL
+                    eventList.sortBy { it.title }
+                    expanded = false
+                  },
+                  modifier =
+                      Modifier.background(
+                          if (selectedOption == SortOption.ALPHABETICAL)
+                              MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+                          else Color.Transparent))
+              DropdownMenuItem(
+                  text = { Text("Date") },
+                  onClick = {
+                    selectedOption = SortOption.DATE
+                    eventList.sortBy { it.date }
+                    expanded = false
+                  },
+                  modifier =
+                      Modifier.background(
+                          if (selectedOption == SortOption.DATE)
+                              MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+                          else Color.Transparent))
+            }
+      }
 }
