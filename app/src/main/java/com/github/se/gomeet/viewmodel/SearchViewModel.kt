@@ -32,7 +32,7 @@ class SearchViewModel() : ViewModel() {
       listOf(
           GoMeetUser(
               "1",
-              "username",
+              "BuzzAldrin",
               "Buzz",
               "Aldrin",
               "buzz.aldrin@nasa.gov",
@@ -46,7 +46,7 @@ class SearchViewModel() : ViewModel() {
               emptyList()),
           GoMeetUser(
               "2",
-              "username",
+              "MichaelCollins",
               "Michael",
               "Collins",
               "email",
@@ -60,7 +60,7 @@ class SearchViewModel() : ViewModel() {
               emptyList()),
           GoMeetUser(
               "3",
-              "username",
+              "JimLovell",
               "Jim",
               "Lovell",
               "email",
@@ -74,7 +74,7 @@ class SearchViewModel() : ViewModel() {
               emptyList()),
           GoMeetUser(
               "4",
-              "username",
+              "EdWhite",
               "Ed",
               "White",
               "email",
