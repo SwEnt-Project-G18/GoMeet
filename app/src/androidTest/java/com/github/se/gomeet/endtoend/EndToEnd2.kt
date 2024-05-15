@@ -240,19 +240,21 @@ class EndToEndTest2 : TestCase() {
     @AfterClass
     @JvmStatic
     fun tearDown() {
-      // clean up the event
-      runBlocking { eventVM.getAllEvents()?.forEach { eventVM.removeEvent(it.eventID) } }
+      runBlocking {
+        // clean up the event
+        eventVM.getAllEvents()?.forEach { eventVM.removeEvent(it.eventID) }
 
-      // clean up the users
-      Firebase.auth.currentUser?.delete()
-      userVM.deleteUser(uid1)
-      userVM.deleteUser(uid2)
+        // clean up the users
+        Firebase.auth.currentUser?.delete()
+        userVM.deleteUser(uid1)
+        userVM.deleteUser(uid2)
 
-      val result = Firebase.auth.signInWithEmailAndPassword(email1, pwd1)
-      while (!result.isComplete) {
-        TimeUnit.SECONDS.sleep(1)
+        val result = Firebase.auth.signInWithEmailAndPassword(email1, pwd1)
+        while (!result.isComplete) {
+          TimeUnit.SECONDS.sleep(1)
+        }
+        Firebase.auth.currentUser?.delete()
       }
-      Firebase.auth.currentUser?.delete()
     }
   }
 }

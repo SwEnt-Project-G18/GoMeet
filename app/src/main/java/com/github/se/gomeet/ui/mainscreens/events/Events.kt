@@ -46,15 +46,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
-import com.github.se.gomeet.model.repository.EventRepository
-import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
@@ -64,8 +60,6 @@ import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.Date
@@ -407,25 +401,4 @@ fun GoMeetSearchBar(
         onActiveChange = {},
         onSearch = {}) {}
   }
-}
-
-/**
- * A custom search bar composable function that provides a user interface for inputting search
- * queries. This search bar includes visual customizations and functionality adjustments tailored to
- * the GoMeet application's theme. It features a leading icon that represents the app, a trailing
- * icon for voice search, and custom color schemes for different states of the search input field.
- *
- * @param query A mutable state holding the current query string, allowing the text to be updated
- *   dynamically.
- * @param backgroundColor The color of the search bar's background.
- * @param contentColor The color of the text and icons within the search bar.
- */
-@Composable
-@Preview
-fun EventPreview() {
-  Events(
-      "",
-      nav = NavigationActions(rememberNavController()),
-      UserViewModel(UserRepository(Firebase.firestore)),
-      EventViewModel("", EventRepository(Firebase.firestore)))
 }

@@ -48,14 +48,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
-import com.github.se.gomeet.model.repository.EventRepository
-import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
@@ -66,8 +62,6 @@ import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import java.time.LocalDate
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -333,14 +327,4 @@ fun ProfileImage(
               .clip(CircleShape)
               .background(color = MaterialTheme.colorScheme.background),
       contentScale = ContentScale.Crop)
-}
-
-@Preview
-@Composable
-fun ProfilePreview() {
-  Profile(
-      nav = NavigationActions(rememberNavController()),
-      "John",
-      UserViewModel(UserRepository(Firebase.firestore)),
-      EventViewModel("John", EventRepository(Firebase.firestore)))
 }

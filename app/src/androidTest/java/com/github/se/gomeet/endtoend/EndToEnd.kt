@@ -47,12 +47,13 @@ class EndToEndTest : TestCase() {
 
   @After
   fun tearDown() {
-    // Clean up the event
-    runBlocking { eventVM.getAllEvents()?.forEach { eventVM.removeEvent(it.eventID) } }
-
-    // Clean up the user
-    Firebase.auth.currentUser?.delete()
-    userVM.deleteUser(uid)
+    runBlocking {
+      // Clean up the event
+      eventVM.getAllEvents()?.forEach { eventVM.removeEvent(it.eventID) }
+      // Clean up the user
+      Firebase.auth.currentUser?.delete()
+      userVM.deleteUser(uid)
+    }
   }
 
   @Test
@@ -159,22 +160,22 @@ class EndToEndTest : TestCase() {
     @JvmStatic
     @BeforeClass
     fun setup() {
-      TimeUnit.SECONDS.sleep(3)
-
-      // create a new user
-      var result = Firebase.auth.createUserWithEmailAndPassword(email, pwd)
-      while (!result.isComplete) {
-        TimeUnit.SECONDS.sleep(1)
+      runBlocking {
+        // create a new user
+        var result = Firebase.auth.createUserWithEmailAndPassword(email, pwd)
+        while (!result.isComplete) {
+          TimeUnit.SECONDS.sleep(1)
+        }
+        uid = result.result.user!!.uid
+        userVM.createUserIfNew(
+            uid, username, "testfirstname", "testlastname", email, "testphonenumber", "testcountry")
+        TimeUnit.SECONDS.sleep(3)
+        result = Firebase.auth.signInWithEmailAndPassword(email, pwd)
+        while (!result.isComplete) {
+          TimeUnit.SECONDS.sleep(1)
+        }
+        eventVM = EventViewModel(uid, EventRepository(Firebase.firestore))
       }
-      uid = result.result.user!!.uid
-      userVM.createUserIfNew(
-          uid, username, "testfirstname", "testlastname", email, "testphonenumber", "testcountry")
-      TimeUnit.SECONDS.sleep(3)
-      result = Firebase.auth.signInWithEmailAndPassword(email, pwd)
-      while (!result.isComplete) {
-        TimeUnit.SECONDS.sleep(1)
-      }
-      eventVM = EventViewModel(uid, EventRepository(Firebase.firestore))
     }
   }
 }
