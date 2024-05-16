@@ -71,7 +71,7 @@ class RegisterScreenTest : TestCase() {
       composeTestRule.onNodeWithTag("Text").assertIsDisplayed()
       composeTestRule.onNodeWithText("First Name").assertIsDisplayed().performTextInput("firstname")
       composeTestRule.onNodeWithText("Last Name").assertIsDisplayed().performTextInput("lastname")
-      composeTestRule.onNodeWithText("Select Country").assertIsDisplayed().performTextInput("q")
+      composeTestRule.onNodeWithText("Select Country").assertIsDisplayed().performClick()
       composeTestRule.onNodeWithTag("CountryDropdownMenu").assertIsDisplayed().performClick()
       composeTestRule
           .onNodeWithText("Phone Number")

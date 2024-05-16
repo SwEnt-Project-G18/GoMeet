@@ -109,9 +109,9 @@ fun RegisterNameCountryPhone(
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
             modifier = Modifier.fillMaxWidth())
 
-
         if (!validLastName && !firstClick) {
           Text(text = "Last Name is not valid", color = Color.Red)
+        }
 
         Spacer(modifier = Modifier.size(screenHeight / 60))
 
@@ -214,11 +214,14 @@ fun CountrySuggestionTextField(total: List<String>, textFieldColors: TextFieldCo
             colors =
                 textFieldColors.copy(focusedTrailingIconColor = MaterialTheme.colorScheme.tertiary))
         ExposedDropdownMenu(
-            modifier = Modifier.background(color = MaterialTheme.colorScheme.primaryContainer).testTag("CountryDropdownMenu"),
+            modifier =
+                Modifier.background(color = MaterialTheme.colorScheme.primaryContainer)
+                    .testTag("CountryDropdownMenu"),
             expanded = expanded,
             onDismissRequest = { expanded = false }) {
               countries.value.forEach { selectionOption ->
                 DropdownMenuItem(
+                    modifier = Modifier.testTag("CountryItem"),
                     text = { Text(text = selectionOption) },
                     onClick = {
                       selectedOptionText = selectionOption
