@@ -38,7 +38,6 @@ import androidx.compose.ui.unit.sp
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.InviteStatus
-import com.github.se.gomeet.model.event.eventMomentToString
 import com.github.se.gomeet.model.repository.EventRepository
 import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.model.user.GoMeetUser
@@ -54,9 +53,6 @@ import java.text.SimpleDateFormat
 import java.time.ZoneId
 import java.util.*
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
-import java.time.LocalDate
-import java.time.LocalTime
 import kotlinx.coroutines.launch
 
 /**
