@@ -28,13 +28,10 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.repository.EventRepository
-import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.navigation.NavigationActions
@@ -150,22 +147,4 @@ fun MyEventInfo(
               }
         }
       }
-}
-
-@Preview
-@Composable
-fun PreviewEventInfo() {
-  MyEventInfo(
-      nav = NavigationActions(rememberNavController()),
-      title = "Event Title",
-      eventId = "eventid",
-      date = "2024-05-01",
-      organizerId = "organiserid",
-      time = "00:00",
-      description = "Event Description",
-      loc = LatLng(0.0, 0.0),
-      userViewModel = UserViewModel(userRepository = UserRepository(Firebase.firestore)),
-      eventViewModel =
-          EventViewModel(
-              creatorId = "organiserid", eventRepository = EventRepository(Firebase.firestore)))
 }

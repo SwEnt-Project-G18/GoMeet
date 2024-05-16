@@ -257,7 +257,8 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                     Icon(
                         Icons.AutoMirrored.Filled.KeyboardArrowRight,
                         null,
-                        modifier = Modifier.clickable { showPopup.value = true })
+                        modifier =
+                            Modifier.clickable { showPopup.value = true }.testTag("TagsButton"))
                   }
 
               Spacer(modifier = Modifier.height(16.dp))
@@ -302,12 +303,13 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                         null,
                         modifier =
                             Modifier.clickable {
-                              if (imageUri != null) {
-                                imageUri = null
-                              } else {
-                                imagePickerLauncher.launch("image/*")
-                              }
-                            })
+                                  if (imageUri != null) {
+                                    imageUri = null
+                                  } else {
+                                    imagePickerLauncher.launch("image/*")
+                                  }
+                                }
+                                .testTag("AddImageButton"))
                   }
 
               Spacer(modifier = Modifier.height(16.dp))

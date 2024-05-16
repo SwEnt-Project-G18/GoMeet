@@ -353,7 +353,9 @@ fun EditProfile(
                       Icon(
                           Icons.Default.KeyboardArrowRight,
                           null,
-                          modifier = Modifier.clickable { showPopup.value = true })
+                          modifier =
+                              Modifier.clickable { showPopup.value = true }
+                                  .testTag("EditTagsButton"))
                     }
               }
         } else {

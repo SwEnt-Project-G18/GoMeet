@@ -33,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -76,7 +77,7 @@ fun RegisterNameCountryPhone(
       verticalArrangement = Arrangement.SpaceAround) {
         Text(
             text = "Tell Us More About Yourself",
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().testTag("Text"),
             style = MaterialTheme.typography.titleMedium,
             textAlign = TextAlign.Center)
 
@@ -133,6 +134,7 @@ fun RegisterNameCountryPhone(
                       x = 20.dp, y = 20.dp), // Adjusts the position directly below the TextField
               modifier =
                   Modifier.fillMaxWidth()
+                      .testTag("CountryDropdownMenu")
                       .heightIn(max = 200.dp) // Limits the height to display around 5 items
               ) {
                 for (c in filteredCountries) {
@@ -169,39 +171,41 @@ fun RegisterNameCountryPhone(
 
         Spacer(modifier = Modifier.size(screenHeight / 15))
 
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-          LinearProgressIndicator(
-              modifier = Modifier.padding(top = 20.dp, end = 25.dp),
-              progress = { 0.6f },
-              color = MaterialTheme.colorScheme.tertiary,
-              trackColor = Color.LightGray,
-              strokeCap = ProgressIndicatorDefaults.CircularIndeterminateStrokeCap)
-          IconButton(
-              modifier = Modifier.padding(bottom = 2.5.dp, end = 3.dp).size(screenHeight / 19),
-              colors = IconButtonDefaults.outlinedIconButtonColors(),
-              onClick = {
-                validLastName = lastName.isNotEmpty() && lastName.length <= 20
-                validFirstName = firstName.isNotEmpty() && firstName.length <= 20
-                validPhoneNumber =
-                    phoneNumber.isEmpty() ||
-                        (PHONE.matcher(phoneNumber).matches() &&
-                            (phoneNumber.startsWith('0') || phoneNumber.startsWith('+')) &&
-                            phoneNumber.length >= 10 &&
-                            phoneNumber.length <= 14)
+        Row(
+            modifier = Modifier.fillMaxWidth().testTag("BottomRow"),
+            horizontalArrangement = Arrangement.End) {
+              LinearProgressIndicator(
+                  modifier = Modifier.padding(top = 20.dp, end = 25.dp),
+                  progress = { 0.6f },
+                  color = MaterialTheme.colorScheme.tertiary,
+                  trackColor = Color.LightGray,
+                  strokeCap = ProgressIndicatorDefaults.CircularIndeterminateStrokeCap)
+              IconButton(
+                  modifier = Modifier.padding(bottom = 2.5.dp, end = 3.dp).size(screenHeight / 19),
+                  colors = IconButtonDefaults.outlinedIconButtonColors(),
+                  onClick = {
+                    validLastName = lastName.isNotEmpty() && lastName.length <= 20
+                    validFirstName = firstName.isNotEmpty() && firstName.length <= 20
+                    validPhoneNumber =
+                        phoneNumber.isEmpty() ||
+                            (PHONE.matcher(phoneNumber).matches() &&
+                                (phoneNumber.startsWith('0') || phoneNumber.startsWith('+')) &&
+                                phoneNumber.length >= 10 &&
+                                phoneNumber.length <= 14)
 
-                countryValid = country.isEmpty() || countries.value.contains(country)
-                firstClick = false
-                if (validFirstName && validLastName && countryValid && validPhoneNumber) {
-                  callback(firstName, lastName, country, phoneNumber)
-                }
-              }) {
-                Icon(
-                    Icons.AutoMirrored.Filled.ArrowForward,
-                    contentDescription = "Next",
-                    tint = MaterialTheme.colorScheme.tertiary,
-                    modifier = Modifier.size(60.dp))
-              }
-        }
+                    countryValid = country.isEmpty() || countries.value.contains(country)
+                    firstClick = false
+                    if (validFirstName && validLastName && countryValid && validPhoneNumber) {
+                      callback(firstName, lastName, country, phoneNumber)
+                    }
+                  }) {
+                    Icon(
+                        Icons.AutoMirrored.Filled.ArrowForward,
+                        contentDescription = "Next",
+                        tint = MaterialTheme.colorScheme.tertiary,
+                        modifier = Modifier.size(60.dp))
+                  }
+            }
       }
 }
 

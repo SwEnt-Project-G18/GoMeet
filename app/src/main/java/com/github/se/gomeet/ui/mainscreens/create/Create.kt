@@ -23,9 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.CREATE_ITEMS
 import com.github.se.gomeet.ui.navigation.NavigationActions
@@ -113,10 +111,4 @@ fun Create(nav: NavigationActions) {
                   }
             }
       }
-}
-
-@Preview
-@Composable
-fun CreatePreview() {
-  Create(nav = NavigationActions(rememberNavController()))
 }

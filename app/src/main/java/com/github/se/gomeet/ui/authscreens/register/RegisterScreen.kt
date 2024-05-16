@@ -79,7 +79,7 @@ fun RegisterScreen(
 
   var state by remember { mutableIntStateOf(1) }
 
-  Column(modifier = Modifier.fillMaxSize()) {
+  Column(modifier = Modifier.fillMaxSize().testTag("RegisterScreen")) {
     TopAppBar(
         modifier = Modifier.testTag("TopBar"),
         backgroundColor = MaterialTheme.colorScheme.background,
@@ -108,7 +108,7 @@ fun RegisterScreen(
           Spacer(modifier = Modifier.height(screenHeight / 10))
           Image(
               painter = painterResource(id = R.drawable.gomeet_text),
-              contentDescription = "Go Meet",
+              contentDescription = "GoMeet",
               modifier = Modifier.padding(top = 0.dp),
               alignment = Alignment.Center,
               colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.tertiary))

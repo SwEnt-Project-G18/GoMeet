@@ -29,9 +29,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.R
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
@@ -211,10 +209,4 @@ fun SettingsSubtitle(text: String, modifier: Modifier) {
       fontFamily = FontFamily.Default,
       textAlign = TextAlign.Start,
       style = MaterialTheme.typography.labelSmall)
-}
-
-@Preview
-@Composable
-fun SettingsScreenPreview() {
-  SettingsScreen(nav = NavigationActions(rememberNavController()))
 }
