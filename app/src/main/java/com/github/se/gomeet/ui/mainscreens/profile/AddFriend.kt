@@ -203,28 +203,31 @@ fun UserItem(
             Text(
                 text = "${user.firstName} ${user.lastName}",
                 style = MaterialTheme.typography.bodyLarge)
-            Text(text = user.username, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6F))
+            Text(
+                text = user.username,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6F))
           }
         }
-      Button(
-          shape = RoundedCornerShape(10.dp),
-          onClick = { onFollowButtonClick(user.uid, isFollowing) },
-          modifier = Modifier
-              .padding(start = 15.dp)
-              .width(110.dp)
-              .testTag(if (isFollowing) "UnfollowButton" else "FollowButton"),
-          colors = ButtonDefaults.buttonColors(
-              containerColor = if (isFollowing) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.outlineVariant,
-              contentColor = if (isFollowing) Color.Black else Color.White,
-              disabledContentColor = Color.Transparent,
-              disabledContainerColor = Color.Transparent
-          )
-      ) {
-          Text(
-              text = if (isFollowing) "Following" else "Follow",
-              style = MaterialTheme.typography.labelLarge,
-              color = if (isFollowing) MaterialTheme.colorScheme.onBackground else Color.White
-          )
-      }
+        Button(
+            shape = RoundedCornerShape(10.dp),
+            onClick = { onFollowButtonClick(user.uid, isFollowing) },
+            modifier =
+                Modifier.padding(start = 15.dp)
+                    .width(110.dp)
+                    .testTag(if (isFollowing) "UnfollowButton" else "FollowButton"),
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor =
+                        if (isFollowing) MaterialTheme.colorScheme.primaryContainer
+                        else MaterialTheme.colorScheme.outlineVariant,
+                    contentColor = if (isFollowing) Color.Black else Color.White,
+                    disabledContentColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent)) {
+              Text(
+                  text = if (isFollowing) "Following" else "Follow",
+                  style = MaterialTheme.typography.labelLarge,
+                  color = if (isFollowing) MaterialTheme.colorScheme.onBackground else Color.White)
+            }
       }
 }
