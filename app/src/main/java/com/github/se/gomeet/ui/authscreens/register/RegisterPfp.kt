@@ -36,6 +36,7 @@ import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -66,7 +67,7 @@ fun RegisterPfp(callback: (String) -> Unit, name: String) {
   Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
     Text(
         text = if (pfp.isEmpty()) "Hi $name!\nWhat about a Profile Picture ?" else "You look good!",
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().testTag("Text"),
         style = MaterialTheme.typography.titleMedium,
         textAlign = TextAlign.Center)
 
@@ -90,23 +91,25 @@ fun RegisterPfp(callback: (String) -> Unit, name: String) {
 
     Spacer(modifier = Modifier.size(screenHeight / 15))
 
-    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-      LinearProgressIndicator(
-          modifier = Modifier.padding(top = 20.dp, end = 25.dp),
-          progress = { 0.8f },
-          color = MaterialTheme.colorScheme.tertiary,
-          trackColor = Color.LightGray,
-          strokeCap = ProgressIndicatorDefaults.CircularIndeterminateStrokeCap)
-      IconButton(
-          modifier = Modifier.padding(bottom = 2.5.dp, end = 3.dp).size(screenHeight / 19),
-          colors = IconButtonDefaults.outlinedIconButtonColors(),
-          onClick = { callback(pfp) }) {
-            Icon(
-                Icons.AutoMirrored.Filled.ArrowForward,
-                contentDescription = "Next",
-                tint = MaterialTheme.colorScheme.tertiary,
-                modifier = Modifier.size(60.dp))
-          }
-    }
+    Row(
+        modifier = Modifier.fillMaxWidth().testTag("BottomRow"),
+        horizontalArrangement = Arrangement.End) {
+          LinearProgressIndicator(
+              modifier = Modifier.padding(top = 20.dp, end = 25.dp),
+              progress = { 0.8f },
+              color = MaterialTheme.colorScheme.tertiary,
+              trackColor = Color.LightGray,
+              strokeCap = ProgressIndicatorDefaults.CircularIndeterminateStrokeCap)
+          IconButton(
+              modifier = Modifier.padding(bottom = 2.5.dp, end = 3.dp).size(screenHeight / 19),
+              colors = IconButtonDefaults.outlinedIconButtonColors(),
+              onClick = { callback(pfp) }) {
+                Icon(
+                    Icons.AutoMirrored.Filled.ArrowForward,
+                    contentDescription = "Next",
+                    tint = MaterialTheme.colorScheme.tertiary,
+                    modifier = Modifier.size(60.dp))
+              }
+        }
   }
 }
