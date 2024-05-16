@@ -3,13 +3,9 @@ package com.github.se.gomeet.ui.authscreens
 import android.app.Activity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,31 +14,26 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Text
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedIconButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.github.se.gomeet.R
-import com.github.se.gomeet.ui.theme.DarkCyan
 import com.google.firebase.auth.FirebaseAuth
 
 /**
@@ -58,6 +49,9 @@ fun WelcomeScreen(
     onNavToRegister: () -> Unit,
     onSignInSuccess: (String) -> Unit
 ) {
+  val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+  val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+
   val launcher =
       rememberLauncherForActivityResult(FirebaseAuthUIActivityResultContract()) { res ->
         if (res.resultCode == Activity.RESULT_OK) {
@@ -80,140 +74,68 @@ fun WelcomeScreen(
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.Top,
       modifier = Modifier.fillMaxSize().padding(25.dp).testTag("WelcomeScreenCol")) {
-        Spacer(modifier = Modifier.size((LocalConfiguration.current.screenHeightDp / 6).dp))
+        Spacer(modifier = Modifier.size(screenHeight / 30))
 
         Image(
-            painter = painterResource(id = R.drawable.gomeet_logo),
+            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.tertiary),
+            painter = painterResource(id = R.drawable.gomeet_text),
             contentDescription = "GoMeet Logo")
 
-        Spacer(modifier = Modifier.size(30.dp))
+        Image(
+            painter = painterResource(id = R.drawable.welcomeimage),
+            contentDescription = "Welcome Image")
 
         Text(
             text = "See what's happening around you right now.",
             modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
-            color = DarkCyan,
-            fontStyle = FontStyle.Normal,
-            fontWeight = FontWeight.SemiBold,
             textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.headlineLarge)
+            style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.SemiBold))
 
-        Spacer(modifier = Modifier.size(80.dp))
+        Spacer(modifier = Modifier.size(screenHeight / 70))
 
-        OutlinedButton(
-            onClick = { launcher.launch(signInIntent) },
-            modifier = Modifier.width(250.dp).height(40.dp),
-            shape = RoundedCornerShape(20.dp),
-            border = BorderStroke(1.dp, Color.Gray),
-            enabled = true,
-            colors = ButtonDefaults.outlinedButtonColors(containerColor = Color(0xFFECEFF1))) {
-              Image(
-                  painter = painterResource(id = R.drawable.google_logo),
-                  contentDescription = "Google logo",
-                  modifier = Modifier.width(24.dp).height(24.dp))
-
-              Spacer(modifier = Modifier.size(15.dp)) // Adjust the size of the spacer as needed
-
-              Text(
-                  text = "Continue with Google",
-                  color = Color.Black,
-                  modifier =
-                      Modifier.padding(
-                          start = 8.dp,
-                          end = 8.dp) // This will add padding around the text inside the button
-                  )
-            }
-
-        Spacer(modifier = Modifier.size(1.dp))
-
-        DividerWithText()
-
-        Spacer(modifier = Modifier.size(1.dp))
-
-        OutlinedButton(
+        Button(
             onClick = { onNavToLogin() },
-            modifier = Modifier.width(250.dp).height(40.dp).testTag("LogInButton"),
-            shape = RoundedCornerShape(20.dp),
-            border = BorderStroke(1.dp, Color.Gray), // Set border here if needed
+            modifier =
+                Modifier.width((screenWidth / 1.5.dp).dp)
+                    .height(screenHeight / 17)
+                    .testTag("LogInButton"),
+            shape = RoundedCornerShape(10.dp),
             enabled = true,
-            colors = ButtonDefaults.outlinedButtonColors(containerColor = Color(0xFFECEFF1))) {
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.outlineVariant)) {
               Text(
-                  text = "Log in",
-                  modifier = Modifier.padding(start = 8.dp, end = 8.dp),
-                  color = Color.Black)
+                  text = "Log In",
+                  style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
+                  color = Color.White)
             }
 
         Spacer(modifier = Modifier.size(10.dp))
+        OutlinedButton(
+            onClick = { onNavToRegister() },
+            modifier = Modifier.width((screenWidth / 1.5.dp).dp).height(screenHeight / 17),
+            shape = RoundedCornerShape(10.dp),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+            enabled = true,
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.background)) {
+              Text(
+                  text = "Sign Up",
+                  style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
+                  color = MaterialTheme.colorScheme.outlineVariant)
+            }
 
-        Row {
-          Text(
-              text = "Don’t have an account?",
-              style =
-                  TextStyle(
-                      fontSize = 11.sp,
-                      lineHeight = 17.sp,
-                      fontFamily = FontFamily(Font(R.font.roboto)),
-                      fontWeight = FontWeight.Normal,
-                      color = MaterialTheme.colorScheme.onBackground,
-                      letterSpacing = 0.25.sp,
-                  ))
+        Spacer(modifier = Modifier.size(screenHeight / 30))
 
-          Text(
-              text = "Create account",
-              modifier = Modifier.clickable { onNavToRegister() },
-              style =
-                  TextStyle(
-                      fontSize = 11.sp,
-                      lineHeight = 17.sp,
-                      fontFamily = FontFamily(Font(R.font.roboto)),
-                      fontWeight = FontWeight.SemiBold,
-                      color = Color(0xFF2F6673),
-                      textAlign = TextAlign.Center,
-                      letterSpacing = 0.25.sp,
-                  ))
-        }
+        OutlinedIconButton(
+            modifier = Modifier.size(screenHeight / 18),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primaryContainer),
+            onClick = { launcher.launch(signInIntent) },
+            enabled = true) {
+              Image(
+                  painter = painterResource(id = R.drawable.multicolor_google_logo),
+                  contentDescription = "Google logo")
+            }
       }
-}
-
-@Preview
-@Composable
-fun WelcomeScreenPreview() {
-  WelcomeScreen(
-      onNavToLogin = {},
-      onNavToRegister = {},
-      onSignInSuccess = { _ -> }) // Preview the WelcomeScreen
-}
-
-/** Composable function for the Divider with Text. */
-@Composable
-fun DividerWithText() {
-  val color = MaterialTheme.colorScheme.tertiary
-  Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
-    Canvas(modifier = Modifier.matchParentSize()) {
-      val canvasWidth = size.width
-      val canvasHalfHeight = size.height / 2
-
-      drawLine(
-          color = color,
-          strokeWidth = 2f,
-          start = Offset(x = 120f, y = canvasHalfHeight),
-          end = Offset(x = (canvasWidth / 2) - 50f, y = canvasHalfHeight),
-      )
-      drawLine(
-          color = color,
-          strokeWidth = 2f,
-          start = Offset(x = (canvasWidth / 2) + 50f, y = canvasHalfHeight),
-          end = Offset(x = canvasWidth - 120, y = canvasHalfHeight),
-      )
-    }
-    Text(
-        text = "or",
-        modifier = Modifier.align(Alignment.Center),
-        style =
-            TextStyle(
-                fontSize = 15.sp,
-                fontFamily = FontFamily(Font(R.font.roboto)),
-                fontWeight = FontWeight(700),
-                color = color,
-            ))
-  }
 }

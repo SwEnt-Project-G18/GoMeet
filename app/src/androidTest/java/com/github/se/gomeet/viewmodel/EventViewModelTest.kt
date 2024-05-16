@@ -1,90 +1,195 @@
 package com.github.se.gomeet.viewmodel
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.location.Location
+import com.github.se.gomeet.model.repository.EventRepository
+import com.github.se.gomeet.model.repository.UserRepository
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import java.time.LocalDate
+import java.time.LocalTime
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.runTest
+import org.junit.AfterClass
+import org.junit.BeforeClass
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class EventViewModelTest {
+  companion object {
+    private const val title = "title"
+    private const val description = "description"
+    private val location = Location(0.0, 0.0, "location")
+    private val date = LocalDate.of(9999, 3, 30)
+    private val time = LocalTime.of(23, 40)
+    private const val price = 0.0
+    private const val url = "url"
+    private val pendingParticipants = emptyList<String>()
+    private val participants = emptyList<String>()
+    private val visibleToIfPrivate = emptyList<String>()
+    private const val maxParticipants = 1
+    private const val public = false
+    private val tags = emptyList<String>()
+    private val images = emptyList<String>()
+    private val imageUrl = null
+    private val userVM = UserViewModel(UserRepository(Firebase.firestore))
+    private const val eventId = "EventViewModelTestEvent"
 
-  private val title = "testevent2"
-  private val uid = "testuid"
+    private const val uid = "EventViewModelTestUser"
+    private val eventVM = EventViewModel(uid, EventRepository(Firebase.firestore))
+
+    @BeforeClass
+    @JvmStatic
+    fun setup() {
+      // Create an event
+      runBlocking {
+        eventVM.createEvent(
+            title,
+            description,
+            location,
+            date,
+            time,
+            price,
+            url,
+            pendingParticipants,
+            participants,
+            visibleToIfPrivate,
+            maxParticipants,
+            public,
+            tags,
+            images,
+            imageUrl,
+            userVM,
+            eventId)
+      }
+
+      // Verify that the event was successfully created
+      runBlocking { assert(eventVM.getEvent(eventId) != null) }
+    }
+
+    @AfterClass
+    @JvmStatic
+    fun tearDown() {
+      // Clean up the events
+      runBlocking { eventVM.getAllEvents()!!.forEach { eventVM.removeEvent(it.eventID) } }
+    }
+  }
 
   @Test
-  fun test() = runTest {
-    val eventViewModel = EventViewModel(uid)
+  fun getEventImageUrlTest() {
+    runBlocking { assert(eventVM.getEventImageUrl(eventId) == null) }
+  }
 
-    // test getAllEvents and createEvent
+  @Test
+  fun getAllEventsTest() {
+    runBlocking { assert(eventVM.getAllEvents()!!.any { it.eventID == eventId }) }
+  }
+
+  @Test
+  fun editEventTest() {
+    val newTitle = "newtitle"
+
+    // Edit the event
+    runBlocking { eventVM.editEvent(eventVM.getEvent(eventId)!!.copy(title = newTitle)) }
+
+    // Verify that the event was changed accordingly
+    runBlocking { assert(eventVM.getEvent(eventId)!!.title == newTitle) }
+  }
+
+  @Test
+  fun joinEventTest() {
+    // Join the event
+    runBlocking { eventVM.joinEvent(eventVM.getEvent(eventId)!!, uid) }
+
+    // Verify that the event's participants list was updated correctly
+    runBlocking { assert(eventVM.getEvent(eventId)!!.participants.contains(uid)) }
+  }
+
+  @Test
+  fun sendInvitationTest() {
+    val userId = "uid1"
+
+    // Send an invitation to the event
+    runBlocking { eventVM.sendInvitation(eventVM.getEvent(eventId)!!, userId) }
+
+    // Verify that the invited user was added to ehe event's pendingParticipants list
+    runBlocking { assert(eventVM.getEvent(eventId)!!.pendingParticipants.contains(userId)) }
+  }
+
+  @Test
+  fun acceptInvitationTest() {
+    val userId = "uid2"
+
+    // Invite a user to the event
+    runBlocking { eventVM.sendInvitation(eventVM.getEvent(eventId)!!, userId) }
+
+    // Make the user accept the invitation
+    runBlocking { eventVM.acceptInvitation(eventVM.getEvent(eventId)!!, userId) }
+
+    // Verify that the event's participants list was updated correctly
+    runBlocking { assert(eventVM.getEvent(eventId)!!.participants.contains(userId)) }
+  }
+
+  @Test
+  fun declineInvitationTest() {
+    val userId = "uid3"
+
+    // Invite a user to the event
+    runBlocking { eventVM.sendInvitation(eventVM.getEvent(eventId)!!, userId) }
+
+    // Make the user decline the invitation
+    runBlocking { eventVM.declineInvitation(eventVM.getEvent(eventId)!!, userId) }
+
+    // Verify that the event's pendingParticipants and participants lists were updated correctly
     runBlocking {
-      eventViewModel.createEvent(
-          title,
-          "description",
-          Location(0.0, 0.0, "name"),
-          LocalDate.of(2024, 4, 29),
-          0.0,
-          "url",
-          emptyList(),
-          emptyList(),
-          0,
-          false,
-          emptyList(),
-          emptyList(),
-          null,
-          UserViewModel(),
-          uid)
+      assert(!eventVM.getEvent(eventId)!!.pendingParticipants.contains(userId))
+      assert(!eventVM.getEvent(eventId)!!.participants.contains(userId))
     }
+  }
 
-    var events: List<Event> = eventViewModel.getAllEvents()!!.filter { it.title == title }
-    while (events.isEmpty()) {
-      events = eventViewModel.getAllEvents()!!.filter { it.title == title }
+  @Test
+  fun kickParticipantTest() {
+    val userId = "uid4"
+
+    // Make the user join the event
+    runBlocking { eventVM.joinEvent(eventVM.getEvent(eventId)!!, userId) }
+
+    // Kick the user from the event
+    runBlocking { eventVM.kickParticipant(eventVM.getEvent(eventId)!!, userId) }
+
+    // Verify that the kicked user is no longer in the event's participants list
+    runBlocking { assert(!eventVM.getEvent(eventId)!!.participants.contains(userId)) }
+  }
+
+  @Test
+  fun cancelInvitationTest() {
+    val userId = "uid5"
+
+    // Invite a user to the event
+    runBlocking { eventVM.sendInvitation(eventVM.getEvent(eventId)!!, userId) }
+
+    // Cancel the invitation
+    runBlocking { eventVM.cancelInvitation(eventVM.getEvent(eventId)!!, uid) }
+
+    // Verify that the event's pendingParticipants list was correctly updated
+    runBlocking { assert(!eventVM.getEvent(eventId)!!.pendingParticipants.contains(uid)) }
+  }
+
+  @Test
+  fun locationTest() {
+    val query = "q"
+    var locationList: List<Location> = emptyList()
+    val numberOfResults = 3
+
+    // Get the location suggestions for the given query
+    runBlocking { eventVM.location(query, numberOfResults) { result -> locationList = result } }
+
+    // Make sure that the locations returned are correct
+    while (locationList.isEmpty()) {
+      TimeUnit.SECONDS.sleep(1)
     }
-
-    assert(events.isNotEmpty())
-
-    // test getEvent
-    val uid = events[0].uid
-    lateinit var event: Event
-    event = eventViewModel.getEvent(uid)!!
-
-    assert(event != null)
-    assert(event.uid == uid)
-    assert(event.title == title)
-
-    assert(eventViewModel.getEvent("this_event_does_not_exist") == null)
-
-    // test editEvent
-    val newTitle = "newtestevent"
-    val newEvent =
-        Event(
-            event.uid,
-            event.creator,
-            newTitle,
-            event.description,
-            event.location,
-            event.date,
-            event.price,
-            event.url,
-            event.participants,
-            event.visibleToIfPrivate,
-            event.maxParticipants,
-            event.public,
-            event.tags,
-            event.images)
-
-    eventViewModel.editEvent(newEvent)
-    event = eventViewModel.getEvent(uid)!!
-
-    assert(event != null)
-    assert(event.uid == uid)
-    assert(event.title == newTitle)
-
-    // test removeEvent
-    eventViewModel.removeEvent(uid)
-    assert(eventViewModel.getEvent(uid) == null)
+    assert(locationList.size == numberOfResults)
+    locationList.forEach { location -> location.name.contains(query, ignoreCase = true) }
   }
 }

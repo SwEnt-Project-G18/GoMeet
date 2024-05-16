@@ -5,7 +5,9 @@ import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.location.Location
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.MetadataChanges
 import java.time.LocalDate
+import java.time.LocalTime
 
 /**
  * This class represents the repository for the events. A repository is a class that communicates
@@ -24,7 +26,7 @@ class EventRepository(private val db: FirebaseFirestore) {
 
   /** This companion object contains the constants for the repository */
   companion object {
-    private const val TAG = "FirebaseConnection"
+    private const val TAG = "EventRepository"
     private const val EVENT_COLLECTION = "events"
   }
 
@@ -95,7 +97,7 @@ class EventRepository(private val db: FirebaseFirestore) {
    */
   fun addEvent(event: Event) {
     db.collection(EVENT_COLLECTION)
-        .document(event.uid)
+        .document(event.eventID)
         .set(event.toMap())
         .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully written!") }
         .addOnFailureListener { e -> Log.w(TAG, "Error adding document", e) }
@@ -107,7 +109,7 @@ class EventRepository(private val db: FirebaseFirestore) {
    * @param event The event to be updated
    */
   fun updateEvent(event: Event) {
-    val documentRef = db.collection(EVENT_COLLECTION).document(event.uid)
+    val documentRef = db.collection(EVENT_COLLECTION).document(event.eventID)
     documentRef
         .update(event.toMap())
         .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully updated!") }
@@ -134,14 +136,16 @@ class EventRepository(private val db: FirebaseFirestore) {
    */
   private fun Event.toMap(): Map<String, Any?> {
     return mapOf(
-        "uid" to uid,
+        "uid" to eventID,
         "creator" to creator,
         "title" to title,
         "description" to description,
         "location" to location.toMap(),
         "date" to date.toString(),
+        "time" to time.toString(),
         "price" to price,
         "url" to url,
+        "pendingParticipants" to pendingParticipants,
         "participants" to participants,
         "visibleToIfPrivate" to visibleToIfPrivate,
         "maxParticipants" to maxParticipants,
@@ -166,14 +170,16 @@ class EventRepository(private val db: FirebaseFirestore) {
    */
   private fun Map<String, Any>.toEvent(id: String? = null): Event {
     return Event(
-        uid = id ?: this["uid"] as? String ?: "",
+        eventID = id ?: this["uid"] as? String ?: "",
         creator = this["creator"] as? String ?: "",
         title = this["title"] as? String ?: "",
         description = this["description"] as? String ?: "",
         location = (this["location"] as? Map<String, Any>)?.toLocation() ?: Location(.0, .0, ""),
         date = LocalDate.parse(this["date"] as? String ?: ""),
+        time = LocalTime.parse(this["time"] as? String ?: "00:00"),
         price = this["price"] as? Double ?: 0.0,
         url = this["url"] as? String ?: "",
+        pendingParticipants = this["pendingParticipants"] as? List<String> ?: emptyList(),
         participants = this["participants"] as? List<String> ?: emptyList(),
         visibleToIfPrivate = this["visibleToIfPrivate"] as? List<String> ?: emptyList(),
         maxParticipants = (this["maxParticipants"] as? String)?.toIntOrNull() ?: 0,
@@ -199,7 +205,7 @@ class EventRepository(private val db: FirebaseFirestore) {
    * the database accordingly to what this function listens to
    */
   private fun startListeningForEvents() {
-    db.collection("events").addSnapshotListener { snapshot, e ->
+    db.collection("events").addSnapshotListener(MetadataChanges.INCLUDE) { snapshot, e ->
       if (e != null) {
         // Handle error
         Log.w("EventRepository", "Listen failed.", e)
@@ -222,6 +228,15 @@ class EventRepository(private val db: FirebaseFirestore) {
             localEventsList.removeIf { it == event }
           }
         }
+
+        val source =
+            if (snapshot.metadata.isFromCache) {
+              "local cache"
+            } else {
+              "server"
+            }
+
+        Log.d(TAG, "Data fetched from $source")
       }
     }
   }

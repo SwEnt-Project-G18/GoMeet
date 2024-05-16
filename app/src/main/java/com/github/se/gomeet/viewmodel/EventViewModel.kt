@@ -17,13 +17,13 @@ import com.github.se.gomeet.model.repository.EventRepository
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
 import com.squareup.picasso.Picasso
 import java.io.IOException
 import java.time.LocalDate
+import java.time.LocalTime
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlinx.coroutines.CompletableDeferred
@@ -45,8 +45,9 @@ import org.json.JSONArray
  *
  * @param creatorId the id of the creator of the event
  */
-class EventViewModel(private val creatorId: String? = null) : ViewModel() {
-  private val db = EventRepository(Firebase.firestore)
+class EventViewModel(private val creatorId: String? = null, eventRepository: EventRepository) :
+    ViewModel() {
+  private val repository = eventRepository
   private val _bitmapDescriptors = mutableStateMapOf<String, BitmapDescriptor>()
   val bitmapDescriptors: MutableMap<String, BitmapDescriptor> = _bitmapDescriptors
 
@@ -68,16 +69,16 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
           val loadJobs =
               events.map { event ->
                 async {
-                  val imagePath = "event_icons/${event.uid}.png"
+                  val imagePath = "event_icons/${event.eventID}.png"
                   val storageRef = FirebaseStorage.getInstance().reference.child(imagePath)
                   val uri = storageRef.downloadUrl.await() // Await the download URL
                   try {
                     val bitmapDescriptor =
                         loadBitmapFromUri(context, uri) // Load the bitmap as a BitmapDescriptor
-                    _bitmapDescriptors[event.uid] = bitmapDescriptor
+                    _bitmapDescriptors[event.eventID] = bitmapDescriptor
                   } catch (e: Exception) {
                     Log.e("ViewModel", "Error loading bitmap descriptor: ${e.message}")
-                    _bitmapDescriptors[event.uid] =
+                    _bitmapDescriptors[event.eventID] =
                         BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)
                   }
                 }
@@ -144,7 +145,7 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
   suspend fun getEvent(uid: String): Event? {
     return try {
       val event = CompletableDeferred<Event?>()
-      db.getEvent(uid) { t -> event.complete(t) }
+      repository.getEvent(uid) { t -> event.complete(t) }
       event.await()
     } catch (e: Exception) {
       null
@@ -200,7 +201,7 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
   suspend fun getAllEvents(): List<Event>? {
     return try {
       val event = CompletableDeferred<List<Event>?>()
-      db.getAllEvents { t -> event.complete(t) }
+      repository.getAllEvents { t -> event.complete(t) }
       event.await()
     } catch (e: Exception) {
       null
@@ -230,8 +231,10 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
       description: String,
       location: Location,
       date: LocalDate,
+      time: LocalTime,
       price: Double,
       url: String,
+      pendingParticipants: List<String>,
       participants: List<String>,
       visibleToIfPrivate: List<String>,
       maxParticipants: Int,
@@ -255,8 +258,10 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
                 description,
                 location,
                 date,
+                time,
                 price,
                 url,
+                pendingParticipants,
                 participants,
                 visibleToIfPrivate,
                 maxParticipants,
@@ -264,9 +269,10 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
                 tags,
                 updatedImages)
 
-        db.addEvent(event)
+        repository.addEvent(event)
         joinEvent(event, creatorId)
-        userViewModel.joinEvent(event.uid, creatorId)
+        userViewModel.joinEvent(event.eventID, creatorId)
+        userViewModel.userCreatesEvent(event.eventID, creatorId)
       } catch (e: Exception) {
         Log.w(TAG, "Error uploading image or adding event", e)
       }
@@ -279,20 +285,62 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
    * @param event the event to edit
    */
   fun editEvent(event: Event) {
-    db.updateEvent(event)
+    repository.updateEvent(event)
   }
 
   /**
    * Remove an event by its UID.
    *
-   * @param uid the UID of the event to remove
+   * @param eventID the ID of the event to remove
    */
-  fun removeEvent(uid: String) {
-    db.removeEvent(uid)
+  fun removeEvent(eventID: String) {
+    repository.removeEvent(eventID)
   }
 
   fun joinEvent(event: Event, userId: String) {
-    db.updateEvent(event.copy(participants = event.participants.plus(userId)))
+    if (event.participants.contains(userId)) {
+      Log.w(TAG, "User $userId is already in event ${event.eventID}")
+      return
+    }
+
+    repository.updateEvent(event.copy(participants = event.participants.plus(userId)))
+  }
+
+  fun sendInvitation(event: Event, userId: String) {
+    if (event.pendingParticipants.contains(userId)) {
+      Log.w(TAG, "User $userId is already invited to event ${event.eventID}")
+      return
+    }
+
+    repository.updateEvent(event.copy(pendingParticipants = event.pendingParticipants.plus(userId)))
+  }
+
+  fun acceptInvitation(event: Event, userId: String) {
+    assert(event.pendingParticipants.contains(userId))
+    repository.updateEvent(
+        event.copy(pendingParticipants = event.pendingParticipants.minus(userId)))
+    joinEvent(event, userId)
+  }
+
+  fun declineInvitation(event: Event, userId: String) {
+    assert(event.pendingParticipants.contains(userId))
+    repository.updateEvent(
+        event.copy(pendingParticipants = event.pendingParticipants.minus(userId)))
+  }
+
+  fun kickParticipant(event: Event, userId: String) {
+    assert(event.participants.contains(userId))
+    repository.updateEvent(event.copy(participants = event.participants.minus(userId)))
+  }
+
+  fun cancelInvitation(event: Event, userId: String) {
+    if (!event.pendingParticipants.contains(userId)) {
+      Log.w(TAG, "Event doesn't have ${userId} as a pendingParticipant")
+      return
+    }
+
+    repository.updateEvent(
+        event.copy(pendingParticipants = event.pendingParticipants.minus(userId)))
   }
 
   /**

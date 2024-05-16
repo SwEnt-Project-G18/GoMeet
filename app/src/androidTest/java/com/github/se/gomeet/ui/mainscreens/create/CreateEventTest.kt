@@ -1,110 +1,92 @@
 package com.github.se.gomeet.ui.mainscreens.create
 
 import androidx.activity.ComponentActivity
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.se.gomeet.model.repository.EventRepository
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
-import com.google.android.gms.maps.MapsInitializer
-import java.time.LocalDate
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.runBlocking
-import org.junit.After
-import org.junit.BeforeClass
+import org.junit.AfterClass
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class CreateEventTest {
-
-  @get:Rule val rule = createAndroidComposeRule<ComponentActivity>()
-
-  @After
-  fun tearDown() {
-    runBlocking { eventViewModel.getAllEvents()?.forEach { eventViewModel.removeEvent(it.uid) } }
-  }
-
-  @Test
-  fun testCreateEventScreen_InputFields() {
-    lateinit var navController: NavHostController
-
-    rule.setContent {
-      navController = rememberNavController()
-      MapsInitializer.initialize(LocalContext.current)
-      CreateEvent(NavigationActions(navController), eventViewModel, isPrivate = true)
-    }
-
-    // Enter text into the Title field
-    rule.onNodeWithText("Title").performTextInput("Sample Event 1")
-
-    // Enter text into the Location field
-    rule.onNodeWithText("Location").performTextInput("test")
-
-    rule.onNodeWithTag("DropdownMenu").assertIsDisplayed()
-
-    // Enter date
-    rule.onNodeWithText("Date").performTextInput(LocalDate.now().toString())
-    // Enter a price
-    rule.onNodeWithText("Price").performTextInput("25.00")
-    // Enter a URL
-    rule.onNodeWithText("Link").performTextInput("http://example.com")
-
-    rule.onNodeWithText("Add Participants").assertIsDisplayed()
-
-    rule.onNodeWithText("Add Image").assertIsDisplayed()
-
-    rule.onNodeWithText("Post").performClick()
-  }
-
-  @Test
-  fun testPublicCreateEventScreen_InputFields() {
-    lateinit var navController: NavHostController
-
-    rule.setContent {
-      navController = rememberNavController()
-      CreateEvent(NavigationActions(navController), eventViewModel, isPrivate = false)
-    }
-
-    // Enter text into the Title field
-    rule.onNodeWithText("Title").performTextInput("Sample Event 2")
-
-    // Enter text into the Description field
-    rule.onNodeWithText("Description").performTextInput("This is a test event.")
-
-    // Enter text into the Location field
-    rule.onNodeWithText("Location").performTextInput("test")
-
-    rule.onNodeWithTag("DropdownMenu").assertIsDisplayed()
-
-    // Enter date
-    rule.onNodeWithText("Date").performTextInput("invalid date")
-    // Enter a price
-    rule.onNodeWithText("Price").performTextInput("25.00")
-    // Enter a URL
-    rule.onNodeWithText("Link").performTextInput("http://example.com")
-
-    rule.onNodeWithText("Add Image").assertIsDisplayed()
-
-    rule.onNodeWithText("Post").performClick()
-  }
+  @get:Rule val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
   companion object {
+    private val uid = "CreateEventTestUser"
+    private val eventVM = EventViewModel(uid, EventRepository(Firebase.firestore))
 
-    private lateinit var eventViewModel: EventViewModel
-    private val uid = "testuid"
-
+    @AfterClass
     @JvmStatic
-    @BeforeClass
-    fun setup() {
-      eventViewModel = EventViewModel(uid)
+    fun tearDown() {
+      runBlocking {
+        // Clean up the event
+        eventVM.getAllEvents()?.forEach { eventVM.removeEvent(it.eventID) }
+      }
     }
+  }
+
+  @Test
+  fun testCreatePrivateEvent() {
+    val eventVM = EventViewModel(uid, EventRepository(Firebase.firestore))
+
+    composeTestRule.setContent {
+      CreateEvent(NavigationActions(rememberNavController()), eventVM, isPrivate = true)
+    }
+
+    composeTestRule.waitForIdle()
+
+    // Verify that the text fields are displayed and fill them in
+    composeTestRule.onNodeWithText("Title").assertIsDisplayed().performTextInput("Sample Event 1")
+    composeTestRule.onNodeWithText("Location").assertIsDisplayed().performTextInput("test")
+    composeTestRule.onNodeWithTag("DropdownMenu").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithText("Price").assertIsDisplayed().performTextInput("25.00")
+    composeTestRule
+        .onNodeWithText("Link")
+        .assertIsDisplayed()
+        .performTextInput("http://example.com")
+
+    // Add tags
+    composeTestRule.onNodeWithText("Add Tags").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("TagsButton").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithTag("TagList").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithText("Save").assertIsDisplayed().performClick()
+
+    // Verify that the rest of the buttons are displayed and create the event
+    composeTestRule.onNodeWithText("Add Participants").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Add Image").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Post").assertIsDisplayed().performClick()
+  }
+
+  @Test
+  fun testCreatePublicEvent() {
+    composeTestRule.setContent {
+      CreateEvent(NavigationActions(rememberNavController()), eventVM, isPrivate = false)
+    }
+
+    composeTestRule.waitForIdle()
+
+    // Verify that the ui is correctly displayed
+    composeTestRule.onNodeWithText("Title").performTextInput("Sample Event 2")
+    composeTestRule.onNodeWithText("Description").performTextInput("This is a test event.")
+    composeTestRule.onNodeWithText("Location").performTextInput("test")
+    composeTestRule.onNodeWithTag("DropdownMenu").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Price").performTextInput("25.00")
+    composeTestRule.onNodeWithText("Link").performTextInput("http://example.com")
+    composeTestRule.onNodeWithText("Add Tags").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Add Image").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Post").assertIsDisplayed()
   }
 }

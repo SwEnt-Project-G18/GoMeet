@@ -3,35 +3,37 @@ package com.github.se.gomeet.ui.mainscreens.create
 import android.graphics.BitmapFactory
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuItemColors
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -45,6 +47,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
@@ -56,9 +59,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.Popup
 import com.github.se.gomeet.R
+import com.github.se.gomeet.model.TagsSelector
 import com.github.se.gomeet.model.event.location.Location
 import com.github.se.gomeet.model.repository.EventRepository
+import com.github.se.gomeet.model.repository.UserRepository
+import com.github.se.gomeet.ui.mainscreens.DateTimePicker
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
@@ -72,8 +79,6 @@ import com.google.firebase.ktx.Firebase
 import java.io.InputStream
 import java.time.LocalDate
 import java.time.LocalTime
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeParseException
 import kotlinx.coroutines.delay
 
 private const val NUMBER_OF_SUGGESTIONS = 3
@@ -88,18 +93,19 @@ private const val NUMBER_OF_SUGGESTIONS = 3
 @Composable
 fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivate: Boolean) {
 
-  val db = EventRepository(Firebase.firestore)
-  val uid = db.getNewId()
+  val eventRepository = EventRepository(Firebase.firestore)
+  val userRepository = UserRepository(Firebase.firestore)
+  val uid = eventRepository.getNewId()
   val titleState = remember { mutableStateOf("") }
   val descriptionState = remember { mutableStateOf("") }
   val locationState = remember { mutableStateOf("") }
-  val textDate = remember { mutableStateOf("") }
-  var dateState by remember { mutableStateOf<LocalDate?>(null) }
-  var dateFormatError by remember { mutableStateOf(false) }
   var price by remember { mutableDoubleStateOf(0.0) }
   var priceText by remember { mutableStateOf("") }
   val url = remember { mutableStateOf("") }
   val isPrivateEvent = remember { mutableStateOf(false) }
+
+  val pickedTime = remember { mutableStateOf(LocalTime.now()) }
+  val pickedDate = remember { mutableStateOf(LocalDate.now()) }
 
   val customPins = remember { CustomPins() }
 
@@ -127,13 +133,28 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
       }
 
   val selectedLocation: MutableState<Location?> = remember { mutableStateOf(null) }
+  val tags = remember { mutableStateOf(emptyList<String>()) }
+  val showPopup = remember { mutableStateOf(false) }
+  var tagsButtonText by remember { mutableStateOf("Add Tags") }
+
+  val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+
+  val textFieldColors =
+      androidx.compose.material3.TextFieldDefaults.colors(
+          focusedTextColor = MaterialTheme.colorScheme.onBackground,
+          unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+          unfocusedContainerColor = Color.Transparent,
+          focusedContainerColor = Color.Transparent,
+          cursorColor = DarkCyan,
+          focusedLabelColor = MaterialTheme.colorScheme.tertiary,
+          focusedIndicatorColor = MaterialTheme.colorScheme.tertiary)
 
   Scaffold(
       topBar = {
         Column {
           Text(
               text = "Create",
-              modifier = Modifier.padding(top = 15.dp, start = 15.dp, end = 18.dp, bottom = 0.dp),
+              modifier = Modifier.padding(top = 15.dp, start = 15.dp, end = 18.dp),
               color = DarkCyan,
               fontStyle = FontStyle.Normal,
               fontWeight = FontWeight.SemiBold,
@@ -145,7 +166,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
             isPrivateEvent.value = true
             Text(
                 text = "Private",
-                modifier = Modifier.padding(top = 0.dp, start = 18.dp, end = 18.dp, bottom = 15.dp),
+                modifier = Modifier.padding(start = 18.dp, end = 18.dp, bottom = 15.dp),
                 color = Grey,
                 fontStyle = FontStyle.Normal,
                 fontWeight = FontWeight.SemiBold,
@@ -156,7 +177,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
             isPrivateEvent.value = false
             Text(
                 text = "Public",
-                modifier = Modifier.padding(top = 0.dp, start = 18.dp, end = 18.dp, bottom = 15.dp),
+                modifier = Modifier.padding(start = 18.dp, end = 18.dp, bottom = 15.dp),
                 color = Grey,
                 fontStyle = FontStyle.Normal,
                 fontWeight = FontWeight.SemiBold,
@@ -181,57 +202,30 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
               // Spacer(modifier = Modifier.size((LocalConfiguration.current.screenHeightDp /
               // 9).dp))
 
-              OutlinedTextField(
+              TextField(
                   value = titleState.value,
+                  singleLine = true,
                   onValueChange = { newVal -> titleState.value = newVal },
                   label = { Text("Title") },
                   placeholder = { Text("Name the event") },
-                  singleLine = true,
-                  shape = RoundedCornerShape(10.dp),
-                  textStyle = TextStyle(color = MaterialTheme.colorScheme.onBackground),
-                  colors =
-                      TextFieldDefaults.outlinedTextFieldColors(
-                          focusedBorderColor = MaterialTheme.colorScheme.onBackground,
-                          unfocusedBorderColor = MaterialTheme.colorScheme.onBackground),
-                  modifier = Modifier.fillMaxWidth().padding(start = 7.dp, end = 7.dp))
+                  colors = textFieldColors,
+                  modifier = Modifier.fillMaxWidth().padding(start = 15.dp, end = 15.dp))
 
-              OutlinedTextField(
+              TextField(
                   value = descriptionState.value,
                   onValueChange = { newVal -> descriptionState.value = newVal },
                   label = { Text("Description") },
                   placeholder = { Text("Describe the task") },
                   singleLine = true,
-                  shape = RoundedCornerShape(10.dp),
-                  textStyle = TextStyle(color = MaterialTheme.colorScheme.onBackground),
-                  colors =
-                      TextFieldDefaults.outlinedTextFieldColors(
-                          focusedBorderColor = MaterialTheme.colorScheme.onBackground,
-                          unfocusedBorderColor = MaterialTheme.colorScheme.onBackground),
-                  modifier = Modifier.fillMaxWidth().padding(start = 7.dp, end = 7.dp))
+                  colors = textFieldColors,
+                  modifier = Modifier.fillMaxWidth().padding(start = 15.dp, end = 15.dp))
               LocationField(selectedLocation, locationState, eventViewModel)
-              OutlinedTextField(
-                  value = textDate.value,
-                  onValueChange = { newText ->
-                    textDate.value = newText
-                    try {
-                      dateState = LocalDate.parse(newText, DateTimeFormatter.ISO_LOCAL_DATE)
-                      dateFormatError = false
-                    } catch (e: DateTimeParseException) {
-                      dateFormatError = true
-                    }
-                  },
-                  label = { Text("Date") },
-                  placeholder = { Text("Enter a date (yyyy-mm-dd)") },
-                  singleLine = true,
-                  shape = RoundedCornerShape(10.dp),
-                  textStyle = TextStyle(color = MaterialTheme.colorScheme.onBackground),
-                  colors =
-                      TextFieldDefaults.outlinedTextFieldColors(
-                          focusedBorderColor = MaterialTheme.colorScheme.onBackground,
-                          unfocusedBorderColor = MaterialTheme.colorScheme.onBackground),
-                  modifier = Modifier.fillMaxWidth().padding(start = 7.dp, end = 7.dp))
 
-              OutlinedTextField(
+              Spacer(modifier = Modifier.height(screenHeight / 30))
+
+              DateTimePicker(pickedTime = pickedTime, pickedDate = pickedDate)
+
+              TextField(
                   value = priceText,
                   onValueChange = { newVal ->
                     priceText = newVal
@@ -240,57 +234,89 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                   label = { Text("Price") },
                   placeholder = { Text("Enter a price") },
                   singleLine = true,
-                  shape = RoundedCornerShape(10.dp),
-                  textStyle = TextStyle(color = MaterialTheme.colorScheme.onBackground),
-                  colors =
-                      TextFieldDefaults.outlinedTextFieldColors(
-                          focusedBorderColor = MaterialTheme.colorScheme.onBackground,
-                          unfocusedBorderColor = MaterialTheme.colorScheme.onBackground),
-                  modifier = Modifier.fillMaxWidth().padding(start = 7.dp, end = 7.dp))
+                  colors = textFieldColors,
+                  modifier = Modifier.fillMaxWidth().padding(start = 15.dp, end = 15.dp))
 
-              OutlinedTextField(
+              TextField(
                   value = url.value,
                   onValueChange = { newVal -> url.value = newVal },
                   label = { Text("Link") },
                   placeholder = { Text("Enter a link") },
                   singleLine = true,
-                  shape = RoundedCornerShape(10.dp),
-                  textStyle = TextStyle(color = MaterialTheme.colorScheme.onBackground),
-                  colors =
-                      TextFieldDefaults.outlinedTextFieldColors(
-                          focusedBorderColor = MaterialTheme.colorScheme.onBackground,
-                          unfocusedBorderColor = MaterialTheme.colorScheme.onBackground),
-                  modifier = Modifier.fillMaxWidth().padding(start = 7.dp, end = 7.dp))
+                  colors = textFieldColors,
+                  modifier = Modifier.fillMaxWidth().padding(start = 15.dp, end = 15.dp))
+
+              Spacer(modifier = Modifier.height(16.dp))
+              Row(
+                  modifier = Modifier.fillMaxWidth().padding(start = 15.dp, top = 10.dp),
+                  verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = tagsButtonText,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        fontStyle = FontStyle.Normal,
+                        fontWeight = FontWeight.Normal,
+                        fontFamily = FontFamily.Default,
+                        textAlign = TextAlign.Start,
+                        style = MaterialTheme.typography.bodyMedium)
+                    Icon(
+                        Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                        null,
+                        modifier =
+                            Modifier.clickable { showPopup.value = true }.testTag("TagsButton"))
+                  }
 
               Spacer(modifier = Modifier.height(16.dp))
 
               if (isPrivate) {
-                Button(
-                    modifier = Modifier.fillMaxWidth().padding(start = 7.dp, end = 7.dp),
-                    onClick = {
-                      nav.navigateToScreen(Route.ADD_PARTICIPANTS.replace("{eventId}", uid))
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = Grey),
-                    shape = RoundedCornerShape(10.dp)) {
-                      Text(text = "Add Participants", color = Color.White)
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(start = 15.dp),
+                    verticalAlignment = Alignment.CenterVertically) {
+                      Text(
+                          text = "Add Participants",
+                          color = MaterialTheme.colorScheme.onBackground,
+                          fontStyle = FontStyle.Normal,
+                          fontWeight = FontWeight.Normal,
+                          fontFamily = FontFamily.Default,
+                          textAlign = TextAlign.Start,
+                          style = MaterialTheme.typography.bodyMedium)
+                      Icon(
+                          Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                          null,
+                          modifier =
+                              Modifier.clickable {
+                                nav.navigateToScreen(
+                                    Route.ADD_PARTICIPANTS.replace("{eventId}", uid))
+                              })
                     }
+                Spacer(modifier = Modifier.height(16.dp))
               }
 
-              Button(
-                  modifier = Modifier.fillMaxWidth().padding(start = 7.dp, end = 7.dp),
-                  onClick = {
-                    if (imageUri != null) {
-                      imageUri = null
-                    } else {
-                      imagePickerLauncher.launch("image/*")
-                    }
-                  },
-                  colors = ButtonDefaults.buttonColors(containerColor = Grey),
-                  shape = RoundedCornerShape(10.dp)) {
+              Row(
+                  modifier = Modifier.fillMaxWidth().padding(start = 15.dp),
+                  verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = if (imageUri != null) "Delete Image" else "Add Image",
-                        color = Color.White)
+                        color = MaterialTheme.colorScheme.onBackground,
+                        fontStyle = FontStyle.Normal,
+                        fontWeight = FontWeight.Normal,
+                        fontFamily = FontFamily.Default,
+                        textAlign = TextAlign.Start,
+                        style = MaterialTheme.typography.bodyMedium)
+                    Icon(
+                        Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                        null,
+                        modifier =
+                            Modifier.clickable {
+                                  if (imageUri != null) {
+                                    imageUri = null
+                                  } else {
+                                    imagePickerLauncher.launch("image/*")
+                                  }
+                                }
+                                .testTag("AddImageButton"))
                   }
+
+              Spacer(modifier = Modifier.height(16.dp))
 
               var showDialog by remember { mutableStateOf(false) }
               imageUri?.let {
@@ -322,9 +348,10 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
 
               Spacer(modifier = Modifier.height(16.dp))
 
-              OutlinedButton(
+              Button(
+                  modifier = Modifier.width(250.dp),
                   onClick = {
-                    if (titleState.value.isNotEmpty() && !dateFormatError && dateState != null) {
+                    if (titleState.value.isNotEmpty()) {
                       if (selectedLocation.value == null) {
                         eventViewModel.location(locationState.value, 1) { locations ->
                           if (locations.isNotEmpty()) {
@@ -332,9 +359,11 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                                 titleState.value,
                                 descriptionState.value,
                                 locations[0],
-                                dateState!!,
+                                pickedDate.value,
+                                pickedTime.value,
                                 price,
                                 url.value,
+                                listOf(),
                                 listOf(),
                                 listOf(),
                                 0,
@@ -342,7 +371,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                                 listOf(),
                                 listOf(),
                                 imageUri,
-                                UserViewModel(),
+                                UserViewModel(userRepository),
                                 uid)
 
                             nav.goBack()
@@ -353,64 +382,63 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                             titleState.value,
                             descriptionState.value,
                             selectedLocation.value!!,
-                            dateState!!,
+                            pickedDate.value,
+                            pickedTime.value,
                             price,
                             url.value,
                             listOf(),
                             listOf(),
+                            listOf(),
                             0,
                             !isPrivateEvent.value,
-                            listOf(),
+                            tags.value,
                             listOf(),
                             imageUri,
-                            UserViewModel(),
+                            UserViewModel(userRepository),
                             uid)
 
                         nav.goBack()
                       }
                     }
 
-                    dateState?.let {
-                      customPins.createCustomPin(context, it, LocalTime.MIDNIGHT) {
-                          bitmapDescriptor,
-                          bitmap ->
-                        // Handle the bitmap descriptor and bitmap as needed
-                        val byteArray = customPins.bitmapToByteArray(bitmap)
-                        customPins.uploadEventIcon(context, byteArray, uid)
-                      }
+                    customPins.createCustomPin(context, pickedDate.value, pickedTime.value) {
+                        _,
+                        bitmap ->
+                      // Handle the bitmap descriptor and bitmap as needed
+                      val byteArray = customPins.bitmapToByteArray(bitmap)
+                      customPins.uploadEventIcon(context, byteArray, uid)
                     }
                   },
                   shape = RoundedCornerShape(10.dp),
-                  border = BorderStroke(1.dp, Color.Gray),
                   enabled =
                       fieldsAreFull(
                           titleState.value,
                           descriptionState.value,
                           locationState.value,
-                          textDate.value,
                           priceText,
                           url.value),
-                  colors = ButtonDefaults.outlinedButtonColors(containerColor = Color(0xFFECEFF1)),
+                  colors =
+                      ButtonColors(
+                          disabledContainerColor = MaterialTheme.colorScheme.primary,
+                          containerColor = DarkCyan,
+                          disabledContentColor = Color.White,
+                          contentColor = Color.White),
               ) {
-                Text(
-                    text = "Post",
-                    style =
-                        TextStyle(
-                            fontSize = 14.sp,
-                            lineHeight = 16.sp,
-                            fontFamily = FontFamily(Font(R.font.roboto)),
-                            fontWeight = FontWeight(1000),
-                            color = Color(0xFF000000),
-                            textAlign = TextAlign.Center,
-                            letterSpacing = 0.5.sp,
-                        ))
-              }
-
-              if (dateFormatError) {
-                Spacer(modifier = Modifier.height(8.dp))
-                Text("Error: Date Format Error", color = Color.Red)
+                Text(text = "Post")
               }
             }
+        if (showPopup.value) {
+          Popup(
+              alignment = Alignment.Center,
+              onDismissRequest = { showPopup.value = !showPopup.value }) {
+                TagsSelector(tagsButtonText, tags) {
+                  showPopup.value = false
+                  if (tags.value.isNotEmpty()) {
+                    tagsButtonText = "Edit Tags"
+                  }
+                }
+              }
+        }
       }
 }
 
@@ -445,8 +473,8 @@ fun LocationField(
   ExposedDropdownMenuBox(
       expanded = expanded,
       onExpandedChange = { expanded = !expanded },
-      modifier = Modifier.padding(start = 7.dp, end = 7.dp).fillMaxSize()) {
-        OutlinedTextField(
+      modifier = Modifier.fillMaxSize().padding(start = 15.dp, end = 15.dp)) {
+        TextField(
             value = locationQuery.value,
             onValueChange = {
               expanded = true
@@ -455,12 +483,15 @@ fun LocationField(
             label = { Text("Location") },
             placeholder = { Text("Enter an address") },
             singleLine = true,
-            shape = RoundedCornerShape(10.dp),
-            textStyle = TextStyle(color = MaterialTheme.colorScheme.onBackground),
             colors =
-                TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = MaterialTheme.colorScheme.onBackground,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.onBackground),
+                androidx.compose.material3.TextFieldDefaults.colors(
+                    focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+                    unfocusedContainerColor = Color.Transparent,
+                    focusedContainerColor = Color.Transparent,
+                    cursorColor = DarkCyan,
+                    focusedLabelColor = MaterialTheme.colorScheme.tertiary,
+                    focusedIndicatorColor = MaterialTheme.colorScheme.tertiary),
             modifier = Modifier.fillMaxWidth().menuAnchor())
         ExposedDropdownMenu(
             expanded = expanded,
@@ -499,18 +530,26 @@ fun LocationField(
       }
 }
 
+/**
+ * Function to determine whether all fields have been filled.
+ *
+ * @param title The title of the event.
+ * @param desc The description of the event.
+ * @param loc The location of the event.
+ * @param price The price of the event.
+ * @param url The url of the event.
+ * @return true if all fields are filled, false otherwise.
+ */
 private fun fieldsAreFull(
     title: String,
     desc: String,
     loc: String,
-    date: String,
     price: String,
     url: String
 ): Boolean {
   return title.isNotEmpty() &&
       desc.isNotEmpty() &&
       loc.isNotEmpty() &&
-      date.isNotEmpty() &&
       price.isNotEmpty() &&
       url.isNotEmpty()
 }

@@ -28,10 +28,10 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.R
+import com.github.se.gomeet.model.event.Event
+import com.github.se.gomeet.model.repository.EventRepository
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.navigation.NavigationActions
@@ -39,6 +39,7 @@ import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 
@@ -54,17 +55,22 @@ fun MyEventInfo(
     image: Painter = painterResource(id = R.drawable.gomeet_logo),
     description: String = "",
     loc: LatLng = LatLng(0.0, 0.0),
-    userViewModel: UserViewModel
+    userViewModel: UserViewModel,
+    eventViewModel: EventViewModel
 ) {
 
   val organizer = remember { mutableStateOf<GoMeetUser?>(null) }
   val currentUser = remember { mutableStateOf<GoMeetUser?>(null) }
+  val myEvent = remember { mutableStateOf<Event?>(null) }
 
   val coroutineScope = rememberCoroutineScope()
 
   LaunchedEffect(Unit) {
-    coroutineScope.launch { organizer.value = userViewModel.getUser(organizerId) }
-    currentUser.value = userViewModel.getUser(Firebase.auth.currentUser!!.uid)
+    coroutineScope.launch {
+      organizer.value = userViewModel.getUser(organizerId)
+      currentUser.value = userViewModel.getUser(Firebase.auth.currentUser!!.uid)
+      myEvent.value = eventViewModel.getEvent(eventId)
+    }
   }
 
   Log.d("EventInfo", "Organizer is $organizerId")
@@ -116,11 +122,23 @@ fun MyEventInfo(
                     date = date,
                     time = time)
                 Spacer(modifier = Modifier.height(20.dp))
-                EventButtons(currentUser.value!!, organizer.value!!, eventId, userViewModel, nav)
+                EventButtons(
+                    currentUser.value!!,
+                    organizer.value!!,
+                    eventId,
+                    userViewModel,
+                    eventViewModel,
+                    nav)
                 Spacer(modifier = Modifier.height(20.dp))
 
                 var imageUrl by remember { mutableStateOf<String?>(null) }
-                LaunchedEffect(eventId) { imageUrl = EventViewModel().getEventImageUrl(eventId) }
+                LaunchedEffect(eventId) {
+                  imageUrl =
+                      EventViewModel(
+                              organizer.value!!.uid,
+                              eventRepository = EventRepository(Firebase.firestore))
+                          .getEventImageUrl(eventId)
+                }
                 EventImage(imageUrl = imageUrl)
                 Spacer(modifier = Modifier.height(20.dp))
                 EventDescription(text = description)
@@ -129,19 +147,4 @@ fun MyEventInfo(
               }
         }
       }
-}
-
-@Preview
-@Composable
-fun PreviewEventInfo() {
-  MyEventInfo(
-      nav = NavigationActions(rememberNavController()),
-      title = "Event Title",
-      eventId = "eventid",
-      date = "2024-05-01",
-      organizerId = "organiserid",
-      time = "00:00",
-      description = "Event Description",
-      loc = LatLng(0.0, 0.0),
-      userViewModel = UserViewModel())
 }

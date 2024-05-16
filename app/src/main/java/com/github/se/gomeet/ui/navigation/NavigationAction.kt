@@ -5,10 +5,17 @@ import android.util.Log
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.AddCircle
+import androidx.compose.material.icons.outlined.DateRange
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Person
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
@@ -50,9 +57,15 @@ object Route {
       "eventInfo/{eventId}/{title}/{date}/{time}/{organizer}/{rating}/{description}/{latitude}/{longitude}"
   const val NOTIFICATIONS = "Notifications"
   const val SETTINGS = "Settings"
+  const val ABOUT = "About"
+  const val HELP = "Help"
+  const val PERMISSIONS = "Permissions"
   const val MESSAGE = "Message/{id}"
   const val FOLLOWERS = "Followers/{uid}"
   const val FOLLOWING = "Following/{uid}"
+  const val MESSAGE_CHANNELS = "MessageChannel"
+  const val CHANNEL = "Channel/{id}"
+  const val ADD_FRIEND = "AddFriend"
 }
 
 val CREATE_ITEMS =
@@ -107,7 +120,20 @@ val SECOND_LEVEL_DESTINATION =
         TopLevelDestination(
             route = Route.SETTINGS, icon = Icons.Default.Settings, textId = Route.SETTINGS),
         TopLevelDestination(
-            Route.EDIT_PROFILE, icon = Icons.Default.Person, textId = Route.EDIT_PROFILE))
+            Route.EDIT_PROFILE, icon = Icons.Default.Person, textId = Route.EDIT_PROFILE),
+        TopLevelDestination(
+            route = Route.ADD_FRIEND, icon = Icons.Default.Person, textId = Route.ADD_FRIEND),
+    )
+
+val SETTINGS =
+    listOf(
+        TopLevelDestination(
+            route = Route.SETTINGS, icon = Icons.Default.Settings, textId = Route.SETTINGS),
+        TopLevelDestination(
+            route = Route.ABOUT, icon = Icons.Default.Settings, textId = Route.ABOUT),
+        TopLevelDestination(
+            route = Route.PERMISSIONS, icon = Icons.Default.Settings, textId = Route.PERMISSIONS),
+        TopLevelDestination(route = Route.HELP, icon = Icons.Default.Settings, textId = Route.HELP))
 
 /**
  * Class that handles navigation in the app.
@@ -182,18 +208,35 @@ class NavigationActions(val navController: NavHostController) {
   }
 }
 /**
- * Gets the icon for the given route.
+ * Gets the icon for the given route if not selected.
  *
  * @param route The route to get the icon for.
  */
 @Composable
 fun getIconForRoute(route: String): ImageVector {
   return when (route) {
-    Route.EVENTS -> Icons.Default.DateRange
+    Route.EVENTS -> Icons.Outlined.DateRange
     Route.TRENDS -> ImageVector.vectorResource(R.drawable.arrow_trending)
-    Route.EXPLORE -> Icons.Default.Home
-    Route.CREATE -> Icons.Default.Add
-    Route.PROFILE -> Icons.Default.Person
-    else -> Icons.Default.AccountCircle
+    Route.EXPLORE -> Icons.Outlined.Home
+    Route.CREATE -> Icons.Outlined.AddCircle
+    Route.PROFILE -> Icons.Outlined.Person
+    else -> Icons.Outlined.AccountCircle
+  }
+}
+
+/**
+ * Gets the icon for the given route if selected.
+ *
+ * @param route The route to get the icon for.
+ */
+@Composable
+fun getIconForSelectedRoute(route: String): ImageVector {
+  return when (route) {
+    Route.EVENTS -> Icons.Filled.DateRange
+    Route.TRENDS -> ImageVector.vectorResource(R.drawable.arrow_trending)
+    Route.EXPLORE -> Icons.Filled.Home
+    Route.CREATE -> Icons.Filled.AddCircle
+    Route.PROFILE -> Icons.Filled.Person
+    else -> Icons.Filled.AccountCircle
   }
 }

@@ -1,8 +1,13 @@
 package com.github.se.gomeet.model.repository
 
+import android.net.Uri
 import android.util.Log
+import com.github.se.gomeet.model.event.Invitation
+import com.github.se.gomeet.model.event.InviteStatus
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.tasks.await
 
 /**
  * Class that connects to the Firebase Firestore database to get, add, update and remove users.
@@ -14,7 +19,7 @@ class UserRepository(private val db: FirebaseFirestore) {
    * Companion object for the UserFirebaseConnection class. Contains the constants for the class.
    */
   companion object {
-    private const val TAG = "FirebaseConnection"
+    private const val TAG = "UserRepository"
     private const val USERS_COLLECTION = "users"
   }
 
@@ -29,11 +34,12 @@ class UserRepository(private val db: FirebaseFirestore) {
         .addOnSuccessListener { querySnapshot ->
           val userList = mutableListOf<GoMeetUser>()
           for (document in querySnapshot.documents) {
-            val user = document.data?.fromMap(document.id)
+            val user = document.data?.toUser(document.id)
             if (user != null) {
               userList.add(user)
             }
           }
+          callback(userList)
         }
         .addOnFailureListener { exception ->
           Log.d(TAG, "Error getting documents: ", exception)
@@ -53,7 +59,7 @@ class UserRepository(private val db: FirebaseFirestore) {
         .get()
         .addOnSuccessListener { document ->
           if (document != null && document.exists()) {
-            val user = document.data!!.fromMap(uid)
+            val user = document.data!!.toUser(uid)
             callback(user)
           } else {
             Log.d(TAG, "No such document")
@@ -93,6 +99,25 @@ class UserRepository(private val db: FirebaseFirestore) {
   }
 
   /**
+   * Upload a user profile image to Firebase Storage and return the download URL.
+   *
+   * @param userId the user ID
+   * @param imageUri the URI of the image to upload
+   * @return the download URL of the uploaded image
+   */
+  suspend fun uploadUserProfileImageAndGetUrl(userId: String, imageUri: Uri): String {
+    val storageReference = FirebaseStorage.getInstance().reference
+    val imageRef = storageReference.child("user_images/$userId/${imageUri.lastPathSegment}")
+
+    // Upload the file and await the completion
+    val uploadTaskSnapshot = imageRef.putFile(imageUri).await()
+
+    // Retrieve and return the download URL
+    return uploadTaskSnapshot.metadata?.reference?.downloadUrl?.await()?.toString()
+        ?: throw Exception("Failed to upload image and retrieve URL")
+  }
+
+  /**
    * Remove a user from the database.
    *
    * @param uid the user id
@@ -116,15 +141,17 @@ class UserRepository(private val db: FirebaseFirestore) {
         "username" to username,
         "following" to following,
         "followers" to followers,
-        "pendingRequests" to pendingRequests,
+        "pendingRequests" to pendingRequests.toList(),
         "firstName" to firstName,
         "lastName" to lastName,
         "email" to email,
         "phoneNumber" to phoneNumber,
         "country" to country,
-        "myTickets" to joinedEvents,
+        "joinedEvents" to joinedEvents,
         "myEvents" to myEvents,
-        "myFavorites" to myFavorites)
+        "myFavorites" to myFavorites,
+        "profilePicture" to profilePicture,
+        "tags" to tags)
   }
 
   /**
@@ -133,20 +160,41 @@ class UserRepository(private val db: FirebaseFirestore) {
    * @param id the user id
    * @return the GoMeetUser
    */
-  private fun Map<String, Any>.fromMap(id: String): GoMeetUser {
+  private fun Map<String, Any>.toUser(id: String): GoMeetUser {
     return GoMeetUser(
         uid = id,
         username = this["username"] as String,
-        following = this["following"] as List<String>,
-        followers = this["followers"] as List<String>,
-        pendingRequests = this["pendingRequests"] as List<String>,
+        following = (this["following"] as? List<String>) ?: emptyList(),
+        followers = (this["followers"] as? List<String>) ?: emptyList(),
+        pendingRequests = convertToInvitationsList(this["pendingRequests"]).toSet(),
         firstName = this["firstName"] as? String ?: "",
         lastName = this["lastName"] as? String ?: "",
         email = this["email"] as? String ?: "",
         phoneNumber = this["phoneNumber"] as? String ?: "",
+        profilePicture = this["profilePicture"] as? String ?: "",
         country = this["country"] as? String ?: "",
-        joinedEvents = this["myTickets"] as List<String>,
-        myEvents = this["myEvents"] as List<String>,
-        myFavorites = this["myFavorites"] as List<String>)
+        joinedEvents = (this["joinedEvents"] as? List<String>) ?: emptyList(),
+        myEvents = (this["myEvents"] as? List<String>) ?: emptyList(),
+        myFavorites = (this["myFavorites"] as? List<String>) ?: emptyList(),
+        tags = (this["tags"] as? List<String>) ?: emptyList())
+  }
+
+  private fun convertToInvitationsList(data: Any?): List<Invitation> {
+    if (data is List<*>) {
+      return data.mapNotNull { element ->
+        if (element is Map<*, *>) {
+          val eventId = element["eventId"] as? String
+          val status = element["status"] as? String
+          if (eventId != null && status != null) {
+            Invitation(eventId, InviteStatus.valueOf(status))
+          } else {
+            null
+          }
+        } else {
+          null
+        }
+      }
+    }
+    return emptyList()
   }
 }

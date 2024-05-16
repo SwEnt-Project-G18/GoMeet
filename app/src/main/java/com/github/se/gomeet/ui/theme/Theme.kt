@@ -19,14 +19,24 @@ private val DarkColorScheme =
         secondary = DarkGrey,
         tertiary = White,
         background = Color.Black,
+        outline = DarkCyan,
+        primaryContainer = DarkModeBackground,
+        secondaryContainer = DarkModeBackground,
+        tertiaryContainer = Color(0xFFEEEEEE),
+        outlineVariant = DodgerBlue,
     )
 
 private val LightColorScheme =
     lightColorScheme(
-        primary = NavBarSelected,
-        secondary = NavBarUnselected,
+        primary = Grey,
+        secondary = DarkGrey,
         tertiary = DarkGrey,
         background = White,
+        primaryContainer = LightGray,
+        secondaryContainer = LightGray,
+        tertiaryContainer = Color(0xFFEEEEEE),
+        outline = Cyan,
+        outlineVariant = DodgerBlue,
 
         /* Other default colors to override
         background = Color(0xFFFFFBFE),
