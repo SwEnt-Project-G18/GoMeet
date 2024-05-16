@@ -133,31 +133,31 @@ class EventRepository private constructor() {
           .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }
     }
 
-
-  /**
-   * This function maps descriptions of parameters of an event to the fields stored in the database
-   *
-   * @return the map of the event
-   */
-  private fun Event.toMap(): Map<String, Any?> {
-    return mapOf(
-        "uid" to eventID,
-        "creator" to creator,
-        "title" to title,
-        "description" to description,
-        "location" to location.toMap(),
-        "date" to date.toString(),
-        "time" to time.toString(),
-        "price" to price,
-        "url" to url,
-        "pendingParticipants" to pendingParticipants,
-        "participants" to participants,
-        "visibleToIfPrivate" to visibleToIfPrivate,
-        "maxParticipants" to maxParticipants,
-        "public" to public,
-        "tags" to tags,
-        "images" to images)
-  }
+    /**
+     * This function maps descriptions of parameters of an event to the fields stored in the
+     * database
+     *
+     * @return the map of the event
+     */
+    private fun Event.toMap(): Map<String, Any?> {
+      return mapOf(
+          "uid" to eventID,
+          "creator" to creator,
+          "title" to title,
+          "description" to description,
+          "location" to location.toMap(),
+          "date" to date.toString(),
+          "time" to time.toString(),
+          "price" to price,
+          "url" to url,
+          "pendingParticipants" to pendingParticipants,
+          "participants" to participants,
+          "visibleToIfPrivate" to visibleToIfPrivate,
+          "maxParticipants" to maxParticipants,
+          "public" to public,
+          "tags" to tags,
+          "images" to images)
+    }
 
     /**
      * This function maps the location of an event to the fields stored in the database
@@ -168,31 +168,30 @@ class EventRepository private constructor() {
       return mapOf("latitude" to latitude, "longitude" to longitude, "name" to name)
     }
 
-
-  /**
-   * This function maps the fields stored in the database to the event
-   *
-   * @return the event
-   */
-  private fun Map<String, Any>.toEvent(id: String? = null): Event {
-    return Event(
-        eventID = id ?: this["uid"] as? String ?: "",
-        creator = this["creator"] as? String ?: "",
-        title = this["title"] as? String ?: "",
-        description = this["description"] as? String ?: "",
-        location = (this["location"] as? Map<String, Any>)?.toLocation() ?: Location(.0, .0, ""),
-        date = LocalDate.parse(this["date"] as? String ?: ""),
-        time = LocalTime.parse(this["time"] as? String ?: "00:00"),
-        price = this["price"] as? Double ?: 0.0,
-        url = this["url"] as? String ?: "",
-        pendingParticipants = this["pendingParticipants"] as? List<String> ?: emptyList(),
-        participants = this["participants"] as? List<String> ?: emptyList(),
-        visibleToIfPrivate = this["visibleToIfPrivate"] as? List<String> ?: emptyList(),
-        maxParticipants = (this["maxParticipants"] as? String)?.toIntOrNull() ?: 0,
-        public = this["public"] as? Boolean ?: false,
-        tags = this["tags"] as? List<String> ?: emptyList(),
-        images = this["images"] as? List<String> ?: emptyList())
-  }
+    /**
+     * This function maps the fields stored in the database to the event
+     *
+     * @return the event
+     */
+    private fun Map<String, Any>.toEvent(id: String? = null): Event {
+      return Event(
+          eventID = id ?: this["uid"] as? String ?: "",
+          creator = this["creator"] as? String ?: "",
+          title = this["title"] as? String ?: "",
+          description = this["description"] as? String ?: "",
+          location = (this["location"] as? Map<String, Any>)?.toLocation() ?: Location(.0, .0, ""),
+          date = LocalDate.parse(this["date"] as? String ?: ""),
+          time = LocalTime.parse(this["time"] as? String ?: "00:00"),
+          price = this["price"] as? Double ?: 0.0,
+          url = this["url"] as? String ?: "",
+          pendingParticipants = this["pendingParticipants"] as? List<String> ?: emptyList(),
+          participants = this["participants"] as? List<String> ?: emptyList(),
+          visibleToIfPrivate = this["visibleToIfPrivate"] as? List<String> ?: emptyList(),
+          maxParticipants = (this["maxParticipants"] as? String)?.toIntOrNull() ?: 0,
+          public = this["public"] as? Boolean ?: false,
+          tags = this["tags"] as? List<String> ?: emptyList(),
+          images = this["images"] as? List<String> ?: emptyList())
+    }
 
     /**
      * This function maps the fields stored in the database to the location
