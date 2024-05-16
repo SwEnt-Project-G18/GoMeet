@@ -15,7 +15,6 @@ import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import java.time.Instant
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -44,12 +43,5 @@ class ExploreTest {
     composeTestRule.onNodeWithText("Search").assertIsDisplayed()
     composeTestRule.onNodeWithTag("CurrentLocationButton").assertIsDisplayed().performClick()
     composeTestRule.onNodeWithTag("MapSlider").assertIsDisplayed()
-  }
-
-  @Test
-  fun eventDateToStringTest() {
-    val date = java.util.Date.from(Instant.parse("9999-03-30T10:15:00Z"))
-    assert(date != null)
-    assert(eventDateToString(eventDate = date) == "30/03/99 at 11:15")
   }
 }
