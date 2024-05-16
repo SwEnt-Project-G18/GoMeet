@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Icon
@@ -51,20 +52,33 @@ fun SettingsScreen(
   Scaffold(
       modifier = Modifier.testTag("SettingsScreen"),
       topBar = {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(top = screenHeight / 40)) {
-              IconButton(onClick = { nav.goBack() }) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
-                    tint = MaterialTheme.colorScheme.onBackground)
+        Column {
+          TopAppBar(
+              modifier = Modifier.testTag("TopBar"),
+              backgroundColor = MaterialTheme.colorScheme.background,
+              elevation = 0.dp,
+              title = {
+                // Empty title since we're placing our own components
+              },
+              navigationIcon = {
+                IconButton(onClick = { nav.goBack() }) {
+                  Icon(
+                      imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                      contentDescription = "Back",
+                      tint = MaterialTheme.colorScheme.onBackground)
+                }
+              })
+
+          Row(
+              verticalAlignment = Alignment.CenterVertically,
+              modifier = Modifier.padding(start = 18.dp)) {
+                Text(
+                    text = "Settings",
+                    style =
+                        MaterialTheme.typography.headlineSmall.copy(
+                            fontWeight = FontWeight.SemiBold))
               }
-              Text(
-                  text = "Settings",
-                  style =
-                      MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.SemiBold))
-            }
+        }
       },
       bottomBar = {
         BottomNavigationMenu(

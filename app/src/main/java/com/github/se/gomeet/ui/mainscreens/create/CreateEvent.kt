@@ -6,7 +6,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,6 +19,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
@@ -154,21 +154,33 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
 
   Scaffold(
       topBar = {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(top = screenHeight / 40)) {
-              IconButton(onClick = { nav.goBack() }) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
-                    tint = MaterialTheme.colorScheme.onBackground)
+        Column {
+          TopAppBar(
+              modifier = Modifier.testTag("TopBar"),
+              backgroundColor = MaterialTheme.colorScheme.background,
+              elevation = 0.dp,
+              title = {
+                // Empty title since we're placing our own components
+              },
+              navigationIcon = {
+                IconButton(onClick = { nav.goBack() }) {
+                  Icon(
+                      imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                      contentDescription = "Back",
+                      tint = MaterialTheme.colorScheme.onBackground)
+                }
+              })
+
+          Row(
+              verticalAlignment = Alignment.CenterVertically,
+              modifier = Modifier.padding(start = 18.dp)) {
+                Text(
+                    text = "Create",
+                    style =
+                        MaterialTheme.typography.headlineSmall.copy(
+                            fontWeight = FontWeight.SemiBold))
               }
-              Text(
-                  text = "Create",
-                  style =
-                      MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.SemiBold))
-            }
-        Spacer(modifier = Modifier.height(screenHeight / 50))
+        }
       },
       bottomBar = {
         BottomNavigationMenu(
@@ -180,11 +192,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
       }) { innerPadding ->
         Column(
             Modifier.padding(innerPadding).verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center) {
-              // Spacer(modifier = Modifier.size((LocalConfiguration.current.screenHeightDp /
-              // 9).dp))
-
+            horizontalAlignment = Alignment.CenterHorizontally) {
               TextField(
                   value = titleState.value,
                   singleLine = true,
