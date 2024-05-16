@@ -31,57 +31,61 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class LoginScreenTest {
+  @get:Rule val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
-  @get:Rule val rule = createAndroidComposeRule<ComponentActivity>()
-
-  private val testEmail = "instrumented@test.com"
-  private val testPwd = "itest123456"
-
-  @After
-  fun teardown() {
-    // Clean up the test data
-    rule.waitForIdle()
-    Firebase.auth.currentUser?.delete()
-  }
+  private val email = "loginscreen@test.com"
+  private val pwd = "123456"
 
   @SuppressLint("StateFlowValueCalledInComposition")
   @Test
   fun testLoginScreen() {
     val authViewModel = AuthViewModel()
 
-    runBlocking { Firebase.auth.createUserWithEmailAndPassword(testEmail, testPwd).await() }
+    runBlocking { Firebase.auth.createUserWithEmailAndPassword(email, pwd).await() }
 
-    rule.setContent {
-      val client =
-          ChatClient.Builder(getResourceString(R.string.chat_api_key), LocalContext.current)
-              .logLevel(ChatLogLevel.NOTHING) // Set to NOTHING in prod
-              .build()
+    composeTestRule.setContent {
+      ChatClient.Builder(getResourceString(R.string.chat_api_key), LocalContext.current)
+          .logLevel(ChatLogLevel.NOTHING) // Set to NOTHING in prod
+          .build()
       LoginScreen(authViewModel, NavigationActions(rememberNavController())) {}
     }
 
-    // Test the UI elements
-    rule.onNodeWithContentDescription("GoMeet").assertIsDisplayed()
-    rule.onNodeWithText("Login").assertIsDisplayed()
+    composeTestRule.waitForIdle()
 
-    rule.onNodeWithText("Email").assertIsDisplayed()
-    rule.onNodeWithText("Password").assertIsDisplayed()
-    rule.onNodeWithText("Log in").assertIsNotEnabled().assertHasClickAction().assertIsDisplayed()
+    // Test the UI elements
+    composeTestRule.onNodeWithContentDescription("GoMeet").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Login").assertIsDisplayed()
+
+    composeTestRule.onNodeWithText("Email").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Password").assertIsDisplayed()
+    composeTestRule
+        .onNodeWithText("Log in")
+        .assertIsNotEnabled()
+        .assertHasClickAction()
+        .assertIsDisplayed()
 
     // Enter email and password
-    rule.onNodeWithText("Email").performTextInput(testEmail)
-    rule.onNodeWithText("Password").performTextInput(testPwd)
+    composeTestRule.onNodeWithText("Email").performTextInput(email)
+    composeTestRule.onNodeWithText("Password").performTextInput(pwd)
 
     // Wait for the Compose framework to recompose the UI
-    rule.waitForIdle()
+    composeTestRule.waitForIdle()
 
     // Click on the "Log in" button
-    rule.onNodeWithText("Log in").assertIsEnabled().assertHasClickAction()
-    rule.onNodeWithText("Log in").performClick()
+    composeTestRule.onNodeWithText("Log in").assertIsEnabled().assertHasClickAction()
+    composeTestRule.onNodeWithText("Log in").performClick()
 
-    rule.waitForIdle()
+    composeTestRule.waitForIdle()
 
     // Sign-in should complete successfully
     assert(authViewModel.signInState.value.signInError == null)
-    //    assert(authViewModel.signInState.value.isSignInSuccessful) // Error here in CI
+  }
+
+  @After
+  fun teardown() {
+    runBlocking {
+      // Clean up the test data
+      Firebase.auth.currentUser?.delete()
+    }
   }
 }
