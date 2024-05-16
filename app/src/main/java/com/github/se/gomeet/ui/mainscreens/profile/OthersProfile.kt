@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -20,7 +19,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -140,7 +138,7 @@ fun OthersProfile(
                         Modifier.fillMaxWidth()
                             .padding(start = screenWidth / 20)
                             .testTag("UserInfo")) {
-                      ProfileImage(userId = uid)
+                      ProfileImage(userId = uid, modifier = Modifier.testTag("Profile Picture"))
                       Column(modifier = Modifier.padding(start = screenWidth / 20)) {
                         Text(
                             (user?.firstName ?: "First") + " " + (user?.lastName ?: " Last"),

@@ -3,143 +3,144 @@ package com.github.se.gomeet.ui.mainscreens.events
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.navigation.compose.rememberNavController
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.model.event.location.Location
+import com.github.se.gomeet.model.repository.EventRepository
+import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.time.LocalDate
-import java.time.LocalTime
 import java.util.concurrent.TimeUnit
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
+import java.time.LocalTime
 
+@RunWith(AndroidJUnit4::class)
 class EventsTest {
+    @get:Rule val composeTestRule = createComposeRule()
 
-  @get:Rule val composeTestRule = createComposeRule()
+    companion object {
+        private const val email = "user@eventstest.com"
+        private const val pwd = "123456"
+        private lateinit var uid: String
+        private const val username = "eventstest"
 
-  @Test
-  fun eventsScreen_RenderingCorrectness() {
-    // Test rendering correctness with events available
-    composeTestRule.setContent {
-      Events(
-          currentUser = currentUserId,
-          nav = NavigationActions(rememberNavController()),
-          userViewModel = UserViewModel(),
-          eventViewModel = EventViewModel("test"))
+        private const val eventId = "EventsTestEvent"
+
+        private val userVM = UserViewModel()
+        private lateinit var eventVM: EventViewModel
+
+        @JvmStatic
+        @BeforeClass
+        fun setup() {
+            runBlocking {
+                // Create a new user
+                var result = Firebase.auth.createUserWithEmailAndPassword(email, pwd)
+                while (!result.isComplete) {
+                    TimeUnit.SECONDS.sleep(1)
+                }
+                uid = result.result.user!!.uid
+
+                // Add the user to the view model
+                userVM.createUserIfNew(
+                    uid, username, "testfirstname", "testlastname", email, "testphonenumber", "testcountry")
+                TimeUnit.SECONDS.sleep(3)
+
+                // Sign in
+                result = Firebase.auth.signInWithEmailAndPassword(email, pwd)
+                while (!result.isComplete) {
+                    TimeUnit.SECONDS.sleep(1)
+                }
+
+                // Create an event
+                eventVM = EventViewModel(uid)
+                eventVM.createEvent(
+                    "title",
+                    "description",
+                    Location(0.0, 0.0, "location"),
+                    LocalDate.of(2026, 1, 1),
+                    LocalTime.of(9, 17),
+                    0.0,
+                    "url",
+                    emptyList(),
+                    emptyList(),
+                    emptyList(),
+                    1,
+                    true,
+                    emptyList(),
+                    emptyList(),
+                    null,
+                    userVM,
+                    eventId)
+
+                // Add the event to the user's favourites
+                userVM.editUser(userVM.getUser(uid)!!.copy(myFavorites = listOf(eventId)))
+                while (userVM.getUser(uid)!!.myFavorites.isEmpty()) {
+                    TimeUnit.SECONDS.sleep(1)
+                }
+            }
+        }
+
+        @AfterClass
+        @JvmStatic
+        fun tearDown() {
+            runBlocking {
+                // Clean up the event
+                eventVM.getAllEvents()?.forEach {
+                    eventVM.removeEvent(it.eventID)
+
+                    // Clean up the user
+                    Firebase.auth.currentUser?.delete()
+                    userVM.deleteUser(uid)
+                }
+            }
+        }
     }
 
-    assert(composeTestRule.onAllNodesWithText("Favourites")[0].isDisplayed()) {
-      "Favourites[0] not displayed"
-    }
-    assert(composeTestRule.onAllNodesWithText("Favourites")[1].isDisplayed()) {
-      "Favourites[1] not displayed"
-    }
-    assert(composeTestRule.onAllNodesWithText("Joined Events")[0].isDisplayed()) {
-      "Joined Events[0] not displayed"
-    }
-    assert(composeTestRule.onAllNodesWithText("Joined Events")[1].isDisplayed()) {
-      "Joined Events[1] not displayed"
-    }
-    assert(composeTestRule.onAllNodesWithText("My Events")[0].isDisplayed()) {
-      "My Events[0] not displayed"
-    }
-    assert(composeTestRule.onAllNodesWithText("My Events")[1].isDisplayed()) {
-      "My Events[1] not displayed"
-    }
-  }
+    @Test
+    fun testEvents() {
+        composeTestRule.setContent {
+            Events(
+                uid,
+                NavigationActions(rememberNavController()),
+                UserViewModel(),
+                eventVM)
+        }
 
-  @Test
-  fun eventsScreen_FilterButtonClick() {
-    // Test button click handling
-    composeTestRule.setContent {
-      Events(
-          currentUser = currentUserId,
-          nav = NavigationActions(rememberNavController()),
-          userViewModel = UserViewModel(),
-          eventViewModel = EventViewModel("NEEGn5cbkJZDXaezeGdfd2D4u6b2"))
+        composeTestRule.waitForIdle()
+
+        // Wait until the events are loaded
+        composeTestRule.waitUntil { composeTestRule.onAllNodesWithText("title")[0].isDisplayed() }
+
+        // Verify that the ui is correctly displayed
+        composeTestRule.onNodeWithText("Search").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("JoinedButton").assertIsDisplayed().performClick().performClick()
+        composeTestRule
+            .onNodeWithTag("FavouritesButton")
+            .assertIsDisplayed()
+            .performClick()
+            .performClick()
+        composeTestRule
+            .onNodeWithTag("MyEventsButton")
+            .assertIsDisplayed()
+            .performClick()
+            .performClick()
+        composeTestRule.onNodeWithTag("JoinedTitle").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("FavouritesTitle").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("MyEventsTitle").assertIsDisplayed()
+        composeTestRule
+            .onAllNodesWithText("title")
+            .assertCountEquals(3) // The event should be present in all categories
+        for (i in 0..2) {
+            composeTestRule.onAllNodesWithText("title")[i].assertIsDisplayed()
+        }
     }
-
-    composeTestRule.onAllNodesWithText("Joined Events")[0].performClick()
-    composeTestRule.onAllNodesWithText("Favourites")[0].performClick()
-    composeTestRule.onAllNodesWithText("My Events")[0].performClick()
-  }
-
-  @Test
-  fun eventsScreen_AsyncBehavior() {
-    // Test asynchronous behavior of fetching events
-    val eventViewModel = EventViewModel(null)
-    runBlocking(Dispatchers.IO) {
-      // Add a mock event to the view model
-      eventViewModel.createEvent(
-          title = "Test Event",
-          description = "Test description",
-          location = Location(46.5190557, 6.5555216, "EPFL Campus"), // Provide a valid location
-          date = LocalDate.now(), // Provide a valid date
-          time = LocalTime.now(), // Provide a valid time as well :)
-          price = 10.0,
-          url = "",
-          pendingParticipants = emptyList(),
-          participants = emptyList(),
-          visibleToIfPrivate = emptyList(),
-          maxParticipants = 0,
-          public = true,
-          tags = emptyList(),
-          images = emptyList(),
-          imageUri = null,
-          userViewModel = UserViewModel(),
-          uid = "")
-      TimeUnit.SECONDS.sleep(3)
-    }
-
-    composeTestRule.setContent {
-      Events(
-          currentUser = currentUserId,
-          nav = NavigationActions(rememberNavController()),
-          userViewModel = UserViewModel(),
-          eventViewModel = EventViewModel("NEEGn5cbkJZDXaezeGdfd2D4u6b2"))
-    }
-  }
-
-  companion object {
-    private val userVM = UserViewModel()
-    private lateinit var currentUserId: String
-
-    private val usr = "u@eventstest.com"
-    private val pwd = "123456"
-
-    @BeforeClass
-    @JvmStatic
-    fun setUp() {
-      // Create a new user and sign in
-      var result = Firebase.auth.createUserWithEmailAndPassword(usr, pwd)
-      while (!result.isComplete) {
-        TimeUnit.SECONDS.sleep(1)
-      }
-      result = Firebase.auth.signInWithEmailAndPassword(usr, pwd)
-      while (!result.isComplete) {
-        TimeUnit.SECONDS.sleep(1)
-      }
-
-      // Set up the user view model
-      // Order is important here, since createUserIfNew sets current user to created user (so we
-      // need to create the current user last)
-      currentUserId = Firebase.auth.currentUser!!.uid
-      userVM.createUserIfNew(currentUserId, "a", "b", "c", usr, "4567", "Angola")
-      TimeUnit.SECONDS.sleep(3)
-    }
-
-    @AfterClass
-    @JvmStatic
-    fun tearDown() {
-      // Clean up the user view model
-      Firebase.auth.currentUser!!.delete()
-      userVM.deleteUser(currentUserId)
-    }
-  }
 }

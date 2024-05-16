@@ -118,7 +118,9 @@ fun Profile(
       topBar = {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(start = screenWidth / 15, top = screenHeight / 30)) {
+            modifier =
+                Modifier.padding(start = screenWidth / 15, top = screenHeight / 30)
+                    .testTag("TopBar")) {
               Text(
                   text = "My Profile",
                   style =
@@ -159,7 +161,10 @@ fun Profile(
                 Row(
                     horizontalArrangement = Arrangement.Start,
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth().padding(start = screenWidth / 20)) {
+                    modifier =
+                        Modifier.fillMaxWidth()
+                            .padding(start = screenWidth / 20)
+                            .testTag("UserInfo")) {
                       ProfileImage(userId = userId, modifier = Modifier.testTag("Profile Picture"))
                       Column(modifier = Modifier.padding(start = screenWidth / 20)) {
                         Text(
