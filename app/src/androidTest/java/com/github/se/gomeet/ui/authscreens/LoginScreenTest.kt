@@ -65,7 +65,7 @@ class LoginScreenTest {
 
     rule.onNodeWithText("Email").assertIsDisplayed()
     rule.onNodeWithText("Password").assertIsDisplayed()
-    rule.onNodeWithText("Log in").assertIsNotEnabled().assertHasClickAction().assertIsDisplayed()
+    rule.onNodeWithText("Log In").assertIsNotEnabled().assertHasClickAction().assertIsDisplayed()
 
     // Enter email and password
     rule.onNodeWithText("Email").performTextInput(testEmail)
