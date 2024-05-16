@@ -292,7 +292,6 @@ fun ManageInvites(
                     initialClicked = false)
               }
               3 -> {
-                // TODO: Fix bug here
                 PageUserInvites(
                     followersFollowingList.filter { u ->
                       u.pendingRequests.any { invitation ->
@@ -412,12 +411,30 @@ fun UserInviteWidget(
               callback(
                   user.copy(
                       pendingRequests =
-                          if (toAdd)
+                          if (toAdd) {
+                            val possiblePreviousInvitationRefused =
+                                user.pendingRequests.find {
+                                  it.eventId == event.eventID && it.status == InviteStatus.REFUSED
+                                }
+
+                            if (user.pendingRequests.contains(possiblePreviousInvitationRefused)) {
+                              user.pendingRequests
+                                  .map {
+                                    if (it == possiblePreviousInvitationRefused) {
+                                      it.copy(status = InviteStatus.PENDING)
+                                    } else {
+                                      it
+                                    }
+                                  }
+                                  .toSet()
+                            } else {
                               user.pendingRequests.plus(
                                   Invitation(event.eventID, status ?: InviteStatus.PENDING))
-                          else
-                              user.pendingRequests.minus(
-                                  Invitation(event.eventID, status ?: InviteStatus.PENDING))))
+                            }
+                          } else {
+                            user.pendingRequests.minus(
+                                Invitation(event.eventID, status ?: InviteStatus.PENDING))
+                          }))
             },
             modifier = Modifier.height(26.dp).width(82.dp),
             contentPadding = PaddingValues(vertical = 2.dp),
