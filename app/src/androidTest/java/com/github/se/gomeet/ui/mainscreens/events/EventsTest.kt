@@ -34,12 +34,24 @@ class EventsTest {
           eventViewModel = EventViewModel("test"))
     }
 
-    assert( composeTestRule.onAllNodesWithText("Favourites")[0].isDisplayed()) { "Favourites[0] not displayed" }
-    assert(composeTestRule.onAllNodesWithText("Favourites")[1].isDisplayed()) { "Favourites[1] not displayed" }
-    assert(composeTestRule.onAllNodesWithText("Joined Events")[0].isDisplayed()) { "Joined Events[0] not displayed" }
-    assert(composeTestRule.onAllNodesWithText("Joined Events")[1].isDisplayed()) { "Joined Events[1] not displayed" }
-    assert(composeTestRule.onAllNodesWithText("My Events")[0].isDisplayed()) { "My Events[0] not displayed" }
-    assert(composeTestRule.onAllNodesWithText("My Events")[1].isDisplayed()) { "My Events[1] not displayed" }
+    assert(composeTestRule.onAllNodesWithText("Favourites")[0].isDisplayed()) {
+      "Favourites[0] not displayed"
+    }
+    assert(composeTestRule.onAllNodesWithText("Favourites")[1].isDisplayed()) {
+      "Favourites[1] not displayed"
+    }
+    assert(composeTestRule.onAllNodesWithText("Joined Events")[0].isDisplayed()) {
+      "Joined Events[0] not displayed"
+    }
+    assert(composeTestRule.onAllNodesWithText("Joined Events")[1].isDisplayed()) {
+      "Joined Events[1] not displayed"
+    }
+    assert(composeTestRule.onAllNodesWithText("My Events")[0].isDisplayed()) {
+      "My Events[0] not displayed"
+    }
+    assert(composeTestRule.onAllNodesWithText("My Events")[1].isDisplayed()) {
+      "My Events[1] not displayed"
+    }
   }
 
   @Test
