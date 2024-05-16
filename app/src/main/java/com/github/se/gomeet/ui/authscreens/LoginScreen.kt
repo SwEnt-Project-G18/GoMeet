@@ -162,7 +162,7 @@ fun LoginScreen(
                       disabledContentColor = MaterialTheme.colorScheme.onBackground),
               enabled =
                   signInState.value.email.isNotEmpty() && signInState.value.password.isNotEmpty()) {
-                Text("Log in")
+                Text("Log In")
               }
 
           if (signInState.value.isLoading) {
