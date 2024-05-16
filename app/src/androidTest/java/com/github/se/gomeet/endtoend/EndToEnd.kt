@@ -27,7 +27,6 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen
-import java.time.LocalDate
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
 import org.junit.AfterClass
@@ -129,9 +128,6 @@ class EndToEndTest : TestCase() {
             .assertIsDisplayed()
             .performTextInput("Description")
         composeTestRule.onNodeWithText("Location").assertIsDisplayed().performTextInput("test")
-        composeTestRule
-            .onNodeWithText("Date")
-            .performTextInput(LocalDate.of(2025, 3, 30).toString())
         composeTestRule.onNodeWithText("Price").performTextInput("1")
         composeTestRule
             .onNodeWithText("Link")
