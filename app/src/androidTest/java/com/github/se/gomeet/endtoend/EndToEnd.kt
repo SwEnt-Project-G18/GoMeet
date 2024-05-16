@@ -68,7 +68,9 @@ class EndToEndTest : TestCase() {
         // Add the user to the view model
         userVM.createUserIfNew(
             uid, username, "testfirstname", "testlastname", email, "testphonenumber", "testcountry")
-        TimeUnit.SECONDS.sleep(3)
+        while (userVM.getUser(uid) == null) {
+          TimeUnit.SECONDS.sleep(1)
+        }
 
         // Sign in
         result = Firebase.auth.signInWithEmailAndPassword(email, pwd)
@@ -102,10 +104,10 @@ class EndToEndTest : TestCase() {
 
     ComposeScreen.onComposeScreen<LoginScreenScreen>(composeTestRule) {
       step("Log in with email and password") {
-        composeTestRule.onNodeWithText("Log in").assertIsDisplayed().assertIsNotEnabled()
+        composeTestRule.onNodeWithText("Log In").assertIsDisplayed().assertIsNotEnabled()
         composeTestRule.onNodeWithText("Email").assertIsDisplayed().performTextInput(email)
         composeTestRule.onNodeWithText("Password").assertIsDisplayed().performTextInput(pwd)
-        composeTestRule.onNodeWithText("Log in").assertIsEnabled().performClick()
+        composeTestRule.onNodeWithText("Log In").assertIsEnabled().performClick()
         composeTestRule.waitForIdle()
         composeTestRule.waitUntil(timeoutMillis = 10000) {
           composeTestRule.onNodeWithTag("CreateUI").isDisplayed()
