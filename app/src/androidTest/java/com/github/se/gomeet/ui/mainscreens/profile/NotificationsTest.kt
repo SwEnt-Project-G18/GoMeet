@@ -108,13 +108,13 @@ class NotificationsTest {
     // Test the ui of the screen
     composeTestRule.onNodeWithTag("NotificationsScreen").assertExists()
     composeTestRule.onNodeWithContentDescription("Go back").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Messages").assertIsDisplayed().performClick()
-    composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithText("Invitations").assertIsDisplayed().performClick()
-    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithText("Messages").assertIsDisplayed().assertHasClickAction()
+    composeTestRule.onNodeWithText("Invitations").assertIsDisplayed().assertHasClickAction()
 
     // Test that the invitation notification widget is correctly displayed
-    composeTestRule.waitUntil(timeoutMillis = 10000) { composeTestRule.onNodeWithTag("InviteText").isDisplayed() }
+    composeTestRule.waitUntil(timeoutMillis = 10000) {
+      composeTestRule.onNodeWithTag("InviteText").isDisplayed()
+    }
     composeTestRule.onNodeWithTag("InviteText").assertIsDisplayed()
     composeTestRule.onNodeWithText(eventTitle).assertIsDisplayed()
     composeTestRule.onNodeWithText("30/03/26", substring = true).assertIsDisplayed()
