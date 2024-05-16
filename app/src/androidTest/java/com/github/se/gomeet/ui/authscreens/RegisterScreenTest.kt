@@ -2,10 +2,12 @@ package com.github.se.gomeet.ui.authscreens
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.MainActivity
@@ -71,12 +73,12 @@ class RegisterScreenTest : TestCase() {
       composeTestRule.onNodeWithTag("Text").assertIsDisplayed()
       composeTestRule.onNodeWithText("First Name").assertIsDisplayed().performTextInput("firstname")
       composeTestRule.onNodeWithText("Last Name").assertIsDisplayed().performTextInput("lastname")
-      composeTestRule.onNodeWithText("Select Country").assertIsDisplayed().performTextInput("q")
-      composeTestRule.onNodeWithTag("CountryDropdownMenu").assertIsDisplayed().performClick()
       composeTestRule
           .onNodeWithText("Phone Number")
           .assertIsDisplayed()
           .performTextInput("+1234567890")
+      composeTestRule.onNodeWithTag("Country").performScrollTo().assertIsDisplayed().performClick()
+      composeTestRule.onAllNodesWithTag("CountryItem")[1].assertIsDisplayed().performClick()
       composeTestRule.onNodeWithTag("BottomRow").assertIsDisplayed()
       composeTestRule.onNodeWithContentDescription("Next").assertIsDisplayed().performClick()
 

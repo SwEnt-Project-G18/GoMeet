@@ -7,6 +7,7 @@ import com.github.se.gomeet.model.repository.UserRepository
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.time.LocalDate
+import java.time.LocalTime
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
 import org.junit.AfterClass
@@ -21,6 +22,7 @@ class EventViewModelTest {
     private const val description = "description"
     private val location = Location(0.0, 0.0, "location")
     private val date = LocalDate.of(9999, 3, 30)
+    private val time = LocalTime.of(23, 40)
     private const val price = 0.0
     private const val url = "url"
     private val pendingParticipants = emptyList<String>()
@@ -47,6 +49,7 @@ class EventViewModelTest {
             description,
             location,
             date,
+            time,
             price,
             url,
             pendingParticipants,

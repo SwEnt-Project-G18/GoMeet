@@ -23,6 +23,7 @@ import com.google.firebase.storage.ktx.storage
 import com.squareup.picasso.Picasso
 import java.io.IOException
 import java.time.LocalDate
+import java.time.LocalTime
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlinx.coroutines.CompletableDeferred
@@ -230,6 +231,7 @@ class EventViewModel(private val creatorId: String? = null, eventRepository: Eve
       description: String,
       location: Location,
       date: LocalDate,
+      time: LocalTime,
       price: Double,
       url: String,
       pendingParticipants: List<String>,
@@ -256,6 +258,7 @@ class EventViewModel(private val creatorId: String? = null, eventRepository: Eve
                 description,
                 location,
                 date,
+                time,
                 price,
                 url,
                 pendingParticipants,

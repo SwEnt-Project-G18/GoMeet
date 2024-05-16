@@ -31,6 +31,7 @@ import com.google.firebase.ktx.Firebase
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen
 import java.time.LocalDate
+import java.time.LocalTime
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
 import org.junit.AfterClass
@@ -112,6 +113,7 @@ class EndToEndTest2 : TestCase() {
           "description",
           Location(0.0, 0.0, "location"),
           LocalDate.of(2025, 3, 30),
+          LocalTime.now(),
           0.0,
           "url",
           emptyList(),

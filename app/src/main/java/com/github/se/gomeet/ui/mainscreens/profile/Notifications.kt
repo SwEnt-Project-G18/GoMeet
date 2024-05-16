@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.sp
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.InviteStatus
+import com.github.se.gomeet.model.event.eventMomentToString
 import com.github.se.gomeet.model.repository.EventRepository
 import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.model.user.GoMeetUser
@@ -54,12 +55,15 @@ import java.time.ZoneId
 import java.util.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.LocalTime
+import kotlinx.coroutines.launch
 
 /**
- * This composable is used to display the notifications page.
+ * This composable function displays the notifications screen.
  *
- * @param nav the navigation actions
- * @param currentUserID the userID of the user receiving the notifications
+ * @param nav The navigation actions.
+ * @param currentUserID The current user's ID.
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
