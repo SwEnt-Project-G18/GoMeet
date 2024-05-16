@@ -68,6 +68,8 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
+import com.github.se.gomeet.model.event.eventMomentToString
+import com.github.se.gomeet.model.event.isPastEvent
 import com.github.se.gomeet.ui.mainscreens.events.GoMeetSearchBar
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
@@ -90,12 +92,7 @@ import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.MarkerInfoWindowContent
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
-import java.text.SimpleDateFormat
 import java.time.LocalDate
-import java.time.ZoneId
-import java.util.Calendar
-import java.util.Date
-import java.util.Locale
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -170,7 +167,7 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
 
     val allEvents = eventViewModel.getAllEvents()
     if (allEvents != null) {
-      eventList.value = allEvents
+      eventList.value = allEvents.filter { e -> !isPastEvent(e) }
     }
 
     // wait for user input
@@ -354,9 +351,7 @@ private fun ContentInColumn(
                   style = MaterialTheme.typography.bodyLarge,
                   color = MaterialTheme.colorScheme.tertiary)
               Text(
-                  text =
-                      eventDateToString(
-                          Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant())),
+                  text = eventMomentToString(event.date, event.time),
                   style = MaterialTheme.typography.bodyMedium,
                   color = MaterialTheme.colorScheme.tertiary)
             }
@@ -417,9 +412,7 @@ fun ContentInRow(
                   style = MaterialTheme.typography.bodyLarge,
                   color = MaterialTheme.colorScheme.tertiary)
               Text(
-                  text =
-                      eventDateToString(
-                          Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant())),
+                  text = eventMomentToString(event.date, event.time),
                   style = MaterialTheme.typography.bodyMedium,
                   color = MaterialTheme.colorScheme.tertiary)
             }
@@ -428,40 +421,6 @@ fun ContentInRow(
       }
     }
   }
-}
-
-fun eventDateToString(eventDate: Date): String {
-
-  val currentDate = Calendar.getInstance()
-  val startOfWeek = currentDate.clone() as Calendar
-  startOfWeek.set(Calendar.DAY_OF_WEEK, startOfWeek.firstDayOfWeek)
-  val endOfWeek = startOfWeek.clone() as Calendar
-  endOfWeek.add(Calendar.DAY_OF_WEEK, 6)
-
-  val eventCalendar = Calendar.getInstance().apply { time = eventDate }
-
-  val isThisWeek = eventCalendar.after(currentDate) && eventCalendar.before(endOfWeek)
-  val isToday =
-      currentDate.get(Calendar.YEAR) == eventCalendar.get(Calendar.YEAR) &&
-          currentDate.get(Calendar.DAY_OF_YEAR) == eventCalendar.get(Calendar.DAY_OF_YEAR)
-
-  val dayFormat =
-      if (isThisWeek) {
-        SimpleDateFormat("EEEE", Locale.getDefault())
-      } else {
-        SimpleDateFormat("dd/MM/yy", Locale.getDefault())
-      }
-
-  val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-
-  val dayString =
-      if (isToday) {
-        "Today"
-      } else {
-        dayFormat.format(eventDate)
-      }
-  val timeString = timeFormat.format(eventDate)
-  return "$dayString at $timeString"
 }
 
 @Composable

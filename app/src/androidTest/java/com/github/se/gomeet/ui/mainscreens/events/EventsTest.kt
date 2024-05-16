@@ -14,6 +14,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.time.LocalDate
+import java.time.LocalTime
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
 import org.junit.AfterClass
@@ -66,6 +67,7 @@ class EventsTest {
             "description",
             Location(0.0, 0.0, "location"),
             LocalDate.of(2026, 1, 1),
+            LocalTime.now(),
             0.0,
             "url",
             emptyList(),

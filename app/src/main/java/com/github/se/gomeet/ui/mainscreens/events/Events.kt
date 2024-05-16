@@ -1,8 +1,10 @@
 package com.github.se.gomeet.ui.mainscreens.events
 
 import EventWidget
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,6 +18,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -52,6 +56,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
+import com.github.se.gomeet.model.event.isPastEvent
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
@@ -61,9 +66,6 @@ import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
-import java.time.LocalDate
-import java.time.ZoneId
-import java.util.Date
 import kotlinx.coroutines.launch
 
 /**
@@ -97,10 +99,10 @@ fun Events(
     coroutineScope.launch {
       user.value = userViewModel.getUser(currentUser)
       val allEvents =
-          eventViewModel.getAllEvents()!!.filter { e ->
+          (eventViewModel.getAllEvents() ?: emptyList()).filter { e ->
             (user.value!!.myEvents.contains(e.eventID) ||
                 user.value!!.myFavorites.contains(e.eventID) ||
-                user.value!!.joinedEvents.contains(e.eventID)) && e.date.isAfter(LocalDate.now())
+                user.value!!.joinedEvents.contains(e.eventID)) && !isPastEvent(e)
           }
       if (allEvents.isNotEmpty()) {
         eventList.addAll(allEvents)
@@ -117,6 +119,18 @@ fun Events(
 
   // Scaffold is a structure that supports top bar, content area, and bottom navigation
   Scaffold(
+      floatingActionButton = {
+        Box(modifier = Modifier.padding(8.dp)) {
+          IconButton(
+              modifier =
+                  Modifier.background(
+                      color = MaterialTheme.colorScheme.outlineVariant,
+                      shape = RoundedCornerShape(10.dp)),
+              onClick = { nav.navigateToScreen(Route.CREATE) }) {
+                Icon(Icons.Filled.Add, contentDescription = "Create Event", tint = Color.White)
+              }
+        }
+      },
       topBar = {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -241,11 +255,8 @@ fun Events(
                                     eventName = event.title,
                                     eventId = event.eventID,
                                     eventDescription = event.description,
-                                    eventDate =
-                                        Date.from(
-                                            event.date
-                                                .atStartOfDay(ZoneId.systemDefault())
-                                                .toInstant()),
+                                    eventDate = event.date,
+                                    eventTime = event.time,
                                     eventPicture = painter,
                                     eventLocation = event.location,
                                     verified = false,
@@ -289,11 +300,8 @@ fun Events(
                                     eventId = event.eventID,
                                     eventName = event.title,
                                     eventDescription = event.description,
-                                    eventDate =
-                                        Date.from(
-                                            event.date
-                                                .atStartOfDay(ZoneId.systemDefault())
-                                                .toInstant()),
+                                    eventDate = event.date,
+                                    eventTime = event.time,
                                     eventPicture = painter,
                                     eventLocation = event.location,
                                     verified = false,
@@ -337,11 +345,8 @@ fun Events(
                                     eventId = event.eventID,
                                     eventName = event.title,
                                     eventDescription = event.description,
-                                    eventDate =
-                                        Date.from(
-                                            event.date
-                                                .atStartOfDay(ZoneId.systemDefault())
-                                                .toInstant()),
+                                    eventDate = event.date,
+                                    eventTime = event.time,
                                     eventPicture = painter,
                                     eventLocation = event.location,
                                     verified = false,
@@ -378,7 +383,7 @@ fun GoMeetSearchBar(
         query = query.value,
         onQueryChange = { query.value = it },
         active = false,
-        modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
         placeholder = { Text("Search", color = contentColor) },
         leadingIcon = {
           IconButton(onClick = { nav.navigateToScreen(Route.MESSAGE_CHANNELS) }) {

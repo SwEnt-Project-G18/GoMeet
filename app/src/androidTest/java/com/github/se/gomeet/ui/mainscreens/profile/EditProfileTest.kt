@@ -3,6 +3,7 @@ package com.github.se.gomeet.ui.mainscreens.profile
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -86,11 +87,10 @@ class EditProfileTest {
     composeTestRule.onNodeWithTag("TagList").assertIsDisplayed().performClick()
     composeTestRule.onNodeWithText("Save").assertIsDisplayed().performClick()
     composeTestRule.waitForIdle()
-    composeTestRule
-        .onNodeWithText("Country")
-        .performScrollTo()
-        .assertIsDisplayed()
-        .performTextInput("fakecountry")
+    composeTestRule.onNodeWithTag("Country").performScrollTo().assertIsDisplayed().performClick()
+
+    composeTestRule.onAllNodesWithTag("CountryItem")[1].assertIsDisplayed().performClick()
+
     composeTestRule
         .onNodeWithText("Phone Number")
         .performScrollTo()

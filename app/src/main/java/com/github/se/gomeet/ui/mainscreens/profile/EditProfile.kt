@@ -3,6 +3,7 @@ package com.github.se.gomeet.ui.mainscreens.profile
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
+import android.util.Patterns
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -59,6 +60,8 @@ import com.github.se.gomeet.R
 import com.github.se.gomeet.model.TagsSelector
 import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.model.user.GoMeetUser
+import com.github.se.gomeet.ui.authscreens.register.CountrySuggestionTextField
+import com.github.se.gomeet.ui.authscreens.register.getCountries
 import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
@@ -66,6 +69,7 @@ import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.auth
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -80,22 +84,34 @@ fun EditProfile(
   val screenHeight = LocalConfiguration.current.screenHeightDp.dp
   val screenWidth = LocalConfiguration.current.screenWidthDp.dp
 
+  val countries = getCountries()
   val currentUser = remember { mutableStateOf<GoMeetUser?>(null) }
   val firstName = remember { mutableStateOf("") }
+  var firstNameValid by remember { mutableStateOf(false) }
   val lastName = remember { mutableStateOf("") }
-  val email = remember { mutableStateOf("") }
+  var lastNameValid by remember { mutableStateOf(false) }
+  var allUsers by remember { mutableStateOf<List<GoMeetUser>?>(null) }
+
   val username = remember { mutableStateOf("") }
+  var usernameValid by remember { mutableStateOf(false) }
+
   val phoneNumber = remember { mutableStateOf("") }
+  var phoneNumberValid by remember { mutableStateOf(false) }
+
   val country = remember { mutableStateOf("") }
+  var countryValid by remember { mutableStateOf(false) }
   val tags = remember { mutableStateOf(emptyList<String>()) }
   var isLoaded by remember { mutableStateOf(false) }
   val showPopup = remember { mutableStateOf(false) }
 
+  var firstClick by remember { mutableStateOf(true) }
+
   LaunchedEffect(Unit) {
-    currentUser.value = userViewModel.getUser(com.google.firebase.Firebase.auth.currentUser!!.uid)
+    allUsers = userViewModel.getAllUsers()
+    currentUser.value = allUsers!!.first { it.uid == Firebase.auth.currentUser!!.uid }
+    allUsers = allUsers!!.minus(currentUser.value!!)
     firstName.value = currentUser.value!!.firstName
     lastName.value = currentUser.value!!.lastName
-    email.value = currentUser.value!!.email
     username.value = currentUser.value!!.username
     phoneNumber.value = currentUser.value!!.phoneNumber
     country.value = currentUser.value!!.country
@@ -156,63 +172,71 @@ fun EditProfile(
 
   Scaffold(
       topBar = {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(top = screenHeight / 40, end = 15.dp)) {
-              IconButton(onClick = { nav.goBack() }) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
-                    tint = MaterialTheme.colorScheme.onBackground)
-              }
-              Text(
-                  text = "Edit Profile",
-                  style =
-                      MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.SemiBold))
-              Spacer(modifier = Modifier.weight(1f))
-              Text(
-                  text = "Done",
-                  fontWeight = FontWeight.SemiBold,
-                  modifier =
-                      Modifier.clickable {
-                        if (imageUri != null) {
-                          userViewModel.uploadImageAndGetUrl(
-                              userId = currentUser.value!!.uid,
-                              imageUri = imageUri!!,
-                              onSuccess = { imageUrl ->
-                                val updatedUser =
-                                    currentUser.value!!.copy(
-                                        firstName = firstName.value,
-                                        lastName = lastName.value,
-                                        email = email.value,
-                                        username = username.value,
-                                        phoneNumber = phoneNumber.value,
-                                        country = country.value,
-                                        profilePicture = imageUrl)
-                                userViewModel.editUser(updatedUser)
-                                nav.goBack()
-                              },
-                              onError = { exception ->
-                                Log.e(
-                                    "ProfileUpdate",
-                                    "Failed to upload new image: ${exception.message}")
-                              })
-                        } else {
-                          val updatedUser =
-                              currentUser.value!!.copy(
-                                  firstName = firstName.value,
-                                  lastName = lastName.value,
-                                  email = email.value,
-                                  username = username.value,
-                                  phoneNumber = phoneNumber.value,
-                                  country = country.value,
-                                  profilePicture = profilePictureUrl ?: "")
-                          userViewModel.editUser(updatedUser)
-                          nav.goBack()
-                          Log.e("ProfileUpdate", "No image selected")
-                        }
-                      })
-            }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+          IconButton(onClick = { nav.goBack() }) {
+            Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = "Go back")
+          }
+          Spacer(modifier = Modifier.weight(1f))
+          Text(
+              text = "Done",
+              style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
+              modifier =
+                  Modifier.padding(2.dp).clickable {
+                    firstNameValid = firstName.value.isNotEmpty() && firstName.value.length <= 20
+                    lastNameValid = lastName.value.isNotEmpty() && lastName.value.length <= 20
+                    phoneNumberValid =
+                        phoneNumber.value.isEmpty() ||
+                            (Patterns.PHONE.matcher(phoneNumber.value).matches() &&
+                                (phoneNumber.value.startsWith('0') ||
+                                    phoneNumber.value.startsWith('+')) &&
+                                phoneNumber.value.length >= 10 &&
+                                phoneNumber.value.length <= 14)
+
+                    countryValid = country.value.isEmpty() || countries.contains(country.value)
+                    usernameValid =
+                        !(allUsers!!.any { u -> u.username == username.value }) &&
+                            username.value.isNotBlank() &&
+                            username.value.length <= 26
+                    firstClick = false
+                    if (imageUri != null) {
+                      userViewModel.uploadImageAndGetUrl(
+                          userId = currentUser.value!!.uid,
+                          imageUri = imageUri!!,
+                          onSuccess = { imageUrl ->
+                            val updatedUser =
+                                currentUser.value!!.copy(
+                                    firstName = firstName.value,
+                                    lastName = lastName.value,
+                                    username = username.value,
+                                    phoneNumber = phoneNumber.value,
+                                    country = country.value,
+                                    profilePicture = imageUrl)
+                            userViewModel.editUser(updatedUser)
+                            nav.goBack()
+                          },
+                          onError = { exception ->
+                            Log.e(
+                                "ProfileUpdate", "Failed to upload new image: ${exception.message}")
+                          })
+                    } else if (firstNameValid &&
+                        lastNameValid &&
+                        usernameValid &&
+                        phoneNumberValid &&
+                        countryValid) {
+                      val updatedUser =
+                          currentUser.value!!.copy(
+                              firstName = firstName.value,
+                              lastName = lastName.value,
+                              username = username.value,
+                              phoneNumber = phoneNumber.value,
+                              country = country.value,
+                              profilePicture = profilePictureUrl ?: "")
+                      userViewModel.editUser(updatedUser)
+                      nav.goBack()
+                      Log.e("ProfileUpdate", "No image selected")
+                    }
+                  })
+        }
       },
       bottomBar = {
         BottomNavigationMenu(
@@ -257,85 +281,62 @@ fun EditProfile(
 
                 TextField(
                     value = firstName.value,
-                    onValueChange = { newValue ->
-                      if (newValue.isNotBlank() && newValue.isNotEmpty()) {
-                        firstName.value = newValue
-                      }
-                    },
+                    onValueChange = { newValue -> firstName.value = newValue },
                     label = { Text("First Name") },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                     colors = textFieldColors)
-
+                if (!firstNameValid && !firstClick) {
+                  Text(text = "First Name is not valid", color = Color.Red)
+                }
                 Spacer(modifier = Modifier.size(16.dp))
 
                 TextField(
                     value = lastName.value,
-                    onValueChange = { newValue ->
-                      if (newValue.isNotBlank() && newValue.isNotEmpty()) {
-                        lastName.value = newValue
-                      }
-                    },
+                    onValueChange = { newValue -> lastName.value = newValue },
                     label = { Text("Last Name") },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                     colors = textFieldColors)
 
-                Spacer(modifier = Modifier.size(16.dp))
-
-                TextField(
-                    value = email.value,
-                    onValueChange = { newValue ->
-                      if (newValue.isNotBlank() && newValue.isNotEmpty()) {
-                        email.value = newValue
-                      }
-                    },
-                    label = { Text("Email Address") },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = textFieldColors)
+                if (!lastNameValid && !firstClick) {
+                  Text(text = "Last Name is not valid", color = Color.Red)
+                }
 
                 Spacer(modifier = Modifier.size(16.dp))
 
                 TextField(
                     value = username.value,
-                    onValueChange = { newValue ->
-                      if (newValue.isNotBlank() && newValue.isNotEmpty()) {
-                        username.value = newValue
-                      }
-                    },
+                    onValueChange = { newValue -> username.value = newValue },
                     label = { Text("Username") },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                     colors = textFieldColors)
 
+                if (!firstClick && !usernameValid) {
+                  Text(text = "The Username is not valid or already taken", color = Color.Red)
+                }
+
                 Spacer(modifier = Modifier.size(16.dp))
 
                 TextField(
                     value = phoneNumber.value,
-                    onValueChange = { newValue ->
-                      if (newValue.isNotBlank() && newValue.isNotEmpty()) {
-                        phoneNumber.value = newValue
-                      }
-                    },
+                    onValueChange = { newValue -> phoneNumber.value = newValue },
                     label = { Text("Phone Number") },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                     colors = textFieldColors)
 
+                if (!phoneNumberValid && !firstClick) {
+                  Text(text = "Phone Number is not valid", color = Color.Red)
+                }
                 Spacer(modifier = Modifier.size(16.dp))
 
-                TextField(
-                    value = country.value,
-                    onValueChange = { newValue ->
-                      if (newValue.isNotBlank() && newValue.isNotEmpty()) {
-                        country.value = newValue
-                      }
-                    },
-                    label = { Text("Country") },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = textFieldColors)
+                CountrySuggestionTextField(countries, textFieldColors)
+
+                if (!countryValid && !firstClick) {
+                  Text(text = "Country is not valid", color = Color.Red)
+                }
 
                 Spacer(modifier = Modifier.size(16.dp))
 

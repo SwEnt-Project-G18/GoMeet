@@ -48,6 +48,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.github.se.gomeet.model.event.Event
+import com.github.se.gomeet.model.event.isPastEvent
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
@@ -58,7 +59,6 @@ import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import java.time.LocalDate
 import kotlinx.coroutines.launch
 
 private var user: GoMeetUser? = null
@@ -94,9 +94,11 @@ fun OthersProfile(
       followerCount = user?.followers?.size ?: 0
 
       val allEvents =
-          eventViewModel.getAllEvents()!!.filter { e -> user!!.myEvents.contains(e.eventID) }
+          eventViewModel.getAllEvents()!!.filter { e ->
+            user!!.myEvents.contains(e.eventID) && e.public
+          }
       allEvents.forEach {
-        if (it.date.isAfter(LocalDate.now())) {
+        if (!isPastEvent(it)) {
           myEventList.add(it)
         } else {
           myHistoryList.add(it)
