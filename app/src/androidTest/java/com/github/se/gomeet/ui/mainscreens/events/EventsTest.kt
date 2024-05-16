@@ -13,6 +13,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.time.LocalDate
+import java.time.LocalTime
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -20,7 +21,6 @@ import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
-import java.time.LocalTime
 
 class EventsTest {
 

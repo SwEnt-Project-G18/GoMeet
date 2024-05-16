@@ -50,6 +50,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.model.event.Event
+import com.github.se.gomeet.model.event.isPastEvent
 import com.github.se.gomeet.model.repository.EventRepository
 import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.model.user.GoMeetUser
@@ -63,7 +64,6 @@ import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import java.time.LocalDate
 import kotlinx.coroutines.launch
 
 private var user: GoMeetUser? = null
@@ -101,7 +101,7 @@ fun OthersProfile(
       val allEvents =
           eventViewModel.getAllEvents()!!.filter { e -> user!!.myEvents.contains(e.eventID) }
       allEvents.forEach {
-        if (it.date.isAfter(LocalDate.now())) {
+        if (!isPastEvent(it)) {
           myEventList.add(it)
         } else {
           myHistoryList.add(it)

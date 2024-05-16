@@ -8,11 +8,11 @@ import com.github.se.gomeet.model.repository.UserRepository
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.time.LocalDate
+import java.time.LocalTime
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.time.LocalTime
 
 @RunWith(AndroidJUnit4::class)
 class EventViewModelTest {

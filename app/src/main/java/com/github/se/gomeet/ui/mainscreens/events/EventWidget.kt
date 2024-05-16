@@ -35,6 +35,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.se.gomeet.R
+import com.github.se.gomeet.model.event.getEventDateString
+import com.github.se.gomeet.model.event.getEventTimeString
 import com.github.se.gomeet.model.event.location.Location
 import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.ui.navigation.NavigationActions
@@ -42,11 +44,8 @@ import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import java.text.SimpleDateFormat
+import java.time.LocalDate
 import java.time.LocalTime
-import java.util.Calendar
-import java.util.Date
-import java.util.Locale
 
 /**
  * A composable function that displays detailed information about an event in a card layout. This
@@ -57,7 +56,8 @@ import java.util.Locale
  * @param eventId The unique identifier for the event.
  * @param eventName The name of the event.
  * @param eventDescription A short description of the event.
- * @param eventDate The date and time at which the event is scheduled.
+ * @param eventDate The day on which the event is scheduled.
+ * @param eventTime The time at which the event is scheduled.
  * @param eventPicture A painter object that handles the rendering of the event's image.
  * @param verified A boolean indicating whether the event or the creator is verified. This could
  *   influence the visual representation.
@@ -69,7 +69,7 @@ fun EventWidget(
     eventId: String,
     eventName: String,
     eventDescription: String,
-    eventDate: Date,
+    eventDate: LocalDate,
     eventTime: LocalTime,
     eventPicture: Painter,
     eventLocation: Location,
@@ -84,38 +84,8 @@ fun EventWidget(
   val smallTextSize = with(density) { screenWidth.toPx() / 85 }
   val bigTextSize = with(density) { screenWidth.toPx() / 60 }
 
-  val currentDate = Calendar.getInstance()
-  val startOfWeek = currentDate.clone() as Calendar
-  startOfWeek.set(Calendar.DAY_OF_WEEK, startOfWeek.firstDayOfWeek)
-  val endOfWeek = startOfWeek.clone() as Calendar
-  endOfWeek.add(Calendar.DAY_OF_WEEK, 6)
-
-  val eventCalendar = Calendar.getInstance().apply { time = eventDate }
-
-  val isThisWeek = eventCalendar.after(currentDate) && eventCalendar.before(endOfWeek)
-  val isToday =
-      currentDate.get(Calendar.YEAR) == eventCalendar.get(Calendar.YEAR) &&
-          currentDate.get(Calendar.DAY_OF_YEAR) == eventCalendar.get(Calendar.DAY_OF_YEAR)
-
-  val dayFormat =
-      if (isThisWeek) {
-        SimpleDateFormat("EEEE", Locale.getDefault())
-      } else {
-        SimpleDateFormat("dd/MM/yy", Locale.getDefault())
-      }
-
-  val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-
-  val dayString =
-      if (isToday) {
-        "Today"
-      } else {
-        dayFormat.format(eventDate)
-      }
-
-  val minutes = if (eventTime.minute > 9) eventTime.minute.toString() else "0${eventTime.minute}"
-  val hours = if (eventTime.hour > 9) eventTime.hour.toString() else "0${eventTime.hour}"
-  val timeString = "${hours}:${minutes}"
+  val dayString = getEventDateString(eventDate)
+  val timeString = getEventTimeString(eventTime)
 
   Card(
       modifier =

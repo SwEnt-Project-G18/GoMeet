@@ -169,9 +169,7 @@ fun Trends(
                           eventName = event.title,
                           eventId = event.eventID,
                           eventDescription = event.description,
-                          eventDate =
-                              Date.from(
-                                  event.date.atStartOfDay(ZoneId.systemDefault()).toInstant()),
+                          eventDate = event.date,
                           eventTime = event.time,
                           eventPicture = painter,
                           eventLocation = event.location,

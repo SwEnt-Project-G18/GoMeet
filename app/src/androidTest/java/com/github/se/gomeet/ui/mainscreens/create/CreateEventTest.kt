@@ -17,7 +17,6 @@ import com.github.se.gomeet.viewmodel.EventViewModel
 import com.google.android.gms.maps.MapsInitializer
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import java.time.LocalDate
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.BeforeClass

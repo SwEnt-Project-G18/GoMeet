@@ -41,3 +41,49 @@ data class Event(
     val tags: List<String>, // Tags of the event
     val images: List<String> // Is it the right type?
 )
+
+/**
+ * This function decides whether an event is in the past or not.
+ *
+ * @param event The event to check.
+ * @return true if the event is today or in the future, false otherwise.
+ */
+fun isPastEvent(event: Event): Boolean {
+  return event.date.isBefore(LocalDate.now()) && event.date != LocalDate.now()
+}
+
+/**
+ * Converts the time of an event to a string.
+ *
+ * @param eventTime The event's time.
+ * @return The string representation of the time.
+ */
+fun getEventTimeString(eventTime: LocalTime): String {
+  val minutes = if (eventTime.minute < 9) "0${eventTime.minute}" else eventTime.minute
+  val hours = if (eventTime.hour < 9) "0${eventTime.hour}" else eventTime.hour
+  return "${hours}:${minutes}"
+}
+
+/**
+ * Converts the date of an event to a string.
+ *
+ * @param eventDate The event's date.
+ * @return The string representation of the date.
+ */
+fun getEventDateString(eventDate: LocalDate): String {
+  val date =
+      if (eventDate == LocalDate.now()) "Today"
+      else "${eventDate.dayOfMonth}/${eventDate.monthValue}/${eventDate.year}"
+  return date
+}
+
+/**
+ * Converts an event's date and time to a string.
+ *
+ * @param eventDate The event's date.
+ * @param eventTime The event's time.
+ * @return The string representation of the date and time.
+ */
+fun eventMomentToString(eventDate: LocalDate, eventTime: LocalTime): String {
+  return "${getEventDateString(eventDate)} at ${getEventTimeString(eventTime)}"
+}

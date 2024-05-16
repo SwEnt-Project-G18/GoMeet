@@ -59,6 +59,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
+import com.github.se.gomeet.model.event.eventMomentToString
 import com.github.se.gomeet.model.repository.EventRepository
 import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.model.user.GoMeetUser
@@ -72,13 +73,16 @@ import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import java.text.SimpleDateFormat
 import java.time.LocalDate
-import java.time.ZoneId
-import java.util.Date
-import java.util.Locale
+import java.time.LocalTime
 import kotlinx.coroutines.launch
 
+/**
+ * This composable function displays the notifications screen.
+ *
+ * @param nav The navigation actions.
+ * @param currentUserID The current user's ID.
+ */
 @Composable
 fun Notifications(nav: NavigationActions, currentUserID: String) {
   val userViewModel = UserViewModel(UserRepository(Firebase.firestore))
@@ -222,6 +226,7 @@ fun Notifications(nav: NavigationActions, currentUserID: String) {
                         organizerName = event.creator,
                         eventTitle = event.title,
                         eventDate = event.date,
+                        eventTime = event.time,
                         eventPicture = painter,
                         verified = true)
                   }
@@ -233,11 +238,23 @@ fun Notifications(nav: NavigationActions, currentUserID: String) {
       }
 }
 
+/**
+ * This composable function displays the event a user is invited to in the notifications screen.
+ *
+ * @param organizerName The name of the event's organiser.
+ * @param eventTitle The title of the event.
+ * @param eventDate The date of the event.
+ * @param eventTime The time of the event.
+ * @param eventPicture The picture of the event.
+ * @param verified True if the event organiser is verified, false otherwise.
+ * @return A Card displaying the event.
+ */
 @Composable
 fun NotificationsWidget(
     organizerName: String,
     eventTitle: String,
     eventDate: LocalDate,
+    eventTime: LocalTime,
     eventPicture: Painter,
     verified: Boolean
 ) {
@@ -329,34 +346,7 @@ fun NotificationsWidget(
                           }
                         }
 
-                    // Get the current date and time
-                    val currentDate = LocalDate.now()
-
-                    // Get the start of the week
-                    val startOfWeek = currentDate.with(java.time.DayOfWeek.MONDAY)
-
-                    // Get the end of the week
-                    val endOfWeek = startOfWeek.plusDays(6)
-
-                    // Convert eventDate to LocalDateTime (assuming eventDate has both date and
-                    // time)
-                    val eventDateTime = eventDate.atStartOfDay()
-
-                    // Determine if the event date is within this week
-                    val isThisWeek = eventDateTime.toLocalDate() in startOfWeek..endOfWeek
-
-                    // Format based on whether the date is in the current week
-                    val dateFormat =
-                        if (isThisWeek) {
-                          SimpleDateFormat("EEEE - HH:mm", Locale.getDefault()) // "Tuesday"
-                        } else {
-                          SimpleDateFormat("dd/MM/yy - HH:mm", Locale.getDefault()) // "05/12/24"
-                        }
-
-                    // Convert the Date object to a formatted String
-                    val dateString =
-                        dateFormat.format(
-                            Date.from(eventDate.atStartOfDay(ZoneId.systemDefault()).toInstant()))
+                    val dateString = eventMomentToString(eventDate, eventTime)
 
                     Column {
                       Text(

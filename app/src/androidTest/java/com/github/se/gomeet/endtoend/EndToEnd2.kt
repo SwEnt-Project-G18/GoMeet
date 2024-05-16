@@ -28,6 +28,7 @@ import com.google.firebase.ktx.Firebase
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen
 import java.time.LocalDate
+import java.time.LocalTime
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
 import org.junit.AfterClass
@@ -35,7 +36,6 @@ import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.time.LocalTime
 
 /**
  * This end to end test tests that a user can (after logging in) click on an event in Trends, view
