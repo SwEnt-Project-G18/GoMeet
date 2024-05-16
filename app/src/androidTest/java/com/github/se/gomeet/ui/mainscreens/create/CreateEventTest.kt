@@ -6,6 +6,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -51,23 +52,32 @@ class CreateEventTest {
     // Verify that the text fields are displayed and fill them in
     composeTestRule.onNodeWithText("Title").assertIsDisplayed().performTextInput("Sample Event 1")
     composeTestRule.onNodeWithText("Location").assertIsDisplayed().performTextInput("test")
-    composeTestRule.onNodeWithTag("DropdownMenu").assertIsDisplayed().performClick()
-    composeTestRule.onNodeWithText("Price").assertIsDisplayed().performTextInput("25.00")
+    composeTestRule
+        .onNodeWithTag("DropdownMenu")
+        .performScrollTo()
+        .assertIsDisplayed()
+        .performClick()
+    composeTestRule
+        .onNodeWithText("Price")
+        .performScrollTo()
+        .assertIsDisplayed()
+        .performTextInput("25.00")
     composeTestRule
         .onNodeWithText("Link")
+        .performScrollTo()
         .assertIsDisplayed()
         .performTextInput("http://example.com")
 
     // Add tags
-    composeTestRule.onNodeWithText("Add Tags").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("TagsButton").assertIsDisplayed().performClick()
-    composeTestRule.onNodeWithTag("TagList").assertIsDisplayed().performClick()
-    composeTestRule.onNodeWithText("Save").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithText("Add Tags").performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("TagsButton").performScrollTo().assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithTag("TagList").performScrollTo().assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithText("Save").performScrollTo().assertIsDisplayed().performClick()
 
     // Verify that the rest of the buttons are displayed and create the event
-    composeTestRule.onNodeWithText("Add Participants").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Add Image").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Post").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithText("Add Participants").performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithText("Add Image").performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithText("Post").performScrollTo().assertIsDisplayed().performClick()
   }
 
   @Test
