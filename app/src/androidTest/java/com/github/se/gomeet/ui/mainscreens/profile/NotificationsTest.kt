@@ -26,6 +26,7 @@ import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.time.LocalTime
 
 @RunWith(AndroidJUnit4::class)
 class NotificationsTest {
@@ -62,6 +63,7 @@ class NotificationsTest {
             "description",
             Location(0.0, 0.0, "location"),
             LocalDate.of(2026, 3, 30),
+            LocalTime.now(),
             0.0,
             "url",
             emptyList(),
