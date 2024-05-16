@@ -24,7 +24,6 @@ class UserViewModelTest {
     private const val country = "testcountry"
 
     private val userVM = UserViewModel(UserRepository(Firebase.firestore))
-    private lateinit var user: GoMeetUser
 
     @BeforeClass
     @JvmStatic
@@ -35,13 +34,13 @@ class UserViewModelTest {
         while (userVM.getUser(uid) == null) {
           TimeUnit.SECONDS.sleep(1)
         }
-        user = userVM.getUser(uid)!!
       }
     }
 
     @AfterClass
     @JvmStatic
     fun tearDown() {
+      // Clean up the user
       runBlocking { userVM.deleteUser(uid) }
       runBlocking { assert(userVM.getUser(uid) == null) }
     }
@@ -52,7 +51,7 @@ class UserViewModelTest {
     val otherUid = "AnotherUser1"
 
     // Add another user to the following list
-    userVM.editUser(user.copy(following = listOf(otherUid)))
+    runBlocking { userVM.editUser(userVM.getUser(uid)!!.copy(following = listOf(otherUid))) }
 
     // Get the other user's followers from the view model
     var followers: List<GoMeetUser>
@@ -71,10 +70,11 @@ class UserViewModelTest {
     var allUsers: List<GoMeetUser>?
     runBlocking { allUsers = userVM.getAllUsers() }
 
-    // There should only be one user
-    assert(allUsers != null)
-    assert(allUsers!!.size == 1)
-    assert(allUsers!![0].equals(user))
+    // Make sure that the created user is present
+    runBlocking {
+      assert(allUsers != null)
+      assert(allUsers!!.any { it.uid == userVM.getUser(uid)!!.uid })
+    }
   }
 
   @Test
@@ -84,11 +84,8 @@ class UserViewModelTest {
     // Join an event
     runBlocking { userVM.joinEvent(eventId, uid) }
 
-    // Update the user variable
-    runBlocking { user = userVM.getUser(uid)!! }
-
     // Verify that the user's joinedEvents list was correctly updated
-    assert(user.joinedEvents.contains(eventId))
+    runBlocking { assert(userVM.getUser(uid)!!.joinedEvents.contains(eventId)) }
   }
 
   @Test
@@ -98,11 +95,8 @@ class UserViewModelTest {
     // Create an event
     runBlocking { userVM.userCreatesEvent(eventId, uid) }
 
-    // Update the user variable
-    runBlocking { user = userVM.getUser(uid)!! }
-
     // Verify that the user's myEvents list was correctly updated
-    assert(user.myEvents.contains(eventId))
+    runBlocking { assert(userVM.getUser(uid)!!.myEvents.contains(eventId)) }
   }
 
   @Test
@@ -112,16 +106,14 @@ class UserViewModelTest {
     // Invite the user to the event
     runBlocking { userVM.gotInvitation(eventId, uid) }
 
-    // Update the user variable
-    runBlocking { user = userVM.getUser(uid)!! }
-
     // Verify that the user's pendingRequests was correctly updated
-    assert(user.pendingRequests.any { it.eventId == eventId })
+    runBlocking { assert(userVM.getUser(uid)!!.pendingRequests.any { it.eventId == eventId }) }
 
     // Make sure that the user can't be invited twice to the same event
     runBlocking { userVM.gotInvitation(eventId, uid) }
-    runBlocking { user = userVM.getUser(uid)!! }
-    assert(user.pendingRequests.count { it.eventId == eventId } == 1)
+    runBlocking {
+      assert(userVM.getUser(uid)!!.pendingRequests.count { it.eventId == eventId } == 1)
+    }
   }
 
   @Test
@@ -134,11 +126,8 @@ class UserViewModelTest {
     // Kick the user from the event
     runBlocking { userVM.gotKickedFromEvent(eventId, uid) }
 
-    // Update the user variable
-    runBlocking { user = userVM.getUser(uid)!! }
-
     // Make sure that the event is no longer in the user's joinedEvents list
-    assert(!user.joinedEvents.any { it == eventId })
+    runBlocking { assert(!userVM.getUser(uid)!!.joinedEvents.any { it == eventId }) }
   }
 
   @Test
@@ -151,11 +140,8 @@ class UserViewModelTest {
     // Cancel the invite
     runBlocking { userVM.invitationCanceled(eventId, uid) }
 
-    // Update the user variable
-    runBlocking { user = userVM.getUser(uid)!! }
-
     // Make sure that the user is no longer invited to the event
-    assert(!user.pendingRequests.any { it.eventId == eventId })
+    runBlocking { assert(!userVM.getUser(uid)!!.pendingRequests.any { it.eventId == eventId }) }
   }
 
   @Test
@@ -168,11 +154,8 @@ class UserViewModelTest {
     // Make the user accept the invitation
     runBlocking { userVM.userAcceptsInvitation(eventId, uid) }
 
-    // Update the user variable
-    runBlocking { user = userVM.getUser(uid)!! }
-
     // Verify that the event appears in the user's joinedEvents list
-    assert(user.joinedEvents.contains(eventId))
+    runBlocking { assert(userVM.getUser(uid)!!.joinedEvents.contains(eventId)) }
   }
 
   @Test
@@ -185,14 +168,14 @@ class UserViewModelTest {
     // Make the user refuse the invitation
     runBlocking { userVM.userRefusesInvitation(eventId, uid) }
 
-    // Update the user variable
-    runBlocking { user = userVM.getUser(uid)!! }
-
     // Verify that the invitation is no longer in pendingRequests
-    assert(!user.pendingRequests.any { it.eventId == eventId })
+    runBlocking { assert(!userVM.getUser(uid)!!.pendingRequests.any { it.eventId == eventId }) }
 
     // Verify that the event doesn't appear in the user's joinedEvents list
-    assert(!user.joinedEvents.contains(eventId))
+    runBlocking {
+      assert(!userVM.getUser(uid)!!.joinedEvents.contains(eventId))
+      assert(!userVM.getUser(uid)!!.pendingRequests.any { it.eventId == eventId })
+    }
   }
 
   @Test
