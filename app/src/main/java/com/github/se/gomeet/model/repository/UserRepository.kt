@@ -11,7 +11,7 @@ import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
 
 /** Class that connects to the Firebase Firestore database to get, add, update and remove users. */
-class UserRepository {
+class UserRepository private constructor() {
 
   /** This companion object contains the functions in the repository */
   companion object {

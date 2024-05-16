@@ -11,13 +11,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
-import com.github.se.gomeet.model.repository.EventRepository
-import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.util.concurrent.TimeUnit
 import org.junit.AfterClass
@@ -38,9 +35,7 @@ class ExploreTest {
 
     rule.setContent {
       navController = rememberNavController()
-      Explore(
-          nav = NavigationActions(navController),
-          eventViewModel = EventViewModel(null, EventRepository(Firebase.firestore)))
+      Explore(nav = NavigationActions(navController), eventViewModel = EventViewModel(null))
     }
 
     rule.waitUntil(timeoutMillis = 10000) { rule.onNodeWithTag("Map").isDisplayed() }
@@ -53,7 +48,7 @@ class ExploreTest {
   companion object {
 
     private lateinit var eventVM: EventViewModel
-    private val userVM = UserViewModel(UserRepository(Firebase.firestore))
+    private val userVM = UserViewModel()
 
     private const val email = "user@exploretest.com"
     private const val pwd = "123456"
@@ -87,7 +82,7 @@ class ExploreTest {
         TimeUnit.SECONDS.sleep(1)
       }
 
-      eventVM = EventViewModel(uid, EventRepository(Firebase.firestore))
+      eventVM = EventViewModel(uid)
     }
 
     @AfterClass

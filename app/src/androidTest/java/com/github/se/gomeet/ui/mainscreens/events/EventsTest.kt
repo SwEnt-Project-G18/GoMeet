@@ -4,13 +4,10 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.model.event.location.Location
-import com.github.se.gomeet.model.repository.EventRepository
-import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.time.LocalDate
 import java.time.LocalTime
@@ -37,12 +34,12 @@ class EventsTest {
           eventViewModel = EventViewModel("test"))
     }
 
-    composeTestRule.onAllNodesWithText("Favourites")[0].assertIsDisplayed()
-    composeTestRule.onAllNodesWithText("Favourites")[1].assertIsDisplayed()
-    composeTestRule.onAllNodesWithText("Joined Events")[0].assertIsDisplayed()
-    composeTestRule.onAllNodesWithText("Joined Events")[1].assertIsDisplayed()
-    composeTestRule.onAllNodesWithText("My Events")[0].assertIsDisplayed()
-    composeTestRule.onAllNodesWithText("My Events")[1].assertIsDisplayed()
+    assert( composeTestRule.onAllNodesWithText("Favourites")[0].isDisplayed()) { "Favourites[0] not displayed" }
+    assert(composeTestRule.onAllNodesWithText("Favourites")[1].isDisplayed()) { "Favourites[1] not displayed" }
+    assert(composeTestRule.onAllNodesWithText("Joined Events")[0].isDisplayed()) { "Joined Events[0] not displayed" }
+    assert(composeTestRule.onAllNodesWithText("Joined Events")[1].isDisplayed()) { "Joined Events[1] not displayed" }
+    assert(composeTestRule.onAllNodesWithText("My Events")[0].isDisplayed()) { "My Events[0] not displayed" }
+    assert(composeTestRule.onAllNodesWithText("My Events")[1].isDisplayed()) { "My Events[1] not displayed" }
   }
 
   @Test
@@ -52,9 +49,8 @@ class EventsTest {
       Events(
           currentUser = currentUserId,
           nav = NavigationActions(rememberNavController()),
-          userViewModel = UserViewModel(UserRepository(Firebase.firestore)),
-          eventViewModel =
-              EventViewModel("NEEGn5cbkJZDXaezeGdfd2D4u6b2", EventRepository(Firebase.firestore)))
+          userViewModel = UserViewModel(),
+          eventViewModel = EventViewModel("NEEGn5cbkJZDXaezeGdfd2D4u6b2"))
     }
 
     composeTestRule.onAllNodesWithText("Joined Events")[0].performClick()
@@ -65,7 +61,7 @@ class EventsTest {
   @Test
   fun eventsScreen_AsyncBehavior() {
     // Test asynchronous behavior of fetching events
-    val eventViewModel = EventViewModel(null, EventRepository(Firebase.firestore))
+    val eventViewModel = EventViewModel(null)
     runBlocking(Dispatchers.IO) {
       // Add a mock event to the view model
       eventViewModel.createEvent(
@@ -84,7 +80,7 @@ class EventsTest {
           tags = emptyList(),
           images = emptyList(),
           imageUri = null,
-          userViewModel = UserViewModel(UserRepository(Firebase.firestore)),
+          userViewModel = UserViewModel(),
           uid = "")
       TimeUnit.SECONDS.sleep(3)
     }
@@ -93,14 +89,13 @@ class EventsTest {
       Events(
           currentUser = currentUserId,
           nav = NavigationActions(rememberNavController()),
-          userViewModel = UserViewModel(UserRepository(Firebase.firestore)),
-          eventViewModel =
-              EventViewModel("NEEGn5cbkJZDXaezeGdfd2D4u6b2", EventRepository(Firebase.firestore)))
+          userViewModel = UserViewModel(),
+          eventViewModel = EventViewModel("NEEGn5cbkJZDXaezeGdfd2D4u6b2"))
     }
   }
 
   companion object {
-    private val userVM = UserViewModel(UserRepository(Firebase.firestore))
+    private val userVM = UserViewModel()
     private lateinit var currentUserId: String
 
     private val usr = "u@eventstest.com"
@@ -109,8 +104,6 @@ class EventsTest {
     @BeforeClass
     @JvmStatic
     fun setUp() {
-      TimeUnit.SECONDS.sleep(3)
-
       // Create a new user and sign in
       var result = Firebase.auth.createUserWithEmailAndPassword(usr, pwd)
       while (!result.isComplete) {
