@@ -1,6 +1,7 @@
 package com.github.se.gomeet.viewmodel
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.se.gomeet.model.event.InviteStatus
 import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.google.firebase.firestore.ktx.firestore
@@ -175,16 +176,24 @@ class UserViewModelTest {
 
     // Verify that the invitation is no longer in pendingRequests
     runBlocking {
-      while (userVM.getUser(uid)!!.pendingRequests.any { it.eventId == eventId }) {
+      while (userVM.getUser(uid)!!.pendingRequests.any {
+        it.eventId == eventId && it.status == InviteStatus.PENDING
+      }) {
         TimeUnit.SECONDS.sleep(1)
       }
-      assert(!userVM.getUser(uid)!!.pendingRequests.any { it.eventId == eventId })
+      assert(
+          userVM.getUser(uid)!!.pendingRequests.any {
+            it.eventId == eventId && it.status == InviteStatus.REFUSED
+          })
     }
 
     // Verify that the event doesn't appear in the user's joinedEvents list
     runBlocking {
       assert(!userVM.getUser(uid)!!.joinedEvents.contains(eventId))
-      assert(!userVM.getUser(uid)!!.pendingRequests.any { it.eventId == eventId })
+      assert(
+          userVM.getUser(uid)!!.pendingRequests.any {
+            it.eventId == eventId && it.status == InviteStatus.REFUSED
+          })
     }
   }
 
