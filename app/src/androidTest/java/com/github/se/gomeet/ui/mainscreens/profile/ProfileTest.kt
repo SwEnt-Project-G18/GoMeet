@@ -42,7 +42,7 @@ class ProfileTest {
     fun setUp() {
       runBlocking {
         // Create a new user and sign in
-        var result = Firebase.auth.createUserWithEmailAndPassword(usr, pwd)
+        val result = Firebase.auth.createUserWithEmailAndPassword(usr, pwd)
         while (!result.isComplete) {
           TimeUnit.SECONDS.sleep(1)
         }
