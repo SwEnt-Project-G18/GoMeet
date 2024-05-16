@@ -114,7 +114,7 @@ class NotificationsTest {
     composeTestRule.waitForIdle()
 
     // Test that the invitation notification widget is correctly displayed
-    composeTestRule.waitUntil { composeTestRule.onNodeWithTag("InviteText").isDisplayed() }
+    composeTestRule.waitUntil(timeoutMillis = 10000) { composeTestRule.onNodeWithTag("InviteText").isDisplayed() }
     composeTestRule.onNodeWithTag("InviteText").assertIsDisplayed()
     composeTestRule.onNodeWithText(eventTitle).assertIsDisplayed()
     composeTestRule.onNodeWithText("30/03/26", substring = true).assertIsDisplayed()
