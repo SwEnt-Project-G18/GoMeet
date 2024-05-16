@@ -62,15 +62,15 @@ class CreateEventTest {
     composeTestRule.onNodeWithText("OK").assertIsDisplayed().performClick()
     composeTestRule.waitForIdle()
     composeTestRule
-      .onNodeWithText("Price")
-      .assertIsDisplayed()
-      .performScrollTo()
-      .performTextInput("25.00")
+        .onNodeWithText("Price")
+        .assertIsDisplayed()
+        .performScrollTo()
+        .performTextInput("25.00")
     composeTestRule
-      .onNodeWithText("Link")
-      .performScrollTo()
-      .assertIsDisplayed()
-      .performTextInput("http://example.com")
+        .onNodeWithText("Link")
+        .performScrollTo()
+        .assertIsDisplayed()
+        .performTextInput("http://example.com")
 
     // Add tags
     composeTestRule.onNodeWithText("Add Tags").assertIsDisplayed()
@@ -106,4 +106,3 @@ class CreateEventTest {
     composeTestRule.onNodeWithText("Post").performScrollTo().assertIsDisplayed()
   }
 }
-
