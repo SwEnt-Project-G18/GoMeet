@@ -3,13 +3,11 @@ package com.github.se.gomeet.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.se.gomeet.model.event.Event
-import com.github.se.gomeet.model.event.location.Location
 import com.github.se.gomeet.model.repository.EventRepository
 import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import java.time.LocalDate
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,122 +26,16 @@ class SearchViewModel() : ViewModel() {
   val searchText = _searchText.asStateFlow()
   val userRepository = UserRepository(Firebase.firestore)
   val eventsRepository = EventRepository(Firebase.firestore)
-  var allUsersList: List<GoMeetUser>? =
-      listOf(
-          GoMeetUser(
-              "1",
-              "BuzzAldrin",
-              "Buzz",
-              "Aldrin",
-              "buzz.aldrin@nasa.gov",
-              "202 062 0690",
-              "United States",
-              emptyList(),
-              emptyList(),
-              emptyList(),
-              emptyList(),
-              emptyList(),
-              emptyList()),
-          GoMeetUser(
-              "2",
-              "MichaelCollins",
-              "Michael",
-              "Collins",
-              "email",
-              "202 062 0690",
-              "United States",
-              emptyList(),
-              emptyList(),
-              emptyList(),
-              emptyList(),
-              emptyList(),
-              emptyList()),
-          GoMeetUser(
-              "3",
-              "JimLovell",
-              "Jim",
-              "Lovell",
-              "email",
-              "phoneNumber",
-              "country",
-              emptyList(),
-              emptyList(),
-              emptyList(),
-              emptyList(),
-              emptyList(),
-              emptyList()),
-          GoMeetUser(
-              "4",
-              "EdWhite",
-              "Ed",
-              "White",
-              "email",
-              "phoneNumber",
-              "country",
-              emptyList(),
-              emptyList(),
-              emptyList(),
-              emptyList(),
-              emptyList(),
-              emptyList()))
-  var allPublicEventsList: List<Event>? =
-      listOf(
-          Event(
-              "1",
-              "creator",
-              "Saturn V Launch",
-              "description",
-              Location(.0, .0, "CCAFS"),
-              LocalDate.now(),
-              0.0,
-              "url",
-              emptyList(),
-              emptyList(),
-              0,
-              true,
-              emptyList(),
-              emptyList()),
-          Event(
-              "2",
-              "creator",
-              "Saturn 1B Launch",
-              "description",
-              Location(.0, .0, "CCAFS"),
-              LocalDate.now(),
-              0.0,
-              "url",
-              emptyList(),
-              emptyList(),
-              0,
-              true,
-              emptyList(),
-              emptyList()),
-          Event(
-              "3",
-              "creator",
-              "Delta II Launch",
-              "description",
-              Location(.0, .0, "CCAFS"),
-              LocalDate.now(),
-              0.0,
-              "url",
-              emptyList(),
-              emptyList(),
-              0,
-              true,
-              emptyList(),
-              emptyList()))
-
+  var allUsersList: List<GoMeetUser>? = null
+  var allPublicEventsList: List<Event>? = null
   private val _searchQuery = MutableStateFlow<List<SearchableItem>>(emptyList())
 
   init {
+    getAllUsers()
+    getAllEvents()
     _searchQuery.value =
         (allUsersList?.map { SearchableItem.User(it) } ?: emptyList()) +
             (allPublicEventsList?.map { SearchableItem.Event(it) } ?: emptyList())
-
-    // getAllUsers()
-    // getAllEvents()
-    // println("### Users: ${allUsersList.toString()}")
   }
 
   private fun getAllUsers() {

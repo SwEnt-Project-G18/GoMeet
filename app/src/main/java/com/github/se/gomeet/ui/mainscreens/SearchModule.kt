@@ -18,8 +18,6 @@ import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -99,15 +97,21 @@ fun SearchModuleSnippet(item: SearchViewModel.SearchableItem) {
           } else {
             painterResource(id = R.drawable.gomeet_logo)
           }
-      Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = 10.dp)) {
-        Image(painter = painter, contentDescription = "User Icon", modifier = Modifier.size(24.dp))
-        Spacer(modifier = Modifier.width(16.dp))
-        Column {
-          Text(
-              text = "${item.event.title} - ${item.event.date.toString()}", modifier = Modifier.fillMaxWidth())
-            Text("${item.event.description}", color = Color.Gray)
-        }
-      }
+      Row(
+          verticalAlignment = Alignment.CenterVertically,
+          modifier = Modifier.padding(vertical = 10.dp)) {
+            Image(
+                painter = painter,
+                contentDescription = "User Icon",
+                modifier = Modifier.size(24.dp))
+            Spacer(modifier = Modifier.width(16.dp))
+            Column {
+              Text(
+                  text = "${item.event.title} - ${item.event.date.toString()}",
+                  modifier = Modifier.fillMaxWidth())
+              Text("${item.event.description}", color = Color.Gray)
+            }
+          }
     }
   }
 }

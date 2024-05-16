@@ -74,9 +74,9 @@ fun Trends(
 
   val eventList = remember { mutableListOf<Event>() }
   val coroutineScope = rememberCoroutineScope()
-    val viewModel = viewModel<SearchViewModel>()
-    val query by viewModel.searchText.collectAsState()
-  //val query = remember { mutableStateOf("") }
+  val viewModel = viewModel<SearchViewModel>()
+  val query by viewModel.searchText.collectAsState()
+  // val query = remember { mutableStateOf("") }
   var eventsLoaded = remember { mutableStateOf(false) }
 
   LaunchedEffect(Unit) {

@@ -30,15 +30,14 @@ data class GoMeetUser(
     var myFavorites: List<String>
     // can add more things later
 ) {
-    fun doesMatchSearchQuery(query: String): Boolean {
-        val matchingCombinations = listOf(
+  fun doesMatchSearchQuery(query: String): Boolean {
+    val matchingCombinations =
+        listOf(
             "$firstName$lastName",
             "$firstName $lastName",
             "${firstName.first()} ${lastName.first()}",
         )
 
-        return matchingCombinations.any {
-            it.contains(query, ignoreCase = true)
-        }
-    }
+    return matchingCombinations.any { it.contains(query, ignoreCase = true) }
+  }
 }

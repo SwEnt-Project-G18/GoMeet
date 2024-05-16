@@ -36,7 +36,6 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -560,7 +559,7 @@ fun EventWidget(
 fun GoMeetSearchBar(query: String, backgroundColor: Color, contentColor: Color) {
   val isFocused = remember { mutableStateOf(false) }
   val viewModel = viewModel<SearchViewModel>()
-  //val searchText by viewModel.searchText.collectAsState()
+  // val searchText by viewModel.searchText.collectAsState()
   val persons by viewModel.searchQuery.collectAsState()
   val isSearching by viewModel.isSearching.collectAsState()
 
@@ -574,7 +573,7 @@ fun GoMeetSearchBar(query: String, backgroundColor: Color, contentColor: Color) 
           if (!isFocused.value) {
             isFocused.value = true
           }
-          //query = it
+          // query = it
         },
         active = isFocused.value,
         modifier = Modifier.fillMaxWidth().padding(start = 5.dp, end = 5.dp),

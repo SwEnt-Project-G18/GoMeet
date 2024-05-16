@@ -36,16 +36,15 @@ data class Event(
     val public: Boolean, // True if the event is public, false if it's private
     val tags: List<String>, // Tags of the event
     val images: List<String> // Is it the right type?
-){
-    fun doesMatchSearchQuery(query: String): Boolean {
-        val matchingCombinations = listOf(
+) {
+  fun doesMatchSearchQuery(query: String): Boolean {
+    val matchingCombinations =
+        listOf(
             "$title$description",
             "$title $description",
             "${title.first()} ${description.first()}",
         )
 
-        return matchingCombinations.any {
-            it.contains(query, ignoreCase = true)
-        }
-    }
+    return matchingCombinations.any { it.contains(query, ignoreCase = true) }
+  }
 }
