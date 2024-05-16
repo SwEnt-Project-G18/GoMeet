@@ -297,20 +297,26 @@ class UserViewModel(userRepository: UserRepository) : ViewModel() {
    * @param userId The id of the user to refuse the invitation for.
    */
   fun userRefusesInvitation(eventId: String, userId: String) {
-    CoroutineScope(Dispatchers.IO).launch {
-      val goMeetUser = getUser(userId)!!
-      val possibleInvitation =
-          goMeetUser.pendingRequests.find {
-            it.eventId == eventId && it.status == InviteStatus.PENDING
+      CoroutineScope(Dispatchers.IO).launch {
+          val goMeetUser = getUser(userId)!!
+          val possibleInvitation = goMeetUser.pendingRequests.find {
+              it.eventId == eventId && it.status == InviteStatus.PENDING
           }
 
-      if (possibleInvitation != null) {
-        editUser(
-            goMeetUser.copy(pendingRequests = goMeetUser.pendingRequests.minus(possibleInvitation)))
-      } else {
-        Log.w(ContentValues.TAG, "Couldn't refuse the invitation")
+          if (possibleInvitation != null) {
+              val updatedPendingRequests = goMeetUser.pendingRequests.map {
+                  if (it.eventId == eventId) {
+                      it.copy(status = InviteStatus.REFUSED)
+                  } else {
+                      it
+                  }
+              }.toSet()
+
+              editUser(goMeetUser.copy(pendingRequests = updatedPendingRequests))
+          } else {
+              Log.w(ContentValues.TAG, "Couldn't refuse the invitation: Invitation not found")
+          }
       }
-    }
   }
 
   /**

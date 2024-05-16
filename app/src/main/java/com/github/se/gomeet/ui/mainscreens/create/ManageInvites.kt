@@ -261,7 +261,7 @@ fun ManageInvites(
                     followersFollowingList.filter { u ->
                       !u.pendingRequests.any { invitation ->
                         invitation.eventId == event.value!!.eventID
-                      }
+                      } && !u.joinedEvents.contains(event.value!!.eventID)
                     },
                     event.value!!,
                     null,
@@ -284,10 +284,7 @@ fun ManageInvites(
               2 -> {
                 PageUserInvites(
                     followersFollowingList.filter { u ->
-                      u.pendingRequests.any { invitation ->
-                        (invitation.eventId == event.value!!.eventID) &&
-                            (invitation.status == InviteStatus.ACCEPTED)
-                      }
+                        u.joinedEvents.contains(event.value!!.eventID)
                     },
                     event.value!!,
                     InviteStatus.ACCEPTED,
@@ -295,6 +292,7 @@ fun ManageInvites(
                     initialClicked = false)
               }
               3 -> {
+                  //TODO: Fix bug here
                 PageUserInvites(
                     followersFollowingList.filter { u ->
                       u.pendingRequests.any { invitation ->
@@ -391,7 +389,7 @@ fun UserInviteWidget(
                   InviteStatus.ACCEPTED -> "Accepted"
                   InviteStatus.REFUSED -> "Refused"
                 },
-            modifier = Modifier.width(70.dp),
+            modifier = Modifier.width(80.dp),
             color =
                 when (status) {
                   null -> MaterialTheme.colorScheme.onBackground
