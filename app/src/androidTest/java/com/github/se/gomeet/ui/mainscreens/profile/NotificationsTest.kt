@@ -129,6 +129,6 @@ class NotificationsTest {
     composeTestRule.waitUntil(timeoutMillis = 10000) {
       composeTestRule.onNodeWithText("Accept").isDisplayed()
     }
-    composeTestRule.onNodeWithText("Accept").assertIsDisplayed().assertHasClickAction()
+    composeTestRule.onNodeWithText("Accept").assertIsDisplayed().performClick()
   }
 }
