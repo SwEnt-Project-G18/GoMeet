@@ -22,7 +22,7 @@ class NotificationsTest {
     composeTestRule.onNodeWithTag("NotificationsScreen").assertExists()
     composeTestRule.onNodeWithText("Invitations").assertIsDisplayed()
     composeTestRule.onNodeWithText("Messages").assertIsDisplayed()
-    composeTestRule.onNodeWithContentDescription("Go Back").assertIsDisplayed()
+    composeTestRule.onNodeWithContentDescription("Go back").assertIsDisplayed()
     //    composeTestRule.onNodeWithTag("InviterUserName").assertIsDisplayed()
     //    composeTestRule.onNodeWithTag("EventCard").assertIsDisplayed()
     //    composeTestRule.onNodeWithTag("EventDate").assertIsDisplayed()
