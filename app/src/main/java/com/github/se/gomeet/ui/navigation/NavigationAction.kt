@@ -65,6 +65,7 @@ object Route {
   const val FOLLOWING = "Following/{uid}"
   const val MESSAGE_CHANNELS = "MessageChannel"
   const val CHANNEL = "Channel/{id}"
+  const val ADD_FRIEND = "AddFriend"
 }
 
 val CREATE_ITEMS =
@@ -119,7 +120,10 @@ val SECOND_LEVEL_DESTINATION =
         TopLevelDestination(
             route = Route.SETTINGS, icon = Icons.Default.Settings, textId = Route.SETTINGS),
         TopLevelDestination(
-            Route.EDIT_PROFILE, icon = Icons.Default.Person, textId = Route.EDIT_PROFILE))
+            Route.EDIT_PROFILE, icon = Icons.Default.Person, textId = Route.EDIT_PROFILE),
+        TopLevelDestination(
+            route = Route.ADD_FRIEND, icon = Icons.Default.Person, textId = Route.ADD_FRIEND),
+    )
 
 val SETTINGS =
     listOf(

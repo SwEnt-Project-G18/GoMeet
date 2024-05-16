@@ -28,6 +28,7 @@ import com.github.se.gomeet.ui.mainscreens.create.CreateEvent
 import com.github.se.gomeet.ui.mainscreens.create.ManageInvites
 import com.github.se.gomeet.ui.mainscreens.events.Events
 import com.github.se.gomeet.ui.mainscreens.events.MyEventInfo
+import com.github.se.gomeet.ui.mainscreens.profile.AddFriend
 import com.github.se.gomeet.ui.mainscreens.profile.EditProfile
 import com.github.se.gomeet.ui.mainscreens.profile.FollowingFollowers
 import com.github.se.gomeet.ui.mainscreens.profile.Notifications
@@ -368,6 +369,7 @@ fun InitNavigation(
                 onBackPressed = { NavigationActions(nav).goBack() })
           }
         }
+    composable(route = Route.ADD_FRIEND) { AddFriend(navAction, userViewModel) }
   }
 }
 
