@@ -80,32 +80,37 @@ class EditProfileTest {
 
     // Test that the ui is correctly displayed. fill in the fields and click on Done
     composeTestRule.onNodeWithTag("Profile Picture").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Edit Tags").performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("EditTagsButton").assertIsDisplayed().performClick()
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag("TagList").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithText("Save").assertIsDisplayed().performClick()
+    composeTestRule.waitForIdle()
     composeTestRule
-        .onNodeWithText("First Name")
+        .onNodeWithText("Country")
         .performScrollTo()
         .assertIsDisplayed()
-        .performTextInput("firstname")
-    composeTestRule
-        .onNodeWithText("Last Name")
-        .performScrollTo()
-        .assertIsDisplayed()
-        .performTextInput("lastname")
-    composeTestRule
-        .onNodeWithText("Username")
-        .performScrollTo()
-        .assertIsDisplayed()
-        .performTextInput("usesrname")
+        .performTextInput("fakecountry")
     composeTestRule
         .onNodeWithText("Phone Number")
         .performScrollTo()
         .assertIsDisplayed()
         .performTextInput("+1234567890")
     composeTestRule
-        .onNodeWithText("Country")
+        .onNodeWithText("Username")
         .performScrollTo()
         .assertIsDisplayed()
-        .performTextInput("fakecountry")
-    composeTestRule.onNodeWithText("Edit Tags").performScrollTo().assertIsDisplayed()
+        .performTextInput("usesrname")
+    composeTestRule
+        .onNodeWithText("Last Name")
+        .performScrollTo()
+        .assertIsDisplayed()
+        .performTextInput("lastname")
+    composeTestRule
+        .onNodeWithText("First Name")
+        .performScrollTo()
+        .assertIsDisplayed()
+        .performTextInput("firstname")
     composeTestRule.onNodeWithText("Done").assertIsDisplayed().performClick()
   }
 }
