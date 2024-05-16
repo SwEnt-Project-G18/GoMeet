@@ -109,7 +109,7 @@ fun EditProfile(
   LaunchedEffect(Unit) {
     allUsers = userViewModel.getAllUsers()
     currentUser.value = allUsers!!.first { it.uid == Firebase.auth.currentUser!!.uid }
-    allUsers!!.minus(currentUser.value!!)
+    allUsers = allUsers!!.minus(currentUser.value!!)
     firstName.value = currentUser.value!!.firstName
     lastName.value = currentUser.value!!.lastName
     username.value = currentUser.value!!.username
@@ -288,9 +288,7 @@ fun EditProfile(
                   Text(text = "First Name is not valid", color = Color.Red)
                 }
                 Spacer(modifier = Modifier.size(16.dp))
-                if (!lastNameValid && !firstClick) {
-                  Text(text = "Last Name is not valid", color = Color.Red)
-                }
+
                 TextField(
                     value = lastName.value,
                     onValueChange = { newValue -> lastName.value = newValue },
@@ -298,6 +296,10 @@ fun EditProfile(
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                     colors = textFieldColors)
+
+                if (!lastNameValid && !firstClick) {
+                  Text(text = "Last Name is not valid", color = Color.Red)
+                }
 
                 Spacer(modifier = Modifier.size(16.dp))
 

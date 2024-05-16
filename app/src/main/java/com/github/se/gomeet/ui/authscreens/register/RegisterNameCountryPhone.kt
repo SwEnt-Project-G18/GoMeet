@@ -114,47 +114,7 @@ fun RegisterNameCountryPhone(
         }
 
         Spacer(modifier = Modifier.size(screenHeight / 60))
-        /*Column {
-            TextField(
-                value = country,
-                onValueChange = {
-                    country = it
-                    filteredCountries =
-                        if (it.isEmpty()) {
-                            countries.value
-                        } else {
-                            countries.value.filter { c ->
-                                c.lowercase(Locale.getDefault())
-                                    .startsWith(it.lowercase(Locale.getDefault()))
-                            }
-                        }
-                    expanded = true
-                },
-                label = { Text("Select Country") },
-                singleLine = true,
-                colors = textFieldColors,
-                readOnly = false,
-                modifier = Modifier.fillMaxWidth())
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-                offset =
-                DpOffset(
-                    x = 20.dp, y = 20.dp), // Adjusts the position directly below the TextField
-                modifier =
-                Modifier.fillMaxWidth()
-                    .heightIn(max = 200.dp) // Limits the height to display around 5 items
-            ) {
-                for (c in filteredCountries) {
-                    DropdownMenuItem(
-                        text = { Text(c) },
-                        onClick = {
-                            country = c
-                            expanded = false
-                        })
-                }
-            }
-        }*/
+
         TextField(
             value = phoneNumber,
             onValueChange = { phoneNumber = it },
