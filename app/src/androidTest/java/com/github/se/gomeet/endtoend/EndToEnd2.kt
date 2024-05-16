@@ -110,13 +110,13 @@ class EndToEndTest2 : TestCase() {
           TimeUnit.SECONDS.sleep(1)
         }
 
-        eventVM =
-            EventViewModel(Firebase.auth.currentUser!!.uid, EventRepository(Firebase.firestore))
+        eventVM = EventViewModel(uid1, EventRepository(Firebase.firestore))
         eventVM.createEvent(
             "title",
             "description",
             Location(0.0, 0.0, "location"),
             LocalDate.of(2025, 3, 30),
+            LocalTime.now(),
             0.0,
             "url",
             emptyList(),
@@ -138,32 +138,9 @@ class EndToEndTest2 : TestCase() {
           TimeUnit.SECONDS.sleep(1)
         }
 
-      eventVM = EventViewModel(Firebase.auth.currentUser!!.uid, EventRepository(Firebase.firestore))
-      eventVM.createEvent(
-          "title",
-          "description",
-          Location(0.0, 0.0, "location"),
-          LocalDate.of(2025, 3, 30),
-          LocalTime.now(),
-          0.0,
-          "url",
-          emptyList(),
-          emptyList(),
-          emptyList(),
-          0,
-          true,
-          emptyList(),
-          emptyList(),
-          null,
-          userVM,
-          "eventuid1")
-      TimeUnit.SECONDS.sleep(3)
-
-      Firebase.auth.signOut()
-      TimeUnit.SECONDS.sleep(3)
-
-      // user2 is used to log in and perform the tests
-      eventVM = EventViewModel(uid2, EventRepository(Firebase.firestore))
+        // user2 is used to log in and perform the tests
+        eventVM = EventViewModel(uid2, EventRepository(Firebase.firestore))
+      }
     }
 
     @AfterClass

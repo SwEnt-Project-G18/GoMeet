@@ -140,8 +140,6 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
   val showPopup = remember { mutableStateOf(false) }
   var tagsButtonText by remember { mutableStateOf("Add Tags") }
 
-  val screenHeight = LocalConfiguration.current.screenHeightDp.dp
-
   val textFieldColors =
       TextFieldDefaults.colors(
           focusedTextColor = MaterialTheme.colorScheme.onBackground,
