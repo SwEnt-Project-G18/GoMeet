@@ -2,9 +2,10 @@ package com.github.se.gomeet.ui.mainscreens
 
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onAllNodesWithText
-import androidx.navigation.NavHostController
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.model.repository.EventRepository
@@ -20,25 +21,31 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class TrendsTest {
-
-  @get:Rule val rule = createAndroidComposeRule<ComponentActivity>()
+  @get:Rule val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
   @Test
-  fun uiElementsDisplayed() {
-    lateinit var navController: NavHostController
+  fun testTrends() {
+    val uid = "TrendsTestUser"
 
-    rule.setContent {
-      navController = rememberNavController()
+    composeTestRule.setContent {
       Trends(
-          currentUser = "NEEGn5cbkJZDXaezeGdfd2D4u6b2",
+          currentUser = uid,
           nav = NavigationActions(rememberNavController()),
           userViewModel = UserViewModel(UserRepository(Firebase.firestore)),
-          eventViewModel =
-              EventViewModel("NEEGn5cbkJZDXaezeGdfd2D4u6b2", EventRepository(Firebase.firestore)))
+          eventViewModel = EventViewModel(uid, EventRepository(Firebase.firestore)))
     }
 
-    rule.onAllNodesWithText("Trends").apply {
-      fetchSemanticsNodes().forEachIndexed { i, _ -> get(i).assertIsDisplayed() }
+    // Wait for the page to load
+    composeTestRule.waitUntil(timeoutMillis = 10000) {
+      composeTestRule.onNodeWithText("Sort").isDisplayed()
     }
+
+    // Verify that the ui is correctly displayed
+    composeTestRule.onNodeWithText("Sort").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithText("Popularity").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithText("Sort").performClick()
+    composeTestRule.onNodeWithText("Name").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithText("Sort").performClick()
+    composeTestRule.onNodeWithText("Date").assertIsDisplayed().performClick()
   }
 }
