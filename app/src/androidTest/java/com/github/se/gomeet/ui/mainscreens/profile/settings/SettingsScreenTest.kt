@@ -27,7 +27,10 @@ class SettingsScreenTest {
 
     // Test that the ui is correctly displayed
     composeTestRule.onNodeWithText("Settings").assertIsDisplayed()
-    composeTestRule.onNodeWithContentDescription("Back button").assertIsDisplayed().assertHasClickAction()
+    composeTestRule
+        .onNodeWithContentDescription("Back button")
+        .assertIsDisplayed()
+        .assertHasClickAction()
 
     composeTestRule.onNodeWithText("Who can see your content").assertIsDisplayed()
     composeTestRule.onNodeWithText("Account privacy").assertIsDisplayed()
