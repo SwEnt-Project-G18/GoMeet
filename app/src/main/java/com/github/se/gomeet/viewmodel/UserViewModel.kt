@@ -212,6 +212,27 @@ class UserViewModel(userRepository: UserRepository) : ViewModel() {
             "User already joined this event or has a pending request for this event")
         return
       }
+      val possiblePreviousInvitationRefused =
+          goMeetUser.pendingRequests.find {
+            it.eventId == eventId && it.status == InviteStatus.REFUSED
+          }
+
+      if (goMeetUser.pendingRequests.contains(possiblePreviousInvitationRefused)) {
+        val updatedPendingRequests =
+            goMeetUser.pendingRequests
+                .map {
+                  if (it.eventId == eventId) {
+                    it.copy(status = InviteStatus.PENDING)
+                  } else {
+                    it
+                  }
+                }
+                .toSet()
+
+        editUser(goMeetUser.copy(pendingRequests = updatedPendingRequests))
+        return
+      }
+
       editUser(
           goMeetUser.copy(
               pendingRequests =
@@ -297,26 +318,30 @@ class UserViewModel(userRepository: UserRepository) : ViewModel() {
    * @param userId The id of the user to refuse the invitation for.
    */
   fun userRefusesInvitation(eventId: String, userId: String) {
-      CoroutineScope(Dispatchers.IO).launch {
-          val goMeetUser = getUser(userId)!!
-          val possibleInvitation = goMeetUser.pendingRequests.find {
-              it.eventId == eventId && it.status == InviteStatus.PENDING
+    CoroutineScope(Dispatchers.IO).launch {
+      val goMeetUser = getUser(userId)!!
+      val possibleInvitation =
+          goMeetUser.pendingRequests.find {
+            it.eventId == eventId && it.status == InviteStatus.PENDING
           }
 
-          if (possibleInvitation != null) {
-              val updatedPendingRequests = goMeetUser.pendingRequests.map {
+      if (possibleInvitation != null) {
+        val updatedPendingRequests =
+            goMeetUser.pendingRequests
+                .map {
                   if (it.eventId == eventId) {
-                      it.copy(status = InviteStatus.REFUSED)
+                    it.copy(status = InviteStatus.REFUSED)
                   } else {
-                      it
+                    it
                   }
-              }.toSet()
+                }
+                .toSet()
 
-              editUser(goMeetUser.copy(pendingRequests = updatedPendingRequests))
-          } else {
-              Log.w(ContentValues.TAG, "Couldn't refuse the invitation: Invitation not found")
-          }
+        editUser(goMeetUser.copy(pendingRequests = updatedPendingRequests))
+      } else {
+        Log.w(ContentValues.TAG, "Couldn't refuse the invitation: Invitation not found")
       }
+    }
   }
 
   /**

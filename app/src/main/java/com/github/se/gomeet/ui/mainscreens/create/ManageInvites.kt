@@ -284,7 +284,7 @@ fun ManageInvites(
               2 -> {
                 PageUserInvites(
                     followersFollowingList.filter { u ->
-                        u.joinedEvents.contains(event.value!!.eventID)
+                      u.joinedEvents.contains(event.value!!.eventID)
                     },
                     event.value!!,
                     InviteStatus.ACCEPTED,
@@ -292,7 +292,7 @@ fun ManageInvites(
                     initialClicked = false)
               }
               3 -> {
-                  //TODO: Fix bug here
+                // TODO: Fix bug here
                 PageUserInvites(
                     followersFollowingList.filter { u ->
                       u.pendingRequests.any { invitation ->

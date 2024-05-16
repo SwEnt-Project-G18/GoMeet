@@ -148,15 +148,15 @@ suspend fun fetchUserAndEvents(
     val events = mutableListOf<Event>()
     val creatorMap = mutableMapOf<Event, String>()
 
-    it.pendingRequests.filter { invitation ->
-        invitation.status == InviteStatus.PENDING
-        }.forEach { request ->
-            val invitedEvent = eventViewModel.getEvent(request.eventId)
-            invitedEvent?.let { event ->
-                events.add(event)
-                val creatorName = userViewModel.getUser(event.creator)?.username ?: "GoMeetUser"
-                creatorMap[event] = creatorName
-            }
+    it.pendingRequests
+        .filter { invitation -> invitation.status == InviteStatus.PENDING }
+        .forEach { request ->
+          val invitedEvent = eventViewModel.getEvent(request.eventId)
+          invitedEvent?.let { event ->
+            events.add(event)
+            val creatorName = userViewModel.getUser(event.creator)?.username ?: "GoMeetUser"
+            creatorMap[event] = creatorName
+          }
         }
 
     eventsList.clear()
@@ -365,166 +365,170 @@ fun InvitationsNotificationsWidget(
     initialClicked: Boolean,
     callback: (Event) -> Unit
 ) {
-    var clicked by rememberSaveable { mutableStateOf(initialClicked) }
+  var clicked by rememberSaveable { mutableStateOf(initialClicked) }
 
-    val configuration = LocalConfiguration.current
-    val screenWidth = configuration.screenWidthDp.dp
-    val density = LocalDensity.current
+  val configuration = LocalConfiguration.current
+  val screenWidth = configuration.screenWidthDp.dp
+  val density = LocalDensity.current
 
-    val smallTextSize = with(density) { screenWidth.toPx() / 85 }
-    val bigTextSize = with(density) { screenWidth.toPx() / 60 }
+  val smallTextSize = with(density) { screenWidth.toPx() / 85 }
+  val bigTextSize = with(density) { screenWidth.toPx() / 60 }
 
-    val currentDate = Calendar.getInstance()
-    val startOfWeek = currentDate.clone() as Calendar
-    startOfWeek.set(Calendar.DAY_OF_WEEK, startOfWeek.firstDayOfWeek)
-    val endOfWeek = startOfWeek.clone() as Calendar
-    endOfWeek.add(Calendar.DAY_OF_WEEK, 6)
+  val currentDate = Calendar.getInstance()
+  val startOfWeek = currentDate.clone() as Calendar
+  startOfWeek.set(Calendar.DAY_OF_WEEK, startOfWeek.firstDayOfWeek)
+  val endOfWeek = startOfWeek.clone() as Calendar
+  endOfWeek.add(Calendar.DAY_OF_WEEK, 6)
 
-    val eventCalendar = Calendar.getInstance().apply { time = Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant()) }
+  val eventCalendar =
+      Calendar.getInstance().apply {
+        time = Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant())
+      }
 
-    val isThisWeek = eventCalendar.after(currentDate) && eventCalendar.before(endOfWeek)
-    val isToday =
-        currentDate.get(Calendar.YEAR) == eventCalendar.get(Calendar.YEAR) &&
-                currentDate.get(Calendar.DAY_OF_YEAR) == eventCalendar.get(Calendar.DAY_OF_YEAR)
+  val isThisWeek = eventCalendar.after(currentDate) && eventCalendar.before(endOfWeek)
+  val isToday =
+      currentDate.get(Calendar.YEAR) == eventCalendar.get(Calendar.YEAR) &&
+          currentDate.get(Calendar.DAY_OF_YEAR) == eventCalendar.get(Calendar.DAY_OF_YEAR)
 
-    val dayFormat =
-        if (isThisWeek) {
-            SimpleDateFormat("EEEE", Locale.getDefault())
-        } else {
-            SimpleDateFormat("dd/MM/yy", Locale.getDefault())
-        }
+  val dayFormat =
+      if (isThisWeek) {
+        SimpleDateFormat("EEEE", Locale.getDefault())
+      } else {
+        SimpleDateFormat("dd/MM/yy", Locale.getDefault())
+      }
 
-    val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+  val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
 
-    val dayString =
-        if (isToday) {
-            "Today"
-        } else {
-            dayFormat.format(Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant()))
-        }
-    val timeString = timeFormat.format(Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant()))
+  val dayString =
+      if (isToday) {
+        "Today"
+      } else {
+        dayFormat.format(Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant()))
+      }
+  val timeString =
+      timeFormat.format(Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant()))
 
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 10.dp, top = 5.dp, end = 10.dp, bottom = 5.dp)
-            .testTag("EventCard"),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
-    ) {
+  Card(
+      modifier =
+          Modifier.fillMaxWidth()
+              .padding(start = 10.dp, top = 5.dp, end = 10.dp, bottom = 5.dp)
+              .testTag("EventCard"),
+      colors =
+          CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceAround
-        ) {
-            Column(
-                modifier = Modifier.weight(4f).padding(15.dp),
-                horizontalAlignment = Alignment.Start,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = event.title,
-                    style = TextStyle(
-                        fontSize = bigTextSize.sp,
-                        lineHeight = 20.sp,
-                        fontFamily = FontFamily(Font(R.font.roboto)),
-                        fontWeight = FontWeight(700),
-                        color = MaterialTheme.colorScheme.onBackground,
-                        letterSpacing = 0.25.sp,
-                    ),
-                    modifier = Modifier.testTag("EventName")
-                )
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    var username by remember { mutableStateOf<String?>("Loading...") }
-                    LaunchedEffect(event.creator) {
-                        username = userViewModel.getUsername(event.creator)
-                    }
-
-                    username?.let {
-                        Text(
-                            it,
-                            style = TextStyle(
-                                fontSize = smallTextSize.sp,
-                                lineHeight = 24.sp,
+            horizontalArrangement = Arrangement.SpaceAround) {
+              Column(
+                  modifier = Modifier.weight(4f).padding(15.dp),
+                  horizontalAlignment = Alignment.Start,
+                  verticalArrangement = Arrangement.Center) {
+                    Text(
+                        text = event.title,
+                        style =
+                            TextStyle(
+                                fontSize = bigTextSize.sp,
+                                lineHeight = 20.sp,
                                 fontFamily = FontFamily(Font(R.font.roboto)),
                                 fontWeight = FontWeight(700),
                                 color = MaterialTheme.colorScheme.onBackground,
-                                letterSpacing = 0.15.sp,
+                                letterSpacing = 0.25.sp,
                             ),
-                            modifier = Modifier.padding(top = 5.dp).testTag("UserName")
-                        )
-                    }
-                }
+                        modifier = Modifier.testTag("EventName"))
 
-                Text(
-                    "$dayString - $timeString",
-                    style = TextStyle(
-                        fontSize = smallTextSize.sp,
-                        lineHeight = 20.sp,
-                        fontFamily = FontFamily(Font(R.font.roboto)),
-                        fontWeight = FontWeight(700),
-                        color = MaterialTheme.colorScheme.onBackground,
-                        letterSpacing = 0.25.sp,
-                    ),
-                    modifier = Modifier.testTag("EventDate")
-                )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center) {
+                          var username by remember { mutableStateOf<String?>("Loading...") }
+                          LaunchedEffect(event.creator) {
+                            username = userViewModel.getUsername(event.creator)
+                          }
+
+                          username?.let {
+                            Text(
+                                it,
+                                style =
+                                    TextStyle(
+                                        fontSize = smallTextSize.sp,
+                                        lineHeight = 24.sp,
+                                        fontFamily = FontFamily(Font(R.font.roboto)),
+                                        fontWeight = FontWeight(700),
+                                        color = MaterialTheme.colorScheme.onBackground,
+                                        letterSpacing = 0.15.sp,
+                                    ),
+                                modifier = Modifier.padding(top = 5.dp).testTag("UserName"))
+                          }
+                        }
+
+                    Text(
+                        "$dayString - $timeString",
+                        style =
+                            TextStyle(
+                                fontSize = smallTextSize.sp,
+                                lineHeight = 20.sp,
+                                fontFamily = FontFamily(Font(R.font.roboto)),
+                                fontWeight = FontWeight(700),
+                                color = MaterialTheme.colorScheme.onBackground,
+                                letterSpacing = 0.25.sp,
+                            ),
+                        modifier = Modifier.testTag("EventDate"))
+                  }
+
+              Image(
+                  painter =
+                      painterResource(
+                          id = R.drawable.gomeet_logo), // Use the event picture if available
+                  contentDescription = "Event Picture",
+                  modifier =
+                      Modifier.weight(3f)
+                          .fillMaxHeight()
+                          .aspectRatio(3f / 1.75f)
+                          .clipToBounds()
+                          .padding(0.dp)
+                          .testTag("EventPicture"),
+                  contentScale = ContentScale.Crop,
+              )
             }
-
-            Image(
-                painter = painterResource(id = R.drawable.gomeet_logo), // Use the event picture if available
-                contentDescription = "Event Picture",
-                modifier = Modifier.weight(3f)
-                    .fillMaxHeight()
-                    .aspectRatio(3f / 1.75f)
-                    .clipToBounds()
-                    .padding(0.dp)
-                    .testTag("EventPicture"),
-                contentScale = ContentScale.Crop,
-            )
-        }
 
         // Accept and Decline buttons
         Row(
             modifier = Modifier.fillMaxWidth().padding(10.dp),
             horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Button(
-                onClick = {
+            verticalAlignment = Alignment.CenterVertically) {
+              Button(
+                  onClick = {
                     clicked = true
-                    callback(event.copy(pendingParticipants = event.pendingParticipants.minus(currentUserId), participants = event.participants.plus(currentUserId)))
-                },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Green,
-                    contentColor = Color.White
-                ),
-                border = BorderStroke(1.dp, Color.Green),
-                enabled = !clicked,
-                modifier = Modifier.testTag("AcceptButton")
-            ) {
-                Text("Accept")
-            }
+                    callback(
+                        event.copy(
+                            pendingParticipants = event.pendingParticipants.minus(currentUserId),
+                            participants = event.participants.plus(currentUserId)))
+                  },
+                  colors =
+                      ButtonDefaults.buttonColors(
+                          containerColor = Color.Green, contentColor = Color.White),
+                  border = BorderStroke(1.dp, Color.Green),
+                  enabled = !clicked,
+                  modifier = Modifier.testTag("AcceptButton")) {
+                    Text("Accept")
+                  }
 
-            Spacer(modifier = Modifier.width(10.dp))
+              Spacer(modifier = Modifier.width(10.dp))
 
-            Button(
-                onClick = {
+              Button(
+                  onClick = {
                     clicked = true
-                    callback(event.copy(pendingParticipants = event.pendingParticipants.minus(currentUserId)))
-                },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Red,
-                    contentColor = Color.White
-                ),
-                border = BorderStroke(1.dp, Color.Red),
-                enabled = !clicked,
-                modifier = Modifier.testTag("DeclineButton")
-            ) {
-                Text("Decline")
+                    callback(
+                        event.copy(
+                            pendingParticipants = event.pendingParticipants.minus(currentUserId)))
+                  },
+                  colors =
+                      ButtonDefaults.buttonColors(
+                          containerColor = Color.Red, contentColor = Color.White),
+                  border = BorderStroke(1.dp, Color.Red),
+                  enabled = !clicked,
+                  modifier = Modifier.testTag("DeclineButton")) {
+                    Text("Decline")
+                  }
             }
-        }
-    }
+      }
 }
