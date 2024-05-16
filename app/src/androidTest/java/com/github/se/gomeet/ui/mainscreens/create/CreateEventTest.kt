@@ -50,10 +50,6 @@ class CreateEventTest {
     composeTestRule.onNodeWithText("Title").assertIsDisplayed().performTextInput("Sample Event 1")
     composeTestRule.onNodeWithText("Location").assertIsDisplayed().performTextInput("test")
     composeTestRule.onNodeWithTag("DropdownMenu").assertIsDisplayed().performClick()
-    composeTestRule
-        .onNodeWithText("Date")
-        .assertIsDisplayed()
-        .performTextInput(LocalDate.now().toString())
     composeTestRule.onNodeWithText("Price").assertIsDisplayed().performTextInput("25.00")
     composeTestRule
         .onNodeWithText("Link")
@@ -85,7 +81,6 @@ class CreateEventTest {
     composeTestRule.onNodeWithText("Description").performTextInput("This is a test event.")
     composeTestRule.onNodeWithText("Location").performTextInput("test")
     composeTestRule.onNodeWithTag("DropdownMenu").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Date").performTextInput("invalid date")
     composeTestRule.onNodeWithText("Price").performTextInput("25.00")
     composeTestRule.onNodeWithText("Link").performTextInput("http://example.com")
     composeTestRule.onNodeWithText("Add Tags").assertIsDisplayed()

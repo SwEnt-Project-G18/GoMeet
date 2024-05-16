@@ -47,6 +47,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
@@ -131,6 +132,8 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
   val showPopup = remember { mutableStateOf(false) }
   var tagsButtonText by remember { mutableStateOf("Add Tags") }
 
+  val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+
   val textFieldColors =
       androidx.compose.material3.TextFieldDefaults.colors(
           focusedTextColor = MaterialTheme.colorScheme.onBackground,
@@ -212,6 +215,8 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                   colors = textFieldColors,
                   modifier = Modifier.fillMaxWidth().padding(start = 15.dp, end = 15.dp))
               LocationField(selectedLocation, locationState, eventViewModel)
+
+              Spacer(modifier = Modifier.height(screenHeight / 30))
 
               DateTimePicker(pickedTime = pickedTime, pickedDate = pickedDate)
 

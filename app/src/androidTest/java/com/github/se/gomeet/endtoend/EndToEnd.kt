@@ -126,9 +126,6 @@ class EndToEndTest : TestCase() {
             .assertIsDisplayed()
             .performTextInput("Description")
         composeTestRule.onNodeWithText("Location").assertIsDisplayed().performTextInput("test")
-        composeTestRule
-            .onNodeWithText("Date")
-            .performTextInput(LocalDate.of(2025, 3, 30).toString())
         composeTestRule.onNodeWithText("Price").performTextInput("1")
         composeTestRule
             .onNodeWithText("Link")

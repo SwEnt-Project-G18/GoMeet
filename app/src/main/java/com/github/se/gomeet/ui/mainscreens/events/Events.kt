@@ -1,8 +1,10 @@
 package com.github.se.gomeet.ui.mainscreens.events
 
 import EventWidget
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,6 +18,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -97,7 +101,7 @@ fun Events(
     coroutineScope.launch {
       user.value = userViewModel.getUser(currentUser)
       val allEvents =
-          eventViewModel.getAllEvents()!!.filter { e ->
+          (eventViewModel.getAllEvents() ?: emptyList()).filter { e ->
             (user.value!!.myEvents.contains(e.eventID) ||
                 user.value!!.myFavorites.contains(e.eventID) ||
                 user.value!!.joinedEvents.contains(e.eventID)) && !isPastEvent(e)
@@ -117,6 +121,18 @@ fun Events(
 
   // Scaffold is a structure that supports top bar, content area, and bottom navigation
   Scaffold(
+      floatingActionButton = {
+        Box(modifier = Modifier.padding(8.dp)) {
+          IconButton(
+              modifier =
+                  Modifier.background(
+                      color = MaterialTheme.colorScheme.outlineVariant,
+                      shape = RoundedCornerShape(10.dp)),
+              onClick = { nav.navigateToScreen(Route.CREATE) }) {
+                Icon(Icons.Filled.Add, contentDescription = "Create Event", tint = Color.White)
+              }
+        }
+      },
       topBar = {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -369,7 +385,7 @@ fun GoMeetSearchBar(
         query = query.value,
         onQueryChange = { query.value = it },
         active = false,
-        modifier = Modifier.fillMaxWidth().padding(start = 5.dp, end = 5.dp),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
         placeholder = { Text("Search", color = contentColor) },
         leadingIcon = {
           IconButton(onClick = { nav.navigateToScreen(Route.MESSAGE_CHANNELS) }) {
