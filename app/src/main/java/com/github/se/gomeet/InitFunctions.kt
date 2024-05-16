@@ -46,11 +46,14 @@ import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.ktx.database
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.memoryCacheSettings
 import com.google.firebase.firestore.persistentCacheSettings
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 import io.getstream.chat.android.client.ChatClient
 import io.getstream.chat.android.client.logger.ChatLogLevel
 import io.getstream.chat.android.compose.ui.channels.ChannelsScreen
@@ -366,4 +369,16 @@ fun InitNavigation(
           }
         }
   }
+}
+
+/**
+ * Call this function in main (as the first thing after onCreate()) to use the Firebase Emulator
+ * Suite for purely local testing.
+ */
+fun debug() {
+  val androidLocalhost = "10.0.2.2"
+  Firebase.firestore.useEmulator(androidLocalhost, 8080)
+  Firebase.auth.useEmulator(androidLocalhost, 9099)
+  Firebase.storage.useEmulator(androidLocalhost, 9199)
+  Firebase.database.useEmulator(androidLocalhost, 9000)
 }

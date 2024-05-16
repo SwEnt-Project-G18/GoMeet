@@ -33,7 +33,7 @@ class EventInfoTest {
     private val eventId = "eventid"
     private val eventDate = "2024-05-01"
     private val organiserId = "organiserid"
-    private val eventTime = "00:00"
+    private val eventTime = "23:40"
     private val eventDescription = "Event Description"
     private val eventLocation = LatLng(0.0, 0.0)
     private val userVM = UserViewModel(UserRepository(Firebase.firestore))

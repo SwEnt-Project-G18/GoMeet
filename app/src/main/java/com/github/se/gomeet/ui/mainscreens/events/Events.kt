@@ -56,6 +56,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
+import com.github.se.gomeet.model.event.isPastEvent
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
@@ -65,9 +66,6 @@ import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
-import java.time.LocalDate
-import java.time.ZoneId
-import java.util.Date
 import kotlinx.coroutines.launch
 
 /**
@@ -104,7 +102,7 @@ fun Events(
           (eventViewModel.getAllEvents() ?: emptyList()).filter { e ->
             (user.value!!.myEvents.contains(e.eventID) ||
                 user.value!!.myFavorites.contains(e.eventID) ||
-                user.value!!.joinedEvents.contains(e.eventID)) && e.date.isAfter(LocalDate.now())
+                user.value!!.joinedEvents.contains(e.eventID)) && !isPastEvent(e)
           }
       if (allEvents.isNotEmpty()) {
         eventList.addAll(allEvents)
@@ -257,11 +255,8 @@ fun Events(
                                     eventName = event.title,
                                     eventId = event.eventID,
                                     eventDescription = event.description,
-                                    eventDate =
-                                        Date.from(
-                                            event.date
-                                                .atStartOfDay(ZoneId.systemDefault())
-                                                .toInstant()),
+                                    eventDate = event.date,
+                                    eventTime = event.time,
                                     eventPicture = painter,
                                     eventLocation = event.location,
                                     verified = false,
@@ -305,11 +300,8 @@ fun Events(
                                     eventId = event.eventID,
                                     eventName = event.title,
                                     eventDescription = event.description,
-                                    eventDate =
-                                        Date.from(
-                                            event.date
-                                                .atStartOfDay(ZoneId.systemDefault())
-                                                .toInstant()),
+                                    eventDate = event.date,
+                                    eventTime = event.time,
                                     eventPicture = painter,
                                     eventLocation = event.location,
                                     verified = false,
@@ -353,11 +345,8 @@ fun Events(
                                     eventId = event.eventID,
                                     eventName = event.title,
                                     eventDescription = event.description,
-                                    eventDate =
-                                        Date.from(
-                                            event.date
-                                                .atStartOfDay(ZoneId.systemDefault())
-                                                .toInstant()),
+                                    eventDate = event.date,
+                                    eventTime = event.time,
                                     eventPicture = painter,
                                     eventLocation = event.location,
                                     verified = false,
