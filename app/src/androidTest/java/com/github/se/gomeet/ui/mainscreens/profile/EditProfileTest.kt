@@ -75,11 +75,11 @@ class EditProfileTest {
 
     // Wait for the page to load
     composeTestRule.waitUntil(timeoutMillis = 10000) {
-      composeTestRule.onNodeWithTag("Profile Picture").isDisplayed()
+      composeTestRule.onNodeWithTag("Profile Picture").performScrollTo().isDisplayed()
     }
 
     // Test that the ui is correctly displayed. fill in the fields and click on Done
-    composeTestRule.onNodeWithTag("Profile Picture").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("Profile Picture").performScrollTo().assertIsDisplayed()
     composeTestRule
         .onNodeWithText("First Name")
         .performScrollTo()
@@ -107,8 +107,8 @@ class EditProfileTest {
         .performTextInput("fakecountry")
     composeTestRule.onNodeWithText("Edit Tags").performScrollTo().assertIsDisplayed()
     composeTestRule.onNodeWithTag("EditTagsButton").performScrollTo().performClick()
-    composeTestRule.onNodeWithTag("TagList").assertIsDisplayed().performClick()
-    composeTestRule.onNodeWithText("Save").assertIsDisplayed().performClick()
-    composeTestRule.onNodeWithText("Done").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithTag("TagList").performScrollTo().assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithText("Save").performScrollTo().assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithText("Done").performScrollTo().assertIsDisplayed().performClick()
   }
 }
