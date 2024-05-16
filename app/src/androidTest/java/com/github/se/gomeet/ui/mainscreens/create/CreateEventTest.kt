@@ -52,11 +52,7 @@ class CreateEventTest {
     // Verify that the text fields are displayed and fill them in
     composeTestRule.onNodeWithText("Title").assertIsDisplayed().performTextInput("Sample Event 1")
     composeTestRule.onNodeWithText("Location").assertIsDisplayed().performTextInput("test")
-    composeTestRule
-        .onNodeWithTag("DropdownMenu")
-        .performScrollTo()
-        .assertIsDisplayed()
-        .performClick()
+    composeTestRule.onNodeWithTag("DropdownMenu").assertIsDisplayed().performClick()
     composeTestRule
         .onNodeWithText("Price")
         .performScrollTo()
@@ -71,8 +67,8 @@ class CreateEventTest {
     // Add tags
     composeTestRule.onNodeWithText("Add Tags").performScrollTo().assertIsDisplayed()
     composeTestRule.onNodeWithTag("TagsButton").performScrollTo().assertIsDisplayed().performClick()
-    composeTestRule.onNodeWithTag("TagList").performScrollTo().assertIsDisplayed().performClick()
-    composeTestRule.onNodeWithText("Save").performScrollTo().assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithTag("TagList").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithText("Save").assertIsDisplayed().performClick()
 
     // Verify that the rest of the buttons are displayed and create the event
     composeTestRule.onNodeWithText("Add Participants").performScrollTo().assertIsDisplayed()
