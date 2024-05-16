@@ -182,6 +182,10 @@ dependencies {
     androidTestImplementation("io.getstream:stream-chat-android-compose:6.0.8")
     androidTestImplementation("io.getstream:stream-chat-android-offline:6.0.8")
 
+
+    implementation("com.google.accompanist:accompanist-pager:0.23.1")
+    implementation("com.google.accompanist:accompanist-pager-indicators:0.23.1")
+
 }
 
 

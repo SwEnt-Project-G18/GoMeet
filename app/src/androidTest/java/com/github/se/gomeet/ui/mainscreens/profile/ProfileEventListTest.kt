@@ -1,9 +1,16 @@
-package com.github.se.gomeet.ui.mainscreens.events
+package com.github.se.gomeet.ui.mainscreens.profile
 
-import androidx.compose.ui.test.*
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.activity.ComponentActivity
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.isDisplayed
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.location.Location
 import com.github.se.gomeet.model.repository.EventRepository
 import com.github.se.gomeet.model.repository.UserRepository
@@ -23,16 +30,17 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class EventsTest {
-  @get:Rule val composeTestRule = createComposeRule()
+class ProfileEventListTest {
+  @get:Rule val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
   companion object {
-    private const val email = "user@eventstest.com"
+    private const val email = "profileeventlist@test.com"
     private const val pwd = "123456"
     private lateinit var uid: String
-    private const val username = "eventstest"
+    private const val username = "ProfileEventList"
 
-    private const val eventId = "EventsTestEvent"
+    private const val eventId = "ProfileEventListEvent"
+    private lateinit var event: Event
 
     private val userVM = UserViewModel(UserRepository(Firebase.firestore))
     private lateinit var eventVM: EventViewModel
@@ -48,10 +56,12 @@ class EventsTest {
         }
         uid = result.result.user!!.uid
 
-        // Add the user to the view model
+        // Add the user to view model
         userVM.createUserIfNew(
             uid, username, "testfirstname", "testlastname", email, "testphonenumber", "testcountry")
-        TimeUnit.SECONDS.sleep(3)
+        while (userVM.getUser(uid) == null) {
+          TimeUnit.SECONDS.sleep(1)
+        }
 
         // Sign in
         result = Firebase.auth.signInWithEmailAndPassword(email, pwd)
@@ -59,7 +69,7 @@ class EventsTest {
           TimeUnit.SECONDS.sleep(1)
         }
 
-        // Create an event
+        // Create an Event
         eventVM = EventViewModel(uid, EventRepository(Firebase.firestore))
         eventVM.createEvent(
             "title",
@@ -78,12 +88,10 @@ class EventsTest {
             null,
             userVM,
             eventId)
-
-        // Add the event to the user's favourites
-        userVM.editUser(userVM.getUser(uid)!!.copy(myFavorites = listOf(eventId)))
-        while (userVM.getUser(uid)!!.myFavorites.isEmpty()) {
+        while (eventVM.getEvent(eventId) == null) {
           TimeUnit.SECONDS.sleep(1)
         }
+        event = eventVM.getEvent(eventId)!!
       }
     }
 
@@ -104,41 +112,24 @@ class EventsTest {
   }
 
   @Test
-  fun testEvents() {
+  fun testProfileEventList() {
     composeTestRule.setContent {
-      Events(
-          uid,
-          NavigationActions(rememberNavController()),
-          UserViewModel(UserRepository(Firebase.firestore)),
-          eventVM)
+      ProfileEventsList(
+          "title",
+          rememberLazyListState(),
+          mutableListOf(event),
+          NavigationActions(rememberNavController()))
     }
 
-    composeTestRule.waitForIdle()
-
-    // Wait until the events are loaded
-    composeTestRule.waitUntil { composeTestRule.onAllNodesWithText("title")[0].isDisplayed() }
-
-    // Verify that the ui is correctly displayed
-    composeTestRule.onNodeWithText("Search").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("JoinedButton").assertIsDisplayed().performClick().performClick()
-    composeTestRule
-        .onNodeWithTag("FavouritesButton")
-        .assertIsDisplayed()
-        .performClick()
-        .performClick()
-    composeTestRule
-        .onNodeWithTag("MyEventsButton")
-        .assertIsDisplayed()
-        .performClick()
-        .performClick()
-    composeTestRule.onNodeWithTag("JoinedTitle").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("FavouritesTitle").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("MyEventsTitle").assertIsDisplayed()
-    composeTestRule
-        .onAllNodesWithText("title")
-        .assertCountEquals(3) // The event should be present in all categories
-    for (i in 0..2) {
-      composeTestRule.onAllNodesWithText("title")[i].assertIsDisplayed()
+    // Wait for the page to load
+    composeTestRule.waitUntil(timeoutMillis = 10000) {
+      composeTestRule.onNodeWithTag("EventsListItems").isDisplayed()
     }
+
+    // Test that the ui is correctly displayed
+    composeTestRule.onNodeWithTag("EventsListItems").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("EventsListHeader").assertIsDisplayed()
+    composeTestRule.onNodeWithText("2026-01-01").assertIsDisplayed()
+    composeTestRule.onNodeWithContentDescription("description").assertIsDisplayed()
   }
 }

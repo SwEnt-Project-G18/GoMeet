@@ -30,7 +30,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
@@ -139,13 +138,4 @@ fun WelcomeScreen(
                   contentDescription = "Google logo")
             }
       }
-}
-
-@Preview
-@Composable
-fun WelcomeScreenPreview() {
-  WelcomeScreen(
-      onNavToLogin = {},
-      onNavToRegister = {},
-      onSignInSuccess = { _ -> }) // Preview the WelcomeScreen
 }

@@ -47,18 +47,15 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
-import com.github.se.gomeet.model.repository.EventRepository
-import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
@@ -68,8 +65,6 @@ import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.Date
@@ -174,6 +169,7 @@ fun Events(
                   horizontalArrangement = Arrangement.SpaceEvenly,
                   modifier = Modifier.heightIn(min = 56.dp).fillMaxWidth()) {
                     Button(
+                        modifier = Modifier.testTag("JoinedButton"),
                         onClick = { onFilterButtonClick("Joined") },
                         content = { Text("Joined Events") },
                         shape = RoundedCornerShape(10.dp),
@@ -188,6 +184,7 @@ fun Events(
                                     MaterialTheme.colorScheme.tertiary))
 
                     Button(
+                        modifier = Modifier.testTag("FavouritesButton"),
                         onClick = { onFilterButtonClick("Favourites") },
                         content = { Text("Favourites") },
                         shape = RoundedCornerShape(10.dp),
@@ -201,6 +198,7 @@ fun Events(
                                     MaterialTheme.colorScheme.primaryContainer,
                                     MaterialTheme.colorScheme.tertiary))
                     Button(
+                        modifier = Modifier.testTag("MyEventsButton"),
                         onClick = { onFilterButtonClick("MyEvents") },
                         content = { Text("My Events") },
                         shape = RoundedCornerShape(10.dp),
@@ -229,7 +227,9 @@ fun Events(
                         Text(
                             text = "Joined Events",
                             style = MaterialTheme.typography.titleLarge,
-                            modifier = Modifier.padding(horizontal = screenWidth / 15))
+                            modifier =
+                                Modifier.padding(horizontal = screenWidth / 15)
+                                    .testTag("JoinedTitle"))
 
                         // Loop through and display events that match the joined events criteria
                         eventList
@@ -276,7 +276,9 @@ fun Events(
                         Text(
                             text = "Favourites",
                             style = MaterialTheme.typography.titleLarge,
-                            modifier = Modifier.padding(horizontal = screenWidth / 15))
+                            modifier =
+                                Modifier.padding(horizontal = screenWidth / 15)
+                                    .testTag("FavouritesTitle"))
 
                         // Loop through and display events are marked favourites by the currentUser
                         eventList
@@ -322,7 +324,9 @@ fun Events(
                         Text(
                             text = "My Events",
                             style = MaterialTheme.typography.titleLarge,
-                            modifier = Modifier.padding(horizontal = screenWidth / 15))
+                            modifier =
+                                Modifier.padding(horizontal = screenWidth / 15)
+                                    .testTag("MyEventsTitle"))
 
                         // Loop through and display events created by currentUser
                         eventList
@@ -423,25 +427,4 @@ fun GoMeetSearchBar(
         onActiveChange = {},
         onSearch = {}) {}
   }
-}
-
-/**
- * A custom search bar composable function that provides a user interface for inputting search
- * queries. This search bar includes visual customizations and functionality adjustments tailored to
- * the GoMeet application's theme. It features a leading icon that represents the app, a trailing
- * icon for voice search, and custom color schemes for different states of the search input field.
- *
- * @param query A mutable state holding the current query string, allowing the text to be updated
- *   dynamically.
- * @param backgroundColor The color of the search bar's background.
- * @param contentColor The color of the text and icons within the search bar.
- */
-@Composable
-@Preview
-fun EventPreview() {
-  Events(
-      "",
-      nav = NavigationActions(rememberNavController()),
-      UserViewModel(UserRepository(Firebase.firestore)),
-      EventViewModel("", EventRepository(Firebase.firestore)))
 }

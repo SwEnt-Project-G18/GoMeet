@@ -1,6 +1,8 @@
 package com.github.se.gomeet.endtoend
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
@@ -8,6 +10,7 @@ import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.MainActivity
 import com.github.se.gomeet.model.event.location.Location
@@ -15,7 +18,7 @@ import com.github.se.gomeet.model.repository.EventRepository
 import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.screens.EventInfoScreen
 import com.github.se.gomeet.screens.FollowScreen
-import com.github.se.gomeet.screens.LoginScreen
+import com.github.se.gomeet.screens.LoginScreenScreen
 import com.github.se.gomeet.screens.OtherProfileScreen
 import com.github.se.gomeet.screens.ProfileScreen
 import com.github.se.gomeet.screens.TrendsScreen
@@ -43,41 +46,131 @@ import org.junit.runner.RunWith
  */
 @RunWith(AndroidJUnit4::class)
 class EndToEndTest2 : TestCase() {
-
   @get:Rule val composeTestRule = createAndroidComposeRule<MainActivity>()
+
+  companion object {
+    private const val email1 = "user1@test2.com"
+    private const val pwd1 = "123456"
+    private var uid1 = ""
+    private const val username1 = "test_user1"
+
+    private const val email2 = "user2@test2.com"
+    private const val pwd2 = "654321"
+    private var uid2 = ""
+    private const val username2 = "test_user2"
+
+    private val userVM = UserViewModel(UserRepository(Firebase.firestore))
+    private lateinit var eventVM: EventViewModel
+
+    @JvmStatic
+    @BeforeClass
+    fun setup() {
+      TimeUnit.SECONDS.sleep(3)
+
+      // create two new users
+      var result = Firebase.auth.createUserWithEmailAndPassword(email1, pwd1)
+      while (!result.isComplete) {
+        TimeUnit.SECONDS.sleep(1)
+      }
+      uid1 = result.result.user!!.uid
+
+      result = Firebase.auth.createUserWithEmailAndPassword(email2, pwd2)
+      while (!result.isComplete) {
+        TimeUnit.SECONDS.sleep(1)
+      }
+      uid2 = result.result.user!!.uid
+
+      // Add the users to the view model
+      userVM.createUserIfNew(
+          uid1,
+          username1,
+          "testfirstname",
+          "testlastname",
+          email1,
+          "testphonenumber",
+          "testcountry")
+      TimeUnit.SECONDS.sleep(3)
+      userVM.createUserIfNew(
+          uid2,
+          username2,
+          "testfirstname2",
+          "testlastname2",
+          email2,
+          "testphonenumber2",
+          "testcountry2")
+      TimeUnit.SECONDS.sleep(3)
+
+      // user1 is used to create an event
+      result = Firebase.auth.signInWithEmailAndPassword(email1, pwd1)
+      while (!result.isComplete) {
+        TimeUnit.SECONDS.sleep(1)
+      }
+
+      eventVM = EventViewModel(Firebase.auth.currentUser!!.uid, EventRepository(Firebase.firestore))
+      eventVM.createEvent(
+          "title",
+          "description",
+          Location(0.0, 0.0, "location"),
+          LocalDate.of(2025, 3, 30),
+          0.0,
+          "url",
+          emptyList(),
+          emptyList(),
+          emptyList(),
+          0,
+          true,
+          emptyList(),
+          emptyList(),
+          null,
+          userVM,
+          "eventuid1")
+      TimeUnit.SECONDS.sleep(3)
+
+      Firebase.auth.signOut()
+      TimeUnit.SECONDS.sleep(3)
+
+      // user2 is used to log in and perform the tests
+      eventVM = EventViewModel(uid2, EventRepository(Firebase.firestore))
+    }
+
+    @AfterClass
+    @JvmStatic
+    fun tearDown() {
+      runBlocking {
+        // clean up the event
+        eventVM.getAllEvents()?.forEach { eventVM.removeEvent(it.eventID) }
+
+        // clean up the users
+        Firebase.auth.currentUser?.delete()
+        userVM.deleteUser(uid1)
+        userVM.deleteUser(uid2)
+
+        val result = Firebase.auth.signInWithEmailAndPassword(email1, pwd1)
+        while (!result.isComplete) {
+          TimeUnit.SECONDS.sleep(1)
+        }
+        Firebase.auth.currentUser?.delete()
+      }
+    }
+  }
 
   @Test
   fun test() = run {
     ComposeScreen.onComposeScreen<WelcomeScreenScreen>(composeTestRule) {
       step("Click on the log in button") {
-        logInButton {
-          assertIsDisplayed()
-          performClick()
-        }
+        composeTestRule.onNodeWithText("Log In").assertIsDisplayed().performClick()
       }
     }
 
-    ComposeScreen.onComposeScreen<LoginScreen>(composeTestRule) {
+    ComposeScreen.onComposeScreen<LoginScreenScreen>(composeTestRule) {
       step("Log in with email and password") {
-        logInButton {
-          assertIsDisplayed()
-          assertIsNotEnabled()
-        }
-        emailField {
-          assertIsDisplayed()
-          performTextInput(email2)
-        }
-        passwordField {
-          assertIsDisplayed()
-          performTextInput(pwd2)
-        }
-        logInButton {
-          assertIsEnabled()
-          performClick()
-          composeTestRule.waitForIdle()
-          composeTestRule.waitUntil(timeoutMillis = 10000) {
-            composeTestRule.onNodeWithTag("CreateUI").isDisplayed()
-          }
+        composeTestRule.onNodeWithText("Log in").assertIsDisplayed().assertIsNotEnabled()
+        composeTestRule.onNodeWithText("Email").assertIsDisplayed().performTextInput(email2)
+        composeTestRule.onNodeWithText("Password").assertIsDisplayed().performTextInput(pwd2)
+        composeTestRule.onNodeWithText("Log in").assertIsEnabled().performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.waitUntil(timeoutMillis = 10000) {
+          composeTestRule.onNodeWithTag("CreateUI").isDisplayed()
         }
       }
     }
@@ -149,110 +242,6 @@ class EndToEndTest2 : TestCase() {
         TimeUnit.SECONDS.sleep(2)
         composeTestRule.onNodeWithText(username1).performClick()
       }
-    }
-  }
-
-  companion object {
-
-    private const val email1 = "user1@test2.com"
-    private const val pwd1 = "123456"
-    private var uid1 = ""
-    private const val username1 = "test_user1"
-
-    private const val email2 = "user2@test2.com"
-    private const val pwd2 = "654321"
-    private var uid2 = ""
-    private const val username2 = "test_user2"
-
-    private val userVM = UserViewModel(UserRepository(Firebase.firestore))
-    private lateinit var eventVM: EventViewModel
-
-    @JvmStatic
-    @BeforeClass
-    fun setup() {
-      TimeUnit.SECONDS.sleep(3)
-
-      // create two new users
-      var result = Firebase.auth.createUserWithEmailAndPassword(email1, pwd1)
-      while (!result.isComplete) {
-        TimeUnit.SECONDS.sleep(1)
-      }
-      uid1 = result.result.user!!.uid
-
-      result = Firebase.auth.createUserWithEmailAndPassword(email2, pwd2)
-      while (!result.isComplete) {
-        TimeUnit.SECONDS.sleep(1)
-      }
-      uid2 = result.result.user!!.uid
-
-      userVM.createUserIfNew(
-          uid1,
-          username1,
-          "testfirstname",
-          "testlastname",
-          email1,
-          "testphonenumber",
-          "testcountry")
-      TimeUnit.SECONDS.sleep(3)
-      userVM.createUserIfNew(
-          uid2,
-          username2,
-          "testfirstname2",
-          "testlastname2",
-          email2,
-          "testphonenumber2",
-          "testcountry2")
-      TimeUnit.SECONDS.sleep(3)
-
-      // the first user is used to create an event
-      result = Firebase.auth.signInWithEmailAndPassword(email1, pwd1)
-      while (!result.isComplete) {
-        TimeUnit.SECONDS.sleep(1)
-      }
-
-      eventVM = EventViewModel(Firebase.auth.currentUser!!.uid, EventRepository(Firebase.firestore))
-      eventVM.createEvent(
-          "title",
-          "description",
-          Location(0.0, 0.0, "location"),
-          LocalDate.of(2025, 3, 30),
-          0.0,
-          "url",
-          emptyList(),
-          emptyList(),
-          emptyList(),
-          0,
-          true,
-          emptyList(),
-          emptyList(),
-          null,
-          userVM,
-          "eventuid1")
-      TimeUnit.SECONDS.sleep(3)
-
-      Firebase.auth.signOut()
-      TimeUnit.SECONDS.sleep(3)
-
-      // the second user is used to log in and perform the tests
-      eventVM = EventViewModel(uid2, EventRepository(Firebase.firestore))
-    }
-
-    @AfterClass
-    @JvmStatic
-    fun tearDown() {
-      // clean up the event
-      runBlocking { eventVM.getAllEvents()?.forEach { eventVM.removeEvent(it.eventID) } }
-
-      // clean up the users
-      Firebase.auth.currentUser?.delete()
-      userVM.deleteUser(uid1)
-      userVM.deleteUser(uid2)
-
-      val result = Firebase.auth.signInWithEmailAndPassword(email1, pwd1)
-      while (!result.isComplete) {
-        TimeUnit.SECONDS.sleep(1)
-      }
-      Firebase.auth.currentUser?.delete()
     }
   }
 }
