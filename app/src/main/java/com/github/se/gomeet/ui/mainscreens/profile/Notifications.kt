@@ -402,7 +402,8 @@ fun InvitationsNotificationsWidget(
                 fontWeight = FontWeight(700),
                 color = Color(0xFF202124),
                 letterSpacing = 0.5.sp,
-            ))
+            ),
+        modifier = Modifier.testTag("InviteText"))
   }
   Card(
       modifier =
