@@ -9,12 +9,14 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performScrollTo
 import androidx.navigation.compose.rememberNavController
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 
+@RunWith(AndroidJUnit4::class)
 class SettingsScreenTest {
-
   @get:Rule val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
   @Test
@@ -23,6 +25,7 @@ class SettingsScreenTest {
 
     composeTestRule.waitForIdle()
 
+    // Test that the ui is correctly displayed
     composeTestRule.onNodeWithText("Settings").assertIsDisplayed()
     composeTestRule
         .onNodeWithContentDescription("Back button")

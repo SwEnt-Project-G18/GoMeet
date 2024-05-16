@@ -3,11 +3,13 @@ package com.github.se.gomeet.ui.mainscreens.profile
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.navigation.compose.rememberNavController
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.location.Location
 import com.github.se.gomeet.model.repository.EventRepository
@@ -21,52 +23,23 @@ import com.google.firebase.ktx.Firebase
 import java.time.LocalDate
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
-import org.junit.After
+import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 
+@RunWith(AndroidJUnit4::class)
 class ProfileEventListTest {
-
   @get:Rule val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
-  @After
-  fun tearDown() {
-    // clean up the event
-    runBlocking { eventVM.getAllEvents()?.forEach { eventVM.removeEvent(it.eventID) } }
-
-    // clean up the users
-    runBlocking {
-      Firebase.auth.currentUser?.delete()
-      userVM.deleteUser(uid)
-    }
-  }
-
-  @Test
-  fun testSettingsAbout() {
-    composeTestRule.setContent {
-      ProfileEventsList(
-          "title",
-          rememberLazyListState(),
-          mutableListOf(event),
-          NavigationActions(rememberNavController()))
-    }
-
-    composeTestRule.waitForIdle()
-
-    composeTestRule.onNodeWithTag("EventsListItems").assertIsDisplayed()
-    composeTestRule.onNodeWithText("View All >").assertIsDisplayed()
-    composeTestRule.onNodeWithText("2026-01-01").assertIsDisplayed()
-    composeTestRule.onNodeWithContentDescription("description").assertIsDisplayed()
-  }
-
   companion object {
-
-    private const val email = "user@eventstest.com"
+    private const val email = "profileeventlist@test.com"
     private const val pwd = "123456"
-    private var uid = ""
-    private const val username = "null"
+    private lateinit var uid: String
+    private const val username = "ProfileEventList"
 
+    private const val eventId = "ProfileEventListEvent"
     private lateinit var event: Event
 
     private val userVM = UserViewModel(UserRepository(Firebase.firestore))
@@ -75,23 +48,28 @@ class ProfileEventListTest {
     @JvmStatic
     @BeforeClass
     fun setup() {
-      TimeUnit.SECONDS.sleep(3)
       runBlocking {
-        // create two new users
+        // Create a new user
         var result = Firebase.auth.createUserWithEmailAndPassword(email, pwd)
         while (!result.isComplete) {
           TimeUnit.SECONDS.sleep(1)
         }
         uid = result.result.user!!.uid
 
+        // Add the user to view model
         userVM.createUserIfNew(
             uid, username, "testfirstname", "testlastname", email, "testphonenumber", "testcountry")
-        TimeUnit.SECONDS.sleep(3)
+        while (userVM.getUser(uid) == null) {
+          TimeUnit.SECONDS.sleep(1)
+        }
 
+        // Sign in
         result = Firebase.auth.signInWithEmailAndPassword(email, pwd)
         while (!result.isComplete) {
           TimeUnit.SECONDS.sleep(1)
         }
+
+        // Create an Event
         eventVM = EventViewModel(uid, EventRepository(Firebase.firestore))
         eventVM.createEvent(
             "title",
@@ -109,14 +87,49 @@ class ProfileEventListTest {
             emptyList(),
             null,
             userVM,
-            "uid")
-        while (eventVM.getEvent("uid") == null) {
+            eventId)
+        while (eventVM.getEvent(eventId) == null) {
           TimeUnit.SECONDS.sleep(1)
         }
-        event = eventVM.getEvent("uid")!!
+        event = eventVM.getEvent(eventId)!!
       }
-
-      TimeUnit.SECONDS.sleep(3)
     }
+
+    @AfterClass
+    @JvmStatic
+    fun tearDown() {
+      runBlocking {
+        // Clean up the event
+        eventVM.getAllEvents()?.forEach {
+          eventVM.removeEvent(it.eventID)
+
+          // Clean up the user
+          Firebase.auth.currentUser?.delete()
+          userVM.deleteUser(uid)
+        }
+      }
+    }
+  }
+
+  @Test
+  fun testProfileEventList() {
+    composeTestRule.setContent {
+      ProfileEventsList(
+          "title",
+          rememberLazyListState(),
+          mutableListOf(event),
+          NavigationActions(rememberNavController()))
+    }
+
+    // Wait for the page to load
+    composeTestRule.waitUntil(timeoutMillis = 10000) {
+      composeTestRule.onNodeWithTag("EventsListItems").isDisplayed()
+    }
+
+    // Test that the ui is correctly displayed
+    composeTestRule.onNodeWithTag("EventsListItems").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("EventsListHeader").assertIsDisplayed()
+    composeTestRule.onNodeWithText("2026-01-01").assertIsDisplayed()
+    composeTestRule.onNodeWithContentDescription("description").assertIsDisplayed()
   }
 }
