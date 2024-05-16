@@ -75,8 +75,8 @@ class LoginScreenTest {
     rule.waitForIdle()
 
     // Click on the "Log in" button
-    rule.onNodeWithText("Log in").assertIsEnabled().assertHasClickAction()
-    rule.onNodeWithText("Log in").performClick()
+    rule.onNodeWithText("Log In").assertIsEnabled().assertHasClickAction()
+    rule.onNodeWithText("Log In").performClick()
 
     rule.waitForIdle()
 
