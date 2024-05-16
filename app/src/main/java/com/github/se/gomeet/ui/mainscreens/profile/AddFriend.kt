@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -97,11 +98,11 @@ fun AddFriend(nav: NavigationActions, userViewModel: UserViewModel) {
 
           Row(
               verticalAlignment = Alignment.CenterVertically,
-              modifier = Modifier.padding(start = screenWidth / 15, top = 0.dp)) {
+              modifier = Modifier.padding(start = 18.dp)) {
                 Text(
                     text = "Find User",
                     style =
-                        MaterialTheme.typography.headlineMedium.copy(
+                        MaterialTheme.typography.headlineSmall.copy(
                             fontWeight = FontWeight.SemiBold))
               }
         }
@@ -175,7 +176,7 @@ fun ProfileImageUser(
             painterResource(id = defaultImageResId)
           },
       contentDescription = "Profile picture",
-      modifier = modifier.size(40.dp).clip(CircleShape).background(color = Color.Gray),
+      modifier = modifier.size(55.dp).clip(CircleShape).background(color = Color.Gray),
       contentScale = ContentScale.Crop)
 }
 
@@ -201,18 +202,29 @@ fun UserItem(
           Column {
             Text(
                 text = "${user.firstName} ${user.lastName}",
-                style = MaterialTheme.typography.bodyMedium)
-            Text(text = user.username, style = MaterialTheme.typography.bodySmall)
+                style = MaterialTheme.typography.bodyLarge)
+            Text(text = user.username, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6F))
           }
         }
-        Button(
-            colors =
-                ButtonDefaults.buttonColors(
-                    if (isFollowing) MaterialTheme.colorScheme.outlineVariant else Color.White,
-                    if (isFollowing) MaterialTheme.colorScheme.onSecondary
-                    else MaterialTheme.colorScheme.tertiary),
-            onClick = { onFollowButtonClick(user.uid, isFollowing) }) {
-              Text(text = if (isFollowing) "Unfollow" else "Follow")
-            }
+      Button(
+          shape = RoundedCornerShape(10.dp),
+          onClick = { onFollowButtonClick(user.uid, isFollowing) },
+          modifier = Modifier
+              .padding(start = 15.dp)
+              .width(110.dp)
+              .testTag(if (isFollowing) "UnfollowButton" else "FollowButton"),
+          colors = ButtonDefaults.buttonColors(
+              containerColor = if (isFollowing) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.outlineVariant,
+              contentColor = if (isFollowing) Color.Black else Color.White,
+              disabledContentColor = Color.Transparent,
+              disabledContainerColor = Color.Transparent
+          )
+      ) {
+          Text(
+              text = if (isFollowing) "Following" else "Follow",
+              style = MaterialTheme.typography.labelLarge,
+              color = if (isFollowing) MaterialTheme.colorScheme.onBackground else Color.White
+          )
+      }
       }
 }
