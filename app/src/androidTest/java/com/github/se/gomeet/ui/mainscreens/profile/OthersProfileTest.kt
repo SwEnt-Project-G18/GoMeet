@@ -11,13 +11,10 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.github.se.gomeet.model.repository.EventRepository
-import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
@@ -62,24 +59,24 @@ class OthersProfileTest {
 
         // Add the users to the view model
         userVM.createUserIfNew(
-          uid1,
-          username1,
-          "testfirstname",
-          "testlastname",
-          email1,
-          "testphonenumber",
-          "testcountry")
+            uid1,
+            username1,
+            "testfirstname",
+            "testlastname",
+            email1,
+            "testphonenumber",
+            "testcountry")
         while (userVM.getUser(uid1) == null) {
           TimeUnit.SECONDS.sleep(1)
         }
         userVM.createUserIfNew(
-          uid2,
-          username2,
-          "testfirstname2",
-          "testlastname2",
-          email2,
-          "testphonenumber2",
-          "testcountry2")
+            uid2,
+            username2,
+            "testfirstname2",
+            "testlastname2",
+            email2,
+            "testphonenumber2",
+            "testcountry2")
         while (userVM.getUser(uid2) == null) {
           TimeUnit.SECONDS.sleep(1)
         }
@@ -115,10 +112,7 @@ class OthersProfileTest {
     // Viewing the profile of user2
     composeTestRule.setContent {
       OthersProfile(
-        NavigationActions(rememberNavController()),
-        uid2,
-        UserViewModel(),
-        EventViewModel())
+          NavigationActions(rememberNavController()), uid2, UserViewModel(), EventViewModel())
     }
     // Wait for the page to load
     composeTestRule.waitUntil { composeTestRule.onNodeWithTag("Profile Picture").isDisplayed() }

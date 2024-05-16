@@ -13,8 +13,6 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.MainActivity
-import com.github.se.gomeet.model.repository.EventRepository
-import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.screens.CreateEventScreen
 import com.github.se.gomeet.screens.CreateScreen
 import com.github.se.gomeet.screens.EventsScreen
@@ -23,7 +21,6 @@ import com.github.se.gomeet.screens.WelcomeScreenScreen
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen
@@ -43,112 +40,112 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class EndToEndTest : TestCase() {
 
-    @get:Rule val composeTestRule = createAndroidComposeRule<MainActivity>()
+  @get:Rule val composeTestRule = createAndroidComposeRule<MainActivity>()
 
-    companion object {
-        private const val email = "user@test.com"
-        private const val pwd = "123456"
-        private lateinit var uid: String
-        private const val username = "EndToEndTestuser"
+  companion object {
+    private const val email = "user@test.com"
+    private const val pwd = "123456"
+    private lateinit var uid: String
+    private const val username = "EndToEndTestuser"
 
-        private val userVM = UserViewModel()
-        private lateinit var eventVM: EventViewModel
+    private val userVM = UserViewModel()
+    private lateinit var eventVM: EventViewModel
 
-        @JvmStatic
-        @BeforeClass
-        fun setup() {
-            runBlocking {
-                // create a new user
-                var result = Firebase.auth.createUserWithEmailAndPassword(email, pwd)
-                while (!result.isComplete) {
-                    TimeUnit.SECONDS.sleep(1)
-                }
-                uid = result.result.user!!.uid
-
-                // Add the user to the view model
-                userVM.createUserIfNew(
-                    uid, username, "testfirstname", "testlastname", email, "testphonenumber", "testcountry")
-                TimeUnit.SECONDS.sleep(3)
-
-                // Sign in
-                result = Firebase.auth.signInWithEmailAndPassword(email, pwd)
-                while (!result.isComplete) {
-                    TimeUnit.SECONDS.sleep(1)
-                }
-                eventVM = EventViewModel(uid)
-            }
+    @JvmStatic
+    @BeforeClass
+    fun setup() {
+      runBlocking {
+        // create a new user
+        var result = Firebase.auth.createUserWithEmailAndPassword(email, pwd)
+        while (!result.isComplete) {
+          TimeUnit.SECONDS.sleep(1)
         }
+        uid = result.result.user!!.uid
 
-        @AfterClass
-        @JvmStatic
-        fun tearDown() {
-            runBlocking {
-                // Clean up the event
-                eventVM.getAllEvents()?.forEach { eventVM.removeEvent(it.eventID) }
-                // Clean up the user
-                Firebase.auth.currentUser?.delete()
-                userVM.deleteUser(uid)
-            }
+        // Add the user to the view model
+        userVM.createUserIfNew(
+            uid, username, "testfirstname", "testlastname", email, "testphonenumber", "testcountry")
+        TimeUnit.SECONDS.sleep(3)
+
+        // Sign in
+        result = Firebase.auth.signInWithEmailAndPassword(email, pwd)
+        while (!result.isComplete) {
+          TimeUnit.SECONDS.sleep(1)
         }
+        eventVM = EventViewModel(uid)
+      }
     }
 
-    @Test
-    fun test() = run {
-        ComposeScreen.onComposeScreen<WelcomeScreenScreen>(composeTestRule) {
-            step("Click on the log in button") {
-                composeTestRule.onNodeWithText("Log In").assertIsDisplayed().performClick()
-            }
-        }
+    @AfterClass
+    @JvmStatic
+    fun tearDown() {
+      runBlocking {
+        // Clean up the event
+        eventVM.getAllEvents()?.forEach { eventVM.removeEvent(it.eventID) }
+        // Clean up the user
+        Firebase.auth.currentUser?.delete()
+        userVM.deleteUser(uid)
+      }
+    }
+  }
 
-        ComposeScreen.onComposeScreen<LoginScreenScreen>(composeTestRule) {
-            step("Log in with email and password") {
-                composeTestRule.onNodeWithText("Log in").assertIsDisplayed().assertIsNotEnabled()
-                composeTestRule.onNodeWithText("Email").assertIsDisplayed().performTextInput(email)
-                composeTestRule.onNodeWithText("Password").assertIsDisplayed().performTextInput(pwd)
-                composeTestRule.onNodeWithText("Log in").assertIsEnabled().performClick()
-                composeTestRule.waitForIdle()
-                composeTestRule.waitUntil(timeoutMillis = 10000) {
-                    composeTestRule.onNodeWithTag("CreateUI").isDisplayed()
-                }
-            }
-        }
+  @Test
+  fun test() = run {
+    ComposeScreen.onComposeScreen<WelcomeScreenScreen>(composeTestRule) {
+      step("Click on the log in button") {
+        composeTestRule.onNodeWithText("Log In").assertIsDisplayed().performClick()
+      }
+    }
 
-        ComposeScreen.onComposeScreen<CreateScreen>(composeTestRule) {
-            step("Select which type of event to create") {
-                composeTestRule.onNodeWithText("Public").assertIsDisplayed().performClick()
-            }
-        }
-
+    ComposeScreen.onComposeScreen<LoginScreenScreen>(composeTestRule) {
+      step("Log in with email and password") {
+        composeTestRule.onNodeWithText("Log in").assertIsDisplayed().assertIsNotEnabled()
+        composeTestRule.onNodeWithText("Email").assertIsDisplayed().performTextInput(email)
+        composeTestRule.onNodeWithText("Password").assertIsDisplayed().performTextInput(pwd)
+        composeTestRule.onNodeWithText("Log in").assertIsEnabled().performClick()
         composeTestRule.waitForIdle()
-
-        ComposeScreen.onComposeScreen<CreateEventScreen>(composeTestRule) {
-            step("Create an event") {
-                composeTestRule.onNodeWithText("Title").assertIsDisplayed().performTextInput("Title")
-                composeTestRule
-                    .onNodeWithText("Description")
-                    .assertIsDisplayed()
-                    .performTextInput("Description")
-                composeTestRule.onNodeWithText("Location").assertIsDisplayed().performTextInput("test")
-                composeTestRule
-                    .onNodeWithText("Date")
-                    .performTextInput(LocalDate.of(2025, 3, 30).toString())
-                composeTestRule.onNodeWithText("Price").performTextInput("1")
-                composeTestRule
-                    .onNodeWithText("Link")
-                    .assertIsDisplayed()
-                    .performTextInput("https://example.com")
-                composeTestRule.onNodeWithText("Post").assertIsEnabled().performClick()
-                TimeUnit.SECONDS.sleep(3)
-            }
+        composeTestRule.waitUntil(timeoutMillis = 10000) {
+          composeTestRule.onNodeWithTag("CreateUI").isDisplayed()
         }
-        composeTestRule.onNodeWithText("Events").performClick()
-        ComposeScreen.onComposeScreen<EventsScreen>(composeTestRule) {
-            composeTestRule.waitForIdle()
-            composeTestRule.onAllNodesWithText("Events")[1].performClick()
-            composeTestRule.waitUntil(timeoutMillis = 5000) {
-                composeTestRule.onAllNodesWithTag("Card")[0].isDisplayed()
-            }
-            composeTestRule.onAllNodesWithTag("Card")[0].assertIsDisplayed()
-        }
+      }
     }
+
+    ComposeScreen.onComposeScreen<CreateScreen>(composeTestRule) {
+      step("Select which type of event to create") {
+        composeTestRule.onNodeWithText("Public").assertIsDisplayed().performClick()
+      }
+    }
+
+    composeTestRule.waitForIdle()
+
+    ComposeScreen.onComposeScreen<CreateEventScreen>(composeTestRule) {
+      step("Create an event") {
+        composeTestRule.onNodeWithText("Title").assertIsDisplayed().performTextInput("Title")
+        composeTestRule
+            .onNodeWithText("Description")
+            .assertIsDisplayed()
+            .performTextInput("Description")
+        composeTestRule.onNodeWithText("Location").assertIsDisplayed().performTextInput("test")
+        composeTestRule
+            .onNodeWithText("Date")
+            .performTextInput(LocalDate.of(2025, 3, 30).toString())
+        composeTestRule.onNodeWithText("Price").performTextInput("1")
+        composeTestRule
+            .onNodeWithText("Link")
+            .assertIsDisplayed()
+            .performTextInput("https://example.com")
+        composeTestRule.onNodeWithText("Post").assertIsEnabled().performClick()
+        TimeUnit.SECONDS.sleep(3)
+      }
+    }
+    composeTestRule.onNodeWithText("Events").performClick()
+    ComposeScreen.onComposeScreen<EventsScreen>(composeTestRule) {
+      composeTestRule.waitForIdle()
+      composeTestRule.onAllNodesWithText("Events")[1].performClick()
+      composeTestRule.waitUntil(timeoutMillis = 5000) {
+        composeTestRule.onAllNodesWithTag("Card")[0].isDisplayed()
+      }
+      composeTestRule.onAllNodesWithTag("Card")[0].assertIsDisplayed()
+    }
+  }
 }

@@ -7,14 +7,11 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.github.se.gomeet.model.repository.EventRepository
-import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
@@ -61,7 +58,7 @@ class EventInfoTest {
         // Add the user to the view model and add a second user who created the event
         uid = Firebase.auth.currentUser!!.uid
         userVM.createUserIfNew(
-          organiserId, "testorganiser", "test", "name", "test@email.com", "0123", "Afghanistan")
+            organiserId, "testorganiser", "test", "name", "test@email.com", "0123", "Afghanistan")
         while (userVM.getUser(organiserId) == null) {
           TimeUnit.SECONDS.sleep(1)
         }
@@ -88,17 +85,17 @@ class EventInfoTest {
   fun testEventInfo() {
     composeTestRule.setContent {
       MyEventInfo(
-        nav = NavigationActions(rememberNavController()),
-        title = eventTitle,
-        eventId = eventId,
-        date = eventDate,
-        time = eventTime,
-        organizerId = organiserId,
-        rating = eventRating,
-        description = eventDescription,
-        loc = eventLocation,
-        userViewModel = userVM,
-        eventViewModel = eventVM)
+          nav = NavigationActions(rememberNavController()),
+          title = eventTitle,
+          eventId = eventId,
+          date = eventDate,
+          time = eventTime,
+          organizerId = organiserId,
+          rating = eventRating,
+          description = eventDescription,
+          loc = eventLocation,
+          userViewModel = userVM,
+          eventViewModel = eventVM)
     }
 
     composeTestRule.waitForIdle()
@@ -113,9 +110,9 @@ class EventInfoTest {
     composeTestRule.onNodeWithTag("EventHeader").assertIsDisplayed()
     composeTestRule.onNodeWithTag("EventImage").assertIsDisplayed()
     composeTestRule
-      .onNodeWithTag("EventDescription")
-      .assertTextContains(eventDescription)
-      .assertIsDisplayed()
+        .onNodeWithTag("EventDescription")
+        .assertTextContains(eventDescription)
+        .assertIsDisplayed()
 
     composeTestRule.onNodeWithTag("EventButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("MapView").assertIsDisplayed()

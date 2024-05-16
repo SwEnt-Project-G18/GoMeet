@@ -14,8 +14,6 @@ import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.MainActivity
 import com.github.se.gomeet.model.event.location.Location
-import com.github.se.gomeet.model.repository.EventRepository
-import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.screens.EventInfoScreen
 import com.github.se.gomeet.screens.FollowScreen
 import com.github.se.gomeet.screens.LoginScreenScreen
@@ -26,11 +24,11 @@ import com.github.se.gomeet.screens.WelcomeScreenScreen
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen
 import java.time.LocalDate
+import java.time.LocalTime
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
 import org.junit.AfterClass
@@ -38,7 +36,6 @@ import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.time.LocalTime
 
 /**
  * This end to end test tests that a user can (after logging in) click on an event in Trends, view
@@ -83,22 +80,22 @@ class EndToEndTest2 : TestCase() {
 
       // Add the users to the view model
       userVM.createUserIfNew(
-        uid1,
-        username1,
-        "testfirstname",
-        "testlastname",
-        email1,
-        "testphonenumber",
-        "testcountry")
+          uid1,
+          username1,
+          "testfirstname",
+          "testlastname",
+          email1,
+          "testphonenumber",
+          "testcountry")
       TimeUnit.SECONDS.sleep(3)
       userVM.createUserIfNew(
-        uid2,
-        username2,
-        "testfirstname2",
-        "testlastname2",
-        email2,
-        "testphonenumber2",
-        "testcountry2")
+          uid2,
+          username2,
+          "testfirstname2",
+          "testlastname2",
+          email2,
+          "testphonenumber2",
+          "testcountry2")
       TimeUnit.SECONDS.sleep(3)
 
       // user1 is used to create an event
@@ -109,23 +106,23 @@ class EndToEndTest2 : TestCase() {
 
       eventVM = EventViewModel(Firebase.auth.currentUser!!.uid)
       eventVM.createEvent(
-        "title",
-        "description",
-        Location(0.0, 0.0, "location"),
-        LocalDate.of(2025, 3, 30),
-        LocalTime.now(),
-        0.0,
-        "url",
-        emptyList(),
-        emptyList(),
-        emptyList(),
-        0,
-        true,
-        emptyList(),
-        emptyList(),
-        null,
-        userVM,
-        "eventuid1")
+          "title",
+          "description",
+          Location(0.0, 0.0, "location"),
+          LocalDate.of(2025, 3, 30),
+          LocalTime.now(),
+          0.0,
+          "url",
+          emptyList(),
+          emptyList(),
+          emptyList(),
+          0,
+          true,
+          emptyList(),
+          emptyList(),
+          null,
+          userVM,
+          "eventuid1")
       TimeUnit.SECONDS.sleep(3)
 
       Firebase.auth.signOut()
