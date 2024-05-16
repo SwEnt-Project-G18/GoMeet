@@ -69,6 +69,7 @@ import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import java.time.LocalDate
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
@@ -341,6 +342,6 @@ fun ProfilePreview() {
   Profile(
       nav = NavigationActions(rememberNavController()),
       "John",
-      UserViewModel(UserRepository(Firebase.firestore)),
-      EventViewModel("John", EventRepository(Firebase.firestore)))
+      UserViewModel(),
+      EventViewModel("John"))
 }

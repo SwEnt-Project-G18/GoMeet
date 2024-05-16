@@ -67,6 +67,9 @@ import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import java.time.LocalDate
+import java.time.ZoneId
+import java.util.Date
 import kotlinx.coroutines.launch
 
 /**
@@ -412,9 +415,5 @@ fun GoMeetSearchBar(
 @Composable
 @Preview
 fun EventPreview() {
-  Events(
-      "",
-      nav = NavigationActions(rememberNavController()),
-      UserViewModel(UserRepository(Firebase.firestore)),
-      EventViewModel("", EventRepository(Firebase.firestore)))
+  Events("", nav = NavigationActions(rememberNavController()), UserViewModel(), EventViewModel(""))
 }

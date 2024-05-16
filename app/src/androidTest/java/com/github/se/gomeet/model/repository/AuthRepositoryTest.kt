@@ -9,7 +9,6 @@ import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
-import org.junit.BeforeClass
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -29,16 +28,16 @@ class AuthRepositoryTest {
   @Test
   fun testSignUpSuccess() = runTest {
     runBlocking {
-      authRepository.signUpWithEmailPassword(email, pwd) { success -> assertTrue(success) }
+      AuthRepository.signUpWithEmailPassword(email, pwd) { success -> assertTrue(success) }
     }
   }
 
   @Test
   fun testSignUpFailure() = runTest {
     runBlocking {
-      authRepository.signUpWithEmailPassword(invEmail, pwd) { success -> assertFalse(success) }
-      authRepository.signUpWithEmailPassword(email, invPwd) { success -> assertFalse(success) }
-      authRepository.signUpWithEmailPassword(invEmail, invPwd) { success -> assertFalse(success) }
+      AuthRepository.signUpWithEmailPassword(invEmail, pwd) { success -> assertFalse(success) }
+      AuthRepository.signUpWithEmailPassword(email, invPwd) { success -> assertFalse(success) }
+      AuthRepository.signUpWithEmailPassword(invEmail, invPwd) { success -> assertFalse(success) }
     }
   }
 
@@ -46,28 +45,17 @@ class AuthRepositoryTest {
   fun testSignInSuccess() = runTest {
     Firebase.auth.createUserWithEmailAndPassword(email, pwd).await()
     runBlocking {
-      authRepository.signInWithEmailPassword(email, pwd) { success -> assertTrue(success) }
+      AuthRepository.signInWithEmailPassword(email, pwd) { success -> assertTrue(success) }
     }
-    authRepository.currentUser?.delete()
+    AuthRepository.currentUser?.delete()
   }
 
   @Test
   fun testSignInFailure() = runTest {
     runBlocking {
-      authRepository.signInWithEmailPassword(email, invPwd) { success -> assertFalse(success) }
-      authRepository.signInWithEmailPassword(invEmail, pwd) { success -> assertFalse(success) }
-      authRepository.signInWithEmailPassword(invEmail, invPwd) { success -> assertFalse(success) }
-    }
-  }
-
-  companion object {
-
-    private lateinit var authRepository: AuthRepository
-
-    @BeforeClass
-    @JvmStatic
-    fun setUp() {
-      authRepository = AuthRepository()
+      AuthRepository.signInWithEmailPassword(email, invPwd) { success -> assertFalse(success) }
+      AuthRepository.signInWithEmailPassword(invEmail, pwd) { success -> assertFalse(success) }
+      AuthRepository.signInWithEmailPassword(invEmail, invPwd) { success -> assertFalse(success) }
     }
   }
 }

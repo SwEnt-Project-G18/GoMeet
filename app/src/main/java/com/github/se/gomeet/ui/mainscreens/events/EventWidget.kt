@@ -38,7 +38,6 @@ import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.getEventDateString
 import com.github.se.gomeet.model.event.getEventTimeString
 import com.github.se.gomeet.model.event.location.Location
-import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.android.gms.maps.model.LatLng
@@ -46,6 +45,10 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.time.LocalDate
 import java.time.LocalTime
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 /**
  * A composable function that displays detailed information about an event in a card layout. This
@@ -133,10 +136,7 @@ fun EventWidget(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center) {
                       var username by remember { mutableStateOf<String?>("Loading...") }
-                      LaunchedEffect(userName) {
-                        username =
-                            UserViewModel(UserRepository(Firebase.firestore)).getUsername(userName)
-                      }
+                      LaunchedEffect(userName) { username = UserViewModel().getUsername(userName) }
 
                       username?.let {
                         Text(

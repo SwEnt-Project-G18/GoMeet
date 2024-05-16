@@ -9,5 +9,11 @@ enum class InviteStatus {
   REFUSED,
 }
 
-/**  */
+/**
+ * This data class represents the invitation to an event. It contains the event's uid and the status
+ * of the invitation.
+ *
+ * @param eventId Event's id
+ * @param status Status of the invitation
+ */
 data class Invitation(val eventId: String, val status: InviteStatus)

@@ -33,8 +33,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
-import com.github.se.gomeet.model.repository.EventRepository
-import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.navigation.NavigationActions
@@ -42,7 +40,6 @@ import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 
@@ -136,11 +133,7 @@ fun MyEventInfo(
 
                 var imageUrl by remember { mutableStateOf<String?>(null) }
                 LaunchedEffect(eventId) {
-                  imageUrl =
-                      EventViewModel(
-                              organizer.value!!.uid,
-                              eventRepository = EventRepository(Firebase.firestore))
-                          .getEventImageUrl(eventId)
+                  imageUrl = EventViewModel(organizer.value!!.uid).getEventImageUrl(eventId)
                 }
                 EventImage(imageUrl = imageUrl)
                 Spacer(modifier = Modifier.height(20.dp))
@@ -164,8 +157,6 @@ fun PreviewEventInfo() {
       time = "00:00",
       description = "Event Description",
       loc = LatLng(0.0, 0.0),
-      userViewModel = UserViewModel(userRepository = UserRepository(Firebase.firestore)),
-      eventViewModel =
-          EventViewModel(
-              creatorId = "organiserid", eventRepository = EventRepository(Firebase.firestore)))
+      userViewModel = UserViewModel(),
+      eventViewModel = EventViewModel(creatorId = "organiserid"))
 }

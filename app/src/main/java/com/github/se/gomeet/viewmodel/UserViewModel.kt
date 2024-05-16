@@ -21,9 +21,8 @@ import kotlinx.coroutines.launch
  * ViewModel for the user. The viewModel is responsible for handling the logic that comes from the
  * UI and the repository.
  */
-class UserViewModel(userRepository: UserRepository) : ViewModel() {
+class UserViewModel : ViewModel() {
   private val currentUser = mutableStateOf<GoMeetUser?>(null)
-  private val repository = userRepository
 
   /**
    * Create a new user if the user is new.
@@ -65,7 +64,7 @@ class UserViewModel(userRepository: UserRepository) : ViewModel() {
                   myFavorites = emptyList(),
                   tags = emptyList())
           currentUser.value = user
-          repository.addUser(user)
+          UserRepository.addUser(user)
         } catch (e: Exception) {
           Log.w(ContentValues.TAG, "Error adding user", e)
         }
@@ -75,7 +74,7 @@ class UserViewModel(userRepository: UserRepository) : ViewModel() {
 
   suspend fun getFollowers(uid: String): List<GoMeetUser> {
     val followers = mutableListOf<GoMeetUser>()
-    repository.getAllUsers { users ->
+    UserRepository.getAllUsers { users ->
       for (user in users) {
         if (user.uid != uid && user.following.contains(uid)) {
           followers.add(user)
@@ -93,7 +92,7 @@ class UserViewModel(userRepository: UserRepository) : ViewModel() {
   ) {
     viewModelScope.launch {
       try {
-        val imageUrl = repository.uploadUserProfileImageAndGetUrl(userId, imageUri)
+        val imageUrl = UserRepository.uploadUserProfileImageAndGetUrl(userId, imageUri)
         onSuccess(imageUrl)
       } catch (e: Exception) {
         onError(e)
@@ -111,7 +110,7 @@ class UserViewModel(userRepository: UserRepository) : ViewModel() {
     return try {
       Log.d("UID IS", "User id is $uid")
       val event = CompletableDeferred<GoMeetUser?>()
-      repository.getUser(uid) { t -> event.complete(t) }
+      UserRepository.getUser(uid) { t -> event.complete(t) }
       event.await()
     } catch (e: Exception) {
       null
@@ -126,7 +125,7 @@ class UserViewModel(userRepository: UserRepository) : ViewModel() {
   suspend fun getAllUsers(): List<GoMeetUser>? {
     return try {
       val users = CompletableDeferred<List<GoMeetUser>?>()
-      repository.getAllUsers { t -> users.complete(t) }
+      UserRepository.getAllUsers { t -> users.complete(t) }
       users.await()
     } catch (e: Exception) {
       emptyList()
@@ -139,7 +138,7 @@ class UserViewModel(userRepository: UserRepository) : ViewModel() {
    * @param user the user to edit
    */
   fun editUser(user: GoMeetUser) {
-    repository.updateUser(user)
+    UserRepository.updateUser(user)
   }
 
   /**
@@ -148,7 +147,7 @@ class UserViewModel(userRepository: UserRepository) : ViewModel() {
    * @param uid the user id
    */
   fun deleteUser(uid: String) {
-    repository.removeUser(uid)
+    UserRepository.removeUser(uid)
   }
 
   /**

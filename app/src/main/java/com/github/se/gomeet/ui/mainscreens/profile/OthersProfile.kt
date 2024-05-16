@@ -62,7 +62,6 @@ import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 
@@ -321,8 +320,5 @@ fun MoreActionsButton() {
 @Composable
 fun OthersProfilePreview() {
   OthersProfile(
-      nav = NavigationActions(rememberNavController()),
-      "",
-      UserViewModel(UserRepository(Firebase.firestore)),
-      EventViewModel(null, EventRepository(Firebase.firestore)))
+      nav = NavigationActions(rememberNavController()), "", UserViewModel(), EventViewModel(null))
 }

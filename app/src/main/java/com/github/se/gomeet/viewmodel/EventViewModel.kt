@@ -45,9 +45,7 @@ import org.json.JSONArray
  *
  * @param creatorId the id of the creator of the event
  */
-class EventViewModel(private val creatorId: String? = null, eventRepository: EventRepository) :
-    ViewModel() {
-  private val repository = eventRepository
+class EventViewModel(private val creatorId: String? = null) : ViewModel() {
   private val _bitmapDescriptors = mutableStateMapOf<String, BitmapDescriptor>()
   val bitmapDescriptors: MutableMap<String, BitmapDescriptor> = _bitmapDescriptors
 
@@ -145,7 +143,7 @@ class EventViewModel(private val creatorId: String? = null, eventRepository: Eve
   suspend fun getEvent(uid: String): Event? {
     return try {
       val event = CompletableDeferred<Event?>()
-      repository.getEvent(uid) { t -> event.complete(t) }
+      EventRepository.getEvent(uid) { t -> event.complete(t) }
       event.await()
     } catch (e: Exception) {
       null
@@ -201,7 +199,7 @@ class EventViewModel(private val creatorId: String? = null, eventRepository: Eve
   suspend fun getAllEvents(): List<Event>? {
     return try {
       val event = CompletableDeferred<List<Event>?>()
-      repository.getAllEvents { t -> event.complete(t) }
+      EventRepository.getAllEvents { t -> event.complete(t) }
       event.await()
     } catch (e: Exception) {
       null
@@ -269,7 +267,7 @@ class EventViewModel(private val creatorId: String? = null, eventRepository: Eve
                 tags,
                 updatedImages)
 
-        repository.addEvent(event)
+        EventRepository.addEvent(event)
         joinEvent(event, creatorId)
         userViewModel.joinEvent(event.eventID, creatorId)
         userViewModel.userCreatesEvent(event.eventID, creatorId)
@@ -285,7 +283,7 @@ class EventViewModel(private val creatorId: String? = null, eventRepository: Eve
    * @param event the event to edit
    */
   fun editEvent(event: Event) {
-    repository.updateEvent(event)
+    EventRepository.updateEvent(event)
   }
 
   /**
@@ -294,7 +292,7 @@ class EventViewModel(private val creatorId: String? = null, eventRepository: Eve
    * @param eventID the ID of the event to remove
    */
   fun removeEvent(eventID: String) {
-    repository.removeEvent(eventID)
+    EventRepository.removeEvent(eventID)
   }
 
   fun joinEvent(event: Event, userId: String) {
@@ -303,7 +301,7 @@ class EventViewModel(private val creatorId: String? = null, eventRepository: Eve
       return
     }
 
-    repository.updateEvent(event.copy(participants = event.participants.plus(userId)))
+    EventRepository.updateEvent(event.copy(participants = event.participants.plus(userId)))
   }
 
   fun sendInvitation(event: Event, userId: String) {
@@ -312,25 +310,26 @@ class EventViewModel(private val creatorId: String? = null, eventRepository: Eve
       return
     }
 
-    repository.updateEvent(event.copy(pendingParticipants = event.pendingParticipants.plus(userId)))
+    EventRepository.updateEvent(
+        event.copy(pendingParticipants = event.pendingParticipants.plus(userId)))
   }
 
   fun acceptInvitation(event: Event, userId: String) {
     assert(event.pendingParticipants.contains(userId))
-    repository.updateEvent(
+    EventRepository.updateEvent(
         event.copy(pendingParticipants = event.pendingParticipants.minus(userId)))
     joinEvent(event, userId)
   }
 
   fun declineInvitation(event: Event, userId: String) {
     assert(event.pendingParticipants.contains(userId))
-    repository.updateEvent(
+    EventRepository.updateEvent(
         event.copy(pendingParticipants = event.pendingParticipants.minus(userId)))
   }
 
   fun kickParticipant(event: Event, userId: String) {
     assert(event.participants.contains(userId))
-    repository.updateEvent(event.copy(participants = event.participants.minus(userId)))
+    EventRepository.updateEvent(event.copy(participants = event.participants.minus(userId)))
   }
 
   fun cancelInvitation(event: Event, userId: String) {
@@ -339,7 +338,7 @@ class EventViewModel(private val creatorId: String? = null, eventRepository: Eve
       return
     }
 
-    repository.updateEvent(
+    EventRepository.updateEvent(
         event.copy(pendingParticipants = event.pendingParticipants.minus(userId)))
   }
 

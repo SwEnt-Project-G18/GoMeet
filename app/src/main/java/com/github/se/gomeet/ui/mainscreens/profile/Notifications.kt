@@ -73,6 +73,7 @@ import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.LocalTime
 import kotlinx.coroutines.launch
@@ -85,8 +86,8 @@ import kotlinx.coroutines.launch
  */
 @Composable
 fun Notifications(nav: NavigationActions, currentUserID: String) {
-  val userViewModel = UserViewModel(UserRepository(Firebase.firestore))
-  val eventViewModel = EventViewModel(null, EventRepository(Firebase.firestore))
+  val userViewModel = UserViewModel()
+  val eventViewModel = EventViewModel(null)
 
   var selectedFilter by remember { mutableStateOf("All") }
   val user = remember { mutableStateOf<GoMeetUser?>(null) }

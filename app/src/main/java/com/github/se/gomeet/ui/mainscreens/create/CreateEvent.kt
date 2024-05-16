@@ -73,8 +73,6 @@ import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.ui.theme.Grey
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import java.io.InputStream
 import java.time.LocalDate
 import java.time.LocalTime
@@ -92,9 +90,7 @@ private const val NUMBER_OF_SUGGESTIONS = 3
 @Composable
 fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivate: Boolean) {
 
-  val eventRepository = EventRepository(Firebase.firestore)
-  val userRepository = UserRepository(Firebase.firestore)
-  val uid = eventRepository.getNewId()
+  val uid = EventRepository.getNewId()
   val titleState = remember { mutableStateOf("") }
   val descriptionState = remember { mutableStateOf("") }
   val locationState = remember { mutableStateOf("") }
@@ -364,7 +360,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                                 listOf(),
                                 listOf(),
                                 imageUri,
-                                UserViewModel(userRepository),
+                                UserViewModel(),
                                 uid)
 
                             nav.goBack()
@@ -387,7 +383,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                             tags.value,
                             listOf(),
                             imageUri,
-                            UserViewModel(userRepository),
+                            UserViewModel(),
                             uid)
 
                         nav.goBack()
