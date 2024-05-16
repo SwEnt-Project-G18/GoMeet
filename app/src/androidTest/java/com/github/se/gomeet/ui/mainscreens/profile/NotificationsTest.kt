@@ -122,4 +122,13 @@ class NotificationsTest {
     composeTestRule.onNodeWithText("Accept").assertIsDisplayed().assertHasClickAction()
     composeTestRule.onNodeWithText("Decline").assertIsDisplayed().performClick()
   }
+
+  @Test
+  fun testAcceptButton() {
+    composeTestRule.setContent { Notifications(NavigationActions(rememberNavController()), uid) }
+    composeTestRule.waitUntil(timeoutMillis = 10000) {
+      composeTestRule.onNodeWithText("Accept").isDisplayed()
+    }
+    composeTestRule.onNodeWithText("Accept").assertIsDisplayed().assertHasClickAction()
+  }
 }
