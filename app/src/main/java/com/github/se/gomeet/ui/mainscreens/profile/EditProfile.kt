@@ -26,6 +26,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -332,7 +333,7 @@ fun EditProfile(
                   }
                   Spacer(modifier = Modifier.size(16.dp))
 
-                  CountrySuggestionTextField(countries, textFieldColors)
+                  CountrySuggestionTextField(countries, textFieldColors, country.value){country.value = it}
 
                   if (!countryValid && !firstClick) {
                     Text(text = "Country is not valid", color = Color.Red)
@@ -352,7 +353,7 @@ fun EditProfile(
                             textAlign = TextAlign.Start,
                             style = MaterialTheme.typography.bodyMedium)
                         Icon(
-                            Icons.Default.KeyboardArrowRight,
+                            Icons.AutoMirrored.Filled.KeyboardArrowRight,
                             null,
                             modifier =
                                 Modifier.clickable { showPopup.value = true }

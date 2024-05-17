@@ -1,5 +1,6 @@
 package com.github.se.gomeet.ui.authscreens.register
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Arrangement
@@ -149,6 +150,7 @@ fun RegisterScreen(
             4 ->
                 RegisterPfp(
                     callback = { pfp ->
+
                       authViewModel.onPfpRegisterChange(pfp)
                       nextState()
                     },
@@ -174,9 +176,22 @@ fun RegisterScreen(
               val country = signInState.value.countryRegister
               val username = signInState.value.usernameRegister
               val pfp = signInState.value.pfp
-
-              userViewModel.createUserIfNew(
-                  uid, username, firstName, lastName, email, phoneNumber, country)
+                if (pfp != null) {
+                    userViewModel.uploadImageAndGetUrl(
+                        userId = uid,
+                        imageUri = pfp,
+                        onSuccess = { imageUrl ->
+                            userViewModel.createUserIfNew(
+                                uid, username, firstName, lastName, email, phoneNumber, country, imageUrl)
+                        },
+                        onError = { exception ->
+                            Log.e(
+                                "ProfileUpdate", "Failed to upload new image: ${exception.message}")
+                        })
+                } else {
+                    userViewModel.createUserIfNew(
+                        uid, username, firstName, lastName, email, phoneNumber, country, "")
+                }
             }
 
             val user =
