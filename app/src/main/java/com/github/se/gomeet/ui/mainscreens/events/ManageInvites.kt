@@ -1,4 +1,4 @@
-package com.github.se.gomeet.ui.mainscreens.create
+package com.github.se.gomeet.ui.mainscreens.events
 
 import android.util.Log
 import androidx.compose.foundation.Canvas
@@ -19,12 +19,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -34,6 +36,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -56,12 +59,12 @@ import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.Invitation
 import com.github.se.gomeet.model.event.InviteStatus
+import com.github.se.gomeet.model.event.InviteStatus.*
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
-import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import kotlinx.coroutines.launch
@@ -130,18 +133,7 @@ fun ManageInvites(
                 verticalAlignment = Alignment.CenterVertically) {
                   IconButton(
                       onClick = {
-                        toUpdate.forEach { user ->
-                          userViewModel.editUser(user)
-                          if (user.pendingRequests.any { invitation ->
-                            invitation.eventId == event.value!!.eventID &&
-                                invitation.status == InviteStatus.PENDING
-                          }) {
-                            eventViewModel.sendInvitation(event.value!!, user.uid)
-                          } else {
-                            eventViewModel.cancelInvitation(event.value!!, user.uid)
-                          }
-                        }
-                        nav.goBack()
+                        inviteAction(toUpdate, event, nav, userViewModel, eventViewModel)
                       }) {
                         Icon(
                             Icons.AutoMirrored.Filled.KeyboardArrowLeft,
@@ -167,15 +159,15 @@ fun ManageInvites(
                     contentAlignment = Alignment.Center,
                     modifier =
                         Modifier.weight(1f).height(screenHeight / 20).clickable {
-                          coroutineScope.launch { pagerState.animateScrollToPage(0) }
+                          coroutineScope.launch {
+                            pagerState.animateScrollToPage(TO_INVITE.ordinal)
+                          }
                         }) {
                       Text(
-                          text = "To Invite",
+                          text = TO_INVITE.formattedName,
                           style =
                               MaterialTheme.typography.bodyMedium.copy(
-                                  fontWeight =
-                                      if (pagerState.currentPage == 0) FontWeight.Bold
-                                      else FontWeight.Normal))
+                                  fontWeight = pagerWeight(pagerState, TO_INVITE.formattedName)))
                     }
 
                 // Pending invitations
@@ -183,15 +175,13 @@ fun ManageInvites(
                     contentAlignment = Alignment.Center,
                     modifier =
                         Modifier.height(screenHeight / 20).weight(1f).clickable {
-                          coroutineScope.launch { pagerState.animateScrollToPage(1) }
+                          coroutineScope.launch { pagerState.animateScrollToPage(PENDING.ordinal) }
                         }) {
                       Text(
-                          text = "Pending",
+                          text = PENDING.formattedName,
                           style =
                               MaterialTheme.typography.bodyMedium.copy(
-                                  fontWeight =
-                                      if (pagerState.currentPage == 1) FontWeight.Bold
-                                      else FontWeight.Normal))
+                                  fontWeight = pagerWeight(pagerState, PENDING.formattedName)))
                     }
 
                 // Accepted invitations
@@ -199,15 +189,13 @@ fun ManageInvites(
                     contentAlignment = Alignment.Center,
                     modifier =
                         Modifier.height(screenHeight / 20).weight(1f).clickable {
-                          coroutineScope.launch { pagerState.animateScrollToPage(2) }
+                          coroutineScope.launch { pagerState.animateScrollToPage(ACCEPTED.ordinal) }
                         }) {
                       Text(
-                          text = "Accepted",
+                          text = ACCEPTED.formattedName,
                           style =
                               MaterialTheme.typography.bodyMedium.copy(
-                                  fontWeight =
-                                      if (pagerState.currentPage == 2) FontWeight.Bold
-                                      else FontWeight.Normal))
+                                  fontWeight = pagerWeight(pagerState, ACCEPTED.formattedName)))
                     }
 
                 // Refused invitations
@@ -215,15 +203,13 @@ fun ManageInvites(
                     contentAlignment = Alignment.Center,
                     modifier =
                         Modifier.height(screenHeight / 20).weight(1f).clickable {
-                          coroutineScope.launch { pagerState.animateScrollToPage(3) }
+                          coroutineScope.launch { pagerState.animateScrollToPage(REFUSED.ordinal) }
                         }) {
                       Text(
-                          text = "Refused",
+                          text = REFUSED.formattedName,
                           style =
                               MaterialTheme.typography.bodyMedium.copy(
-                                  fontWeight =
-                                      if (pagerState.currentPage == 3) FontWeight.Bold
-                                      else FontWeight.Normal))
+                                  fontWeight = pagerWeight(pagerState, REFUSED.formattedName)))
                     }
               }
           Canvas(
@@ -256,54 +242,51 @@ fun ManageInvites(
         if (isLoaded) {
           HorizontalPager(state = pagerState, modifier = Modifier.padding(innerPadding)) { page ->
             when (page) {
-              0 -> {
+              TO_INVITE.ordinal -> {
                 PageUserInvites(
                     followersFollowingList.filter { u ->
                       !u.pendingRequests.any { invitation ->
                         invitation.eventId == event.value!!.eventID
-                      }
+                      } && !u.joinedEvents.contains(event.value!!.eventID)
                     },
                     event.value!!,
                     null,
                     callback = { toUpdate.add(it) },
                     initialClicked = false)
               }
-              1 -> {
+              PENDING.ordinal -> {
                 PageUserInvites(
                     followersFollowingList.filter { u ->
                       u.pendingRequests.any { invitation ->
                         (invitation.eventId == event.value!!.eventID) &&
-                            (invitation.status == InviteStatus.PENDING)
+                            (invitation.status == PENDING)
                       }
                     },
                     event.value!!,
-                    InviteStatus.PENDING,
+                    PENDING,
                     callback = { toUpdate.add(it) },
                     initialClicked = false)
               }
-              2 -> {
+              ACCEPTED.ordinal -> {
                 PageUserInvites(
                     followersFollowingList.filter { u ->
-                      u.pendingRequests.any { invitation ->
-                        (invitation.eventId == event.value!!.eventID) &&
-                            (invitation.status == InviteStatus.ACCEPTED)
-                      }
+                      u.joinedEvents.contains(event.value!!.eventID)
                     },
                     event.value!!,
-                    InviteStatus.ACCEPTED,
+                    ACCEPTED,
                     callback = { toUpdate.add(it) },
                     initialClicked = false)
               }
-              3 -> {
+              REFUSED.ordinal -> {
                 PageUserInvites(
                     followersFollowingList.filter { u ->
                       u.pendingRequests.any { invitation ->
                         (invitation.eventId == event.value!!.eventID) &&
-                            (invitation.status == InviteStatus.REFUSED)
+                            (invitation.status == REFUSED)
                       }
                     },
                     event.value!!,
-                    InviteStatus.REFUSED,
+                    REFUSED,
                     callback = { toUpdate.add(it) },
                     initialClicked = false)
               }
@@ -317,6 +300,15 @@ fun ManageInvites(
       }
 }
 
+/**
+ * This composable function represents the list of users that can be invited to an event.
+ *
+ * @param list the list of users that can be invited
+ * @param currentEvent the event for which the users are invited
+ * @param status the status of the invitation
+ * @param callback the callback function to update the list of users to invite
+ * @param initialClicked the initial state of the button
+ */
 @Composable
 fun PageUserInvites(
     list: List<GoMeetUser>,
@@ -336,6 +328,16 @@ fun PageUserInvites(
       }
 }
 
+/**
+ * This composable function represents the user invite widget when the user can be invited to an
+ * event.
+ *
+ * @param user the user that can be invited
+ * @param event the event for which the user is invited
+ * @param status the status of the invitation
+ * @param initialClicked the initial state of the button
+ * @param callback the callback function to update the list of users to invite
+ */
 @Composable
 fun UserInviteWidget(
     user: GoMeetUser,
@@ -347,7 +349,11 @@ fun UserInviteWidget(
 
   var clicked by rememberSaveable { mutableStateOf(initialClicked) }
   Row(
-      modifier = Modifier.fillMaxWidth().padding(start = 15.dp, end = 15.dp).height(50.dp),
+      modifier =
+          Modifier.fillMaxWidth()
+              .padding(start = 15.dp, end = 15.dp)
+              .height(50.dp)
+              .testTag("UserInviteWidget"),
       horizontalArrangement = Arrangement.SpaceBetween,
       verticalAlignment = Alignment.CenterVertically) {
         // Profile picture
@@ -367,20 +373,20 @@ fun UserInviteWidget(
         Text(
             text =
                 when (status) {
-                  null -> ""
-                  InviteStatus.PENDING -> "Pending"
-                  InviteStatus.ACCEPTED -> "Accepted"
-                  InviteStatus.REFUSED -> "Refused"
+                  PENDING -> PENDING.formattedName
+                  ACCEPTED -> ACCEPTED.formattedName
+                  REFUSED -> REFUSED.formattedName
+                  else -> ""
                 },
-            modifier = Modifier.width(70.dp),
+            modifier = Modifier.width(80.dp).testTag("InviteStatus"),
             color =
                 when (status) {
-                  null -> MaterialTheme.colorScheme.onBackground
-                  InviteStatus.PENDING ->
+                  PENDING ->
                       if (clicked) MaterialTheme.colorScheme.onBackground
                       else MaterialTheme.colorScheme.primary
-                  InviteStatus.ACCEPTED -> Color.Green
-                  InviteStatus.REFUSED -> Color.Red
+                  ACCEPTED -> Color.Green
+                  REFUSED -> Color.Red
+                  else -> MaterialTheme.colorScheme.onBackground
                 })
 
         // Button to invite or cancel invitation
@@ -388,48 +394,132 @@ fun UserInviteWidget(
             onClick = {
               clicked = !clicked
               val toAdd =
-                  (clicked && (status == null || status == InviteStatus.REFUSED)) ||
-                      (!clicked &&
-                          (status == InviteStatus.PENDING || status == InviteStatus.ACCEPTED))
+                  (clicked && (status == null || status == REFUSED)) ||
+                      (!clicked && (status == PENDING || status == ACCEPTED))
               Log.d("ManageInvites", "toAdd: $toAdd, clicked: $clicked, status: $status")
-              callback(
-                  user.copy(
-                      pendingRequests =
-                          if (toAdd)
-                              user.pendingRequests.plus(
-                                  Invitation(event.eventID, status ?: InviteStatus.PENDING))
-                          else
-                              user.pendingRequests.minus(
-                                  Invitation(event.eventID, status ?: InviteStatus.PENDING))))
+              callback(user.copy(pendingRequests = pendingRequests(user, event, status, toAdd)))
             },
             modifier = Modifier.height(26.dp).width(82.dp),
             contentPadding = PaddingValues(vertical = 2.dp),
             shape = RoundedCornerShape(10.dp),
-            colors =
-                ButtonDefaults.buttonColors(
-                    containerColor =
-                        when (status) {
-                          null -> if (!clicked) DarkCyan else Color.LightGray
-                          InviteStatus.PENDING -> if (clicked) DarkCyan else Color.LightGray
-                          InviteStatus.ACCEPTED -> if (clicked) DarkCyan else Color.LightGray
-                          InviteStatus.REFUSED -> if (!clicked) DarkCyan else Color.LightGray
-                        })) {
+            colors = manageInvitesButtonColour(status, clicked)) {
               Text(
                   text =
                       when (status) {
-                        null -> if (!clicked) "Invite" else "Cancel"
-                        InviteStatus.PENDING -> if (clicked) "Invite" else "Cancel"
-                        InviteStatus.ACCEPTED -> if (clicked) "Invite" else "Cancel"
-                        InviteStatus.REFUSED -> if (!clicked) "Invite" else "Cancel"
+                        PENDING,
+                        ACCEPTED -> if (clicked) "Invite" else "Cancel"
+                        else -> if (!clicked) "Invite" else "Cancel"
                       },
                   color =
                       when (status) {
-                        null -> if (!clicked) Color.White else Color.DarkGray
-                        InviteStatus.PENDING -> if (clicked) Color.White else Color.DarkGray
-                        InviteStatus.ACCEPTED -> if (clicked) Color.White else Color.DarkGray
-                        InviteStatus.REFUSED -> if (!clicked) Color.White else Color.DarkGray
+                        PENDING,
+                        ACCEPTED -> if (clicked) Color.White else Color.DarkGray
+                        else -> if (!clicked) Color.White else Color.DarkGray
                       },
                   fontSize = 12.sp)
             }
       }
+}
+
+/**
+ * This function updates the list of users to invite to an event.
+ *
+ * @param toUpdate The list of users to update.
+ * @param event The event to which the users are invited.
+ * @param nav The navigation actions.
+ * @param userViewModel The user view model.
+ * @param eventViewModel The event view model.
+ */
+private fun inviteAction(
+    toUpdate: List<GoMeetUser>,
+    event: MutableState<Event?>,
+    nav: NavigationActions,
+    userViewModel: UserViewModel,
+    eventViewModel: EventViewModel
+) {
+  toUpdate.forEach { user ->
+    userViewModel.editUser(user)
+    if (user.pendingRequests.any { invitation ->
+      invitation.eventId == event.value!!.eventID && invitation.status == PENDING
+    }) {
+      eventViewModel.sendInvitation(event.value!!, user.uid)
+    } else {
+      eventViewModel.cancelInvitation(event.value!!, user.uid)
+    }
+  }
+  nav.goBack()
+}
+
+/**
+ * This function returns the font weight of the text of the pager buttons.
+ *
+ * @param pagerState The state of the pager.
+ * @param button The name of the button.
+ */
+@OptIn(ExperimentalFoundationApi::class)
+private fun pagerWeight(pagerState: PagerState, button: String): FontWeight {
+  if ((pagerState.currentPage == TO_INVITE.ordinal && button == TO_INVITE.formattedName) ||
+      (pagerState.currentPage == PENDING.ordinal && button == PENDING.formattedName) ||
+      (pagerState.currentPage == ACCEPTED.ordinal && button == ACCEPTED.formattedName) ||
+      (pagerState.currentPage == REFUSED.ordinal && button == REFUSED.formattedName))
+      return FontWeight.Bold
+  else return FontWeight.Normal
+}
+
+/**
+ * This function updates the list of pending requests of a user.
+ *
+ * @param user The user to update.
+ * @param event The event to which the user gets invited to.
+ * @param status The status of the invitation.
+ * @param toAdd True if the invitation is to be added, false if it is to be removed.
+ */
+fun pendingRequests(
+    user: GoMeetUser,
+    event: Event,
+    status: InviteStatus?,
+    toAdd: Boolean
+): Set<Invitation> {
+  if (toAdd) {
+    val possiblePreviousInvitationRefused =
+        user.pendingRequests.find { it.eventId == event.eventID && it.status == REFUSED }
+
+    if (user.pendingRequests.contains(possiblePreviousInvitationRefused)) {
+      return user.pendingRequests
+          .map {
+            if (it == possiblePreviousInvitationRefused) {
+              it.copy(status = PENDING)
+            } else {
+              it
+            }
+          }
+          .toSet()
+    } else {
+      return user.pendingRequests.plus(Invitation(event.eventID, status ?: PENDING))
+    }
+  } else {
+    return user.pendingRequests.minus(Invitation(event.eventID, status ?: PENDING))
+  }
+}
+
+/**
+ * This function returns the button colour for the user invite widget.
+ *
+ * @param status The status of the invitation.
+ * @param clicked True if the button is clicked, false otherwise.
+ * @return The button colours.
+ */
+@Composable
+private fun manageInvitesButtonColour(status: InviteStatus?, clicked: Boolean): ButtonColors {
+
+  val c1 = MaterialTheme.colorScheme.outlineVariant
+  val c2 = Color.LightGray
+
+  return ButtonDefaults.buttonColors(
+      containerColor =
+          when (status) {
+            PENDING,
+            ACCEPTED -> if (clicked) c1 else c2
+            else -> if (!clicked) c1 else c2
+          })
 }

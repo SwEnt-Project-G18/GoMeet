@@ -18,6 +18,8 @@ import com.github.se.gomeet.model.event.Invitation
  * @param joinedEvents The list of events that the user joined
  * @param myEvents The list of events that were created by the user
  * @param myFavorites The list of events that the user added to favorites
+ * @param profilePicture The profile picture of the user
+ * @param tags The list of tags that the user is interested in
  */
 data class GoMeetUser(
     val uid: String,

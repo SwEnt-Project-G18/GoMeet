@@ -11,11 +11,9 @@ import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
@@ -30,7 +28,7 @@ class EditProfileTest {
   @get:Rule val composeTestRule = createComposeRule()
 
   companion object {
-    private val userVM = UserViewModel(UserRepository(Firebase.firestore))
+    private val userVM = UserViewModel()
     private lateinit var uid: String
 
     private val usr = "editprofile@test.com"

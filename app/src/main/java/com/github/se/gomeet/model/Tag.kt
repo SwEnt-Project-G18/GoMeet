@@ -40,7 +40,6 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.github.se.gomeet.ui.theme.DarkCyan
 
 /** Tag that users can add to their profile and events */
 enum class Tag {
@@ -103,9 +102,11 @@ fun TagsSelector(title: String, tags: MutableState<List<String>>, onSave: () -> 
                       .padding(top = 15.dp, start = 15.dp, end = 15.dp, bottom = 15.dp)) {
                 Text(
                     title,
-                    color = DarkCyan,
+                    color = MaterialTheme.colorScheme.tertiary,
                     fontWeight = FontWeight.SemiBold,
-                    style = MaterialTheme.typography.titleLarge)
+                    style =
+                        MaterialTheme.typography.headlineSmall.copy(
+                            fontWeight = FontWeight.SemiBold))
               }
           FlowRow(
               modifier =
@@ -124,7 +125,8 @@ fun TagsSelector(title: String, tags: MutableState<List<String>>, onSave: () -> 
                                 .testTag("Tag"),
                         colors =
                             ButtonDefaults.buttonColors(
-                                containerColor = DarkCyan, contentColor = Color.White),
+                                containerColor = MaterialTheme.colorScheme.outlineVariant,
+                                contentColor = Color.White),
                         contentPadding = PaddingValues(start = 15.dp, end = 10.dp)) {
                           Row(
                               verticalAlignment = Alignment.CenterVertically,
@@ -167,7 +169,7 @@ fun TagsSelector(title: String, tags: MutableState<List<String>>, onSave: () -> 
                 Text(
                     "Save",
                     fontWeight = FontWeight.SemiBold,
-                    color = DarkCyan,
+                    color = MaterialTheme.colorScheme.tertiary,
                     modifier = Modifier.clickable { onSave() })
               }
         }

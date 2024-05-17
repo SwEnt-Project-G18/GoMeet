@@ -10,11 +10,8 @@ import androidx.compose.ui.test.performClick
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
-import com.github.se.gomeet.model.repository.EventRepository
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -30,7 +27,7 @@ class ExploreTest {
     composeTestRule.setContent {
       Explore(
           nav = NavigationActions(rememberNavController()),
-          eventViewModel = EventViewModel("ExploreTestUser", EventRepository(Firebase.firestore)))
+          eventViewModel = EventViewModel("ExploreTestUser"))
     }
 
     // Wait for the page to load

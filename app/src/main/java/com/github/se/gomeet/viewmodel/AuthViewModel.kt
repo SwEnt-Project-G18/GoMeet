@@ -1,6 +1,7 @@
 package com.github.se.gomeet.viewmodel
 
 import android.content.Context
+import android.net.Uri
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,15 +17,14 @@ import kotlinx.coroutines.launch
  */
 class AuthViewModel : ViewModel() {
 
-  private val authRepository by lazy { AuthRepository() }
   private val _signInState = MutableStateFlow(SignInState())
   val signInState: StateFlow<SignInState> = _signInState
 
-  val currentUser = authRepository.currentUser
+  val currentUser = AuthRepository.currentUser
 
   /** Check if the user is signed in. */
   val hasUser: Boolean
-    get() = authRepository.hasUserSignedIn()
+    get() = AuthRepository.hasUserSignedIn()
 
   /**
    * Update the email field in the signInState.
@@ -76,7 +76,7 @@ class AuthViewModel : ViewModel() {
    *
    * @param pfpRegister the password to update the field with
    */
-  fun onPfpRegisterChange(pfpRegister: String) {
+  fun onPfpRegisterChange(pfpRegister: Uri?) {
     _signInState.value = _signInState.value.copy(pfp = pfpRegister)
   }
 
@@ -194,7 +194,7 @@ class AuthViewModel : ViewModel() {
         _signInState.value = _signInState.value.copy(isLoading = true)
         _signInState.value = _signInState.value.copy(registerError = null)
 
-        authRepository.signUpWithEmailPassword(
+        AuthRepository.signUpWithEmailPassword(
             _signInState.value.emailRegister, _signInState.value.passwordRegister) { isSuccessful ->
               if (isSuccessful) {
                 Toast.makeText(context, "Registration successful", Toast.LENGTH_SHORT).show()
@@ -224,7 +224,7 @@ class AuthViewModel : ViewModel() {
         _signInState.value = _signInState.value.copy(isLoading = true)
         _signInState.value = _signInState.value.copy(signInError = null)
 
-        authRepository.signInWithEmailPassword(
+        AuthRepository.signInWithEmailPassword(
             _signInState.value.email, _signInState.value.password) { isSuccessful ->
               if (isSuccessful) {
                 Toast.makeText(context, "Sign in successful", Toast.LENGTH_SHORT).show()
@@ -245,6 +245,6 @@ class AuthViewModel : ViewModel() {
 
   /** Sign out the user. */
   fun signOut() {
-    authRepository.signOut()
+    AuthRepository.signOut()
   }
 }

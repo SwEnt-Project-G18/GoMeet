@@ -20,7 +20,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.CircularProgressIndicator
@@ -46,7 +46,9 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.navigation.NavigationActions
@@ -106,16 +108,14 @@ fun FollowingFollowers(
   Scaffold(
       modifier = Modifier.testTag("FollowingFollower"),
       topBar = {
-        Column() {
+        Column {
           Box(contentAlignment = Alignment.Center) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically) {
                   IconButton(
                       modifier = Modifier.testTag("GoBackFollower"), onClick = { nav.goBack() }) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                            contentDescription = "Go back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Go back")
                       }
                 }
             Row(
@@ -247,7 +247,7 @@ fun PageUsers(
                     colors =
                         ButtonColors(
                             containerColor = MaterialTheme.colorScheme.primaryContainer,
-                            contentColor = Color.Black,
+                            contentColor = MaterialTheme.colorScheme.onBackground,
                             disabledContentColor = Color.Transparent,
                             disabledContainerColor = Color.Transparent)) {
                       Text(text = "Following", style = MaterialTheme.typography.labelLarge)
@@ -273,4 +273,10 @@ fun PageUsers(
           }
     }
   }
+}
+
+@Preview
+@Composable
+fun FollowingPreview() {
+  FollowingFollowers(NavigationActions(rememberNavController()), "", UserViewModel(), true)
 }

@@ -1,10 +1,8 @@
 package com.github.se.gomeet.viewmodel
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.github.se.gomeet.model.repository.UserRepository
+import com.github.se.gomeet.model.event.InviteStatus
 import com.github.se.gomeet.model.user.GoMeetUser
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
 import org.junit.AfterClass
@@ -23,14 +21,14 @@ class UserViewModelTest {
     private const val phonenumber = "testphonenumber"
     private const val country = "testcountry"
 
-    private val userVM = UserViewModel(UserRepository(Firebase.firestore))
+    private val userVM = UserViewModel()
 
     @BeforeClass
     @JvmStatic
     fun setup() {
       // Assumes that getUser works...
       runBlocking {
-        userVM.createUserIfNew(uid, username, firstname, lastname, email, phonenumber, country)
+        userVM.createUserIfNew(uid, username, firstname, lastname, email, phonenumber, country, "")
         while (userVM.getUser(uid) == null) {
           TimeUnit.SECONDS.sleep(1)
         }
@@ -117,7 +115,7 @@ class UserViewModelTest {
   }
 
   @Test
-  fun gotKickedFromEvent() {
+  fun gotKickedFromEventTest() {
     val eventId = "event4"
 
     // Join the event
@@ -155,7 +153,12 @@ class UserViewModelTest {
     runBlocking { userVM.userAcceptsInvitation(eventId, uid) }
 
     // Verify that the event appears in the user's joinedEvents list
-    runBlocking { assert(userVM.getUser(uid)!!.joinedEvents.contains(eventId)) }
+    runBlocking {
+      while (!userVM.getUser(uid)!!.joinedEvents.contains(eventId)) {
+        TimeUnit.SECONDS.sleep(1)
+      }
+      assert(userVM.getUser(uid)!!.joinedEvents.contains(eventId))
+    }
   }
 
   @Test
@@ -169,12 +172,25 @@ class UserViewModelTest {
     runBlocking { userVM.userRefusesInvitation(eventId, uid) }
 
     // Verify that the invitation is no longer in pendingRequests
-    runBlocking { assert(!userVM.getUser(uid)!!.pendingRequests.any { it.eventId == eventId }) }
+    runBlocking {
+      while (userVM.getUser(uid)!!.pendingRequests.any {
+        it.eventId == eventId && it.status == InviteStatus.PENDING
+      }) {
+        TimeUnit.SECONDS.sleep(1)
+      }
+      assert(
+          userVM.getUser(uid)!!.pendingRequests.any {
+            it.eventId == eventId && it.status == InviteStatus.REFUSED
+          })
+    }
 
     // Verify that the event doesn't appear in the user's joinedEvents list
     runBlocking {
       assert(!userVM.getUser(uid)!!.joinedEvents.contains(eventId))
-      assert(!userVM.getUser(uid)!!.pendingRequests.any { it.eventId == eventId })
+      assert(
+          userVM.getUser(uid)!!.pendingRequests.any {
+            it.eventId == eventId && it.status == InviteStatus.REFUSED
+          })
     }
   }
 

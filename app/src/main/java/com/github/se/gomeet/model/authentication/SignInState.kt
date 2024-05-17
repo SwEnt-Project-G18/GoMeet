@@ -1,5 +1,8 @@
 package com.github.se.gomeet.model.authentication
 
+import android.net.Uri
+import java.util.Locale
+
 /**
  * This data class represents the state of the sign in authentication.
  *
@@ -37,7 +40,7 @@ data class SignInState(
     val usernameRegister: String = "",
     val username: String = "",
     val firstName: String = "",
-    val pfp: String = "",
+    val pfp: Uri? = null,
     val lastName: String = "",
     val phoneNumber: String = "",
     val country: String = "",
@@ -46,3 +49,34 @@ data class SignInState(
     val registerError: String? = null,
     val signInError: String? = null
 )
+
+/**
+ * This function validates the email address.
+ *
+ * @param email The email address to be validated
+ * @return True if the email address is valid, false otherwise
+ */
+fun validateEmail(email: String): Boolean {
+  return email.isNotEmpty() && android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+}
+
+/**
+ * This function returns all countries with their respective flags.
+ *
+ * @return A list of countries with their respective flags
+ */
+fun getCountries(): ArrayList<String> {
+  val isoCountryCodes: Array<String> = Locale.getISOCountries()
+  val countriesWithEmojis: ArrayList<String> = arrayListOf()
+  for (countryCode in isoCountryCodes) {
+    val locale = Locale("", countryCode)
+    val countryName: String = locale.displayCountry
+    val flagOffset = 0x1F1E6
+    val asciiOffset = 0x41
+    val firstChar = Character.codePointAt(countryCode, 0) - asciiOffset + flagOffset
+    val secondChar = Character.codePointAt(countryCode, 1) - asciiOffset + flagOffset
+    val flag = (String(Character.toChars(firstChar)) + String(Character.toChars(secondChar)))
+    countriesWithEmojis.add("$countryName $flag")
+  }
+  return countriesWithEmojis
+}

@@ -5,13 +5,10 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.model.event.location.Location
-import com.github.se.gomeet.model.repository.EventRepository
-import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.time.LocalDate
 import java.time.LocalTime
@@ -35,7 +32,7 @@ class EventsTest {
 
     private const val eventId = "EventsTestEvent"
 
-    private val userVM = UserViewModel(UserRepository(Firebase.firestore))
+    private val userVM = UserViewModel()
     private lateinit var eventVM: EventViewModel
 
     @JvmStatic
@@ -52,7 +49,9 @@ class EventsTest {
         // Add the user to the view model
         userVM.createUserIfNew(
             uid, username, "testfirstname", "testlastname", email, "testphonenumber", "testcountry")
-        TimeUnit.SECONDS.sleep(3)
+        while (userVM.getUser(uid) == null) {
+          TimeUnit.SECONDS.sleep(1)
+        }
 
         // Sign in
         result = Firebase.auth.signInWithEmailAndPassword(email, pwd)
@@ -61,13 +60,13 @@ class EventsTest {
         }
 
         // Create an event
-        eventVM = EventViewModel(uid, EventRepository(Firebase.firestore))
+        eventVM = EventViewModel(uid)
         eventVM.createEvent(
             "title",
             "description",
             Location(0.0, 0.0, "location"),
             LocalDate.of(2026, 1, 1),
-            LocalTime.now(),
+            LocalTime.of(9, 17),
             0.0,
             "url",
             emptyList(),
@@ -94,13 +93,11 @@ class EventsTest {
     fun tearDown() {
       runBlocking {
         // Clean up the event
-        eventVM.getAllEvents()?.forEach {
-          eventVM.removeEvent(it.eventID)
+        eventVM.getAllEvents()?.forEach { eventVM.removeEvent(it.eventID) }
 
-          // Clean up the user
-          Firebase.auth.currentUser?.delete()
-          userVM.deleteUser(uid)
-        }
+        // Clean up the user
+        Firebase.auth.currentUser?.delete()
+        userVM.deleteUser(uid)
       }
     }
   }
@@ -108,11 +105,7 @@ class EventsTest {
   @Test
   fun testEvents() {
     composeTestRule.setContent {
-      Events(
-          uid,
-          NavigationActions(rememberNavController()),
-          UserViewModel(UserRepository(Firebase.firestore)),
-          eventVM)
+      Events(uid, NavigationActions(rememberNavController()), UserViewModel(), eventVM)
     }
 
     composeTestRule.waitForIdle()

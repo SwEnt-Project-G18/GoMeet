@@ -13,8 +13,6 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.MainActivity
-import com.github.se.gomeet.model.repository.EventRepository
-import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.screens.CreateEventScreen
 import com.github.se.gomeet.screens.CreateScreen
 import com.github.se.gomeet.screens.EventsScreen
@@ -23,7 +21,6 @@ import com.github.se.gomeet.screens.WelcomeScreenScreen
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen
@@ -50,7 +47,7 @@ class EndToEndTest : TestCase() {
     private lateinit var uid: String
     private const val username = "EndToEndTestuser"
 
-    private val userVM = UserViewModel(UserRepository(Firebase.firestore))
+    private val userVM = UserViewModel()
     private lateinit var eventVM: EventViewModel
 
     @JvmStatic
@@ -67,14 +64,16 @@ class EndToEndTest : TestCase() {
         // Add the user to the view model
         userVM.createUserIfNew(
             uid, username, "testfirstname", "testlastname", email, "testphonenumber", "testcountry")
-        TimeUnit.SECONDS.sleep(3)
+        while (userVM.getUser(uid) == null) {
+          TimeUnit.SECONDS.sleep(1)
+        }
 
         // Sign in
         result = Firebase.auth.signInWithEmailAndPassword(email, pwd)
         while (!result.isComplete) {
           TimeUnit.SECONDS.sleep(1)
         }
-        eventVM = EventViewModel(uid, EventRepository(Firebase.firestore))
+        eventVM = EventViewModel(uid)
       }
     }
 
@@ -101,10 +100,10 @@ class EndToEndTest : TestCase() {
 
     ComposeScreen.onComposeScreen<LoginScreenScreen>(composeTestRule) {
       step("Log in with email and password") {
-        composeTestRule.onNodeWithText("Log in").assertIsDisplayed().assertIsNotEnabled()
+        composeTestRule.onNodeWithText("Log In").assertIsDisplayed().assertIsNotEnabled()
         composeTestRule.onNodeWithText("Email").assertIsDisplayed().performTextInput(email)
         composeTestRule.onNodeWithText("Password").assertIsDisplayed().performTextInput(pwd)
-        composeTestRule.onNodeWithText("Log in").assertIsEnabled().performClick()
+        composeTestRule.onNodeWithText("Log In").assertIsEnabled().performClick()
         composeTestRule.waitForIdle()
         composeTestRule.waitUntil(timeoutMillis = 10000) {
           composeTestRule.onNodeWithTag("CreateUI").isDisplayed()

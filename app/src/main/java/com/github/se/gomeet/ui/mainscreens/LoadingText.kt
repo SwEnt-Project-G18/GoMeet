@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+/** Composable for the loading text, to be called whenever there is loading downtime. */
 @Composable
 fun LoadingText() {
   Column(

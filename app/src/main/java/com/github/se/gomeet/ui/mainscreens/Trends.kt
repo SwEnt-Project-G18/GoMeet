@@ -36,24 +36,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
+import com.github.se.gomeet.model.event.isPastEvent
 import com.github.se.gomeet.ui.mainscreens.events.GoMeetSearchBar
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.viewmodel.EventViewModel
+import com.github.se.gomeet.viewmodel.EventViewModel.SortOption
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
@@ -61,7 +60,6 @@ import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.rememberPagerState
 import com.google.android.gms.maps.model.LatLng
 import java.text.SimpleDateFormat
-import java.time.LocalDate
 import java.time.ZoneId
 import java.util.Calendar
 import java.util.Date
@@ -81,7 +79,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Trends(
-    currentUser: String,
+    currentUserId: String,
     nav: NavigationActions,
     userViewModel: UserViewModel,
     eventViewModel: EventViewModel
@@ -90,13 +88,13 @@ fun Trends(
   val eventList = remember { mutableStateListOf<Event>() }
   val coroutineScope = rememberCoroutineScope()
   val query = remember { mutableStateOf("") }
-  var eventsLoaded = remember { mutableStateOf(false) }
+  val eventsLoaded = remember { mutableStateOf(false) }
   val screenWidth = LocalConfiguration.current.screenWidthDp.dp
   val screenHeight = LocalConfiguration.current.screenHeightDp.dp
 
   LaunchedEffect(Unit) {
     coroutineScope.launch {
-      val allEvents = eventViewModel.getAllEvents()!!.filter { it.date.isAfter(LocalDate.now()) }
+      val allEvents = eventViewModel.getAllEvents()!!.filter { !isPastEvent(it) }
       if (allEvents.isNotEmpty()) {
         eventList.addAll(allEvents)
       }
@@ -150,31 +148,9 @@ fun Trends(
                   // TODO: Remove the top 5 events from the list
                   eventList.forEach { event ->
                     if (event.title.contains(query.value, ignoreCase = true)) {
-                      val painter: Painter =
-                          if (event.images.isNotEmpty()) {
-                            rememberAsyncImagePainter(
-                                ImageRequest.Builder(LocalContext.current)
-                                    .data(data = event.images[0])
-                                    .apply {
-                                      crossfade(true)
-                                      placeholder(R.drawable.gomeet_logo)
-                                    }
-                                    .build())
-                          } else {
-                            painterResource(id = R.drawable.gomeet_logo)
-                          }
 
                       EventWidget(
-                          userName = event.creator,
-                          eventName = event.title,
-                          eventId = event.eventID,
-                          eventDescription = event.description,
-                          eventDate = event.date,
-                          eventTime = event.time,
-                          eventPicture = painter,
-                          eventLocation = event.location,
-                          verified = false,
-                          nav = nav)
+                          event = event, verified = false, nav = nav, userVM = userViewModel)
                     }
                   }
                 }
@@ -183,6 +159,12 @@ fun Trends(
       }
 }
 
+/**
+ * Event carousel composable. This is where the events are displayed in a carousel.
+ *
+ * @param events The list of events to display.
+ * @param nav Navigation actions.
+ */
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun EventCarousel(events: List<Event>, nav: NavigationActions) {
@@ -192,7 +174,7 @@ fun EventCarousel(events: List<Event>, nav: NavigationActions) {
     launch {
       while (true) {
         delay(10000) // Wait for 10 seconds
-        val nextPage = (pagerState.currentPage + 1) % events.size
+        val nextPage = if (events.isNotEmpty()) (pagerState.currentPage + 1) % events.size else 0
         pagerState.animateScrollToPage(nextPage)
       }
     }
@@ -288,16 +270,15 @@ fun EventCarousel(events: List<Event>, nav: NavigationActions) {
   }
 }
 
-enum class SortOption {
-  DEFAULT,
-  ALPHABETICAL,
-  DATE
-}
-
+/**
+ * Sort button composable. This is where the user can sort the events.
+ *
+ * @param eventList The list of events to sort.
+ */
 @Composable
 fun SortButton(eventList: MutableList<Event>) {
   var expanded by remember { mutableStateOf(false) }
-  var selectedOption by remember { mutableStateOf(SortOption.DEFAULT) }
+  var selectedOption by remember { mutableStateOf(EventViewModel.SortOption.DEFAULT) }
 
   Box(
       contentAlignment = Alignment.Center,
@@ -314,7 +295,10 @@ fun SortButton(eventList: MutableList<Event>) {
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            modifier = Modifier.align(Alignment.Center).fillMaxWidth()) {
+            modifier =
+                Modifier.align(Alignment.Center)
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.primaryContainer)) {
               DropdownMenuItem(
                   text = { Text("Popularity") },
                   onClick = {

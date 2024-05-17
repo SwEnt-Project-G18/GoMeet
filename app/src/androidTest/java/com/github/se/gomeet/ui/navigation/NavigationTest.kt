@@ -6,8 +6,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.github.se.gomeet.model.repository.EventRepository
-import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.ui.mainscreens.Explore
 import com.github.se.gomeet.ui.mainscreens.Trends
 import com.github.se.gomeet.ui.mainscreens.create.Create
@@ -16,7 +14,6 @@ import com.github.se.gomeet.ui.mainscreens.profile.Profile
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
@@ -35,33 +32,31 @@ class NavigationTest {
   fun testNavigateTo() {
     composeTestRule.setContent {
       val nav = rememberNavController()
-      val userRepository = UserRepository(Firebase.firestore)
-      val eventRepository = EventRepository(Firebase.firestore)
       NavHost(navController = nav, startDestination = Route.EVENTS) {
         composable(TOP_LEVEL_DESTINATIONS[0].route) {
-          Explore(nav = NavigationActions(nav), EventViewModel(null, eventRepository))
+          Explore(nav = NavigationActions(nav), EventViewModel(null))
         }
         composable(TOP_LEVEL_DESTINATIONS[1].route) {
           Events(
               currentUser = currentUserId,
               nav = NavigationActions(rememberNavController()),
-              userViewModel = UserViewModel(userRepository),
-              eventViewModel = EventViewModel("NEEGn5cbkJZDXaezeGdfd2D4u6b2", eventRepository))
+              userViewModel = UserViewModel(),
+              eventViewModel = EventViewModel("NEEGn5cbkJZDXaezeGdfd2D4u6b2"))
         }
         composable(TOP_LEVEL_DESTINATIONS[2].route) {
           Trends(
-              currentUser = currentUserId,
+              currentUserId = currentUserId,
               nav = NavigationActions(rememberNavController()),
-              userViewModel = UserViewModel(userRepository),
-              eventViewModel = EventViewModel("NEEGn5cbkJZDXaezeGdfd2D4u6b2", eventRepository))
+              userViewModel = UserViewModel(),
+              eventViewModel = EventViewModel("NEEGn5cbkJZDXaezeGdfd2D4u6b2"))
         }
         composable(TOP_LEVEL_DESTINATIONS[3].route) { Create(NavigationActions(nav)) }
         composable(TOP_LEVEL_DESTINATIONS[4].route) {
           Profile(
               NavigationActions(nav),
               userId = currentUserId,
-              UserViewModel(userRepository),
-              EventViewModel(currentUserId, eventRepository))
+              UserViewModel(),
+              EventViewModel(currentUserId))
         }
         // Add more destinations as needed
       }
@@ -79,33 +74,31 @@ class NavigationTest {
   fun testGoBack() {
     composeTestRule.setContent {
       val nav = rememberNavController()
-      val userRepository = UserRepository(Firebase.firestore)
-      val eventRepository = EventRepository(Firebase.firestore)
       NavHost(navController = nav, startDestination = TOP_LEVEL_DESTINATIONS[0].route) {
         composable(TOP_LEVEL_DESTINATIONS[0].route) {
-          Explore(nav = NavigationActions(nav), EventViewModel(null, eventRepository))
+          Explore(nav = NavigationActions(nav), EventViewModel(null))
         }
         composable(TOP_LEVEL_DESTINATIONS[1].route) {
           Events(
               currentUser = currentUserId,
               nav = NavigationActions(rememberNavController()),
-              userViewModel = UserViewModel(userRepository),
-              eventViewModel = EventViewModel("NEEGn5cbkJZDXaezeGdfd2D4u6b2", eventRepository))
+              userViewModel = UserViewModel(),
+              eventViewModel = EventViewModel("NEEGn5cbkJZDXaezeGdfd2D4u6b2"))
         }
         composable(TOP_LEVEL_DESTINATIONS[2].route) {
           Trends(
-              currentUser = currentUserId,
+              currentUserId = currentUserId,
               nav = NavigationActions(rememberNavController()),
-              userViewModel = UserViewModel(userRepository),
-              eventViewModel = EventViewModel("NEEGn5cbkJZDXaezeGdfd2D4u6b2", eventRepository))
+              userViewModel = UserViewModel(),
+              eventViewModel = EventViewModel("NEEGn5cbkJZDXaezeGdfd2D4u6b2"))
         }
         composable(TOP_LEVEL_DESTINATIONS[3].route) { Create(NavigationActions(nav)) }
         composable(TOP_LEVEL_DESTINATIONS[4].route) {
           Profile(
               NavigationActions(nav),
               userId = currentUserId,
-              UserViewModel(userRepository),
-              EventViewModel(currentUserId, eventRepository))
+              UserViewModel(),
+              EventViewModel(currentUserId))
         }
       }
 
@@ -122,7 +115,7 @@ class NavigationTest {
   }
 
   companion object {
-    private val userVM = UserViewModel(UserRepository(Firebase.firestore))
+    private val userVM = UserViewModel()
     private lateinit var currentUserId: String
 
     private val usr = "u@navtest.com"
@@ -147,7 +140,7 @@ class NavigationTest {
       // Order is important here, since createUserIfNew sets current user to created user (so we
       // need to create the current user last)
       currentUserId = Firebase.auth.currentUser!!.uid
-      userVM.createUserIfNew(currentUserId, "a", "b", "c", usr, "4567", "Angola")
+      userVM.createUserIfNew(currentUserId, "a", "b", "c", usr, "4567", "Angola", "")
       TimeUnit.SECONDS.sleep(3)
     }
 

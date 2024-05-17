@@ -8,13 +8,9 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.github.se.gomeet.model.repository.EventRepository
-import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -29,10 +25,10 @@ class TrendsTest {
 
     composeTestRule.setContent {
       Trends(
-          currentUser = uid,
+          currentUserId = uid,
           nav = NavigationActions(rememberNavController()),
-          userViewModel = UserViewModel(UserRepository(Firebase.firestore)),
-          eventViewModel = EventViewModel(uid, EventRepository(Firebase.firestore)))
+          userViewModel = UserViewModel(),
+          eventViewModel = EventViewModel(uid))
     }
 
     // Wait for the page to load

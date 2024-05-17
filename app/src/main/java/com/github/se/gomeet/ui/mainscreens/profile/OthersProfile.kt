@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -19,8 +18,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -46,7 +44,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.isPastEvent
 import com.github.se.gomeet.model.user.GoMeetUser
@@ -121,7 +121,7 @@ fun OthersProfile(
       topBar = {
         Row(modifier = Modifier.testTag("TopBar"), verticalAlignment = Alignment.CenterVertically) {
           IconButton(onClick = { nav.goBack() }) {
-            Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = "Go back")
+            Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Go back")
           }
           Spacer(modifier = Modifier.weight(1F))
           MoreActionsButton()
@@ -253,8 +253,9 @@ fun OthersProfile(
                 Spacer(modifier = Modifier.fillMaxWidth().height(screenHeight / 50))
 
                 LazyRow(
+                    modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.Start,
                     contentPadding = PaddingValues(start = 15.dp, end = 15.dp)) {
                       items(user!!.tags.size) { index ->
                         Button(
@@ -269,7 +270,7 @@ fun OthersProfile(
                                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                                     contentColor = MaterialTheme.colorScheme.outlineVariant),
                             border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-                        )
+                            modifier = Modifier.padding(end = 8.dp))
                       }
                     }
                 Spacer(modifier = Modifier.height(screenHeight / 40))
@@ -312,4 +313,11 @@ fun MoreActionsButton() {
           showMenu = false
         })
   }
+}
+
+@Preview
+@Composable
+fun OthersProfilePreview() {
+  OthersProfile(
+      nav = NavigationActions(rememberNavController()), "", UserViewModel(), EventViewModel(null))
 }

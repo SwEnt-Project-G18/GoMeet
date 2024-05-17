@@ -6,14 +6,12 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.github.se.gomeet.model.repository.EventRepository
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.runBlocking
 import org.junit.AfterClass
 import org.junit.Rule
@@ -26,7 +24,7 @@ class CreateEventTest {
 
   companion object {
     private val uid = "CreateEventTestUser"
-    private val eventVM = EventViewModel(uid, EventRepository(Firebase.firestore))
+    private val eventVM = EventViewModel(uid)
 
     @AfterClass
     @JvmStatic
@@ -39,8 +37,8 @@ class CreateEventTest {
   }
 
   @Test
-  fun testCreatePrivateEvent() {
-    val eventVM = EventViewModel(uid, EventRepository(Firebase.firestore))
+  fun testCratePrivateEvent() {
+    val eventVM = EventViewModel(uid)
 
     composeTestRule.setContent {
       CreateEvent(NavigationActions(rememberNavController()), eventVM, isPrivate = true)
@@ -52,22 +50,35 @@ class CreateEventTest {
     composeTestRule.onNodeWithText("Title").assertIsDisplayed().performTextInput("Sample Event 1")
     composeTestRule.onNodeWithText("Location").assertIsDisplayed().performTextInput("test")
     composeTestRule.onNodeWithTag("DropdownMenu").assertIsDisplayed().performClick()
-    composeTestRule.onNodeWithText("Price").assertIsDisplayed().performTextInput("25.00")
+    composeTestRule.onNodeWithText("Pick date").assertIsDisplayed().performClick()
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithText("OK").assertIsDisplayed().performClick()
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithText("Pick time").assertIsDisplayed().performClick()
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithText("OK").assertIsDisplayed().performClick()
+    composeTestRule.waitForIdle()
+    composeTestRule
+        .onNodeWithText("Price")
+        .assertIsDisplayed()
+        .performScrollTo()
+        .performTextInput("25.00")
     composeTestRule
         .onNodeWithText("Link")
+        .performScrollTo()
         .assertIsDisplayed()
         .performTextInput("http://example.com")
 
     // Add tags
-    composeTestRule.onNodeWithText("Add Tags").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("TagsButton").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithText("Add Tags").performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("TagsButton").performScrollTo().assertIsDisplayed().performClick()
     composeTestRule.onNodeWithTag("TagList").assertIsDisplayed().performClick()
     composeTestRule.onNodeWithText("Save").assertIsDisplayed().performClick()
 
     // Verify that the rest of the buttons are displayed and create the event
-    composeTestRule.onNodeWithText("Add Participants").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Add Image").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Post").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithText("Add Participants").performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithText("Add Image").performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithText("Post").performScrollTo().assertIsDisplayed().performClick()
   }
 
   @Test
@@ -83,10 +94,12 @@ class CreateEventTest {
     composeTestRule.onNodeWithText("Description").performTextInput("This is a test event.")
     composeTestRule.onNodeWithText("Location").performTextInput("test")
     composeTestRule.onNodeWithTag("DropdownMenu").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Price").performTextInput("25.00")
-    composeTestRule.onNodeWithText("Link").performTextInput("http://example.com")
-    composeTestRule.onNodeWithText("Add Tags").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Add Image").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Post").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Pick date").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Pick time").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Price").performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithText("Link").performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithText("Add Tags").performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithText("Add Image").performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithText("Post").performScrollTo().assertIsDisplayed()
   }
 }

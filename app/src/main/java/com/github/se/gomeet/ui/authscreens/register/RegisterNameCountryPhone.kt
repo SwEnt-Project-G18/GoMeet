@@ -41,7 +41,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import java.util.Locale
+import com.github.se.gomeet.model.authentication.getCountries
 
 /**
  * This composable function collects personal details such as first name, last name, country, and
@@ -131,7 +131,7 @@ fun RegisterNameCountryPhone(
         }
 
         Spacer(modifier = Modifier.size(screenHeight / 60))
-        CountrySuggestionTextField(countries.value, textFieldColors)
+        CountrySuggestionTextField(countries.value, textFieldColors, countries.value[0]) {}
 
         if (!countryValid && !firstClick) {
           Text(text = "Country is not valid", color = Color.Red)
@@ -177,27 +177,16 @@ fun RegisterNameCountryPhone(
       }
 }
 
-fun getCountries(): ArrayList<String> {
-  val isoCountryCodes: Array<String> = Locale.getISOCountries()
-  val countriesWithEmojis: ArrayList<String> = arrayListOf()
-  for (countryCode in isoCountryCodes) {
-    val locale = Locale("", countryCode)
-    val countryName: String = locale.displayCountry
-    val flagOffset = 0x1F1E6
-    val asciiOffset = 0x41
-    val firstChar = Character.codePointAt(countryCode, 0) - asciiOffset + flagOffset
-    val secondChar = Character.codePointAt(countryCode, 1) - asciiOffset + flagOffset
-    val flag = (String(Character.toChars(firstChar)) + String(Character.toChars(secondChar)))
-    countriesWithEmojis.add("$countryName $flag")
-  }
-  return countriesWithEmojis
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CountrySuggestionTextField(total: List<String>, textFieldColors: TextFieldColors) {
+fun CountrySuggestionTextField(
+    total: List<String>,
+    textFieldColors: TextFieldColors,
+    value: String,
+    callback: (String) -> Unit
+) {
   var expanded by remember { mutableStateOf(false) }
-  var selectedOptionText by remember { mutableStateOf(total[0]) }
+  var selectedOptionText by remember { mutableStateOf(value) }
   val countries = remember { mutableStateOf(total) }
 
   ExposedDropdownMenuBox(
@@ -205,27 +194,32 @@ fun CountrySuggestionTextField(total: List<String>, textFieldColors: TextFieldCo
       expanded = expanded,
       onExpandedChange = { expanded = !expanded }) {
         TextField(
-            modifier = Modifier.menuAnchor(),
+            modifier = Modifier.menuAnchor().fillMaxWidth(),
             readOnly = true,
             value = selectedOptionText,
             onValueChange = {},
-            label = { Text("Label") },
+            label = { Text("Country") },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             colors =
                 textFieldColors.copy(focusedTrailingIconColor = MaterialTheme.colorScheme.tertiary))
         ExposedDropdownMenu(
             modifier =
-                Modifier.background(color = MaterialTheme.colorScheme.primaryContainer)
+                Modifier.fillMaxWidth()
+                    .background(color = MaterialTheme.colorScheme.primaryContainer)
                     .testTag("CountryDropdownMenu"),
             expanded = expanded,
             onDismissRequest = { expanded = false }) {
               countries.value.forEach { selectionOption ->
                 DropdownMenuItem(
-                    modifier = Modifier.testTag("CountryItem"),
+                    modifier =
+                        Modifier.align(Alignment.CenterHorizontally)
+                            .fillMaxWidth()
+                            .testTag("CountryItem"),
                     text = { Text(text = selectionOption) },
                     onClick = {
                       selectedOptionText = selectionOption
                       expanded = false
+                      callback(selectedOptionText)
                     })
               }
             }
