@@ -333,7 +333,9 @@ fun EditProfile(
                   }
                   Spacer(modifier = Modifier.size(16.dp))
 
-                  CountrySuggestionTextField(countries, textFieldColors, country.value){country.value = it}
+                  CountrySuggestionTextField(countries, textFieldColors, country.value) {
+                    country.value = it
+                  }
 
                   if (!countryValid && !firstClick) {
                     Text(text = "Country is not valid", color = Color.Red)

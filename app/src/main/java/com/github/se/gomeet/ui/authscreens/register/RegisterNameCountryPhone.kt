@@ -133,7 +133,7 @@ fun RegisterNameCountryPhone(
         Spacer(modifier = Modifier.size(screenHeight / 60))
         CountrySuggestionTextField(countries.value, textFieldColors, countries.value[0]) {}
 
-      if (!countryValid && !firstClick) {
+        if (!countryValid && !firstClick) {
           Text(text = "Country is not valid", color = Color.Red)
         }
 
@@ -195,7 +195,12 @@ fun getCountries(): ArrayList<String> {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CountrySuggestionTextField(total: List<String>, textFieldColors: TextFieldColors, value: String, callback: (String) -> Unit) {
+fun CountrySuggestionTextField(
+    total: List<String>,
+    textFieldColors: TextFieldColors,
+    value: String,
+    callback: (String) -> Unit
+) {
   var expanded by remember { mutableStateOf(false) }
   var selectedOptionText by remember { mutableStateOf(value) }
   val countries = remember { mutableStateOf(total) }
@@ -215,7 +220,8 @@ fun CountrySuggestionTextField(total: List<String>, textFieldColors: TextFieldCo
                 textFieldColors.copy(focusedTrailingIconColor = MaterialTheme.colorScheme.tertiary))
         ExposedDropdownMenu(
             modifier =
-                Modifier.fillMaxWidth().background(color = MaterialTheme.colorScheme.primaryContainer)
+                Modifier.fillMaxWidth()
+                    .background(color = MaterialTheme.colorScheme.primaryContainer)
                     .testTag("CountryDropdownMenu"),
             expanded = expanded,
             onDismissRequest = { expanded = false }) {
@@ -226,7 +232,7 @@ fun CountrySuggestionTextField(total: List<String>, textFieldColors: TextFieldCo
                     onClick = {
                       selectedOptionText = selectionOption
                       expanded = false
-                        callback(selectedOptionText)
+                      callback(selectedOptionText)
                     })
               }
             }
