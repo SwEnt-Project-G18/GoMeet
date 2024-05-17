@@ -26,6 +26,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -58,8 +59,8 @@ import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.Invitation
 import com.github.se.gomeet.model.event.InviteStatus
+import com.github.se.gomeet.model.event.InviteStatus.*
 import com.github.se.gomeet.model.user.GoMeetUser
-import com.github.se.gomeet.ui.mainscreens.create.PagerPages.*
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
@@ -258,11 +259,11 @@ fun ManageInvites(
                     followersFollowingList.filter { u ->
                       u.pendingRequests.any { invitation ->
                         (invitation.eventId == event.value!!.eventID) &&
-                            (invitation.status == InviteStatus.PENDING)
+                            (invitation.status == PENDING)
                       }
                     },
                     event.value!!,
-                    InviteStatus.PENDING,
+                    PENDING,
                     callback = { toUpdate.add(it) },
                     initialClicked = false)
               }
@@ -272,7 +273,7 @@ fun ManageInvites(
                       u.joinedEvents.contains(event.value!!.eventID)
                     },
                     event.value!!,
-                    InviteStatus.ACCEPTED,
+                    ACCEPTED,
                     callback = { toUpdate.add(it) },
                     initialClicked = false)
               }
@@ -281,11 +282,11 @@ fun ManageInvites(
                     followersFollowingList.filter { u ->
                       u.pendingRequests.any { invitation ->
                         (invitation.eventId == event.value!!.eventID) &&
-                            (invitation.status == InviteStatus.REFUSED)
+                            (invitation.status == REFUSED)
                       }
                     },
                     event.value!!,
-                    InviteStatus.REFUSED,
+                    REFUSED,
                     callback = { toUpdate.add(it) },
                     initialClicked = false)
               }
@@ -372,20 +373,20 @@ fun UserInviteWidget(
         Text(
             text =
                 when (status) {
-                  null -> ""
-                  InviteStatus.PENDING -> "Pending"
-                  InviteStatus.ACCEPTED -> "Accepted"
-                  InviteStatus.REFUSED -> "Refused"
+                  PENDING -> PENDING.formattedName
+                  ACCEPTED -> ACCEPTED.formattedName
+                  REFUSED -> REFUSED.formattedName
+                  else -> ""
                 },
             modifier = Modifier.width(80.dp).testTag("InviteStatus"),
             color =
                 when (status) {
-                  null -> MaterialTheme.colorScheme.onBackground
-                  InviteStatus.PENDING ->
+                  PENDING ->
                       if (clicked) MaterialTheme.colorScheme.onBackground
                       else MaterialTheme.colorScheme.primary
-                  InviteStatus.ACCEPTED -> Color.Green
-                  InviteStatus.REFUSED -> Color.Red
+                  ACCEPTED -> Color.Green
+                  REFUSED -> Color.Red
+                  else -> MaterialTheme.colorScheme.onBackground
                 })
 
         // Button to invite or cancel invitation
@@ -393,52 +394,42 @@ fun UserInviteWidget(
             onClick = {
               clicked = !clicked
               val toAdd =
-                  (clicked && (status == null || status == InviteStatus.REFUSED)) ||
-                      (!clicked &&
-                          (status == InviteStatus.PENDING || status == InviteStatus.ACCEPTED))
+                  (clicked && (status == null || status == REFUSED)) ||
+                      (!clicked && (status == PENDING || status == ACCEPTED))
               Log.d("ManageInvites", "toAdd: $toAdd, clicked: $clicked, status: $status")
               callback(user.copy(pendingRequests = pendingRequests(user, event, status, toAdd)))
             },
             modifier = Modifier.height(26.dp).width(82.dp),
             contentPadding = PaddingValues(vertical = 2.dp),
             shape = RoundedCornerShape(10.dp),
-            colors =
-                ButtonDefaults.buttonColors(
-                    containerColor =
-                        when (status) {
-                          null ->
-                              if (!clicked) MaterialTheme.colorScheme.outlineVariant
-                              else Color.LightGray
-                          InviteStatus.PENDING ->
-                              if (clicked) MaterialTheme.colorScheme.outlineVariant
-                              else Color.LightGray
-                          InviteStatus.ACCEPTED ->
-                              if (clicked) MaterialTheme.colorScheme.outlineVariant
-                              else Color.LightGray
-                          InviteStatus.REFUSED ->
-                              if (!clicked) MaterialTheme.colorScheme.outlineVariant
-                              else Color.LightGray
-                        })) {
+            colors = buttonColour(status, clicked)) {
               Text(
                   text =
                       when (status) {
-                        null -> if (!clicked) "Invite" else "Cancel"
-                        InviteStatus.PENDING -> if (clicked) "Invite" else "Cancel"
-                        InviteStatus.ACCEPTED -> if (clicked) "Invite" else "Cancel"
-                        InviteStatus.REFUSED -> if (!clicked) "Invite" else "Cancel"
+                        PENDING,
+                        ACCEPTED -> if (clicked) "Invite" else "Cancel"
+                        else -> if (!clicked) "Invite" else "Cancel"
                       },
                   color =
                       when (status) {
-                        null -> if (!clicked) Color.White else Color.DarkGray
-                        InviteStatus.PENDING -> if (clicked) Color.White else Color.DarkGray
-                        InviteStatus.ACCEPTED -> if (clicked) Color.White else Color.DarkGray
-                        InviteStatus.REFUSED -> if (!clicked) Color.White else Color.DarkGray
+                        PENDING,
+                        ACCEPTED -> if (clicked) Color.White else Color.DarkGray
+                        else -> if (!clicked) Color.White else Color.DarkGray
                       },
                   fontSize = 12.sp)
             }
       }
 }
 
+/**
+ * This function updates the list of users to invite to an event.
+ *
+ * @param toUpdate The list of users to update.
+ * @param event The event to which the users are invited.
+ * @param nav The navigation actions.
+ * @param userViewModel The user view model.
+ * @param eventViewModel The event view model.
+ */
 private fun inviteAction(
     toUpdate: List<GoMeetUser>,
     event: MutableState<Event?>,
@@ -449,7 +440,7 @@ private fun inviteAction(
   toUpdate.forEach { user ->
     userViewModel.editUser(user)
     if (user.pendingRequests.any { invitation ->
-      invitation.eventId == event.value!!.eventID && invitation.status == InviteStatus.PENDING
+      invitation.eventId == event.value!!.eventID && invitation.status == PENDING
     }) {
       eventViewModel.sendInvitation(event.value!!, user.uid)
     } else {
@@ -459,6 +450,12 @@ private fun inviteAction(
   nav.goBack()
 }
 
+/**
+ * This function returns the font weight of the text of the pager buttons.
+ *
+ * @param pagerState The state of the pager.
+ * @param button The name of the button.
+ */
 @OptIn(ExperimentalFoundationApi::class)
 private fun pagerWeight(pagerState: PagerState, button: String): FontWeight {
   if ((pagerState.currentPage == TO_INVITE.ordinal && button == TO_INVITE.formattedName) ||
@@ -469,17 +466,14 @@ private fun pagerWeight(pagerState: PagerState, button: String): FontWeight {
   else return FontWeight.Normal
 }
 
-private enum class PagerPages(val formattedName: String) {
-  TO_INVITE("To Invite"),
-  PENDING("Pending"),
-  ACCEPTED("Accepted"),
-  REFUSED("Refused");
-
-  override fun toString(): String {
-    return formattedName
-  }
-}
-
+/**
+ * This function updates the list of pending requests of a user.
+ *
+ * @param user The user to update.
+ * @param event The event to which the user gets invited to.
+ * @param status The status of the invitation.
+ * @param toAdd True if the invitation is to be added, false if it is to be removed.
+ */
 fun pendingRequests(
     user: GoMeetUser,
     event: Event,
@@ -488,24 +482,44 @@ fun pendingRequests(
 ): Set<Invitation> {
   if (toAdd) {
     val possiblePreviousInvitationRefused =
-        user.pendingRequests.find {
-          it.eventId == event.eventID && it.status == InviteStatus.REFUSED
-        }
+        user.pendingRequests.find { it.eventId == event.eventID && it.status == REFUSED }
 
     if (user.pendingRequests.contains(possiblePreviousInvitationRefused)) {
       return user.pendingRequests
           .map {
             if (it == possiblePreviousInvitationRefused) {
-              it.copy(status = InviteStatus.PENDING)
+              it.copy(status = PENDING)
             } else {
               it
             }
           }
           .toSet()
     } else {
-      return user.pendingRequests.plus(Invitation(event.eventID, status ?: InviteStatus.PENDING))
+      return user.pendingRequests.plus(Invitation(event.eventID, status ?: PENDING))
     }
   } else {
-    return user.pendingRequests.minus(Invitation(event.eventID, status ?: InviteStatus.PENDING))
+    return user.pendingRequests.minus(Invitation(event.eventID, status ?: PENDING))
   }
+}
+
+/**
+ * This function returns the button colour for the user invite widget.
+ *
+ * @param status The status of the invitation.
+ * @param clicked True if the button is clicked, false otherwise.
+ * @return The button colours.
+ */
+@Composable
+private fun buttonColour(status: InviteStatus?, clicked: Boolean): ButtonColors {
+
+  val c1 = MaterialTheme.colorScheme.outlineVariant
+  val c2 = Color.LightGray
+
+  return ButtonDefaults.buttonColors(
+      containerColor =
+          when (status) {
+            PENDING,
+            ACCEPTED -> if (clicked) c1 else c2
+            else -> if (!clicked) c1 else c2
+          })
 }
