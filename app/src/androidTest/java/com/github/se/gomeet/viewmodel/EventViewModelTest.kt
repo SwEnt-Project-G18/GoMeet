@@ -1,6 +1,7 @@
 package com.github.se.gomeet.viewmodel
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.location.Location
 import com.github.se.gomeet.model.repository.EventRepository
 import com.github.se.gomeet.model.repository.UserRepository
@@ -10,6 +11,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.junit.Test
@@ -73,6 +75,99 @@ class EventViewModelTest {
     fun tearDown() {
       // Clean up the events
       runBlocking { eventVM.getAllEvents()!!.forEach { eventVM.removeEvent(it.eventID) } }
+    }
+  }
+
+  @Test
+  fun testTrendsAlgo() = runTest {
+
+    val userID = "user1"
+    userVM.createUserIfNew(
+      userID, "huge", "Hugh", "Jass", "big@455.com", "12345", "Switzerland")
+
+    val eid1 = "01"
+    val eid2 = "02"
+    val eid3 = "03"
+
+    val tags1 = listOf("EPFL", "Lausanne")
+    val tags2 = listOf("UNIL", "Lausanne")
+    val tags3 = listOf("Lausanne", "HEC")
+
+    runBlocking {
+      eventVM.createEvent(
+          "event1",
+          "description",
+          Location(0.0, 0.0, "name"),
+          LocalDate.of(2024, 4, 29),
+          LocalTime.now(),
+          0.0,
+          "url",
+          emptyList(),
+          emptyList(),
+          emptyList(),
+          0,
+          false,
+          tags1,
+          emptyList(),
+          null,
+          userVM,
+          eid1)
+    }
+//
+//    runBlocking {
+//      eventViewModel.createEvent(
+//          "event2",
+//          "description",
+//          Location(0.0, 0.0, "name"),
+//          LocalDate.of(2024, 4, 29),
+//          0.0,
+//          "url",
+//          emptyList(),
+//          emptyList(),
+//          0,
+//          false,
+//          tags2,
+//          emptyList(),
+//          null,
+//          UserViewModel(),
+//          eid2)
+//    }
+//
+//    runBlocking {
+//      eventViewModel.createEvent(
+//          "event3",
+//          "description",
+//          Location(0.0, 0.0, "name"),
+//          LocalDate.of(2024, 4, 29),
+//          0.0,
+//          "url",
+//          emptyList(),
+//          emptyList(),
+//          0,
+//          true,
+//          tags3,
+//          emptyList(),
+//          null,
+//          UserViewModel(),
+//          eid3)
+//    }
+
+    TimeUnit.SECONDS.sleep(3)
+
+    for (i in 0..10) eventVM.sawEvent(eid1)
+
+    for (i in 0..20) eventVM.sawEvent(eid2)
+
+    for (i in 0..30) eventVM.sawEvent(eid3)
+
+    assert(eventVM.getEvent(eid1)!!.nViews == 10) {
+      "Expected 10, got ${eventVM.getEvent(eid1)!!.nViews}"
+    }
+    assert(eventVM.getEvent(eid2)!!.nViews == 20) {
+      "Expected 20, got ${eventVM.getEvent(eid2)!!.nViews}"
+    }
+    assert(eventVM.getEvent(eid3)!!.nViews == 30) {
+      "Expected 30, got ${eventVM.getEvent(eid3)!!.nViews}"
     }
   }
 

@@ -14,9 +14,11 @@ import androidx.lifecycle.viewModelScope
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.location.Location
 import com.github.se.gomeet.model.repository.EventRepository
+import com.github.se.gomeet.model.repository.UserRepository
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
@@ -32,6 +34,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
@@ -55,7 +58,12 @@ class EventViewModel(private val creatorId: String? = null, eventRepository: Eve
   private val _loading = MutableLiveData(false)
   val loading: LiveData<Boolean> = _loading
 
-  /**
+    private val currentUser = runBlocking { UserViewModel(UserRepository(Firebase.firestore)).getUser(creatorId!!) }
+    // The weight that the user tags will have compared to the number of views (for the sorting
+    // algorithm)
+    private val relevanceFactor = 0.5
+
+    /**
    * Load custom pins for the events.
    *
    * @param context the context of the application
@@ -267,7 +275,8 @@ class EventViewModel(private val creatorId: String? = null, eventRepository: Eve
                 maxParticipants,
                 public,
                 tags,
-                updatedImages)
+                updatedImages,
+                0)
 
         repository.addEvent(event)
         joinEvent(event, creatorId)
@@ -373,6 +382,17 @@ class EventViewModel(private val creatorId: String? = null, eventRepository: Eve
     }
   }
 
+    /**
+     * Update the number of views of an event.
+     *
+     * @param eventID the id of the event to update
+     */
+    fun sawEvent(eventID: String) {
+        var event: Event? = null
+        repository.getEvent(eventID) { t -> event = t }
+        if (event != null) repository.updateEvent(event!!.copy(nViews = event!!.nViews + 1))
+    }
+
   /**
    * Helper function to parse the location response.
    *
@@ -398,4 +418,46 @@ class EventViewModel(private val creatorId: String? = null, eventRepository: Eve
     }
     return locations
   }
+
+    /**
+     * Sort the events depending on the number of event views and the user's preferences. Called each
+     * time getAllEvents() is called or when loadCustomPins() is called. If currentUser is null, the
+     * events are only sorted by descending order of nViews. This method is like O(n^3) lmao, but hey
+     * it works so don't worry about it too much bro
+     */
+    private fun sortEvents() {
+
+        // Sort events by descending order of nViews
+        if (currentUser != null) {
+            val tags = currentUser.tags
+            val eventScoreList: Map<String, Pair<Int, Int>> = mutableMapOf()
+            var maxTags = 0
+            var maxViews = 0
+            lastLoadedEvents?.forEach { event ->
+                eventScoreList.plus(Pair(event.eventID, Pair(0, 0)))
+                // Check if the event has any of the user's preferred tags
+                event.tags.forEach { tag ->
+                    if (tags.contains(tag)) {
+                        eventScoreList[event.eventID]?.first?.plus(event.nViews)
+                        eventScoreList[event.eventID]?.second?.plus(1)
+                    }
+                }
+                val nTags = eventScoreList[event.eventID]?.second ?: 0
+                if (nTags > maxTags) maxTags = nTags
+                if (event.nViews > maxViews) maxViews = event.nViews
+            }
+
+            val sortedEvents =
+                lastLoadedEvents?.sortedByDescending { event ->
+                    val tagScore: Double =
+                        (eventScoreList[event.eventID]?.second?.toDouble() ?: 0.0) / (maxTags.toDouble())
+                    val viewScore: Double = (event.nViews.toDouble() / maxViews.toDouble())
+                    (1 - relevanceFactor) * viewScore + relevanceFactor * tagScore
+                }
+
+            lastLoadedEvents = sortedEvents
+        } else {
+            lastLoadedEvents = lastLoadedEvents?.sortedByDescending { event -> event.nViews }
+        }
+    }
 }
