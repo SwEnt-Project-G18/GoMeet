@@ -227,7 +227,10 @@ fun CountrySuggestionTextField(
             onDismissRequest = { expanded = false }) {
               countries.value.forEach { selectionOption ->
                 DropdownMenuItem(
-                    modifier = Modifier.align(Alignment.CenterHorizontally).fillMaxWidth().testTag("CountryItem"),
+                    modifier =
+                        Modifier.align(Alignment.CenterHorizontally)
+                            .fillMaxWidth()
+                            .testTag("CountryItem"),
                     text = { Text(text = selectionOption) },
                     onClick = {
                       selectedOptionText = selectionOption
