@@ -44,7 +44,7 @@ class UserViewModel(userRepository: UserRepository) : ViewModel() {
       email: String,
       phoneNumber: String,
       country: String,
-      pfp: String
+      pfp: String = ""
   ) {
     CoroutineScope(Dispatchers.IO).launch {
       if (getUser(uid) == null) {
