@@ -324,7 +324,7 @@ private fun ContentInColumn(
     Column {
       TopTitle(forColumn = true, alpha = columnAlpha)
 
-      LazyColumn(modifier = Modifier.alpha(columnAlpha), state = listState) {
+      LazyColumn(modifier = Modifier.alpha(columnAlpha), state = listState, horizontalAlignment = Alignment.CenterHorizontally) {
         itemsIndexed(events) { _, event ->
           Column {
             Card(
