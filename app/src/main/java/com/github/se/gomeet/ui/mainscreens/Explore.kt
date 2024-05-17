@@ -13,6 +13,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -31,6 +32,8 @@ import androidx.compose.material.BackdropValue
 import androidx.compose.material.Card
 import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.rememberBackdropScaffoldState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -69,6 +72,8 @@ import coil.request.ImageRequest
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.eventMomentToString
+import com.github.se.gomeet.model.event.getEventDateString
+import com.github.se.gomeet.model.event.getEventTimeString
 import com.github.se.gomeet.model.event.isPastEvent
 import com.github.se.gomeet.ui.mainscreens.events.GoMeetSearchBar
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
@@ -201,7 +206,7 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
     val backdropState = rememberBackdropScaffoldState(BackdropValue.Concealed)
     LaunchedEffect(backdropState) { backdropState.reveal() }
     val offset by backdropState.offset
-    val halfHeight = (LocalConfiguration.current.screenHeightDp - 80) / 3
+    val halfHeight = (LocalConfiguration.current.screenHeightDp - 80) / 4
     val halfHeightPx = with(LocalDensity.current) { halfHeight.dp.toPx() }
     val rowAlpha = (offset / halfHeightPx).coerceIn(0f..1f)
 
@@ -228,13 +233,15 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
                         backdropState = backdropState,
                         halfHeightPx = halfHeightPx,
                         listState = listState,
-                        eventList = eventList)
+                        eventList = eventList,
+                        nav = nav)
 
                     ContentInColumn(
                         backdropState = backdropState,
                         halfHeightPx = halfHeightPx,
                         listState = listState,
-                        eventList = eventList)
+                        eventList = eventList,
+                        nav = nav)
                   }
                 }
               },
@@ -266,7 +273,8 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
                               modifier = Modifier.testTag("Map"),
                               query = query,
                               locationPermitted = locationPermitted.value!!,
-                              eventViewModel = eventViewModel)
+                              eventViewModel = eventViewModel,
+                              nav = nav)
                         }
                       } else {
                         Box(
@@ -305,7 +313,8 @@ private fun ContentInColumn(
     backdropState: BackdropScaffoldState,
     halfHeightPx: Float,
     listState: LazyListState,
-    eventList: MutableState<List<Event>>
+    eventList: MutableState<List<Event>>,
+    nav: NavigationActions
 ) {
   val offset by backdropState.offset
 
@@ -321,7 +330,19 @@ private fun ContentInColumn(
             Card(
                 elevation = 4.dp,
                 modifier =
-                    Modifier.size(width = 360.dp, height = 200.dp).padding(8.dp).clickable {}) {
+                    Modifier.size(width = 360.dp, height = 200.dp).padding(8.dp).clickable {
+                      nav.navigateToEventInfo(
+                          eventId = event.eventID,
+                          title = event.title,
+                          date = getEventDateString(event.date),
+                          time = getEventTimeString(event.time),
+                          description = event.description,
+                          organizer = event.creator,
+                          loc = LatLng(event.location.latitude, event.location.longitude),
+                          rating = 0.0 // TODO: replace with actual rating
+                          // TODO: add image
+                          )
+                    }) {
                   val painter: Painter =
                       if (event.images.isNotEmpty()) {
                         rememberAsyncImagePainter(
@@ -369,7 +390,8 @@ fun ContentInRow(
     backdropState: BackdropScaffoldState,
     halfHeightPx: Float,
     listState: LazyListState,
-    eventList: MutableState<List<Event>>
+    eventList: MutableState<List<Event>>,
+    nav: NavigationActions
 ) {
 
   val screenHeight = LocalConfiguration.current.screenHeightDp.dp
@@ -384,7 +406,20 @@ fun ContentInRow(
           Column(modifier = Modifier.padding(8.dp).fillMaxWidth()) {
             Card(
                 elevation = 4.dp,
-                modifier = Modifier.size(width = 280.dp, height = screenHeight / 4).clickable {}) {
+                modifier =
+                    Modifier.size(width = 280.dp, height = screenHeight / 6).clickable {
+                      nav.navigateToEventInfo(
+                          eventId = event.eventID,
+                          title = event.title,
+                          date = getEventDateString(event.date),
+                          time = getEventTimeString(event.time),
+                          description = event.description,
+                          organizer = event.creator,
+                          loc = LatLng(event.location.latitude, event.location.longitude),
+                          rating = 0.0 // TODO: replace with actual rating
+                          // TODO: add image
+                          )
+                    }) {
                   val painter: Painter =
                       if (event.images.isNotEmpty()) {
                         rememberAsyncImagePainter(
@@ -465,7 +500,8 @@ fun GoogleMapView(
     events: MutableState<List<Event>>,
     query: MutableState<String>,
     locationPermitted: Boolean,
-    eventViewModel: EventViewModel
+    eventViewModel: EventViewModel,
+    nav: NavigationActions
 ) {
   val ctx = LocalContext.current
   val coroutineScope = rememberCoroutineScope()
@@ -577,8 +613,37 @@ fun GoogleMapView(
                             ?: BitmapDescriptorFactory.defaultMarker(
                                 BitmapDescriptorFactory.HUE_RED),
                     onClick = markerClick,
+                    onInfoWindowClick = {
+                      nav.navigateToEventInfo(
+                          eventId = event.eventID,
+                          title = event.title,
+                          date = getEventDateString(event.date),
+                          time = getEventTimeString(event.time),
+                          description = event.description,
+                          organizer = event.creator,
+                          loc = LatLng(event.location.latitude, event.location.longitude),
+                          rating = 0.0 // TODO: replace with actual rating
+                          // TODO: add image
+                          )
+                    },
                     visible = event.title.contains(query.value, ignoreCase = true)) {
-                      Text(it.title!!, color = Color.Black)
+                      Row(verticalAlignment = Alignment.CenterVertically) {
+                        Column(Modifier.padding(20.dp)) {
+                          Text(
+                              event.title,
+                              color = MaterialTheme.colorScheme.secondary,
+                              style = MaterialTheme.typography.titleMedium)
+                          Text(
+                              getEventDateString(event.date),
+                              color = MaterialTheme.colorScheme.secondary,
+                              style = MaterialTheme.typography.bodyMedium)
+                        }
+                        Icon(
+                            imageVector = Icons.Filled.Info,
+                            tint = MaterialTheme.colorScheme.secondary,
+                            contentDescription = "See More",
+                            modifier = Modifier.padding(end = 20.dp))
+                      }
                     }
               }
             }
