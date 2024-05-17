@@ -308,7 +308,8 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
       return
     }
 
-    EventRepository.updateEvent(event.copy(participants = event.participants.plus(userId)))
+    EventRepository.updateEvent(
+        event.copy(participants = event.participants.plus(userId)))
   }
 
   /**
@@ -366,7 +367,8 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
    */
   fun kickParticipant(event: Event, userId: String) {
     assert(event.participants.contains(userId))
-    EventRepository.updateEvent(event.copy(participants = event.participants.minus(userId)))
+    EventRepository.updateEvent(
+        event.copy(participants = event.participants.minus(userId)))
   }
 
   /**
