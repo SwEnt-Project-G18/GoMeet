@@ -8,7 +8,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.res.painterResource
 import androidx.core.content.ContextCompat.getString
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -260,7 +259,6 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
               time,
               organizer,
               rating.toDouble(),
-              painterResource(id = R.drawable.gomeet_logo),
               description,
               loc,
               userViewModel,

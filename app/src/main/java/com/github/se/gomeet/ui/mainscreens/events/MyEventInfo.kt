@@ -25,13 +25,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
-import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.LoadingText
@@ -52,7 +49,6 @@ fun MyEventInfo(
     time: String = "",
     organizerId: String,
     rating: Double = 0.0,
-    image: Painter = painterResource(id = R.drawable.gomeet_logo),
     description: String = "",
     loc: LatLng = LatLng(0.0, 0.0),
     userViewModel: UserViewModel,
@@ -132,9 +128,7 @@ fun MyEventInfo(
                 Spacer(modifier = Modifier.height(20.dp))
 
                 var imageUrl by remember { mutableStateOf<String?>(null) }
-                LaunchedEffect(eventId) {
-                  imageUrl = EventViewModel(organizer.value!!.uid).getEventImageUrl(eventId)
-                }
+                LaunchedEffect(eventId) { imageUrl = eventViewModel.getEventImageUrl(eventId) }
                 EventImage(imageUrl = imageUrl)
                 Spacer(modifier = Modifier.height(20.dp))
                 EventDescription(text = description)

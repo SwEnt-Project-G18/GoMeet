@@ -12,7 +12,6 @@ import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
-import java.time.LocalDate
 import kotlinx.coroutines.runBlocking
 import org.junit.AfterClass
 import org.junit.Rule

@@ -18,6 +18,8 @@ class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
+    debug()
+
     MapsInitializer.initialize(this)
     initCache()
     val client = initChatClient(applicationContext)

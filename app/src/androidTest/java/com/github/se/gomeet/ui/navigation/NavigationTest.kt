@@ -45,7 +45,7 @@ class NavigationTest {
         }
         composable(TOP_LEVEL_DESTINATIONS[2].route) {
           Trends(
-              currentUser = currentUserId,
+              currentUserId = currentUserId,
               nav = NavigationActions(rememberNavController()),
               userViewModel = UserViewModel(),
               eventViewModel = EventViewModel("NEEGn5cbkJZDXaezeGdfd2D4u6b2"))
@@ -87,7 +87,7 @@ class NavigationTest {
         }
         composable(TOP_LEVEL_DESTINATIONS[2].route) {
           Trends(
-              currentUser = currentUserId,
+              currentUserId = currentUserId,
               nav = NavigationActions(rememberNavController()),
               userViewModel = UserViewModel(),
               eventViewModel = EventViewModel("NEEGn5cbkJZDXaezeGdfd2D4u6b2"))

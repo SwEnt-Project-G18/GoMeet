@@ -222,7 +222,7 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
    * @param tags the tags of the event
    * @param images the images of the event
    * @param imageUri the URI of the image of the event
-   * @param uid the UID of the event
+   * @param eventId the UID of the event
    */
   fun createEvent(
       title: String,
@@ -241,7 +241,7 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
       images: List<String>,
       imageUri: Uri?,
       userViewModel: UserViewModel,
-      uid: String
+      eventId: String
   ) {
     Log.d("CreatorID", "Creator ID is $creatorId")
     CoroutineScope(Dispatchers.IO).launch {
@@ -250,7 +250,7 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
         val updatedImages = images.toMutableList().apply { imageUrl?.let { add(it) } }
         val event =
             Event(
-                uid,
+                eventId,
                 creatorId!!,
                 title,
                 description,
@@ -441,5 +441,12 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
       }
     }
     return locations
+  }
+
+  /** Events sorting enum, placed here because this is also where the sorting algorithm goes. */
+  enum class SortOption {
+    DEFAULT,
+    ALPHABETICAL,
+    DATE
   }
 }

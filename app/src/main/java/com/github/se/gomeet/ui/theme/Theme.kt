@@ -39,7 +39,6 @@ private val LightColorScheme =
         outlineVariant = DodgerBlue,
     )
 
-
 @Composable
 fun GoMeetTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),

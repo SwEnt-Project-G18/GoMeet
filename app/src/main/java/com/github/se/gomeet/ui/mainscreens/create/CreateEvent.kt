@@ -392,7 +392,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                         bitmap ->
                       // Handle the bitmap descriptor and bitmap as needed
                       val byteArray = customPins.bitmapToByteArray(bitmap)
-                      customPins.uploadEventIcon(context, byteArray, uid)
+                      customPins.uploadEventIcon(byteArray, uid)
                     }
                   },
                   shape = RoundedCornerShape(10.dp),
