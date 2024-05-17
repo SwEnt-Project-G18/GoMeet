@@ -1,6 +1,17 @@
 package com.github.se.gomeet.ui.mainscreens.events
 
 import EventWidget
+import android.Manifest
+import android.app.Activity
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Bundle
+import android.speech.RecognitionListener
+import android.speech.RecognizerIntent
+import android.speech.SpeechRecognizer
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -33,6 +44,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
@@ -52,6 +64,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.github.se.gomeet.R
@@ -66,6 +79,7 @@ import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
+import java.util.Locale
 import kotlinx.coroutines.launch
 
 /**
@@ -377,6 +391,68 @@ fun GoMeetSearchBar(
 ) {
   val customTextSelectionColors =
       TextSelectionColors(handleColor = DarkCyan, backgroundColor = DarkCyan.copy(alpha = 0.4f))
+  val context = LocalContext.current
+  val activity = LocalContext.current as? Activity
+  val speechRecognizer = remember { SpeechRecognizer.createSpeechRecognizer(context) }
+  val speechRecognizerIntent = remember {
+    Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+      putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+      putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+    }
+  }
+  val isListening = remember { mutableStateOf(false) }
+
+  val speechRecognizerListener = remember {
+    object : RecognitionListener {
+      override fun onReadyForSpeech(params: Bundle?) {}
+
+      override fun onBeginningOfSpeech() {}
+
+      override fun onRmsChanged(rmsdB: Float) {}
+
+      override fun onBufferReceived(buffer: ByteArray?) {}
+
+      override fun onEndOfSpeech() {
+        isListening.value = false
+      }
+
+      override fun onError(error: Int) {
+        isListening.value = false
+        Toast.makeText(context, "Error recognizing speech: $error", Toast.LENGTH_SHORT).show()
+      }
+
+      override fun onResults(results: Bundle?) {
+        val matches = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
+        matches?.let {
+          if (it.isNotEmpty()) {
+            query.value = it[0]
+          }
+        }
+      }
+
+      override fun onPartialResults(partialResults: Bundle?) {}
+
+      override fun onEvent(eventType: Int, params: Bundle?) {}
+    }
+  }
+
+  DisposableEffect(Unit) {
+    speechRecognizer.setRecognitionListener(speechRecognizerListener)
+    onDispose { speechRecognizer.destroy() }
+  }
+
+  val requestPermissionLauncher =
+      rememberLauncherForActivityResult(contract = ActivityResultContracts.RequestPermission()) {
+          isGranted: Boolean ->
+        if (isGranted) {
+          // Permission is granted, do the speech recognition
+          speechRecognizer.startListening(speechRecognizerIntent)
+        } else {
+          // Permission denied, show a message to the user
+          Toast.makeText(context, "Permission denied to record audio", Toast.LENGTH_SHORT).show()
+        }
+      }
+
   CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
     SearchBar(
         shape = RoundedCornerShape(10.dp),
@@ -400,7 +476,24 @@ fun GoMeetSearchBar(
               tint = contentColor,
               modifier =
                   Modifier.clickable {
-                    // TODO: handle voice search
+                    when {
+                      ContextCompat.checkSelfPermission(
+                          context, Manifest.permission.RECORD_AUDIO) ==
+                          PackageManager.PERMISSION_GRANTED -> {
+                        // Permission is already granted
+                        if (!isListening.value) {
+                          isListening.value = true
+                          speechRecognizer.startListening(speechRecognizerIntent)
+                        } else {
+                          isListening.value = false
+                          speechRecognizer.stopListening()
+                        }
+                      }
+                      activity != null -> {
+                        // Request the permission
+                        requestPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                      }
+                    }
                   })
         },
         colors =
