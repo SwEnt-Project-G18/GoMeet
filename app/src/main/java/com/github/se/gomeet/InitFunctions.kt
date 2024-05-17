@@ -158,7 +158,7 @@ fun InitNavigation(
               eventViewModel = EventViewModel(uid, eventRepository)
 
               userViewModel.createUserIfNew(
-                  uid, username, firstName, lastName, email, phoneNumber, country)
+                  uid, username, firstName, lastName, email, phoneNumber, country, "")
             }
             val user =
                 User(

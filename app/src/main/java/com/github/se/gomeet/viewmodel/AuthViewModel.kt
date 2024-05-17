@@ -1,6 +1,7 @@
 package com.github.se.gomeet.viewmodel
 
 import android.content.Context
+import android.net.Uri
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -76,7 +77,7 @@ class AuthViewModel : ViewModel() {
    *
    * @param pfpRegister the password to update the field with
    */
-  fun onPfpRegisterChange(pfpRegister: String) {
+  fun onPfpRegisterChange(pfpRegister: Uri?) {
     _signInState.value = _signInState.value.copy(pfp = pfpRegister)
   }
 

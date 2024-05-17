@@ -51,7 +51,7 @@ import com.github.se.gomeet.R
  * @param name The first name of the user, used to personalize the greeting message.
  */
 @Composable
-fun RegisterPfp(callback: (String) -> Unit, name: String) {
+fun RegisterPfp(callback: (Uri?) -> Unit, name: String) {
   val screenHeight = LocalConfiguration.current.screenHeightDp.dp
   var pfpUri by remember { mutableStateOf<Uri?>(null) }
   var pfp by remember { mutableStateOf("") }
@@ -103,7 +103,7 @@ fun RegisterPfp(callback: (String) -> Unit, name: String) {
           IconButton(
               modifier = Modifier.padding(bottom = 2.5.dp, end = 3.dp).size(screenHeight / 19),
               colors = IconButtonDefaults.outlinedIconButtonColors(),
-              onClick = { callback(pfp) }) {
+              onClick = { callback(pfpUri) }) {
                 Icon(
                     Icons.AutoMirrored.Filled.ArrowForward,
                     contentDescription = "Next",

@@ -43,7 +43,8 @@ class UserViewModel(userRepository: UserRepository) : ViewModel() {
       lastName: String,
       email: String,
       phoneNumber: String,
-      country: String
+      country: String,
+      pfp: String = ""
   ) {
     CoroutineScope(Dispatchers.IO).launch {
       if (getUser(uid) == null) {
@@ -63,6 +64,7 @@ class UserViewModel(userRepository: UserRepository) : ViewModel() {
                   joinedEvents = emptyList(),
                   myEvents = emptyList(),
                   myFavorites = emptyList(),
+                  profilePicture = pfp,
                   tags = emptyList())
           currentUser.value = user
           repository.addUser(user)
