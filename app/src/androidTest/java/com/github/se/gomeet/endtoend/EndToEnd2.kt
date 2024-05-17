@@ -49,12 +49,12 @@ class EndToEndTest2 : TestCase() {
   companion object {
     private const val email1 = "user1@test2.com"
     private const val pwd1 = "123456"
-    private var uid1 = ""
+    private var uid1 = "uid1"
     private const val username1 = "test_user1"
 
     private const val email2 = "user2@test2.com"
     private const val pwd2 = "654321"
-    private var uid2 = ""
+    private var uid2 = "uid2"
     private const val username2 = "test_user2"
 
     private val userVM = UserViewModel()
@@ -135,6 +135,12 @@ class EndToEndTest2 : TestCase() {
           TimeUnit.SECONDS.sleep(1)
         }
 
+        // user2 is used to create the second event
+        result = Firebase.auth.signInWithEmailAndPassword(email2, pwd2)
+        while (!result.isComplete) {
+          TimeUnit.SECONDS.sleep(1)
+        }
+
         eventVM = EventViewModel(Firebase.auth.currentUser!!.uid)
         eventVM.createEvent(
             "title",
@@ -153,7 +159,7 @@ class EndToEndTest2 : TestCase() {
             emptyList(),
             null,
             userVM,
-            "eventuid1")
+            "eventuid2")
         TimeUnit.SECONDS.sleep(3)
 
         Firebase.auth.signOut()
@@ -224,7 +230,7 @@ class EndToEndTest2 : TestCase() {
         composeTestRule.waitUntil(timeoutMillis = 10000) {
           composeTestRule.onNodeWithTag("EventHeader").isDisplayed()
         }
-        eventHeader { composeTestRule.onNodeWithTag("Username").performClick() }
+        eventHeader { composeTestRule.onNodeWithTag("Username").assertIsDisplayed().performClick() }
       }
     }
 
