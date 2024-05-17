@@ -392,7 +392,7 @@ fun UserInviteWidget(
                   InviteStatus.ACCEPTED -> "Accepted"
                   InviteStatus.REFUSED -> "Refused"
                 },
-            modifier = Modifier.width(80.dp),
+            modifier = Modifier.width(80.dp).testTag("InviteStatus"),
             color =
                 when (status) {
                   null -> MaterialTheme.colorScheme.onBackground

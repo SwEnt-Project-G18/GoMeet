@@ -4,6 +4,7 @@ import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
@@ -19,9 +20,9 @@ import com.github.se.gomeet.model.event.location.Location
 import com.github.se.gomeet.model.repository.EventRepository
 import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.screens.EventInfoScreen
+import com.github.se.gomeet.screens.EventsScreen
 import com.github.se.gomeet.screens.LoginScreenScreen
 import com.github.se.gomeet.screens.ManageInvitesScreen
-import com.github.se.gomeet.screens.TrendsScreen
 import com.github.se.gomeet.screens.WelcomeScreenScreen
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
@@ -40,11 +41,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-/**
- * This end to end test tests that a user can (after logging in) click on an event in Trends, view
- * its owner's profile and follow them, and see the change in both the user's following list and the
- * event owner's followers list
- */
+/** This end to end test tests that a user can add participants to an event they created. */
 @RunWith(AndroidJUnit4::class)
 class EndToEndTest3 : TestCase() {
   @get:Rule val composeTestRule = createAndroidComposeRule<MainActivity>()
@@ -104,7 +101,7 @@ class EndToEndTest3 : TestCase() {
           TimeUnit.SECONDS.sleep(1)
         }
 
-        // user1 is used to create an event
+        // user1 creates an event
         result = Firebase.auth.signInWithEmailAndPassword(email1, pwd1)
         while (!result.isComplete) {
           TimeUnit.SECONDS.sleep(1)
@@ -132,8 +129,6 @@ class EndToEndTest3 : TestCase() {
         while (eventVM.getEvent("eventuid1") == null) {
           TimeUnit.SECONDS.sleep(1)
         }
-
-        // user2 is used to log in and perform the tests
         eventVM = EventViewModel(uid1, EventRepository(Firebase.firestore))
       }
     }
@@ -182,8 +177,8 @@ class EndToEndTest3 : TestCase() {
 
     step("Go to Events") { composeTestRule.onNodeWithText("Events").performClick() }
 
-    ComposeScreen.onComposeScreen<TrendsScreen>(composeTestRule) {
-      step("View the info page of an event by clicking on it") {
+    ComposeScreen.onComposeScreen<EventsScreen>(composeTestRule) {
+      step("View the info page of the event") {
         composeTestRule.waitForIdle()
         composeTestRule.onAllNodesWithText("Events")[1].performClick()
         composeTestRule.waitUntil(timeoutMillis = 10000) {
@@ -194,7 +189,7 @@ class EndToEndTest3 : TestCase() {
     }
 
     ComposeScreen.onComposeScreen<EventInfoScreen>(composeTestRule) {
-      step("Visit the event creator's profile") {
+      step("Go to ManageInvites by clicking on the Add Participants button") {
         composeTestRule.waitUntil(timeoutMillis = 10000) {
           composeTestRule.onNodeWithTag("EventHeader").isDisplayed()
         }
@@ -209,14 +204,30 @@ class EndToEndTest3 : TestCase() {
         composeTestRule.onNodeWithTag("UserInviteWidget").isDisplayed()
       }
 
-      composeTestRule.onNodeWithText("Manage Invites").assertIsDisplayed()
-      composeTestRule.onNodeWithText("Pending").assertIsDisplayed()
-      composeTestRule.onNodeWithText("Accepted").assertIsDisplayed()
-      composeTestRule.onNodeWithText("Refused").assertIsDisplayed()
-      composeTestRule.onNodeWithText("To Invite").assertIsDisplayed()
-      composeTestRule.onNodeWithContentDescription("profile picture").assertIsDisplayed()
-      composeTestRule.onNodeWithText(username2).assertIsDisplayed()
-      composeTestRule.onNodeWithText("Invite").assertIsDisplayed().performClick()
+      step("Test the ui of ManageInvites and invite a user to the event") {
+        composeTestRule.onNodeWithText("Manage Invites").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Pending").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Accepted").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Refused").assertIsDisplayed()
+        composeTestRule.onNodeWithText("To Invite").assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescription("profile picture").assertIsDisplayed()
+        composeTestRule.onNodeWithText(username2).assertIsDisplayed()
+        composeTestRule.onNodeWithText("Invite").assertIsDisplayed().performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Cancel").assertIsDisplayed().assertHasClickAction()
+      }
+
+      step("Verify that the invitation appears in Pending") {
+        composeTestRule.onNodeWithText("Pending").performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.waitUntil {
+          composeTestRule.onNodeWithTag("UserInviteWidget").isDisplayed()
+        }
+        composeTestRule
+            .onNodeWithTag("InviteStatus")
+            .assertIsDisplayed()
+            .assertTextEquals("Pending")
+      }
     }
   }
 }
