@@ -49,7 +49,7 @@ class ProfileTest {
         uid = result.result.user!!.uid
 
         // Add the user to the view model
-        userVM.createUserIfNew(uid, "a", "b", "c", usr, "4567", "Angola")
+        userVM.createUserIfNew(uid, "a", "b", "c", usr, "4567", "Angola", "")
         while (userVM.getUser(uid) == null) {
           TimeUnit.SECONDS.sleep(1)
         }

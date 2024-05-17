@@ -147,7 +147,7 @@ class NavigationTest {
       // Order is important here, since createUserIfNew sets current user to created user (so we
       // need to create the current user last)
       currentUserId = Firebase.auth.currentUser!!.uid
-      userVM.createUserIfNew(currentUserId, "a", "b", "c", usr, "4567", "Angola")
+      userVM.createUserIfNew(currentUserId, "a", "b", "c", usr, "4567", "Angola", "")
       TimeUnit.SECONDS.sleep(3)
     }
 

@@ -149,7 +149,16 @@ fun InitNavigation(
             val currentUser = Firebase.auth.currentUser
             if (currentUser != null) {
               val uid = currentUser.uid
+              val email = currentUser.email ?: ""
+              val firstName = authViewModel.signInState.value.firstNameRegister
+              val lastName = authViewModel.signInState.value.lastNameRegister
+              val phoneNumber = authViewModel.signInState.value.phoneNumberRegister
+              val country = authViewModel.signInState.value.countryRegister
+              val username = authViewModel.signInState.value.usernameRegister
               eventViewModel = EventViewModel(uid, eventRepository)
+
+              userViewModel.createUserIfNew(
+                  uid, username, firstName, lastName, email, phoneNumber, country, "")
             }
             val user =
                 User(

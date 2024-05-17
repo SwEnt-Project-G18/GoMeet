@@ -31,7 +31,7 @@ class UserViewModelTest {
     fun setup() {
       // Assumes that getUser works...
       runBlocking {
-        userVM.createUserIfNew(uid, username, firstname, lastname, email, phonenumber, country)
+        userVM.createUserIfNew(uid, username, firstname, lastname, email, phonenumber, country, "")
         while (userVM.getUser(uid) == null) {
           TimeUnit.SECONDS.sleep(1)
         }
