@@ -134,7 +134,13 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
       WelcomeScreen(
           onNavToLogin = { NavigationActions(nav).navigateTo(LOGIN_ITEMS[1]) },
           onNavToRegister = { NavigationActions(nav).navigateTo(LOGIN_ITEMS[2]) },
-          onSignInSuccess = { userId: String ->
+          onSignInSuccess = {
+              userId: String,
+              username: String,
+              email: String,
+              firstName: String,
+              lastName: String,
+              phoneNumber: String ->
             val currentUser = Firebase.auth.currentUser
             if (currentUser != null) {
               val uid = currentUser.uid
@@ -145,9 +151,8 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
               val country = authViewModel.signInState.value.countryRegister
               val username = authViewModel.signInState.value.usernameRegister
               eventViewModel = EventViewModel(uid)
-
               userViewModel.createUserIfNew(
-                  uid, username, firstName, lastName, email, phoneNumber, country, "")
+                  uid, username, firstName, lastName, email, phoneNumber, country)
             }
             val user =
                 User(
