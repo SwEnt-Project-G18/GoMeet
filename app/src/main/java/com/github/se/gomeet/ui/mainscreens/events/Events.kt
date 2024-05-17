@@ -21,6 +21,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -48,14 +49,13 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.isPastEvent
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.LoadingText
+import com.github.se.gomeet.ui.mainscreens.events.SelectedStatus.*
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
@@ -84,21 +84,12 @@ fun Events(
   val screenWidth = LocalConfiguration.current.screenWidthDp.dp
   val screenHeight = LocalConfiguration.current.screenHeightDp.dp
   // State management for event filters and list
-  var selectedFilter by remember { mutableStateOf("All") }
+  var selectedFilter by remember { mutableStateOf(ALL) }
   val eventList = remember { mutableListOf<Event>() }
   val coroutineScope = rememberCoroutineScope()
   val query = remember { mutableStateOf("") }
   val user = remember { mutableStateOf<GoMeetUser?>(null) }
   val eventsLoaded = remember { mutableStateOf(false) }
-
-  val selectedButtonColour =
-      ButtonDefaults.buttonColors(
-          containerColor = MaterialTheme.colorScheme.outlineVariant, contentColor = Color.White)
-
-  val unselectedButtonColour =
-      ButtonDefaults.buttonColors(
-          containerColor = MaterialTheme.colorScheme.primaryContainer,
-          contentColor = MaterialTheme.colorScheme.tertiary)
 
   // Initial data loading using LaunchedEffect
   LaunchedEffect(Unit) {
@@ -119,8 +110,8 @@ fun Events(
 
   // Event filtering functionality
 
-  fun onFilterButtonClick(filterType: String) {
-    selectedFilter = if (selectedFilter == filterType) "All" else filterType
+  fun onFilterButtonClick(filterType: SelectedStatus) {
+    selectedFilter = if (selectedFilter == filterType) ALL else filterType
   }
 
   // Scaffold is a structure that supports top bar, content area, and bottom navigation
@@ -174,29 +165,22 @@ fun Events(
                   modifier = Modifier.heightIn(min = 56.dp).fillMaxWidth()) {
                     Button(
                         modifier = Modifier.testTag("JoinedButton"),
-                        onClick = { onFilterButtonClick("Joined") },
-                        content = { Text("Joined Events") },
+                        onClick = { onFilterButtonClick(JOINED) },
+                        content = { Text(JOINED.formattedName) },
                         shape = RoundedCornerShape(10.dp),
-                        colors =
-                            if (selectedFilter == "Joined") selectedButtonColour
-                            else unselectedButtonColour)
-
+                        colors = eventsButtonColour(selectedFilter))
                     Button(
                         modifier = Modifier.testTag("FavouritesButton"),
-                        onClick = { onFilterButtonClick("Favourites") },
-                        content = { Text("Favourites") },
+                        onClick = { onFilterButtonClick(FAVOURITES) },
+                        content = { Text(FAVOURITES.formattedName) },
                         shape = RoundedCornerShape(10.dp),
-                        colors =
-                            if (selectedFilter == "Favourites") selectedButtonColour
-                            else unselectedButtonColour)
+                        colors = eventsButtonColour(selectedFilter))
                     Button(
                         modifier = Modifier.testTag("MyEventsButton"),
-                        onClick = { onFilterButtonClick("MyEvents") },
-                        content = { Text("My Events") },
+                        onClick = { onFilterButtonClick(MY_EVENTS) },
+                        content = { Text(MY_EVENTS.formattedName) },
                         shape = RoundedCornerShape(10.dp),
-                        colors =
-                            if (selectedFilter == "MyEvents") selectedButtonColour
-                            else unselectedButtonColour)
+                        colors = eventsButtonColour(selectedFilter))
                   }
 
               if (!eventsLoaded.value) {
@@ -209,10 +193,10 @@ fun Events(
                     horizontalAlignment = Alignment.CenterHorizontally) {
 
                       // Display joined events if 'All' or 'Joined' is selected
-                      if (selectedFilter == "All" || selectedFilter == "Joined") {
+                      if (selectedFilter == ALL || selectedFilter == JOINED) {
                         Spacer(modifier = Modifier.height(screenHeight / 40))
                         Text(
-                            text = "Joined Events",
+                            text = JOINED.formattedName,
                             style = MaterialTheme.typography.titleLarge,
                             modifier =
                                 Modifier.padding(horizontal = screenWidth / 15)
@@ -231,10 +215,10 @@ fun Events(
                       }
 
                       // Display favourite events if 'All' or 'Favourites' is selected
-                      if (selectedFilter == "All" || selectedFilter == "Favourites") {
+                      if (selectedFilter == ALL || selectedFilter == FAVOURITES) {
                         Spacer(modifier = Modifier.height(screenHeight / 40))
                         Text(
-                            text = "Favourites",
+                            text = FAVOURITES.formattedName,
                             style = MaterialTheme.typography.titleLarge,
                             modifier =
                                 Modifier.padding(horizontal = screenWidth / 15)
@@ -253,10 +237,10 @@ fun Events(
                       }
 
                       // Display user's own events if 'All' or 'MyEvents' is selected
-                      if (selectedFilter == "All" || selectedFilter == "MyEvents") {
+                      if (selectedFilter == ALL || selectedFilter == MY_EVENTS) {
                         Spacer(modifier = Modifier.height(screenHeight / 40))
                         Text(
-                            text = "My Events",
+                            text = MY_EVENTS.formattedName,
                             style = MaterialTheme.typography.titleLarge,
                             modifier =
                                 Modifier.padding(horizontal = screenWidth / 15)
@@ -277,25 +261,6 @@ fun Events(
               }
             }
       }
-}
-
-/**
- * Composable function to display the event widgets.
- *
- * @param event Event object to display
- * @param query String object to store the search query
- * @param nav NavigationActions object to handle navigation
- * @param userVM UserViewModel object to handle users
- */
-@Composable
-fun ShowWidgets(event: Event, query: String, nav: NavigationActions, userVM: UserViewModel) {
-  if (event.title.contains(query, ignoreCase = true)) {
-    EventWidget(
-        event = event,
-        verified = false,
-        nav = nav,
-        userVM = userVM) // TODO: verification to be done using user details
-  }
 }
 
 /**
@@ -356,8 +321,62 @@ fun GoMeetSearchBar(
   }
 }
 
+/**
+ * Helper composable function to display the event widgets.
+ *
+ * @param event Event object to display
+ * @param query String object to store the search query
+ * @param nav NavigationActions object to handle navigation
+ * @param userVM UserViewModel object to handle users
+ */
 @Composable
-@Preview
-fun EventPreview() {
-  Events("", nav = NavigationActions(rememberNavController()), UserViewModel(), EventViewModel(""))
+private fun ShowWidgets(
+    event: Event,
+    query: String,
+    nav: NavigationActions,
+    userVM: UserViewModel
+) {
+  if (event.title.contains(query, ignoreCase = true)) {
+    EventWidget(
+        event = event,
+        verified = false,
+        nav = nav,
+        userVM = userVM) // TODO: verification to be done using user details
+  }
+}
+
+/**
+ * Helper function to get the button colour based on the selected filter.
+ *
+ * @param selectedFilter SelectedStatus object to store the selected filter
+ * @return ButtonColors object representing the button colours
+ */
+@Composable
+private fun eventsButtonColour(selectedFilter: SelectedStatus): ButtonColors {
+  val selectedButtonColour =
+      ButtonDefaults.buttonColors(
+          containerColor = MaterialTheme.colorScheme.outlineVariant, contentColor = Color.White)
+
+  val unselectedButtonColour =
+      ButtonDefaults.buttonColors(
+          containerColor = MaterialTheme.colorScheme.primaryContainer,
+          contentColor = MaterialTheme.colorScheme.tertiary)
+
+  return if (selectedFilter == JOINED) selectedButtonColour else unselectedButtonColour
+}
+
+/**
+ * Enum class to represent the selected status of the events.
+ *
+ * @param formattedName String object representing the formatted name of the status
+ */
+private enum class SelectedStatus(val formattedName: String) {
+  JOINED("Joined Events"),
+  FAVOURITES("Favourites"),
+  MY_EVENTS("My Events"),
+  ALL("All");
+
+  override fun toString(): String {
+    return formattedName
+  }
 }

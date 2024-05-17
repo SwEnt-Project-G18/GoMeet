@@ -1,4 +1,4 @@
-package com.github.se.gomeet.ui.mainscreens.create
+package com.github.se.gomeet.ui.mainscreens.events
 
 import android.util.Log
 import androidx.compose.foundation.Canvas
@@ -402,7 +402,7 @@ fun UserInviteWidget(
             modifier = Modifier.height(26.dp).width(82.dp),
             contentPadding = PaddingValues(vertical = 2.dp),
             shape = RoundedCornerShape(10.dp),
-            colors = buttonColour(status, clicked)) {
+            colors = manageInvitesButtonColour(status, clicked)) {
               Text(
                   text =
                       when (status) {
@@ -510,7 +510,7 @@ fun pendingRequests(
  * @return The button colours.
  */
 @Composable
-private fun buttonColour(status: InviteStatus?, clicked: Boolean): ButtonColors {
+private fun manageInvitesButtonColour(status: InviteStatus?, clicked: Boolean): ButtonColors {
 
   val c1 = MaterialTheme.colorScheme.outlineVariant
   val c2 = Color.LightGray

@@ -60,16 +60,15 @@ import androidx.compose.ui.window.Popup
 import coil.compose.rememberAsyncImagePainter
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.TagsSelector
+import com.github.se.gomeet.model.authentication.getCountries
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.authscreens.register.CountrySuggestionTextField
-import com.github.se.gomeet.ui.authscreens.register.getCountries
 import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.viewmodel.UserViewModel
-import com.google.firebase.auth.auth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase

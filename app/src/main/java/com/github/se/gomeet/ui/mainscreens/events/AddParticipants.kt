@@ -1,4 +1,4 @@
-package com.github.se.gomeet.ui.mainscreens.create
+package com.github.se.gomeet.ui.mainscreens.events
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -94,21 +94,29 @@ fun AddParticipants(
       }
 }
 
+/**
+ * Composable function for the add users widget.
+ *
+ * @param userId The user id of the user to invite.
+ * @param invited The current invite status.
+ * @param remove The remove function.
+ * @param add The add function.
+ */
 @Composable
 fun AddWidget(userId: String, invited: Boolean, remove: () -> Unit, add: () -> Unit) {
-  val invt = remember { mutableStateOf<Boolean>(invited) }
+  val invite = remember { mutableStateOf(invited) }
   Row {
     Text(text = userId)
     OutlinedButton(
         onClick = {
-          if (invt.value) {
+          if (invite.value) {
             remove()
           } else {
             add()
           }
-          invt.value = !invt.value
+          invite.value = !invite.value
         }) {
-          if (invt.value) {
+          if (invite.value) {
             Text(text = "Invited")
           } else {
             Text(text = "Send Invite")

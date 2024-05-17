@@ -23,7 +23,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -55,13 +54,6 @@ import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.Marker
-import com.google.maps.android.compose.rememberCameraPositionState
-import com.google.maps.android.compose.rememberMarkerState
 import kotlinx.coroutines.launch
 
 /**
@@ -304,47 +296,7 @@ fun EventButtons(
 }
 
 /**
- * MapViewComposable is a composable that displays the map view of an event.
- *
- * @param loc Location of the event
- * @param zoomLevel Zoom level of the map
- */
-@Composable
-fun MapViewComposable(
-    loc: LatLng,
-    zoomLevel: Float = 15f // Default zoom level for close-up of location
-) {
-  val cameraPositionState = rememberCameraPositionState {
-    position = CameraPosition.fromLatLngZoom(loc, zoomLevel)
-  }
-
-  val markerState = rememberMarkerState(position = loc)
-
-  // Set up the GoogleMap composable
-  GoogleMap(
-      modifier =
-          Modifier.testTag("MapView").fillMaxWidth().height(200.dp).clip(RoundedCornerShape(20.dp)),
-      cameraPositionState = cameraPositionState) {
-        Marker(
-            state = markerState,
-            title = "Marker in Location",
-            snippet = "This is the selected location")
-      }
-
-  // Initialize the map position once and avoid resetting on recomposition
-  DisposableEffect(loc) {
-    cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(loc, zoomLevel))
-    onDispose {}
-  }
-
-  DisposableEffect(loc) {
-    markerState.position = loc
-    onDispose {}
-  }
-}
-
-/**
- * The action to perform when clicking the favourite button.
+ * Helper function to perform the appropriate action when clicking the favourite button.
  *
  * @param currentUser Current user
  * @param eventId Event ID
@@ -367,27 +319,40 @@ private fun favouriteAction(
 }
 
 /**
- * Favourite button composable.
+ * Helper function to show the favourite button composable.
  *
  * @param isFavourite Whether the event is a favourite.
  */
 @Composable
 private fun FavouriteButton(isFavourite: Boolean) {
+  val tint = MaterialTheme.colorScheme.outlineVariant
+  val iconSize = 30.dp
   if (!isFavourite) {
     Icon(
         imageVector = ImageVector.vectorResource(id = R.drawable.heart),
         contentDescription = "Add to Favorites",
-        modifier = Modifier.size(30.dp),
-        tint = MaterialTheme.colorScheme.outlineVariant)
+        modifier = Modifier.size(iconSize),
+        tint = tint)
   } else {
     Icon(
         imageVector = ImageVector.vectorResource(id = R.drawable.redheart),
         contentDescription = "Remove from favorites",
-        modifier = Modifier.size(30.dp),
-        tint = MaterialTheme.colorScheme.outlineVariant)
+        modifier = Modifier.size(iconSize),
+        tint = tint)
   }
 }
 
+/**
+ * Helper function to perform the appropriate action when clicking the event button.
+ *
+ * @param currentUser Current user
+ * @param organiser Event organiser
+ * @param eventId Event ID
+ * @param userViewModel UserViewModel
+ * @param eventViewModel EventViewModel
+ * @param isJoined Whether the user has joined the event
+ * @param currentEvent The current event
+ */
 private fun eventAction(
     currentUser: GoMeetUser,
     organiser: GoMeetUser,

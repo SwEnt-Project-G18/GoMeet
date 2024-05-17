@@ -35,6 +35,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.github.se.gomeet.model.authentication.validateEmail
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.viewmodel.UserViewModel
 import kotlinx.coroutines.launch
@@ -153,8 +154,4 @@ fun RegisterUsernameEmail(
                   }
             }
       }
-}
-
-fun validateEmail(email: String): Boolean {
-  return email.isNotEmpty() && android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
 }

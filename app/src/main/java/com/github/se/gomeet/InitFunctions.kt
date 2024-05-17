@@ -19,11 +19,11 @@ import com.github.se.gomeet.ui.authscreens.WelcomeScreen
 import com.github.se.gomeet.ui.authscreens.register.RegisterScreen
 import com.github.se.gomeet.ui.mainscreens.Explore
 import com.github.se.gomeet.ui.mainscreens.Trends
-import com.github.se.gomeet.ui.mainscreens.create.AddParticipants
 import com.github.se.gomeet.ui.mainscreens.create.Create
 import com.github.se.gomeet.ui.mainscreens.create.CreateEvent
-import com.github.se.gomeet.ui.mainscreens.create.ManageInvites
+import com.github.se.gomeet.ui.mainscreens.events.AddParticipants
 import com.github.se.gomeet.ui.mainscreens.events.Events
+import com.github.se.gomeet.ui.mainscreens.events.ManageInvites
 import com.github.se.gomeet.ui.mainscreens.events.MyEventInfo
 import com.github.se.gomeet.ui.mainscreens.profile.AddFriend
 import com.github.se.gomeet.ui.mainscreens.profile.EditProfile

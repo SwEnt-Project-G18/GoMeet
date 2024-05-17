@@ -205,6 +205,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                   singleLine = true,
                   colors = textFieldColors,
                   modifier = Modifier.fillMaxWidth().padding(start = 15.dp, end = 15.dp))
+
               LocationField(selectedLocation, locationState, eventViewModel)
 
               Spacer(modifier = Modifier.height(screenHeight / 30))
@@ -232,7 +233,8 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                   colors = textFieldColors,
                   modifier = Modifier.fillMaxWidth().padding(start = 15.dp, end = 15.dp))
 
-              Spacer(modifier = Modifier.height(16.dp))
+              Spacer(modifier = Modifier.height(screenHeight / 80))
+
               Row(
                   modifier = Modifier.fillMaxWidth().padding(start = 15.dp, top = 10.dp),
                   verticalAlignment = Alignment.CenterVertically) {
@@ -251,7 +253,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                             Modifier.clickable { showPopup.value = true }.testTag("TagsButton"))
                   }
 
-              Spacer(modifier = Modifier.height(16.dp))
+              Spacer(modifier = Modifier.height(screenHeight / 80))
 
               if (isPrivate) {
                 Row(
@@ -274,7 +276,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                                     Route.ADD_PARTICIPANTS.replace("{eventId}", uid))
                               })
                     }
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(screenHeight / 80))
               }
 
               Row(
@@ -302,7 +304,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                                 .testTag("AddImageButton"))
                   }
 
-              Spacer(modifier = Modifier.height(16.dp))
+              Spacer(modifier = Modifier.height(screenHeight / 80))
 
               var showDialog by remember { mutableStateOf(false) }
               imageUri?.let {
@@ -332,7 +334,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                 }
               }
 
-              Spacer(modifier = Modifier.height(16.dp))
+              Spacer(modifier = Modifier.height(screenHeight / 80))
 
               Button(
                   modifier = Modifier.width((screenWidth / 1.5.dp).dp).height(screenHeight / 17),
