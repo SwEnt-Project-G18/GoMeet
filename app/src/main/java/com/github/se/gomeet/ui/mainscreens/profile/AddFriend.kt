@@ -191,9 +191,10 @@ fun UserItem(
 
   Row(
       modifier =
-          Modifier.fillMaxWidth().padding(vertical = 3.dp).clickable {
-            nav.navigateToScreen(Route.OTHERS_PROFILE.replace("{uid}", user.uid))
-          },
+          Modifier.fillMaxWidth()
+              .padding(vertical = 3.dp)
+              .clickable { nav.navigateToScreen(Route.OTHERS_PROFILE.replace("{uid}", user.uid)) }
+              .testTag("UserItem"),
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.SpaceBetween) {
         Row(verticalAlignment = Alignment.CenterVertically) {
