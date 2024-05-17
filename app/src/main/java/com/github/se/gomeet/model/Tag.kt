@@ -43,44 +43,44 @@ import androidx.compose.ui.unit.dp
 
 /** Tag that users can add to their profile and events */
 enum class Tag(val tagName: String) {
-    //Quick set of tag for a start
-    //TODO: Add more tags once a search feature is available.
-    Tag0("Networking"),
-    Tag1("Conference"),
-    Tag2("Workshop"),
-    Tag3("Presentation"),
-    Tag4("Meeting"),
-    Tag5("Webinar"),
-    Tag6("Seminar"),
-    Tag7("Business Event"),
-    Tag8("Hackathon"),
-    Tag9("Team Building"),
-    Tag10("Concert"),
-    Tag11("Festival"),
-    Tag12("Live Music"),
-    Tag13("Performance"),
-    Tag14("Art Exhibition"),
-    Tag15("Theater"),
-    Tag16("Movie Night"),
-    Tag17("Game Night"),
-    Tag18("Board Games"),
-    Tag19("Sports Event"),
-    Tag20("Fitness Class"),
-    Tag21("Dance Class"),
-    Tag22("Cooking Class"),
-    Tag23("Date Night"),
-    Tag24("Social Gathering"),
-    Tag25("Happy Hour"),
-    Tag26("Dinner Party"),
-    Tag27("Picnic"),
-    Tag28("Student Association"),
-    Tag29("Charity Event");
+  // Quick set of tag for a start
+  // TODO: Add more tags once a search feature is available.
+  Tag0("Networking"),
+  Tag1("Conference"),
+  Tag2("Workshop"),
+  Tag3("Presentation"),
+  Tag4("Meeting"),
+  Tag5("Webinar"),
+  Tag6("Seminar"),
+  Tag7("Business Event"),
+  Tag8("Hackathon"),
+  Tag9("Team Building"),
+  Tag10("Concert"),
+  Tag11("Festival"),
+  Tag12("Live Music"),
+  Tag13("Performance"),
+  Tag14("Art Exhibition"),
+  Tag15("Theater"),
+  Tag16("Movie Night"),
+  Tag17("Game Night"),
+  Tag18("Board Games"),
+  Tag19("Sports Event"),
+  Tag20("Fitness Class"),
+  Tag21("Dance Class"),
+  Tag22("Cooking Class"),
+  Tag23("Date Night"),
+  Tag24("Social Gathering"),
+  Tag25("Happy Hour"),
+  Tag26("Dinner Party"),
+  Tag27("Picnic"),
+  Tag28("Student Association"),
+  Tag29("Charity Event");
 
-    companion object {
-        fun fromTagName(tagName: String): Tag? {
-            return entries.find { it.tagName == tagName }
-        }
+  companion object {
+    fun fromTagName(tagName: String): Tag? {
+      return entries.find { it.tagName == tagName }
     }
+  }
 }
 /**
  * Composable function to display a menu that allows the user to choose tags.
