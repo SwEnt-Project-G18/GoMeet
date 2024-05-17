@@ -42,40 +42,46 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 /** Tag that users can add to their profile and events */
-enum class Tag {
-  // TODO: replace these by actual tags
-  tag1,
-  tag2,
-  tag3,
-  tag4,
-  tag5,
-  tag6,
-  tag7,
-  tag8,
-  tag9,
-  tag10,
-  tag11,
-  tag12,
-  tag13,
-  tag14,
-  tag15,
-  tag16,
-  tag17,
-  tag18,
-  tag19,
-  tag20,
-  tag21,
-  tag22,
-  tag23,
-  tag24,
-  tag25,
-  tag26,
-  tag27,
-  tag28,
-  tag29,
-  tag30
-}
+enum class Tag(val tagName: String) {
+    //Quick set of tag for a start
+    //TODO: Add more tags once a search feature is available.
+    Tag0("Networking"),
+    Tag1("Conference"),
+    Tag2("Workshop"),
+    Tag3("Presentation"),
+    Tag4("Meeting"),
+    Tag5("Webinar"),
+    Tag6("Seminar"),
+    Tag7("Business Event"),
+    Tag8("Hackathon"),
+    Tag9("Team Building"),
+    Tag10("Concert"),
+    Tag11("Festival"),
+    Tag12("Live Music"),
+    Tag13("Performance"),
+    Tag14("Art Exhibition"),
+    Tag15("Theater"),
+    Tag16("Movie Night"),
+    Tag17("Game Night"),
+    Tag18("Board Games"),
+    Tag19("Sports Event"),
+    Tag20("Fitness Class"),
+    Tag21("Dance Class"),
+    Tag22("Cooking Class"),
+    Tag23("Date Night"),
+    Tag24("Social Gathering"),
+    Tag25("Happy Hour"),
+    Tag26("Dinner Party"),
+    Tag27("Picnic"),
+    Tag28("Student Association"),
+    Tag29("Charity Event");
 
+    companion object {
+        fun fromTagName(tagName: String): Tag? {
+            return entries.find { it.tagName == tagName }
+        }
+    }
+}
 /**
  * Composable function to display a menu that allows the user to choose tags.
  *
@@ -116,9 +122,9 @@ fun TagsSelector(title: String, tags: MutableState<List<String>>, onSave: () -> 
                       .padding(start = 15.dp)
                       .testTag("TagList")) {
                 for (tag in Tag.entries) {
-                  if (tags.value.contains(tag.name)) {
+                  if (tags.value.contains(tag.tagName)) {
                     Button(
-                        onClick = { tags.value = tags.value.minus(tag.name) },
+                        onClick = { tags.value = tags.value.minus(tag.tagName) },
                         modifier =
                             Modifier.padding(end = 15.dp, bottom = 5.dp)
                                 .wrapContentSize()
@@ -131,7 +137,7 @@ fun TagsSelector(title: String, tags: MutableState<List<String>>, onSave: () -> 
                           Row(
                               verticalAlignment = Alignment.CenterVertically,
                               horizontalArrangement = Arrangement.SpaceBetween) {
-                                Text(tag.name, modifier = Modifier.padding(end = 10.dp))
+                                Text(tag.tagName, modifier = Modifier.padding(end = 10.dp))
                                 Icon(
                                     Icons.Default.Check,
                                     contentDescription = null,
@@ -140,7 +146,7 @@ fun TagsSelector(title: String, tags: MutableState<List<String>>, onSave: () -> 
                         }
                   } else {
                     OutlinedButton(
-                        onClick = { tags.value = tags.value.plus(tag.name) },
+                        onClick = { tags.value = tags.value.plus(tag.tagName) },
                         modifier = Modifier.padding(end = 15.dp, bottom = 5.dp).wrapContentSize(),
                         border = BorderStroke(1.dp, MaterialTheme.colorScheme.onBackground),
                         contentPadding = PaddingValues(start = 15.dp, end = 10.dp),
@@ -153,7 +159,7 @@ fun TagsSelector(title: String, tags: MutableState<List<String>>, onSave: () -> 
                           Row(
                               verticalAlignment = Alignment.CenterVertically,
                               horizontalArrangement = Arrangement.SpaceBetween) {
-                                Text(tag.name, modifier = Modifier.padding(end = 10.dp))
+                                Text(tag.tagName, modifier = Modifier.padding(end = 10.dp))
                                 Icon(
                                     Icons.Default.Add,
                                     contentDescription = null,
