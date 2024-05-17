@@ -145,20 +145,25 @@ fun InitNavigation(
       WelcomeScreen(
           onNavToLogin = { NavigationActions(nav).navigateTo(LOGIN_ITEMS[1]) },
           onNavToRegister = { NavigationActions(nav).navigateTo(LOGIN_ITEMS[2]) },
-          onSignInSuccess = { userId: String ->
+          onSignInSuccess = {
+              userId: String,
+              username: String,
+              email: String,
+              firstName: String,
+              lastName: String,
+              phoneNumber: String ->
             val currentUser = Firebase.auth.currentUser
             if (currentUser != null) {
               val uid = currentUser.uid
-              val email = currentUser.email ?: ""
-              val firstName = authViewModel.signInState.value.firstNameRegister
-              val lastName = authViewModel.signInState.value.lastNameRegister
-              val phoneNumber = authViewModel.signInState.value.phoneNumberRegister
-              val country = authViewModel.signInState.value.countryRegister
-              val username = authViewModel.signInState.value.usernameRegister
+              val email = email
+              val firstName = firstName
+              val lastName = lastName
+              val phoneNumber = phoneNumber
+              val country = ""
+              val username = username
               eventViewModel = EventViewModel(uid, eventRepository)
-
               userViewModel.createUserIfNew(
-                  uid, username, firstName, lastName, email, phoneNumber, country, "")
+                  uid, username, firstName, lastName, email, phoneNumber, country)
             }
             val user =
                 User(
