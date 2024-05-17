@@ -192,7 +192,7 @@ fun EventCarousel(events: List<Event>, nav: NavigationActions) {
     launch {
       while (true) {
         delay(10000) // Wait for 10 seconds
-        val nextPage = (pagerState.currentPage + 1) % events.size
+        val nextPage = if (events.isNotEmpty()) (pagerState.currentPage + 1) % events.size else 0
         pagerState.animateScrollToPage(nextPage)
       }
     }
