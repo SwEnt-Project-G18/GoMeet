@@ -61,8 +61,8 @@ fun LoginScreen(
   val context = LocalContext.current
   val textFieldColors =
       TextFieldDefaults.colors(
-          focusedTextColor = MaterialTheme.colorScheme.onBackground,
-          unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+          focusedTextColor = DarkCyan,
+          unfocusedTextColor = DarkCyan,
           unfocusedContainerColor = Color.Transparent,
           focusedContainerColor = Color.Transparent,
           cursorColor = DarkCyan,

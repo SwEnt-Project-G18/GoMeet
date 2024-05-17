@@ -5,4 +5,5 @@ import io.github.kakaocup.compose.node.element.ComposeScreen
 
 class TrendsScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
     ComposeScreen<TrendsScreen>(
-        semanticsProvider = semanticsProvider, viewBuilderAction = { hasTestTag("TrendsScreen") })
+        semanticsProvider = semanticsProvider,
+        viewBuilderAction = { hasTestTag("TrendsScreen") }) {}

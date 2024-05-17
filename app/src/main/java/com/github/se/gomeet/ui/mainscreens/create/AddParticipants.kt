@@ -16,11 +16,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import com.github.se.gomeet.model.event.EventInviteUsers
+import com.github.se.gomeet.model.event.InviteStatus
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
+import com.github.se.gomeet.viewmodel.EventInviteViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import kotlinx.coroutines.launch
 
@@ -34,7 +37,8 @@ fun AddParticipants(
     nav: NavigationActions,
     userId: String,
     userViewModel: UserViewModel,
-    eventId: String
+    eventId: String,
+    eventInviteViewModel: EventInviteViewModel
 ) {
 
   /* TODO: Code the UI of the AddParticipants screen when the logic of
@@ -80,10 +84,9 @@ fun AddParticipants(
             }
         OutlinedButton(
             onClick = {
-              //              eventInviteViewModel.addEventInviteUsers(
-              //                  EventInviteUsers(
-              //                      eventId, invited.map { it to InviteStatus.PENDING
-              // }.toMutableStateMap()))
+              eventInviteViewModel.addEventInviteUsers(
+                  EventInviteUsers(
+                      eventId, invited.map { Pair(it, InviteStatus.PENDING) }.toMutableList()))
               nav.goBack()
             }) {
               Text(text = "Finish")

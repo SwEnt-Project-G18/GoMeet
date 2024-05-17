@@ -1,7 +1,5 @@
 package com.github.se.gomeet.model.user
 
-import com.github.se.gomeet.model.event.Invitation
-
 /**
  * This data class represents the user of the application. It contains the user's information.
  *
@@ -15,9 +13,6 @@ import com.github.se.gomeet.model.event.Invitation
  * @param following The list of users that the user is following
  * @param followers The list of users that are following the user
  * @param pendingRequests The list of requests that the user has not accepted or refused yet
- * @param joinedEvents The list of events that the user joined
- * @param myEvents The list of events that were created by the user
- * @param myFavorites The list of events that the user added to favorites
  */
 data class GoMeetUser(
     val uid: String,
@@ -29,12 +24,10 @@ data class GoMeetUser(
     val country: String,
     val following: List<String>,
     val followers: List<String>,
-    val pendingRequests: Set<Invitation>, // For now, the requests are just invitations
-    var joinedEvents: List<String>,
+    val pendingRequests: List<String>,
+    val joinedEvents: List<String>,
     var myEvents: List<String>,
-    var myFavorites: List<String>,
-    var profilePicture: String = "",
-    var tags: List<String>
+    var myFavorites: List<String>
     // can add more things later
 ) {
   fun doesMatchSearchQuery(query: String): Boolean {

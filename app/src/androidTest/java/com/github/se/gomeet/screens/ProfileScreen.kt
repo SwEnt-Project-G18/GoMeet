@@ -5,4 +5,4 @@ import io.github.kakaocup.compose.node.element.ComposeScreen
 
 class ProfileScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
     ComposeScreen<ProfileScreen>(
-        semanticsProvider = semanticsProvider, viewBuilderAction = { hasTestTag("Profile") })
+        semanticsProvider = semanticsProvider, viewBuilderAction = { hasTestTag("Profile") }) {}

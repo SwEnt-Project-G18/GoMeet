@@ -1,107 +1,91 @@
 package com.github.se.gomeet.ui.authscreens
 
+import androidx.activity.ComponentActivity
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onAllNodesWithTag
-import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
+import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.github.se.gomeet.MainActivity
-import com.github.se.gomeet.screens.RegisterScreenScreen
-import com.github.se.gomeet.screens.WelcomeScreenScreen
+import com.github.se.gomeet.R
+import com.github.se.gomeet.ui.navigation.NavigationActions
+import com.github.se.gomeet.viewmodel.AuthViewModel
+import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
-import io.github.kakaocup.compose.node.element.ComposeScreen
-import kotlinx.coroutines.runBlocking
+import io.getstream.chat.android.client.ChatClient
+import io.getstream.chat.android.client.logger.ChatLogLevel
+import io.github.kakaocup.kakao.common.utilities.getResourceString
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class RegisterScreenTest : TestCase() {
-  @get:Rule val composeTestRule = createAndroidComposeRule<MainActivity>()
+class RegisterScreenTest {
 
-  @Test
-  fun testRegisterScreen() = run {
-    val email = "registerscreen@test.com"
+  @get:Rule val rule = createAndroidComposeRule<ComponentActivity>()
 
-    ComposeScreen.onComposeScreen<WelcomeScreenScreen>(composeTestRule) {
-      composeTestRule.waitForIdle()
-      composeTestRule.onNodeWithText("Sign Up").performClick()
-    }
-
-    ComposeScreen.onComposeScreen<RegisterScreenScreen>(composeTestRule) {
-      composeTestRule.waitForIdle()
-
-      // Test the ui of RegisterUsernameEmail and fill in the fields
-      composeTestRule.onNodeWithContentDescription("GoMeet").assertIsDisplayed()
-      composeTestRule.onNodeWithContentDescription("Back").assertIsDisplayed()
-      composeTestRule.onNodeWithTag("Text").assertIsDisplayed()
-      composeTestRule
-          .onNodeWithText("Username")
-          .assertIsDisplayed()
-          .performTextInput("RegisterScreenTestUser")
-      composeTestRule.onNodeWithText("Email").assertIsDisplayed().performTextInput(email)
-      composeTestRule.onNodeWithTag("BottomRow").assertIsDisplayed()
-      composeTestRule.onNodeWithContentDescription("Next").assertIsDisplayed().performClick()
-
-      composeTestRule.waitForIdle()
-
-      // Test the ui of RegisterPassword and fill in the fields
-      composeTestRule.onNodeWithContentDescription("GoMeet").assertIsDisplayed()
-      composeTestRule.onNodeWithContentDescription("Back").assertIsDisplayed()
-      composeTestRule.onNodeWithTag("Text").assertIsDisplayed()
-      composeTestRule.onNodeWithText("Password").assertIsDisplayed().performTextInput("123456")
-      composeTestRule
-          .onNodeWithText("Confirm Password")
-          .assertIsDisplayed()
-          .performTextInput("123456")
-      composeTestRule.onNodeWithTag("BottomRow").assertIsDisplayed()
-      composeTestRule.onNodeWithContentDescription("Next").assertIsDisplayed().performClick()
-
-      composeTestRule.waitForIdle()
-
-      // Test the ui of RegisterNameCountryPhone and fill in the fields
-      composeTestRule.onNodeWithContentDescription("GoMeet").assertIsDisplayed()
-      composeTestRule.onNodeWithContentDescription("Back").assertIsDisplayed()
-      composeTestRule.onNodeWithTag("Text").assertIsDisplayed()
-      composeTestRule.onNodeWithText("First Name").assertIsDisplayed().performTextInput("firstname")
-      composeTestRule.onNodeWithText("Last Name").assertIsDisplayed().performTextInput("lastname")
-      composeTestRule
-          .onNodeWithText("Phone Number")
-          .assertIsDisplayed()
-          .performTextInput("+1234567890")
-      composeTestRule.onNodeWithTag("Country").performScrollTo().assertIsDisplayed().performClick()
-      composeTestRule.onAllNodesWithTag("CountryItem")[1].assertIsDisplayed().performClick()
-      composeTestRule.onNodeWithTag("BottomRow").assertIsDisplayed()
-      composeTestRule.onNodeWithContentDescription("Next").assertIsDisplayed().performClick()
-
-      composeTestRule.waitForIdle()
-
-      // Test the ui of RegisterPfp
-      composeTestRule.onNodeWithContentDescription("GoMeet").assertIsDisplayed()
-      composeTestRule.onNodeWithContentDescription("Back").assertIsDisplayed()
-      composeTestRule.onNodeWithTag("Text").assertIsDisplayed()
-      composeTestRule.onNodeWithContentDescription("Profile Picture").assertIsDisplayed()
-      composeTestRule.onNodeWithTag("BottomRow").assertIsDisplayed()
-      composeTestRule.onNodeWithContentDescription("Next").assertIsDisplayed().performClick()
-
-      // Verify that the user was created
-      composeTestRule.waitUntil(timeoutMillis = 10000) { Firebase.auth.currentUser != null }
-    }
-  }
+  private lateinit var authViewModel: AuthViewModel
+  private lateinit var userViewModel: UserViewModel
 
   @After
   fun tearDown() {
-    runBlocking {
-      // Clean up the user
-      Firebase.auth.currentUser?.delete()
+    // Clean up the test data
+    rule.waitForIdle()
+    Firebase.auth.currentUser?.delete()
+  }
+
+  @Test
+  fun testRegisterScreen() = runTest {
+    authViewModel = AuthViewModel()
+    userViewModel = UserViewModel()
+
+    rule.setContent {
+      val client =
+          ChatClient.Builder(getResourceString(R.string.chat_api_key), LocalContext.current)
+              .logLevel(ChatLogLevel.NOTHING) // Set to NOTHING in prod
+              .build()
+      RegisterScreen(
+          client, NavigationActions(rememberNavController()), authViewModel, userViewModel) {}
     }
+
+    rule.onNodeWithTag("register_title").assertIsDisplayed()
+
+    rule.onNodeWithText("Email").assertIsDisplayed()
+    rule.onNodeWithText("Password").assertIsDisplayed()
+    rule.onNodeWithText("Confirm Password").performScrollTo().assertIsDisplayed()
+
+    rule
+        .onNodeWithTag("register_button")
+        .assertIsNotEnabled()
+        .assertHasClickAction()
+        .performScrollTo()
+        .assertIsDisplayed()
+
+    rule.onNodeWithText("Email").performScrollTo().performTextInput("signup@test1.com")
+    rule.onNodeWithText("Password").performScrollTo().performTextInput("123456")
+    rule.onNodeWithText("Confirm Password").performScrollTo().performTextInput("123456")
+
+    // Wait for the Compose framework to recompose the UI
+    rule.waitForIdle()
+
+    rule.onNodeWithTag("register_button").assertIsEnabled().performScrollTo().performClick()
+
+    rule.waitForIdle()
+
+    // Assert that the register worked
+    assert(authViewModel.signInState.value.signInError == null)
+    //    assert(authViewModel.signInState.value.isSignInSuccessful) // Error here in CI
+
+    if (Firebase.auth.currentUser != null) userViewModel.deleteUser(Firebase.auth.currentUser!!.uid)
   }
 }

@@ -24,11 +24,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,12 +48,10 @@ import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.github.se.gomeet.R
-import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.theme.DarkCyan
-import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
@@ -67,7 +63,6 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
-import kotlinx.coroutines.launch
 
 /**
  * EventHeader is a composable that displays the header of an event.
@@ -163,7 +158,7 @@ fun EventDateTime(day: String, time: String) {
 /**
  * EventImage is a composable that displays the image of an event.
  *
- * @param imageUrl URL of the image
+ * @param painter Painter object for the image
  */
 @Composable
 fun EventImage(imageUrl: String?) {
@@ -227,23 +222,11 @@ fun EventButtons(
     organizer: GoMeetUser,
     eventId: String,
     userViewModel: UserViewModel,
-    eventViewModel: EventViewModel,
     nav: NavigationActions
 ) {
-  val coroutineScope = rememberCoroutineScope()
+
   val isFavorite = remember { mutableStateOf(currentUser.myFavorites.contains(eventId)) }
-  val currentEvent = remember { mutableStateOf<Event?>(null) }
-  val isJoined = remember { mutableStateOf(false) }
-
-  LaunchedEffect(Unit) {
-    coroutineScope.launch {
-      currentEvent.value = eventViewModel.getEvent(eventId)
-      isJoined.value =
-          currentUser.joinedEvents.contains(eventId) &&
-              currentEvent.value!!.participants.contains(currentUser.uid)
-    }
-  }
-
+  val isJoined = remember { mutableStateOf(currentUser.myEvents.contains(eventId)) }
   Row(
       modifier = Modifier.fillMaxWidth().testTag("EventButton"),
       horizontalArrangement = Arrangement.SpaceBetween) {
@@ -253,16 +236,11 @@ fun EventButtons(
                 // TODO: GO TO EDIT EVENT PARAMETERS SCREEN
               } else {
                 if (!isJoined.value) {
-                  currentUser.joinedEvents = currentUser.joinedEvents.plus(eventId)
-                  currentEvent.value!!.participants =
-                      currentEvent.value!!.participants.plus(currentUser.uid)
+                  currentUser.myEvents = currentUser.myEvents.plus(eventId)
                 } else {
-                  currentUser.joinedEvents = currentUser.joinedEvents.minus(eventId)
-                  currentEvent.value!!.participants =
-                      currentEvent.value!!.participants.minus(currentUser.uid)
+                  currentUser.myEvents = currentUser.myEvents.minus(eventId)
                 }
                 userViewModel.editUser(currentUser)
-                eventViewModel.editEvent(currentEvent.value!!)
                 isJoined.value = !isJoined.value
               }
             },

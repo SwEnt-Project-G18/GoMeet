@@ -14,7 +14,6 @@ package com.github.se.gomeet.model.authentication
  * @param countryRegister The country of the user for registration.
  * @param usernameRegister The username of the user for registration.
  * @param username The username of the user for registration.
- * @param pfp The profile picture of the user for registration.
  * @param firstName The first name of the user for registration.
  * @param lastName The last name of the user for registration.
  * @param phoneNumber The phone number of the user for registration.
@@ -37,7 +36,6 @@ data class SignInState(
     val usernameRegister: String = "",
     val username: String = "",
     val firstName: String = "",
-    val pfp: String = "",
     val lastName: String = "",
     val phoneNumber: String = "",
     val country: String = "",

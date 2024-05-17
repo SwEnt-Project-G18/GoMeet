@@ -28,7 +28,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,55 +50,45 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.github.se.gomeet.R
-import com.github.se.gomeet.model.event.Event
-import com.github.se.gomeet.model.event.eventMomentToString
-import com.github.se.gomeet.model.repository.EventRepository
-import com.github.se.gomeet.model.repository.UserRepository
-import com.github.se.gomeet.model.user.GoMeetUser
+import com.github.se.gomeet.model.event.InviteStatus
+import com.github.se.gomeet.model.event.UserInvitedToEvents
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.ui.theme.NavBarUnselected
-import com.github.se.gomeet.viewmodel.EventViewModel
-import com.github.se.gomeet.viewmodel.UserViewModel
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
-import java.time.LocalDate
-import java.time.LocalTime
-import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
-/**
- * This composable function displays the notifications screen.
- *
- * @param nav The navigation actions.
- * @param currentUserID The current user's ID.
- */
 @Composable
-fun Notifications(nav: NavigationActions, currentUserID: String) {
-  val userViewModel = UserViewModel(UserRepository(Firebase.firestore))
-  val eventViewModel = EventViewModel(null, EventRepository(Firebase.firestore))
+fun Notifications(nav: NavigationActions) {
 
+  val initialState =
+      UserInvitedToEvents(user = "", invitedToEvents = mutableListOf("" to InviteStatus.PENDING))
   var selectedFilter by remember { mutableStateOf("All") }
-  val user = remember { mutableStateOf<GoMeetUser?>(null) }
-  val event = remember { mutableStateOf<Event?>(null) }
+  val inviteList = remember { mutableStateOf(initialState) }
   val coroutineScope = rememberCoroutineScope()
 
+  /*
   LaunchedEffect(Unit) {
-    coroutineScope.launch {
-      val currentUser = userViewModel.getUser(currentUserID)
-
-      if (currentUser != null) {
-        user.value = currentUser
+      coroutineScope.launch {
+          val allInvitedEvents = inviteViewModel.getUsersInvitedToEvent(userId)
+          if (allInvitedEvents != null) {
+              inviteList.value = allInvitedEvents
+          }
       }
-    }
   }
+  */
 
   // Define a function to handle button clicks
   fun onFilterButtonClick(filterType: String) {
@@ -135,7 +124,8 @@ fun Notifications(nav: NavigationActions, currentUserID: String) {
               Row(
                   verticalAlignment = Alignment.CenterVertically,
                   horizontalArrangement = Arrangement.Start,
-                  modifier = Modifier.testTag("Back").clickable { nav.goBack() }) {
+                  modifier =
+                      Modifier.testTag("Back").clickable { nav.navigateToScreen(Route.PROFILE) }) {
                     Icon(
                         painter = painterResource(id = R.drawable.arrow_back_24px),
                         contentDescription = "image description",
@@ -188,10 +178,10 @@ fun Notifications(nav: NavigationActions, currentUserID: String) {
                         colors =
                             ButtonDefaults.buttonColors(
                                 containerColor =
-                                    if (selectedFilter == "My events") DarkCyan
+                                    if (selectedFilter == "MyEvents") DarkCyan
                                     else NavBarUnselected,
                                 contentColor =
-                                    if (selectedFilter == "My events") Color.White else DarkCyan),
+                                    if (selectedFilter == "MyEvents") Color.White else DarkCyan),
                         border = BorderStroke(1.dp, DarkCyan),
                         modifier = Modifier.testTag("MyEventsButton"))
                   }
@@ -208,51 +198,25 @@ fun Notifications(nav: NavigationActions, currentUserID: String) {
                                       placeholder(R.drawable.gomeet_logo)
                                     })
                             .build())
-
-                user.value?.pendingRequests?.forEach { invitation ->
-                  val eventName = invitation.eventId
-                  coroutineScope.launch {
-                    val currentEvent = eventViewModel.getEvent(eventName)
-
-                    if (currentEvent != null) {
-                      event.value = currentEvent
-                    }
-                  }
-
-                  event.value?.let { event ->
-                    NotificationsWidget(
-                        organizerName = event.creator,
-                        eventTitle = event.title,
-                        eventDate = event.date,
-                        eventTime = event.time,
-                        eventPicture = painter,
-                        verified = true)
-                  }
-
-                  Spacer(Modifier.height(10.dp))
-                }
+                NotificationsWidget(
+                    userName = "Bill Clinton",
+                    eventName = "Chess night",
+                    eventDate = Date(),
+                    eventPicture = painter,
+                    organizerName = "EPFL Chess Club",
+                    verified = true)
+                Spacer(Modifier.height(10.dp))
               }
             }
       }
 }
 
-/**
- * This composable function displays the event a user is invited to in the notifications screen.
- *
- * @param organizerName The name of the event's organiser.
- * @param eventTitle The title of the event.
- * @param eventDate The date of the event.
- * @param eventTime The time of the event.
- * @param eventPicture The picture of the event.
- * @param verified True if the event organiser is verified, false otherwise.
- * @return A Card displaying the event.
- */
 @Composable
 fun NotificationsWidget(
+    userName: String,
     organizerName: String,
-    eventTitle: String,
-    eventDate: LocalDate,
-    eventTime: LocalTime,
+    eventName: String,
+    eventDate: Date,
     eventPicture: Painter,
     verified: Boolean
 ) {
@@ -266,7 +230,7 @@ fun NotificationsWidget(
   val bigTextSize = with(density) { screenWidth.toPx() / 60 }
   Row(Modifier.padding(start = 10.dp)) {
     Text(
-        text = organizerName,
+        text = userName,
         style =
             TextStyle(
                 fontSize = 11.sp,
@@ -306,7 +270,7 @@ fun NotificationsWidget(
                   horizontalAlignment = Alignment.Start, // Align text horizontally to center
                   verticalArrangement = Arrangement.Center) {
                     Text(
-                        text = eventTitle,
+                        text = eventName,
                         style =
                             TextStyle(
                                 fontSize = bigTextSize.sp,
@@ -344,8 +308,27 @@ fun NotificationsWidget(
                           }
                         }
 
-                    val dateString = eventMomentToString(eventDate, eventTime)
+                    val currentDate = Calendar.getInstance()
+                    val startOfWeek = currentDate.clone() as Calendar
+                    startOfWeek[Calendar.DAY_OF_WEEK] = startOfWeek.firstDayOfWeek
+                    val endOfWeek = startOfWeek.clone() as Calendar
+                    endOfWeek.add(Calendar.DAY_OF_WEEK, 6)
 
+                    val eventCalendar = Calendar.getInstance().apply { time = eventDate }
+
+                    // Determine if the event date is within this week
+                    val isThisWeek = eventCalendar >= startOfWeek && eventCalendar <= endOfWeek
+
+                    // Format based on whether the date is in the current week
+                    val dateFormat =
+                        if (isThisWeek) {
+                          SimpleDateFormat("EEEE - HH:mm", Locale.getDefault()) // "Tuesday"
+                        } else {
+                          SimpleDateFormat("dd/MM/yy - HH:mm", Locale.getDefault()) // "05/12/24"
+                        }
+
+                    // Convert the Date object to a formatted String
+                    val dateString = dateFormat.format(eventDate)
                     Column {
                       Text(
                           dateString,
@@ -363,7 +346,7 @@ fun NotificationsWidget(
                         Button(
                             onClick = {},
                             content = {
-                              Row {
+                              Row() {
                                 /*Icon(
                                 painter = painterResource(id = R.drawable.check_circle),
                                 contentDescription = "Accept",
@@ -415,4 +398,10 @@ fun NotificationsWidget(
               )
             }
       }
+}
+
+@Preview
+@Composable
+fun NotificationsPreview() {
+  Notifications(nav = NavigationActions(rememberNavController()))
 }

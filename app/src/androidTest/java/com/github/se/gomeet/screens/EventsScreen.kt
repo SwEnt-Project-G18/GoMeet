@@ -5,4 +5,4 @@ import io.github.kakaocup.compose.node.element.ComposeScreen
 
 class EventsScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
     ComposeScreen<EventsScreen>(
-        semanticsProvider = semanticsProvider, viewBuilderAction = { hasTestTag("CreateUI") })
+        semanticsProvider = semanticsProvider, viewBuilderAction = { hasTestTag("CreateUI") }) {}

@@ -1,12 +1,10 @@
-package com.github.se.gomeet.ui.mainscreens.profile.settings
+package com.github.se.gomeet.ui.mainscreens.profile
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -25,7 +23,9 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.R
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
@@ -105,24 +105,15 @@ fun SettingsScreen(
               SettingsSubtitle("Your app and media", Modifier.padding(15.dp).align(Alignment.Start))
 
               SettingsComposable(R.drawable.folder, "Suggested content")
-              SettingsComposable(
-                  R.drawable.mobile_friendly,
-                  "Device permissions",
-                  true,
-                  { nav.navigateToScreen(Route.PERMISSIONS) })
+              SettingsComposable(R.drawable.mobile_friendly, "Device permissions")
               SettingsComposable(R.drawable.check_icon, "Accessibility")
               SettingsComposable(R.drawable.language, "Language")
 
               SettingsSubtitle(
                   "More info and support", Modifier.padding(15.dp).align(Alignment.Start))
 
-              SettingsComposable(
-                  R.drawable.baseline_chat_bubble_outline_24,
-                  "Help",
-                  true,
-                  { nav.navigateToScreen(Route.HELP) })
-              SettingsComposable(
-                  R.drawable.gomeet_icon, "About", true, { nav.navigateToScreen(Route.ABOUT) })
+              SettingsComposable(R.drawable.baseline_chat_bubble_outline_24, "Help")
+              SettingsComposable(R.drawable.gomeet_icon, "About")
 
               Text(
                   text = "Log out",
@@ -154,24 +145,15 @@ fun SettingsScreen(
  * @param text The text for the item.
  */
 @Composable
-fun SettingsComposable(
-    icon: Int,
-    text: String,
-    clickable: Boolean = false,
-    onClick: () -> Unit = {}
-) {
+fun SettingsComposable(icon: Int, text: String) {
   Row(
-      modifier =
-          Modifier.padding(start = 15.dp).let {
-            if (clickable) it.clickable(onClick = onClick) else it
-          }, // Add the clickable modifier here if clickable is true
+      modifier = Modifier.padding(start = 15.dp),
       horizontalArrangement = Arrangement.Start,
       verticalAlignment = Alignment.CenterVertically) {
         Icon(
             painter = painterResource(id = icon),
             contentDescription = text + "icon",
-            tint = MaterialTheme.colorScheme.onBackground,
-            modifier = Modifier.size(24.dp))
+            tint = MaterialTheme.colorScheme.onBackground)
 
         Text(
             text = text,
@@ -222,4 +204,10 @@ fun SettingsSubtitle(text: String, modifier: Modifier) {
       fontFamily = FontFamily.Default,
       textAlign = TextAlign.Start,
       style = MaterialTheme.typography.labelSmall)
+}
+
+@Preview
+@Composable
+fun SettingsScreenPreview() {
+  SettingsScreen(nav = NavigationActions(rememberNavController()))
 }
