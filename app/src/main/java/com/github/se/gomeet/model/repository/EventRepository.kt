@@ -151,7 +151,8 @@ class EventRepository(private val db: FirebaseFirestore) {
         "maxParticipants" to maxParticipants,
         "public" to public,
         "tags" to tags,
-        "images" to images)
+        "images" to images,
+        "nViews" to nViews)
   }
 
   /**
@@ -185,7 +186,8 @@ class EventRepository(private val db: FirebaseFirestore) {
         maxParticipants = (this["maxParticipants"] as? String)?.toIntOrNull() ?: 0,
         public = this["public"] as? Boolean ?: false,
         tags = this["tags"] as? List<String> ?: emptyList(),
-        images = this["images"] as? List<String> ?: emptyList())
+        images = this["images"] as? List<String> ?: emptyList(),
+        nViews = this["nViews"] as? Int ?: 0,)
   }
 
   /**

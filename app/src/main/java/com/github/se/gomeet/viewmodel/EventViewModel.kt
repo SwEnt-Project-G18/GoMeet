@@ -54,14 +54,14 @@ class EventViewModel(private val creatorId: String? = null, eventRepository: Eve
   private val _bitmapDescriptors = mutableStateMapOf<String, BitmapDescriptor>()
   val bitmapDescriptors: MutableMap<String, BitmapDescriptor> = _bitmapDescriptors
 
-  private var lastLoadedEvents: List<Event>? = null
+  private var lastLoadedEvents: List<Event> = emptyList()
   private val _loading = MutableLiveData(false)
   val loading: LiveData<Boolean> = _loading
 
-    private val currentUser = runBlocking { UserViewModel(UserRepository(Firebase.firestore)).getUser(creatorId!!) }
+//  private val currentUser = if(creatorId != null) runBlocking { UserViewModel(UserRepository(Firebase.firestore)).getUser(creatorId) } else null
     // The weight that the user tags will have compared to the number of views (for the sorting
     // algorithm)
-    private val relevanceFactor = 0.5
+  private val relevanceFactor = 0.5
 
     /**
    * Load custom pins for the events.
@@ -256,6 +256,7 @@ class EventViewModel(private val creatorId: String? = null, eventRepository: Eve
     Log.d("CreatorID", "Creator ID is $creatorId")
     CoroutineScope(Dispatchers.IO).launch {
       try {
+          val participantsWithCreator = if(participants.contains(creatorId)) participants else participants.plus(creatorId!!)
         val imageUrl = imageUri?.let { uploadImageAndGetUrl(it) }
         val updatedImages = images.toMutableList().apply { imageUrl?.let { add(it) } }
         val event =
@@ -270,16 +271,15 @@ class EventViewModel(private val creatorId: String? = null, eventRepository: Eve
                 price,
                 url,
                 pendingParticipants,
-                participants,
+                participantsWithCreator,
                 visibleToIfPrivate,
                 maxParticipants,
                 public,
                 tags,
-                updatedImages,
-                0)
+                updatedImages)
 
         repository.addEvent(event)
-        joinEvent(event, creatorId)
+          lastLoadedEvents = lastLoadedEvents.plus(event)
         userViewModel.joinEvent(event.eventID, creatorId)
         userViewModel.userCreatesEvent(event.eventID, creatorId)
       } catch (e: Exception) {
@@ -294,6 +294,8 @@ class EventViewModel(private val creatorId: String? = null, eventRepository: Eve
    * @param event the event to edit
    */
   fun editEvent(event: Event) {
+    lastLoadedEvents = lastLoadedEvents.filter { it.eventID != event.eventID }
+    lastLoadedEvents = lastLoadedEvents.plus(event)
     repository.updateEvent(event)
   }
 
@@ -303,6 +305,7 @@ class EventViewModel(private val creatorId: String? = null, eventRepository: Eve
    * @param eventID the ID of the event to remove
    */
   fun removeEvent(eventID: String) {
+    lastLoadedEvents = lastLoadedEvents.filter { it.eventID != eventID }
     repository.removeEvent(eventID)
   }
 
@@ -388,9 +391,11 @@ class EventViewModel(private val creatorId: String? = null, eventRepository: Eve
      * @param eventID the id of the event to update
      */
     fun sawEvent(eventID: String) {
-        var event: Event? = null
-        repository.getEvent(eventID) { t -> event = t }
-        if (event != null) repository.updateEvent(event!!.copy(nViews = event!!.nViews + 1))
+        val event = lastLoadedEvents.find { it.eventID == eventID } ?: return
+        lastLoadedEvents = lastLoadedEvents.filter { it.eventID != eventID}
+        lastLoadedEvents = lastLoadedEvents.plus(event.copy(nViews = event.nViews + 1))
+        repository.updateEvent(event.copy(nViews = event.nViews + 1))
+        Log.d("ViewModel", "Saw event $eventID")
     }
 
   /**
@@ -428,12 +433,14 @@ class EventViewModel(private val creatorId: String? = null, eventRepository: Eve
     private fun sortEvents() {
 
         // Sort events by descending order of nViews
+        val currentUser = if(creatorId != null) runBlocking { UserViewModel(UserRepository(Firebase.firestore)).getUser(creatorId) } else null
+
         if (currentUser != null) {
             val tags = currentUser.tags
             val eventScoreList: Map<String, Pair<Int, Int>> = mutableMapOf()
             var maxTags = 0
             var maxViews = 0
-            lastLoadedEvents?.forEach { event ->
+            lastLoadedEvents.forEach { event ->
                 eventScoreList.plus(Pair(event.eventID, Pair(0, 0)))
                 // Check if the event has any of the user's preferred tags
                 event.tags.forEach { tag ->
@@ -448,7 +455,7 @@ class EventViewModel(private val creatorId: String? = null, eventRepository: Eve
             }
 
             val sortedEvents =
-                lastLoadedEvents?.sortedByDescending { event ->
+                lastLoadedEvents.sortedByDescending { event ->
                     val tagScore: Double =
                         (eventScoreList[event.eventID]?.second?.toDouble() ?: 0.0) / (maxTags.toDouble())
                     val viewScore: Double = (event.nViews.toDouble() / maxViews.toDouble())
@@ -457,7 +464,7 @@ class EventViewModel(private val creatorId: String? = null, eventRepository: Eve
 
             lastLoadedEvents = sortedEvents
         } else {
-            lastLoadedEvents = lastLoadedEvents?.sortedByDescending { event -> event.nViews }
+            lastLoadedEvents = lastLoadedEvents.sortedByDescending { event -> event.nViews }
         }
     }
 }
