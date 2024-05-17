@@ -42,7 +42,8 @@ class UserViewModel : ViewModel() {
       lastName: String,
       email: String,
       phoneNumber: String,
-      country: String
+      country: String,
+      pfp: String = ""
   ) {
     CoroutineScope(Dispatchers.IO).launch {
       if (getUser(uid) == null) {
@@ -62,6 +63,7 @@ class UserViewModel : ViewModel() {
                   joinedEvents = emptyList(),
                   myEvents = emptyList(),
                   myFavorites = emptyList(),
+                  profilePicture = pfp,
                   tags = emptyList())
           currentUser.value = user
           UserRepository.addUser(user)
@@ -173,6 +175,13 @@ class UserViewModel : ViewModel() {
     }
   }
 
+  /**
+   * User creates an event and adds it to their list of myEvents. It is used when a user creates an
+   * event.
+   *
+   * @param eventId The id of the event to create.
+   * @param userId The id of the user creating the event.
+   */
   suspend fun userCreatesEvent(eventId: String, userId: String) {
     try {
       val goMeetUser = getUser(userId)!!
@@ -182,6 +191,13 @@ class UserViewModel : ViewModel() {
     }
   }
 
+  /**
+   * The user receives an invitation and adds it to their list of pendingRequests. Note that this
+   * function should be called in the same time as the equivalent function in the EventViewModel.
+   *
+   * @param eventId The id of the event to invite the user to.
+   * @param userId The id of the user to invite.
+   */
   suspend fun gotInvitation(eventId: String, userId: String) {
     val possibleInvitation =
         getUser(userId)!!.pendingRequests.find {
@@ -197,6 +213,27 @@ class UserViewModel : ViewModel() {
             "User already joined this event or has a pending request for this event")
         return
       }
+      val possiblePreviousInvitationRefused =
+          goMeetUser.pendingRequests.find {
+            it.eventId == eventId && it.status == InviteStatus.REFUSED
+          }
+
+      if (goMeetUser.pendingRequests.contains(possiblePreviousInvitationRefused)) {
+        val updatedPendingRequests =
+            goMeetUser.pendingRequests
+                .map {
+                  if (it.eventId == eventId) {
+                    it.copy(status = InviteStatus.PENDING)
+                  } else {
+                    it
+                  }
+                }
+                .toSet()
+
+        editUser(goMeetUser.copy(pendingRequests = updatedPendingRequests))
+        return
+      }
+
       editUser(
           goMeetUser.copy(
               pendingRequests =
@@ -206,6 +243,14 @@ class UserViewModel : ViewModel() {
     }
   }
 
+  /**
+   * The user gets kicked from an event and removes it from their list of joinedEvents. Note that
+   * this function should be called in the same time as the equivalent function in the
+   * EventViewModel.
+   *
+   * @param eventId The id of the event to kick the user from.
+   * @param userId The id of the user to kick.
+   */
   suspend fun gotKickedFromEvent(eventId: String, userId: String) {
     try {
       val goMeetUser = getUser(userId)!!
@@ -215,6 +260,14 @@ class UserViewModel : ViewModel() {
     }
   }
 
+  /**
+   * The user got his invitation canceled and is removed from his list of pendingRequests. Note that
+   * this function should be called in the same time as the equivalent function in the
+   * EventViewModel.
+   *
+   * @param eventId The id of the event to cancel the invitation for.
+   * @param userId The id of the user to cancel the invitation for.
+   */
   suspend fun invitationCanceled(eventId: String, userId: String) {
     val possibleInvitation =
         getUser(userId)!!.pendingRequests.find {
@@ -231,37 +284,64 @@ class UserViewModel : ViewModel() {
     }
   }
 
-  suspend fun userAcceptsInvitation(eventId: String, userId: String) {
-    val possibleInvitation =
-        getUser(userId)!!.pendingRequests.find {
-          it.eventId == eventId && it.status == InviteStatus.PENDING
-        }
-    try {
+  /**
+   * The user accepts an invitation and adds the event to his list of joinedEvents and removes it
+   * from his list of pendingRequests. Note that this function should be called in the same time as
+   * the equivalent function in the EventViewModel.
+   *
+   * @param eventId The id of the event to accept the invitation for.
+   * @param userId The id of the user to accept the invitation for.
+   */
+  fun userAcceptsInvitation(eventId: String, userId: String) {
+    CoroutineScope(Dispatchers.IO).launch {
       val goMeetUser = getUser(userId)!!
+      val possibleInvitation =
+          goMeetUser.pendingRequests.find {
+            it.eventId == eventId && it.status == InviteStatus.PENDING
+          }
+
       if (possibleInvitation != null) {
         editUser(
-            goMeetUser.copy(pendingRequests = goMeetUser.pendingRequests.minus(possibleInvitation)))
+            goMeetUser.copy(
+                pendingRequests = goMeetUser.pendingRequests.minus(possibleInvitation),
+                joinedEvents = goMeetUser.joinedEvents.plus(eventId)))
+      } else {
+        Log.w(ContentValues.TAG, "Couldn't accept the invitation")
       }
-      editUser(goMeetUser.copy(joinedEvents = goMeetUser.joinedEvents.plus(eventId)))
-    } catch (e: Exception) {
-      Log.w(ContentValues.TAG, "Couldn't accept the invitation", e)
     }
   }
 
-  suspend fun userRefusesInvitation(eventId: String, userId: String) {
-    val possibleInvitation =
-        getUser(userId)!!.pendingRequests.find {
-          it.eventId == eventId && it.status == InviteStatus.PENDING
-        }
-
-    try {
+  /**
+   * The user refuses an invitation and removes it from his list of pendingRequests. Note that this
+   * function should be called in the same time as the equivalent function in the EventViewModel.
+   *
+   * @param eventId The id of the event to refuse the invitation for.
+   * @param userId The id of the user to refuse the invitation for.
+   */
+  fun userRefusesInvitation(eventId: String, userId: String) {
+    CoroutineScope(Dispatchers.IO).launch {
       val goMeetUser = getUser(userId)!!
+      val possibleInvitation =
+          goMeetUser.pendingRequests.find {
+            it.eventId == eventId && it.status == InviteStatus.PENDING
+          }
+
       if (possibleInvitation != null) {
-        editUser(
-            goMeetUser.copy(pendingRequests = goMeetUser.pendingRequests.minus(possibleInvitation)))
+        val updatedPendingRequests =
+            goMeetUser.pendingRequests
+                .map {
+                  if (it.eventId == eventId) {
+                    it.copy(status = InviteStatus.REFUSED)
+                  } else {
+                    it
+                  }
+                }
+                .toSet()
+
+        editUser(goMeetUser.copy(pendingRequests = updatedPendingRequests))
+      } else {
+        Log.w(ContentValues.TAG, "Couldn't refuse the invitation: Invitation not found")
       }
-    } catch (e: Exception) {
-      Log.w(ContentValues.TAG, "Couldn't refuse the invitation", e)
     }
   }
 

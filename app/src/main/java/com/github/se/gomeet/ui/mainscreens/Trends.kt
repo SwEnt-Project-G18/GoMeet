@@ -192,7 +192,7 @@ fun EventCarousel(events: List<Event>, nav: NavigationActions) {
     launch {
       while (true) {
         delay(10000) // Wait for 10 seconds
-        val nextPage = (pagerState.currentPage + 1) % events.size
+        val nextPage = if (events.isNotEmpty()) (pagerState.currentPage + 1) % events.size else 0
         pagerState.animateScrollToPage(nextPage)
       }
     }
@@ -314,7 +314,10 @@ fun SortButton(eventList: MutableList<Event>) {
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            modifier = Modifier.align(Alignment.Center).fillMaxWidth()) {
+            modifier =
+                Modifier.align(Alignment.Center)
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.primaryContainer)) {
               DropdownMenuItem(
                   text = { Text("Popularity") },
                   onClick = {

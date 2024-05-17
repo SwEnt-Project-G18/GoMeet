@@ -26,6 +26,7 @@ import com.github.se.gomeet.ui.mainscreens.create.CreateEvent
 import com.github.se.gomeet.ui.mainscreens.create.ManageInvites
 import com.github.se.gomeet.ui.mainscreens.events.Events
 import com.github.se.gomeet.ui.mainscreens.events.MyEventInfo
+import com.github.se.gomeet.ui.mainscreens.profile.AddFriend
 import com.github.se.gomeet.ui.mainscreens.profile.EditProfile
 import com.github.se.gomeet.ui.mainscreens.profile.FollowingFollowers
 import com.github.se.gomeet.ui.mainscreens.profile.Notifications
@@ -147,7 +148,7 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
               eventViewModel = EventViewModel(uid)
 
               userViewModel.createUserIfNew(
-                  uid, username, firstName, lastName, email, phoneNumber, country)
+                  uid, username, firstName, lastName, email, phoneNumber, country, "")
             }
             val user =
                 User(
@@ -357,6 +358,7 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
                 onBackPressed = { NavigationActions(nav).goBack() })
           }
         }
+    composable(route = Route.ADD_FRIEND) { AddFriend(navAction, userViewModel) }
   }
 }
 

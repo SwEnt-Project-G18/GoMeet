@@ -24,7 +24,7 @@ private val DarkColorScheme =
         secondaryContainer = DarkModeBackground,
         tertiaryContainer = Color(0xFFEEEEEE),
         outlineVariant = DodgerBlue,
-    )
+        onBackground = Color.White)
 
 private val LightColorScheme =
     lightColorScheme(
@@ -38,6 +38,7 @@ private val LightColorScheme =
         outline = Cyan,
         outlineVariant = DodgerBlue,
     )
+
 
 @Composable
 fun GoMeetTheme(

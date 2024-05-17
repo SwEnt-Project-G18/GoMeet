@@ -1,5 +1,7 @@
 package com.github.se.gomeet.model.authentication
 
+import android.net.Uri
+
 /**
  * This data class represents the state of the sign in authentication.
  *
@@ -37,7 +39,7 @@ data class SignInState(
     val usernameRegister: String = "",
     val username: String = "",
     val firstName: String = "",
-    val pfp: String = "",
+    val pfp: Uri? = null,
     val lastName: String = "",
     val phoneNumber: String = "",
     val country: String = "",

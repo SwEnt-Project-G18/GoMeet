@@ -49,7 +49,9 @@ class EventsTest {
         // Add the user to the view model
         userVM.createUserIfNew(
             uid, username, "testfirstname", "testlastname", email, "testphonenumber", "testcountry")
-        TimeUnit.SECONDS.sleep(3)
+        while (userVM.getUser(uid) == null) {
+          TimeUnit.SECONDS.sleep(1)
+        }
 
         // Sign in
         result = Firebase.auth.signInWithEmailAndPassword(email, pwd)
@@ -91,13 +93,11 @@ class EventsTest {
     fun tearDown() {
       runBlocking {
         // Clean up the event
-        eventVM.getAllEvents()?.forEach {
-          eventVM.removeEvent(it.eventID)
+        eventVM.getAllEvents()?.forEach { eventVM.removeEvent(it.eventID) }
 
-          // Clean up the user
-          Firebase.auth.currentUser?.delete()
-          userVM.deleteUser(uid)
-        }
+        // Clean up the user
+        Firebase.auth.currentUser?.delete()
+        userVM.deleteUser(uid)
       }
     }
   }

@@ -61,7 +61,6 @@ import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
-import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import kotlinx.coroutines.launch
@@ -261,7 +260,7 @@ fun ManageInvites(
                     followersFollowingList.filter { u ->
                       !u.pendingRequests.any { invitation ->
                         invitation.eventId == event.value!!.eventID
-                      }
+                      } && !u.joinedEvents.contains(event.value!!.eventID)
                     },
                     event.value!!,
                     null,
@@ -284,10 +283,7 @@ fun ManageInvites(
               2 -> {
                 PageUserInvites(
                     followersFollowingList.filter { u ->
-                      u.pendingRequests.any { invitation ->
-                        (invitation.eventId == event.value!!.eventID) &&
-                            (invitation.status == InviteStatus.ACCEPTED)
-                      }
+                      u.joinedEvents.contains(event.value!!.eventID)
                     },
                     event.value!!,
                     InviteStatus.ACCEPTED,
@@ -317,6 +313,15 @@ fun ManageInvites(
       }
 }
 
+/**
+ * This composable function represents the list of users that can be invited to an event.
+ *
+ * @param list the list of users that can be invited
+ * @param currentEvent the event for which the users are invited
+ * @param status the status of the invitation
+ * @param callback the callback function to update the list of users to invite
+ * @param initialClicked the initial state of the button
+ */
 @Composable
 fun PageUserInvites(
     list: List<GoMeetUser>,
@@ -336,6 +341,16 @@ fun PageUserInvites(
       }
 }
 
+/**
+ * This composable function represents the user invite widget when the user can be invited to an
+ * event.
+ *
+ * @param user the user that can be invited
+ * @param event the event for which the user is invited
+ * @param status the status of the invitation
+ * @param initialClicked the initial state of the button
+ * @param callback the callback function to update the list of users to invite
+ */
 @Composable
 fun UserInviteWidget(
     user: GoMeetUser,
@@ -347,7 +362,11 @@ fun UserInviteWidget(
 
   var clicked by rememberSaveable { mutableStateOf(initialClicked) }
   Row(
-      modifier = Modifier.fillMaxWidth().padding(start = 15.dp, end = 15.dp).height(50.dp),
+      modifier =
+          Modifier.fillMaxWidth()
+              .padding(start = 15.dp, end = 15.dp)
+              .height(50.dp)
+              .testTag("UserInviteWidget"),
       horizontalArrangement = Arrangement.SpaceBetween,
       verticalAlignment = Alignment.CenterVertically) {
         // Profile picture
@@ -372,7 +391,7 @@ fun UserInviteWidget(
                   InviteStatus.ACCEPTED -> "Accepted"
                   InviteStatus.REFUSED -> "Refused"
                 },
-            modifier = Modifier.width(70.dp),
+            modifier = Modifier.width(80.dp).testTag("InviteStatus"),
             color =
                 when (status) {
                   null -> MaterialTheme.colorScheme.onBackground
@@ -395,12 +414,30 @@ fun UserInviteWidget(
               callback(
                   user.copy(
                       pendingRequests =
-                          if (toAdd)
+                          if (toAdd) {
+                            val possiblePreviousInvitationRefused =
+                                user.pendingRequests.find {
+                                  it.eventId == event.eventID && it.status == InviteStatus.REFUSED
+                                }
+
+                            if (user.pendingRequests.contains(possiblePreviousInvitationRefused)) {
+                              user.pendingRequests
+                                  .map {
+                                    if (it == possiblePreviousInvitationRefused) {
+                                      it.copy(status = InviteStatus.PENDING)
+                                    } else {
+                                      it
+                                    }
+                                  }
+                                  .toSet()
+                            } else {
                               user.pendingRequests.plus(
                                   Invitation(event.eventID, status ?: InviteStatus.PENDING))
-                          else
-                              user.pendingRequests.minus(
-                                  Invitation(event.eventID, status ?: InviteStatus.PENDING))))
+                            }
+                          } else {
+                            user.pendingRequests.minus(
+                                Invitation(event.eventID, status ?: InviteStatus.PENDING))
+                          }))
             },
             modifier = Modifier.height(26.dp).width(82.dp),
             contentPadding = PaddingValues(vertical = 2.dp),
@@ -409,10 +446,18 @@ fun UserInviteWidget(
                 ButtonDefaults.buttonColors(
                     containerColor =
                         when (status) {
-                          null -> if (!clicked) DarkCyan else Color.LightGray
-                          InviteStatus.PENDING -> if (clicked) DarkCyan else Color.LightGray
-                          InviteStatus.ACCEPTED -> if (clicked) DarkCyan else Color.LightGray
-                          InviteStatus.REFUSED -> if (!clicked) DarkCyan else Color.LightGray
+                          null ->
+                              if (!clicked) MaterialTheme.colorScheme.outlineVariant
+                              else Color.LightGray
+                          InviteStatus.PENDING ->
+                              if (clicked) MaterialTheme.colorScheme.outlineVariant
+                              else Color.LightGray
+                          InviteStatus.ACCEPTED ->
+                              if (clicked) MaterialTheme.colorScheme.outlineVariant
+                              else Color.LightGray
+                          InviteStatus.REFUSED ->
+                              if (!clicked) MaterialTheme.colorScheme.outlineVariant
+                              else Color.LightGray
                         })) {
               Text(
                   text =

@@ -4,10 +4,9 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
@@ -20,6 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -42,6 +42,8 @@ import java.time.format.DateTimeFormatter
  */
 @Composable
 fun DateTimePicker(pickedTime: MutableState<LocalTime>, pickedDate: MutableState<LocalDate>) {
+  val screenWidth = LocalConfiguration.current.screenWidthDp
+
   GoMeetTheme {
     val datePickerColours =
         com.vanpra.composematerialdialogs.datetime.date.DatePickerDefaults.colors(
@@ -96,9 +98,8 @@ fun DateTimePicker(pickedTime: MutableState<LocalTime>, pickedDate: MutableState
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-      Spacer(modifier = Modifier.width(80.dp))
-
       Column(
+          modifier = Modifier.wrapContentSize().padding(end = (screenWidth / 6).dp),
           horizontalAlignment = Alignment.CenterHorizontally,
           verticalArrangement = Arrangement.Center) {
             Button(
@@ -108,7 +109,7 @@ fun DateTimePicker(pickedTime: MutableState<LocalTime>, pickedDate: MutableState
             Text(text = formattedDate)
           }
       Column(
-          modifier = Modifier.fillMaxSize(),
+          modifier = Modifier.wrapContentSize(),
           horizontalAlignment = Alignment.CenterHorizontally,
           verticalArrangement = Arrangement.Center) {
             Button(

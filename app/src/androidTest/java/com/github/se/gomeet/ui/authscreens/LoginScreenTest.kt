@@ -59,7 +59,7 @@ class LoginScreenTest {
     composeTestRule.onNodeWithText("Email").assertIsDisplayed()
     composeTestRule.onNodeWithText("Password").assertIsDisplayed()
     composeTestRule
-        .onNodeWithText("Log in")
+        .onNodeWithText("Log In")
         .assertIsNotEnabled()
         .assertHasClickAction()
         .assertIsDisplayed()
@@ -72,8 +72,8 @@ class LoginScreenTest {
     composeTestRule.waitForIdle()
 
     // Click on the "Log in" button
-    composeTestRule.onNodeWithText("Log in").assertIsEnabled().assertHasClickAction()
-    composeTestRule.onNodeWithText("Log in").performClick()
+    composeTestRule.onNodeWithText("Log In").assertIsEnabled().assertHasClickAction()
+    composeTestRule.onNodeWithText("Log In").performClick()
 
     composeTestRule.waitForIdle()
 
