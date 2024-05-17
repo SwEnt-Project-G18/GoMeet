@@ -61,7 +61,6 @@ import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
-import com.github.se.gomeet.ui.theme.DarkCyan
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import kotlinx.coroutines.launch
@@ -447,10 +446,18 @@ fun UserInviteWidget(
                 ButtonDefaults.buttonColors(
                     containerColor =
                         when (status) {
-                          null -> if (!clicked) DarkCyan else Color.LightGray
-                          InviteStatus.PENDING -> if (clicked) DarkCyan else Color.LightGray
-                          InviteStatus.ACCEPTED -> if (clicked) DarkCyan else Color.LightGray
-                          InviteStatus.REFUSED -> if (!clicked) DarkCyan else Color.LightGray
+                          null ->
+                              if (!clicked) MaterialTheme.colorScheme.outlineVariant
+                              else Color.LightGray
+                          InviteStatus.PENDING ->
+                              if (clicked) MaterialTheme.colorScheme.outlineVariant
+                              else Color.LightGray
+                          InviteStatus.ACCEPTED ->
+                              if (clicked) MaterialTheme.colorScheme.outlineVariant
+                              else Color.LightGray
+                          InviteStatus.REFUSED ->
+                              if (!clicked) MaterialTheme.colorScheme.outlineVariant
+                              else Color.LightGray
                         })) {
               Text(
                   text =

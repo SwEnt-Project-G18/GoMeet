@@ -268,8 +268,9 @@ fun Profile(
                 Spacer(modifier = Modifier.fillMaxWidth().height(screenHeight / 50))
 
                 LazyRow(
+                    modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.Start,
                     contentPadding = PaddingValues(start = 15.dp, end = 15.dp)) {
                       items(currentUser!!.tags.size) { index ->
                         Button(
@@ -284,7 +285,7 @@ fun Profile(
                                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                                     contentColor = MaterialTheme.colorScheme.outlineVariant),
                             border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-                        )
+                            modifier = Modifier.padding(end = 8.dp))
                       }
                     }
 

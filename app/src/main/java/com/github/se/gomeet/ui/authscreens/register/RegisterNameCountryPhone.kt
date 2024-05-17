@@ -205,11 +205,11 @@ fun CountrySuggestionTextField(total: List<String>, textFieldColors: TextFieldCo
       expanded = expanded,
       onExpandedChange = { expanded = !expanded }) {
         TextField(
-            modifier = Modifier.menuAnchor(),
+            modifier = Modifier.menuAnchor().fillMaxWidth(),
             readOnly = true,
             value = selectedOptionText,
             onValueChange = {},
-            label = { Text("Label") },
+            label = { Text("Country") },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             colors =
                 textFieldColors.copy(focusedTrailingIconColor = MaterialTheme.colorScheme.tertiary))

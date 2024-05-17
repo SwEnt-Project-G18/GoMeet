@@ -245,7 +245,7 @@ fun PageUsers(
                     colors =
                         ButtonColors(
                             containerColor = MaterialTheme.colorScheme.primaryContainer,
-                            contentColor = Color.Black,
+                            contentColor = MaterialTheme.colorScheme.onBackground,
                             disabledContentColor = Color.Transparent,
                             disabledContainerColor = Color.Transparent)) {
                       Text(text = "Following", style = MaterialTheme.typography.labelLarge)
