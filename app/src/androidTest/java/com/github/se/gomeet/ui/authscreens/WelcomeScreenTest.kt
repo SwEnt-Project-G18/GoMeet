@@ -31,7 +31,7 @@ class WelcomeScreenTest {
 
   @Test
   fun testWelcomeScreen() {
-    composeTestRule.setContent { WelcomeScreen({}, {}, {}) }
+    composeTestRule.setContent { WelcomeScreen({}, {}) { _, _, _, _, _, _ -> } }
 
     composeTestRule.waitForIdle()
 
