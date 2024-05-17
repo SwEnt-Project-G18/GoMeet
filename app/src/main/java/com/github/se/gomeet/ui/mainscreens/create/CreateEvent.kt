@@ -6,7 +6,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,20 +19,24 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuItemColors
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -70,8 +73,6 @@ import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
-import com.github.se.gomeet.ui.theme.DarkCyan
-import com.github.se.gomeet.ui.theme.Grey
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.firestore.ktx.firestore
@@ -92,6 +93,8 @@ private const val NUMBER_OF_SUGGESTIONS = 3
  */
 @Composable
 fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivate: Boolean) {
+  val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+  val screenWidth = LocalConfiguration.current.screenWidthDp.dp
 
   val eventRepository = EventRepository(Firebase.firestore)
   val userRepository = UserRepository(Firebase.firestore)
@@ -137,54 +140,46 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
   val showPopup = remember { mutableStateOf(false) }
   var tagsButtonText by remember { mutableStateOf("Add Tags") }
 
-  val screenHeight = LocalConfiguration.current.screenHeightDp.dp
-
   val textFieldColors =
-      androidx.compose.material3.TextFieldDefaults.colors(
+      TextFieldDefaults.colors(
           focusedTextColor = MaterialTheme.colorScheme.onBackground,
           unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
           unfocusedContainerColor = Color.Transparent,
           focusedContainerColor = Color.Transparent,
-          cursorColor = DarkCyan,
+          cursorColor = MaterialTheme.colorScheme.outlineVariant,
           focusedLabelColor = MaterialTheme.colorScheme.tertiary,
-          focusedIndicatorColor = MaterialTheme.colorScheme.tertiary)
+          unfocusedLabelColor = MaterialTheme.colorScheme.tertiary,
+          focusedIndicatorColor = MaterialTheme.colorScheme.tertiary,
+          unfocusedIndicatorColor = MaterialTheme.colorScheme.tertiary)
 
   Scaffold(
       topBar = {
         Column {
-          Text(
-              text = "Create",
-              modifier = Modifier.padding(top = 15.dp, start = 15.dp, end = 18.dp),
-              color = DarkCyan,
-              fontStyle = FontStyle.Normal,
-              fontWeight = FontWeight.SemiBold,
-              fontFamily = FontFamily.Default,
-              textAlign = TextAlign.Start,
-              style = MaterialTheme.typography.headlineLarge)
+          TopAppBar(
+              modifier = Modifier.testTag("TopBar"),
+              backgroundColor = MaterialTheme.colorScheme.background,
+              elevation = 0.dp,
+              title = {
+                // Empty title since we're placing our own components
+              },
+              navigationIcon = {
+                IconButton(onClick = { nav.goBack() }) {
+                  Icon(
+                      imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                      contentDescription = "Back",
+                      tint = MaterialTheme.colorScheme.onBackground)
+                }
+              })
 
-          if (isPrivate) {
-            isPrivateEvent.value = true
-            Text(
-                text = "Private",
-                modifier = Modifier.padding(start = 18.dp, end = 18.dp, bottom = 15.dp),
-                color = Grey,
-                fontStyle = FontStyle.Normal,
-                fontWeight = FontWeight.SemiBold,
-                fontFamily = FontFamily.Default,
-                textAlign = TextAlign.Start,
-                style = MaterialTheme.typography.titleSmall)
-          } else {
-            isPrivateEvent.value = false
-            Text(
-                text = "Public",
-                modifier = Modifier.padding(start = 18.dp, end = 18.dp, bottom = 15.dp),
-                color = Grey,
-                fontStyle = FontStyle.Normal,
-                fontWeight = FontWeight.SemiBold,
-                fontFamily = FontFamily.Default,
-                textAlign = TextAlign.Start,
-                style = MaterialTheme.typography.titleSmall)
-          }
+          Row(
+              verticalAlignment = Alignment.CenterVertically,
+              modifier = Modifier.padding(start = 18.dp)) {
+                Text(
+                    text = "Create",
+                    style =
+                        MaterialTheme.typography.headlineSmall.copy(
+                            fontWeight = FontWeight.SemiBold))
+              }
         }
       },
       bottomBar = {
@@ -197,11 +192,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
       }) { innerPadding ->
         Column(
             Modifier.padding(innerPadding).verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center) {
-              // Spacer(modifier = Modifier.size((LocalConfiguration.current.screenHeightDp /
-              // 9).dp))
-
+            horizontalAlignment = Alignment.CenterHorizontally) {
               TextField(
                   value = titleState.value,
                   singleLine = true,
@@ -349,7 +340,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
               Spacer(modifier = Modifier.height(16.dp))
 
               Button(
-                  modifier = Modifier.width(250.dp),
+                  modifier = Modifier.width((screenWidth / 1.5.dp).dp).height(screenHeight / 17),
                   onClick = {
                     if (titleState.value.isNotEmpty()) {
                       if (selectedLocation.value == null) {
@@ -418,11 +409,11 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                           priceText,
                           url.value),
                   colors =
-                      ButtonColors(
-                          disabledContainerColor = MaterialTheme.colorScheme.primary,
-                          containerColor = DarkCyan,
-                          disabledContentColor = Color.White,
-                          contentColor = Color.White),
+                      ButtonDefaults.buttonColors(
+                          containerColor = MaterialTheme.colorScheme.outlineVariant,
+                          contentColor = Color.White,
+                          disabledContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                          disabledContentColor = MaterialTheme.colorScheme.onBackground),
               ) {
                 Text(text = "Post")
               }
@@ -484,14 +475,16 @@ fun LocationField(
             placeholder = { Text("Enter an address") },
             singleLine = true,
             colors =
-                androidx.compose.material3.TextFieldDefaults.colors(
+                TextFieldDefaults.colors(
                     focusedTextColor = MaterialTheme.colorScheme.onBackground,
                     unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
                     unfocusedContainerColor = Color.Transparent,
                     focusedContainerColor = Color.Transparent,
-                    cursorColor = DarkCyan,
+                    cursorColor = MaterialTheme.colorScheme.outlineVariant,
                     focusedLabelColor = MaterialTheme.colorScheme.tertiary,
-                    focusedIndicatorColor = MaterialTheme.colorScheme.tertiary),
+                    unfocusedLabelColor = MaterialTheme.colorScheme.tertiary,
+                    focusedIndicatorColor = MaterialTheme.colorScheme.tertiary,
+                    unfocusedIndicatorColor = MaterialTheme.colorScheme.tertiary),
             modifier = Modifier.fillMaxWidth().menuAnchor())
         ExposedDropdownMenu(
             expanded = expanded,

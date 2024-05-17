@@ -252,8 +252,9 @@ fun OthersProfile(
                 Spacer(modifier = Modifier.fillMaxWidth().height(screenHeight / 50))
 
                 LazyRow(
+                    modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.Start,
                     contentPadding = PaddingValues(start = 15.dp, end = 15.dp)) {
                       items(user!!.tags.size) { index ->
                         Button(
@@ -268,7 +269,7 @@ fun OthersProfile(
                                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                                     contentColor = MaterialTheme.colorScheme.outlineVariant),
                             border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-                        )
+                            modifier = Modifier.padding(end = 8.dp))
                       }
                     }
                 Spacer(modifier = Modifier.height(screenHeight / 40))
