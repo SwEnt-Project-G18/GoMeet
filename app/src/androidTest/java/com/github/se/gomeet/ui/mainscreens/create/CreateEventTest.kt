@@ -73,8 +73,8 @@ class CreateEventTest {
         .performTextInput("http://example.com")
 
     // Add tags
-    composeTestRule.onNodeWithText("Add Tags").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("TagsButton").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithText("Add Tags").performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("TagsButton").performScrollTo().assertIsDisplayed().performClick()
     composeTestRule.onNodeWithTag("TagList").assertIsDisplayed().performClick()
     composeTestRule.onNodeWithText("Save").assertIsDisplayed().performClick()
 
