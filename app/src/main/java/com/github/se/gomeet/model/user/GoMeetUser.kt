@@ -13,6 +13,8 @@ package com.github.se.gomeet.model.user
  * @param following The list of users that the user is following
  * @param followers The list of users that are following the user
  * @param pendingRequests The list of requests that the user has not accepted or refused yet
+ * @param profilePicture The profile picture of the user
+ * @param tags The list of tags that the user is interested in
  */
 data class GoMeetUser(
     val uid: String,

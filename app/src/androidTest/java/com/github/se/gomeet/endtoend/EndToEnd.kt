@@ -39,17 +39,54 @@ import org.junit.runner.RunWith
 class EndToEndTest : TestCase() {
 
   @get:Rule val composeTestRule = createAndroidComposeRule<MainActivity>()
-  @get:Rule
-  var permissionRule = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
 
-  @After
-  fun tearDown() {
-    // Clean up the event
-    runBlocking { eventVM.getAllEvents()?.forEach { eventVM.removeEvent(it.uid) } }
+  companion object {
+    private const val email = "user@test.com"
+    private const val pwd = "123456"
+    private lateinit var uid: String
+    private const val username = "EndToEndTestuser"
 
-    // Clean up the user
-    Firebase.auth.currentUser?.delete()
-    userVM.deleteUser(uid)
+    private val userVM = UserViewModel(UserRepository(Firebase.firestore))
+    private lateinit var eventVM: EventViewModel
+
+    @JvmStatic
+    @BeforeClass
+    fun setup() {
+      runBlocking {
+        // create a new user
+        var result = Firebase.auth.createUserWithEmailAndPassword(email, pwd)
+        while (!result.isComplete) {
+          TimeUnit.SECONDS.sleep(1)
+        }
+        uid = result.result.user!!.uid
+
+        // Add the user to the view model
+        userVM.createUserIfNew(
+            uid, username, "testfirstname", "testlastname", email, "testphonenumber", "testcountry")
+        while (userVM.getUser(uid) == null) {
+          TimeUnit.SECONDS.sleep(1)
+        }
+
+        // Sign in
+        result = Firebase.auth.signInWithEmailAndPassword(email, pwd)
+        while (!result.isComplete) {
+          TimeUnit.SECONDS.sleep(1)
+        }
+        eventVM = EventViewModel(uid, EventRepository(Firebase.firestore))
+      }
+    }
+
+    @AfterClass
+    @JvmStatic
+    fun tearDown() {
+      runBlocking {
+        // Clean up the event
+        eventVM.getAllEvents()?.forEach { eventVM.removeEvent(it.eventID) }
+        // Clean up the user
+        Firebase.auth.currentUser?.delete()
+        userVM.deleteUser(uid)
+      }
+    }
   }
 
   @Test
@@ -65,25 +102,13 @@ class EndToEndTest : TestCase() {
 
     ComposeScreen.onComposeScreen<LoginScreen>(composeTestRule) {
       step("Log in with email and password") {
-        logInButton {
-          assertIsDisplayed()
-          assertIsNotEnabled()
-        }
-        emailField {
-          assertIsDisplayed()
-          performTextInput(email)
-        }
-        passwordField {
-          assertIsDisplayed()
-          performTextInput(pwd)
-        }
-        logInButton {
-          assertIsEnabled()
-          performClick()
-          composeTestRule.waitForIdle()
-          composeTestRule.waitUntil(timeoutMillis = 10000) {
-            composeTestRule.onNodeWithTag("CreateUI").isDisplayed()
-          }
+        composeTestRule.onNodeWithText("Log In").assertIsDisplayed().assertIsNotEnabled()
+        composeTestRule.onNodeWithText("Email").assertIsDisplayed().performTextInput(email)
+        composeTestRule.onNodeWithText("Password").assertIsDisplayed().performTextInput(pwd)
+        composeTestRule.onNodeWithText("Log In").assertIsEnabled().performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.waitUntil(timeoutMillis = 10000) {
+          composeTestRule.onNodeWithTag("CreateUI").isDisplayed()
         }
       }
     }

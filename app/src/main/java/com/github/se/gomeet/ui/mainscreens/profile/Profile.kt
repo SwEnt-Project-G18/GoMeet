@@ -363,47 +363,35 @@ fun Profile(
                                 modifier = Modifier.align(Alignment.CenterHorizontally))
                           }
                     }
-                Spacer(modifier = Modifier.height(30.dp))
-                Text(
-                    text = "Tags",
-                    style =
-                        TextStyle(
-                            fontSize = 18.sp,
-                            lineHeight = 16.sp,
-                            fontFamily = FontFamily(Font(R.font.roboto)),
-                            fontWeight = FontWeight(1000),
-                            color = DarkCyan,
-                            textAlign = TextAlign.Start,
-                            letterSpacing = 0.5.sp,
-                        ),
-                    modifier =
-                        Modifier.width(74.dp)
-                            .height(20.dp)
-                            .align(Alignment.Start)
-                            .padding(start = 15.dp))
-                Column(modifier = Modifier.padding(start = 0.dp, end = 0.dp).fillMaxWidth()) {
-                  Spacer(modifier = Modifier.height(10.dp))
-                  LazyRow(
-                      verticalAlignment = Alignment.CenterVertically,
-                      horizontalArrangement = Arrangement.spacedBy(8.dp),
-                      contentPadding = PaddingValues(start = 15.dp, end = 15.dp),
-                      modifier = Modifier.heightIn(min = 56.dp)) {
-                        items(10) {
-                          Button(
-                              onClick = {},
-                              content = { Text("Tag") },
-                              colors =
-                                  ButtonDefaults.buttonColors(
-                                      containerColor = NavBarUnselected, contentColor = DarkCyan),
-                              border = BorderStroke(1.dp, DarkCyan),
-                          )
-                        }
+
+                Spacer(modifier = Modifier.fillMaxWidth().height(screenHeight / 50))
+
+                LazyRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Start,
+                    contentPadding = PaddingValues(start = 15.dp, end = 15.dp)) {
+                      items(currentUser!!.tags.size) { index ->
+                        Button(
+                            onClick = {},
+                            content = {
+                              Text(
+                                  text = currentUser!!.tags[index],
+                                  style = MaterialTheme.typography.labelLarge)
+                            },
+                            colors =
+                                ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                    contentColor = MaterialTheme.colorScheme.outlineVariant),
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                            modifier = Modifier.padding(end = 8.dp))
                       }
-                }
-                Spacer(modifier = Modifier.height(10.dp))
-                ProfileEventsList("My Events", rememberLazyListState(), myEventList)
-                Spacer(modifier = Modifier.height(10.dp))
-                ProfileEventsList("History", rememberLazyListState(), myHistoryList)
+                    }
+
+                Spacer(modifier = Modifier.height(screenHeight / 40))
+                ProfileEventsList("Joined Events", rememberLazyListState(), myEventList, nav)
+                Spacer(modifier = Modifier.height(screenHeight / 30))
+                ProfileEventsList("My History", rememberLazyListState(), myHistoryList, nav)
               }
         } else {
           LoadingText()

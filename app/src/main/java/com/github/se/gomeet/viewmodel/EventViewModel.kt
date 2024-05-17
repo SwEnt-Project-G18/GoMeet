@@ -287,12 +287,99 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
    *
    * @param uid the UID of the event to remove
    */
-  fun removeEvent(uid: String) {
-    db.removeEvent(uid)
+  fun removeEvent(eventID: String) {
+    repository.removeEvent(eventID)
   }
 
+  /**
+   * Update the event participants field by adding the given user to the list. Note that this
+   * function should be called at the same time as the equivalent function in the UserViewModel.
+   *
+   * @param event the event to update
+   * @param userId the ID of the user to add to the event
+   */
   fun joinEvent(event: Event, userId: String) {
-    db.updateEvent(event.copy(participants = event.participants.plus(userId)))
+    if (event.participants.contains(userId)) {
+      Log.w(TAG, "User $userId is already in event ${event.eventID}")
+      return
+    }
+
+    repository.updateEvent(event.copy(participants = event.participants.plus(userId)))
+  }
+
+  /**
+   * Update the event pendingParticipants field by adding the given user to the list. Note that this
+   * function should be called at the same time as the equivalent function in the UserViewModel.
+   *
+   * @param event the event to update
+   * @param userId the ID of the user to add to the event
+   */
+  fun sendInvitation(event: Event, userId: String) {
+    if (event.pendingParticipants.contains(userId)) {
+      Log.w(TAG, "User $userId is already invited to event ${event.eventID}")
+      return
+    }
+
+    repository.updateEvent(event.copy(pendingParticipants = event.pendingParticipants.plus(userId)))
+  }
+
+  /**
+   * Update the event pendingParticipants field by removing the given user to the list and adds the
+   * given user to the participants list of the event. Note that this function should be called at
+   * the same time as the equivalent function in the UserViewModel.
+   *
+   * @param event the event to update
+   * @param userId the ID of the user to add to the event
+   */
+  fun acceptInvitation(event: Event, userId: String) {
+    assert(event.pendingParticipants.contains(userId))
+    repository.updateEvent(
+        event.copy(pendingParticipants = event.pendingParticipants.minus(userId)))
+    joinEvent(event, userId)
+  }
+
+  /**
+   * Update the event pendingParticipants field by removing the given user from the list. Note that
+   * this function should be called at the same time as the equivalent function in the
+   * UserViewModel.
+   *
+   * @param event the event to update
+   * @param userId the ID of the user to remove from the event
+   */
+  fun declineInvitation(event: Event, userId: String) {
+    assert(event.pendingParticipants.contains(userId))
+    repository.updateEvent(
+        event.copy(pendingParticipants = event.pendingParticipants.minus(userId)))
+  }
+
+  /**
+   * Update the event participants field by removing the given user from the list. Note that this
+   * function should be called at the same time as the equivalent function in the UserViewModel.
+   *
+   * @param event the event to update
+   * @param userId the ID of the user to remove from the event
+   */
+  fun kickParticipant(event: Event, userId: String) {
+    assert(event.participants.contains(userId))
+    repository.updateEvent(event.copy(participants = event.participants.minus(userId)))
+  }
+
+  /**
+   * Update the event pendingParticipants field by removing the given user from the list. Note that
+   * this function should be called at the same time as the equivalent function in the
+   * UserViewModel.
+   *
+   * @param event the event to update
+   * @param userId the ID of the user to remove from the event
+   */
+  fun cancelInvitation(event: Event, userId: String) {
+    if (!event.pendingParticipants.contains(userId)) {
+      Log.w(TAG, "Event doesn't have $userId as a pendingParticipant")
+      return
+    }
+
+    repository.updateEvent(
+        event.copy(pendingParticipants = event.pendingParticipants.minus(userId)))
   }
 
   /**

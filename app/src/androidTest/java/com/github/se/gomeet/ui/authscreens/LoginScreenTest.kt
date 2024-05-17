@@ -63,9 +63,13 @@ class LoginScreenTest {
     rule.onNodeWithContentDescription("GoMeet").assertIsDisplayed()
     rule.onNodeWithText("Login").assertIsDisplayed()
 
-    rule.onNodeWithText("Email").assertIsDisplayed()
-    rule.onNodeWithText("Password").assertIsDisplayed()
-    rule.onNodeWithText("Log in").assertIsNotEnabled().assertHasClickAction().assertIsDisplayed()
+    composeTestRule.onNodeWithText("Email").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Password").assertIsDisplayed()
+    composeTestRule
+        .onNodeWithText("Log In")
+        .assertIsNotEnabled()
+        .assertHasClickAction()
+        .assertIsDisplayed()
 
     // Enter email and password
     rule.onNodeWithText("Email").performTextInput(testEmail)
@@ -75,8 +79,8 @@ class LoginScreenTest {
     rule.waitForIdle()
 
     // Click on the "Log in" button
-    rule.onNodeWithText("Log in").assertIsEnabled().assertHasClickAction()
-    rule.onNodeWithText("Log in").performClick()
+    composeTestRule.onNodeWithText("Log In").assertIsEnabled().assertHasClickAction()
+    composeTestRule.onNodeWithText("Log In").performClick()
 
     rule.waitForIdle()
 

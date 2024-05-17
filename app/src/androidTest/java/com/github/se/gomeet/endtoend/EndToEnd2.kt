@@ -44,6 +44,121 @@ class EndToEndTest2 : TestCase() {
 
   @get:Rule val composeTestRule = createAndroidComposeRule<MainActivity>()
 
+  companion object {
+    private const val email1 = "user1@test2.com"
+    private const val pwd1 = "123456"
+    private var uid1 = ""
+    private const val username1 = "test_user1"
+
+    private const val email2 = "user2@test2.com"
+    private const val pwd2 = "654321"
+    private var uid2 = ""
+    private const val username2 = "test_user2"
+
+    private val userVM = UserViewModel(UserRepository(Firebase.firestore))
+    private lateinit var eventVM: EventViewModel
+
+    @JvmStatic
+    @BeforeClass
+    fun setup() {
+      runBlocking {
+        // create two new users
+        var result = Firebase.auth.createUserWithEmailAndPassword(email1, pwd1)
+        while (!result.isComplete) {
+          TimeUnit.SECONDS.sleep(1)
+        }
+        uid1 = result.result.user!!.uid
+
+        result = Firebase.auth.createUserWithEmailAndPassword(email2, pwd2)
+        while (!result.isComplete) {
+          TimeUnit.SECONDS.sleep(1)
+        }
+        uid2 = result.result.user!!.uid
+
+        // Add the users to the view model
+        userVM.createUserIfNew(
+            uid1,
+            username1,
+            "testfirstname",
+            "testlastname",
+            email1,
+            "testphonenumber",
+            "testcountry")
+        while (userVM.getUser(uid1) == null) {
+          TimeUnit.SECONDS.sleep(1)
+        }
+        userVM.createUserIfNew(
+            uid2,
+            username2,
+            "testfirstname2",
+            "testlastname2",
+            email2,
+            "testphonenumber2",
+            "testcountry2")
+        while (userVM.getUser(uid2) == null) {
+          TimeUnit.SECONDS.sleep(1)
+        }
+
+        // user1 is used to create an event
+        result = Firebase.auth.signInWithEmailAndPassword(email1, pwd1)
+        while (!result.isComplete) {
+          TimeUnit.SECONDS.sleep(1)
+        }
+
+        eventVM = EventViewModel(uid1, EventRepository(Firebase.firestore))
+        eventVM.createEvent(
+            "title",
+            "description",
+            Location(0.0, 0.0, "location"),
+            LocalDate.of(2025, 3, 30),
+            LocalTime.now(),
+            0.0,
+            "url",
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            0,
+            true,
+            emptyList(),
+            emptyList(),
+            null,
+            userVM,
+            "eventuid1")
+        while (eventVM.getEvent("eventuid1") == null) {
+          TimeUnit.SECONDS.sleep(1)
+        }
+
+        Firebase.auth.signOut()
+        while (Firebase.auth.currentUser != null) {
+          TimeUnit.SECONDS.sleep(1)
+        }
+
+        // user2 is used to log in and perform the tests
+        eventVM = EventViewModel(uid2, EventRepository(Firebase.firestore))
+      }
+    }
+
+    @AfterClass
+    @JvmStatic
+    fun tearDown() {
+      runBlocking {
+        // clean up the event
+        eventVM.getAllEvents()?.forEach { eventVM.removeEvent(it.eventID) }
+
+        // clean up the users
+        Firebase.auth.currentUser?.delete()
+        userVM.deleteUser(uid1)
+        userVM.deleteUser(uid2)
+
+        val result = Firebase.auth.signInWithEmailAndPassword(email1, pwd1)
+        while (!result.isComplete) {
+          TimeUnit.SECONDS.sleep(1)
+        }
+        Firebase.auth.currentUser?.delete()
+      }
+    }
+  }
+
   @Test
   fun test() = run {
     ComposeScreen.onComposeScreen<WelcomeScreenScreen>(composeTestRule) {
@@ -57,25 +172,13 @@ class EndToEndTest2 : TestCase() {
 
     ComposeScreen.onComposeScreen<LoginScreen>(composeTestRule) {
       step("Log in with email and password") {
-        logInButton {
-          assertIsDisplayed()
-          assertIsNotEnabled()
-        }
-        emailField {
-          assertIsDisplayed()
-          performTextInput(email2)
-        }
-        passwordField {
-          assertIsDisplayed()
-          performTextInput(pwd2)
-        }
-        logInButton {
-          assertIsEnabled()
-          performClick()
-          composeTestRule.waitForIdle()
-          composeTestRule.waitUntil(timeoutMillis = 5000) {
-            composeTestRule.onNodeWithTag("CreateUI").isDisplayed()
-          }
+        composeTestRule.onNodeWithText("Log In").assertIsDisplayed().assertIsNotEnabled()
+        composeTestRule.onNodeWithText("Email").assertIsDisplayed().performTextInput(email2)
+        composeTestRule.onNodeWithText("Password").assertIsDisplayed().performTextInput(pwd2)
+        composeTestRule.onNodeWithText("Log In").assertIsEnabled().performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.waitUntil(timeoutMillis = 10000) {
+          composeTestRule.onNodeWithTag("CreateUI").isDisplayed()
         }
       }
     }

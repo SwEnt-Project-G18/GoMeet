@@ -51,7 +51,7 @@ import com.github.se.gomeet.R
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
-import com.github.se.gomeet.ui.theme.DarkCyan
+import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
@@ -95,7 +95,7 @@ fun EventHeader(
                   TextStyle(
                       fontSize = 24.sp,
                       fontWeight = FontWeight.Bold,
-                      color = DarkCyan,
+                      color = MaterialTheme.colorScheme.tertiary,
                       letterSpacing = 0.5.sp))
           Spacer(modifier = Modifier.height(5.dp))
           Text(
@@ -248,14 +248,15 @@ fun EventButtons(
             modifier = Modifier.weight(1f),
             colors =
                 ButtonDefaults.textButtonColors(
-                    containerColor = Color(0xFFECEFF1), contentColor = Color.Black)) {
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.tertiary)) {
               if (organizer.uid.contentEquals(Firebase.auth.currentUser!!.uid)) {
                 Text("Edit My Event")
               } else {
                 if (isJoined.value) {
-                  Text("LeaveEvent")
+                  Text("Leave Event")
                 } else {
-                  Text("JoinEvent")
+                  Text("Join Event")
                 }
               }
             }
@@ -269,7 +270,8 @@ fun EventButtons(
               modifier = Modifier.weight(1f),
               colors =
                   ButtonDefaults.textButtonColors(
-                      containerColor = Color(0xFFECEFF1), contentColor = Color.Black)) {
+                      containerColor = MaterialTheme.colorScheme.primaryContainer,
+                      contentColor = MaterialTheme.colorScheme.tertiary)) {
                 Text("Add Participants")
               }
         }
@@ -301,13 +303,13 @@ fun EventButtons(
                     imageVector = ImageVector.vectorResource(id = R.drawable.heart),
                     contentDescription = "Add to Favorites",
                     modifier = Modifier.size(30.dp),
-                    tint = DarkCyan)
+                    tint = MaterialTheme.colorScheme.outlineVariant)
               } else {
                 Icon(
                     imageVector = ImageVector.vectorResource(id = R.drawable.redheart),
                     contentDescription = "Remove from favorites",
                     modifier = Modifier.size(30.dp),
-                    tint = DarkCyan)
+                    tint = MaterialTheme.colorScheme.outlineVariant)
               }
             }
       }

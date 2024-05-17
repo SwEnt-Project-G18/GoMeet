@@ -19,31 +19,33 @@ class WelcomeScreenTest {
 
   @Before
   fun setup() {
-    // Initialize Intents before each test
-    Intents.init()
+    runBlocking {
+      // Initialize Intents before each test
+      Intents.init()
+    }
+  }
+
+  @Test
+  fun testWelcomeScreen() {
+    composeTestRule.setContent { WelcomeScreen({}, {}) { _, _, _, _, _, _ -> } }
+
+    composeTestRule.waitForIdle()
+
+    // Test the ui and sign in with Google
+    composeTestRule.onNodeWithContentDescription("GoMeet Logo").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Log In").assertExists().assertIsDisplayed()
+    composeTestRule.onNodeWithText("Sign Up").assertExists().assertIsDisplayed()
+    composeTestRule.onNodeWithContentDescription("Google logo").assertIsDisplayed().performClick()
+
+    // Assert that an Intent to Google Mobile Services has been sent
+    intended(toPackage("com.google.android.gms"))
   }
 
   @After
   fun tearDown() {
-    // Release Intents after each test
-    Intents.release()
-  }
-
-  @Test
-  fun googleSignInButtonShouldLaunchIntent() {
-
-    rule.setContent { WelcomeScreen({}, {}, {}) }
-
-    rule.onNodeWithContentDescription("GoMeet Logo").assertExists()
-
-    rule.onNodeWithText("Log in").assertExists().assertIsEnabled()
-
-    rule.onNodeWithText("Create account").assertExists().assertIsEnabled()
-
-    // Directly interact with the UI elements
-    rule.onNodeWithText("Continue with Google").assertExists().performClick()
-
-    // Assert that an Intent to Google Mobile Services has been sent
-    intended(toPackage("com.google.android.gms"))
+    runBlocking {
+      // Release Intents after each test
+      Intents.release()
+    }
   }
 }

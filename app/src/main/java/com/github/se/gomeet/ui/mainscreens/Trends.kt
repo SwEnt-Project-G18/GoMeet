@@ -172,3 +172,178 @@ fun Trends(
             }
       }
 }
+
+@OptIn(ExperimentalPagerApi::class)
+@Composable
+fun EventCarousel(events: List<Event>, nav: NavigationActions) {
+  val pagerState = rememberPagerState()
+
+  LaunchedEffect(pagerState) {
+    launch {
+      while (true) {
+        delay(10000) // Wait for 10 seconds
+        val nextPage = if (events.isNotEmpty()) (pagerState.currentPage + 1) % events.size else 0
+        pagerState.animateScrollToPage(nextPage)
+      }
+    }
+  }
+
+  Column(modifier = Modifier.fillMaxWidth().height(250.dp)) {
+    HorizontalPager(count = events.size, state = pagerState, modifier = Modifier.weight(1f)) { page
+      ->
+      val event = events[page]
+      val painter =
+          if (event.images.isNotEmpty()) {
+            rememberAsyncImagePainter(event.images[0])
+          } else {
+            painterResource(id = R.drawable.gomeet_logo)
+          }
+
+      val eventDate = Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant())
+
+      val currentDate = Calendar.getInstance()
+      val startOfWeek = currentDate.clone() as Calendar
+      startOfWeek.set(Calendar.DAY_OF_WEEK, startOfWeek.firstDayOfWeek)
+      val endOfWeek = startOfWeek.clone() as Calendar
+      endOfWeek.add(Calendar.DAY_OF_WEEK, 6)
+
+      val eventCalendar = Calendar.getInstance().apply { time = eventDate }
+
+      val isThisWeek = eventCalendar.after(currentDate) && eventCalendar.before(endOfWeek)
+      val isToday =
+          currentDate.get(Calendar.YEAR) == eventCalendar.get(Calendar.YEAR) &&
+              currentDate.get(Calendar.DAY_OF_YEAR) == eventCalendar.get(Calendar.DAY_OF_YEAR)
+
+      val dayFormat =
+          if (isThisWeek) {
+            SimpleDateFormat("EEEE", Locale.getDefault())
+          } else {
+            SimpleDateFormat("dd/MM/yy", Locale.getDefault())
+          }
+
+      val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+
+      val dayString =
+          if (isToday) {
+            "Today"
+          } else {
+            dayFormat.format(eventDate)
+          }
+      val timeString = timeFormat.format(eventDate)
+
+      Box(
+          modifier =
+              Modifier.padding(8.dp)
+                  .background(Color.Gray, shape = RoundedCornerShape(16.dp))
+                  .fillMaxSize()
+                  .clickable {
+                    nav.navigateToEventInfo(
+                        eventId = event.eventID,
+                        title = event.title,
+                        date = dayString,
+                        time = timeString,
+                        organizer = event.creator,
+                        rating = 0.0,
+                        description = event.description,
+                        loc = LatLng(event.location.latitude, event.location.longitude))
+                  }
+                  .clip(RoundedCornerShape(16.dp)),
+          contentAlignment = Alignment.Center) {
+            Image(
+                painter = painter,
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop)
+            Box(modifier = Modifier.align(Alignment.BottomCenter).padding(8.dp)) {
+              Box(
+                  modifier =
+                      Modifier.clip(RoundedCornerShape(8.dp))
+                          .background(Color.Black.copy(alpha = 0.5f))
+                          .padding(horizontal = 8.dp, vertical = 4.dp)) {
+                    Text(
+                        text = event.title,
+                        color = Color.White,
+                        fontSize = 17.sp,
+                    )
+                  }
+            }
+          }
+    }
+
+    HorizontalPagerIndicator(
+        pagerState = pagerState,
+        modifier = Modifier.align(Alignment.CenterHorizontally).padding(16.dp),
+        inactiveColor = MaterialTheme.colorScheme.inverseOnSurface,
+        activeColor = MaterialTheme.colorScheme.onSurface)
+  }
+}
+
+enum class SortOption {
+  DEFAULT,
+  ALPHABETICAL,
+  DATE
+}
+
+@Composable
+fun SortButton(eventList: MutableList<Event>) {
+  var expanded by remember { mutableStateOf(false) }
+  var selectedOption by remember { mutableStateOf(SortOption.DEFAULT) }
+
+  Box(
+      contentAlignment = Alignment.Center,
+      modifier = Modifier.fillMaxWidth().padding(top = 10.dp, start = 10.dp, end = 10.dp)) {
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            colors =
+                ButtonDefaults.buttonColors(
+                    MaterialTheme.colorScheme.primaryContainer, MaterialTheme.colorScheme.tertiary),
+            onClick = { expanded = true }) {
+              Text("Sort")
+            }
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier =
+                Modifier.align(Alignment.Center)
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.primaryContainer)) {
+              DropdownMenuItem(
+                  text = { Text("Popularity") },
+                  onClick = {
+                    // TODO: Implement popularity sorting
+                    selectedOption = SortOption.DEFAULT
+                    expanded = false
+                  },
+                  modifier =
+                      Modifier.background(
+                          if (selectedOption == SortOption.DEFAULT)
+                              MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+                          else Color.Transparent))
+              DropdownMenuItem(
+                  text = { Text("Name") },
+                  onClick = {
+                    selectedOption = SortOption.ALPHABETICAL
+                    eventList.sortBy { it.title }
+                    expanded = false
+                  },
+                  modifier =
+                      Modifier.background(
+                          if (selectedOption == SortOption.ALPHABETICAL)
+                              MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+                          else Color.Transparent))
+              DropdownMenuItem(
+                  text = { Text("Date") },
+                  onClick = {
+                    selectedOption = SortOption.DATE
+                    eventList.sortBy { it.date }
+                    expanded = false
+                  },
+                  modifier =
+                      Modifier.background(
+                          if (selectedOption == SortOption.DATE)
+                              MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+                          else Color.Transparent))
+            }
+      }
+}

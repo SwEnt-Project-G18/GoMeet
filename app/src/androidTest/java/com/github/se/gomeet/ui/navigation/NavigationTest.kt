@@ -102,4 +102,43 @@ class NavigationTest {
       }
     }
   }
+
+  companion object {
+    private val userVM = UserViewModel(UserRepository(Firebase.firestore))
+    private lateinit var currentUserId: String
+
+    private val usr = "u@navtest.com"
+    private val pwd = "123456"
+
+    @BeforeClass
+    @JvmStatic
+    fun setUp() {
+      TimeUnit.SECONDS.sleep(3)
+
+      // Create a new user and sign in
+      var result = Firebase.auth.createUserWithEmailAndPassword(usr, pwd)
+      while (!result.isComplete) {
+        TimeUnit.SECONDS.sleep(1)
+      }
+      result = Firebase.auth.signInWithEmailAndPassword(usr, pwd)
+      while (!result.isComplete) {
+        TimeUnit.SECONDS.sleep(1)
+      }
+
+      // Set up the user view model
+      // Order is important here, since createUserIfNew sets current user to created user (so we
+      // need to create the current user last)
+      currentUserId = Firebase.auth.currentUser!!.uid
+      userVM.createUserIfNew(currentUserId, "a", "b", "c", usr, "4567", "Angola", "")
+      TimeUnit.SECONDS.sleep(3)
+    }
+
+    @AfterClass
+    @JvmStatic
+    fun tearDown() {
+      // Clean up the user view model
+      Firebase.auth.currentUser!!.delete()
+      userVM.deleteUser(currentUserId)
+    }
+  }
 }

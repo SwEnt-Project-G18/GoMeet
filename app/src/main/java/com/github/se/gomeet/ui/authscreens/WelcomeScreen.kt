@@ -1,5 +1,6 @@
 package com.github.se.gomeet.ui.authscreens
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.BorderStroke
@@ -52,17 +53,28 @@ import com.google.firebase.auth.FirebaseAuth
  * @param onNavToRegister The navigation function to navigate to the Register Screen.
  * @param onSignInSuccess The function to call when the user successfully signs in.
  */
+@SuppressLint("RestrictedApi")
 @Composable
 fun WelcomeScreen(
     onNavToLogin: () -> Unit,
     onNavToRegister: () -> Unit,
-    onSignInSuccess: (String) -> Unit
+    onSignInSuccess: (String, String, String, String, String, String) -> Unit
 ) {
   val launcher =
       rememberLauncherForActivityResult(FirebaseAuthUIActivityResultContract()) { res ->
         if (res.resultCode == Activity.RESULT_OK) {
-          val user = FirebaseAuth.getInstance().currentUser
-          user?.uid?.let { userId -> onSignInSuccess(userId) }
+          val userFirebase = FirebaseAuth.getInstance().currentUser
+          val email = res.idpResponse!!.email ?: ""
+          val phoneNumber = res.idpResponse!!.phoneNumber ?: ""
+
+          val name = res.idpResponse!!.user.name ?: ""
+          val index = name.indexOf(" ")
+          val lastName = res.idpResponse!!.user.name?.take(index) ?: ""
+          val firstName = res.idpResponse!!.user.name?.drop(index) ?: ""
+          userFirebase?.uid?.let { userId ->
+            onSignInSuccess(
+                userId, "user" + userId.take(6), email, firstName, lastName, phoneNumber)
+          }
         } else {
           // Sign-in error
         }
