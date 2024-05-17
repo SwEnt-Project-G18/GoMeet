@@ -100,6 +100,7 @@ class EndToEndTest3 : TestCase() {
         while (userVM.getUser(uid2) == null) {
           TimeUnit.SECONDS.sleep(1)
         }
+        userVM.editUser(userVM.getUser(uid1)!!.copy(followers = listOf(uid2)))
 
         // user1 creates an event
         result = Firebase.auth.signInWithEmailAndPassword(email1, pwd1)
@@ -215,6 +216,19 @@ class EndToEndTest3 : TestCase() {
         composeTestRule.onNodeWithText("Invite").assertIsDisplayed().performClick()
         composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText("Cancel").assertIsDisplayed().assertHasClickAction()
+        composeTestRule.onNodeWithContentDescription("Go back").assertIsDisplayed().performClick()
+        composeTestRule.waitForIdle()
+      }
+
+      ComposeScreen.onComposeScreen<EventInfoScreen>(composeTestRule) {
+        step("Refresh ManageInvites") {
+          composeTestRule.waitUntil(timeoutMillis = 10000) {
+            composeTestRule.onNodeWithTag("EventHeader").isDisplayed()
+          }
+          composeTestRule.onNodeWithText("Edit My Event").assertIsDisplayed().assertHasClickAction()
+          composeTestRule.onNodeWithText("Add Participants").assertIsDisplayed().performClick()
+          composeTestRule.waitForIdle()
+        }
       }
 
       step("Verify that the invitation appears in Pending") {
