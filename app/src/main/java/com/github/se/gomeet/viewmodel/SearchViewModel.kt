@@ -52,7 +52,7 @@ class SearchViewModel() : ViewModel() {
     // viewModelScope.launch { userRepository.getAllUsers { users -> allUsersList = users }}
     userRepository.getAllUsers { users ->
       allUsersList = users
-      // updateSearchQuery()
+      // updateSearchQuery() 
     }
   }
 
