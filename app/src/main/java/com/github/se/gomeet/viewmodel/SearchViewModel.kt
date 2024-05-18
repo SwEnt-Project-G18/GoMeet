@@ -24,27 +24,48 @@ import kotlinx.coroutines.launch
 class SearchViewModel() : ViewModel() {
     private val _searchText = MutableStateFlow("")
     val searchText = _searchText.asStateFlow()
-    val userRepository = UserRepository(Firebase.firestore)
-    val eventsRepository = EventRepository(Firebase.firestore)
-    var allUsersList: List<GoMeetUser>? = null
-    var allPublicEventsList: List<Event>? = null
+    private val userRepository = UserRepository(Firebase.firestore)
+    private val eventsRepository = EventRepository(Firebase.firestore)
+    private var allUsersList: List<GoMeetUser>? = emptyList()
+    private var allPublicEventsList: List<Event>? = emptyList()
     private val _searchQuery = MutableStateFlow<List<SearchableItem>>(emptyList())
 
     init {
-        getAllUsers()
-        getAllEvents()
+        viewModelScope.launch {
+            getAllUsers()
+            getAllEvents()
+        }
+        /*
+        _searchQuery.value =
+            (allUsersList?.map { SearchableItem.User(it) } ?: emptyList()) +
+                    (allPublicEventsList?.map { SearchableItem.Event(it) } ?: emptyList())
+                    */
+    }
+
+
+
+
+     fun getAllUsers() {
+        //viewModelScope.launch { userRepository.getAllUsers { users -> allUsersList = users }}
+         userRepository.getAllUsers { users ->
+             allUsersList = users
+             updateSearchQuery()
+         }
+    }
+
+    private fun updateSearchQuery() {
         _searchQuery.value =
             (allUsersList?.map { SearchableItem.User(it) } ?: emptyList()) +
                     (allPublicEventsList?.map { SearchableItem.Event(it) } ?: emptyList())
     }
 
-    private fun getAllUsers() {
-        viewModelScope.launch { userRepository.getAllUsers { users -> allUsersList = users } }
-    }
-
-    private fun getAllEvents() {
-        viewModelScope.launch {
-            eventsRepository.getAllEvents { events -> allPublicEventsList = events }
+    fun getAllEvents() {
+        //viewModelScope.launch {
+        //    eventsRepository.getAllEvents { events -> allPublicEventsList = events }
+        //}
+        eventsRepository.getAllEvents { events ->
+            allPublicEventsList = events
+            updateSearchQuery()
         }
     }
 
