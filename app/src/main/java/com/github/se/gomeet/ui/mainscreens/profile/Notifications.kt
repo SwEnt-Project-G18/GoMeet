@@ -37,19 +37,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
-import com.github.se.gomeet.model.event.InviteStatus
+import com.github.se.gomeet.model.event.InviteStatus.*
+import com.github.se.gomeet.model.event.getEventDateString
+import com.github.se.gomeet.model.event.getEventTimeString
 import com.github.se.gomeet.model.user.GoMeetUser
+import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
-import java.text.SimpleDateFormat
-import java.time.ZoneId
-import java.util.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import com.github.se.gomeet.ui.mainscreens.profile.NotificationPagerState.*
+
 
 /**
  * This composable function displays the notifications screen.
@@ -62,7 +64,7 @@ import kotlinx.coroutines.launch
 fun Notifications(nav: NavigationActions, currentUserID: String) {
   val userViewModel = UserViewModel()
   val eventViewModel = EventViewModel(null)
-  val pagerState = rememberPagerState(pageCount = { 2 })
+  val pagerState = rememberPagerState(pageCount = { NotificationPagerState.entries.size })
   val screenHeight = LocalConfiguration.current.screenHeightDp.dp
 
   var isLoaded by remember { mutableStateOf(false) }
@@ -112,7 +114,7 @@ fun Notifications(nav: NavigationActions, currentUserID: String) {
           }
         } else {
           Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            CircularProgressIndicator()
+            LoadingText()
           }
         }
       }
@@ -144,13 +146,12 @@ suspend fun fetchUserAndEvents(
     val creatorMap = mutableMapOf<Event, String>()
 
     it.pendingRequests
-        .filter { invitation -> invitation.status == InviteStatus.PENDING }
+        .filter { invitation -> invitation.status == PENDING }
         .forEach { request ->
           val invitedEvent = eventViewModel.getEvent(request.eventId)
           invitedEvent?.let { event ->
             events.add(event)
-            val creatorName = userViewModel.getUser(event.creator)?.username ?: "GoMeetUser"
-            creatorMap[event] = creatorName
+            creatorMap[event] = userViewModel.getUser(event.creator)?.username ?: "GoMeetUser"
           }
         }
 
@@ -254,43 +255,61 @@ fun TabRow(pagerState: PagerState, coroutineScope: CoroutineScope, screenHeight:
         Box(
             contentAlignment = Alignment.Center,
             modifier =
-                Modifier.weight(1f).height(screenHeight / 20).clickable {
-                  coroutineScope.launch { pagerState.animateScrollToPage(0) }
+            Modifier
+                .weight(1f)
+                .height(screenHeight / 20)
+                .clickable {
+                    coroutineScope.launch { pagerState.animateScrollToPage(INVITATIONS.ordinal) }
                 }) {
               Text(
-                  text = "Invitations",
+                  text = INVITATIONS.str,
                   style =
                       MaterialTheme.typography.bodyMedium.copy(
                           fontWeight =
-                              if (pagerState.currentPage == 0) FontWeight.Bold
-                              else FontWeight.Normal))
+                          when(pagerState.currentPage){
+                                INVITATIONS.ordinal -> FontWeight.Bold
+                                else -> FontWeight.Normal
+                          }))
             }
 
         Box(
             contentAlignment = Alignment.Center,
             modifier =
-                Modifier.weight(1f).height(screenHeight / 20).clickable {
-                  coroutineScope.launch { pagerState.animateScrollToPage(1) }
+            Modifier
+                .weight(1f)
+                .height(screenHeight / 20)
+                .clickable {
+                    coroutineScope.launch { pagerState.animateScrollToPage(MESSAGES.ordinal) }
                 }) {
               Text(
-                  text = "Messages",
+                  text = MESSAGES.str,
                   style =
                       MaterialTheme.typography.bodyMedium.copy(
                           fontWeight =
-                              if (pagerState.currentPage == 1) FontWeight.Bold
-                              else FontWeight.Normal))
+                          when(pagerState.currentPage){
+                                MESSAGES.ordinal -> FontWeight.Bold
+                                else -> FontWeight.Normal
+                            }))
             }
       }
-  Canvas(modifier = Modifier.fillMaxWidth().height(1.dp)) {
+  Canvas(modifier = Modifier
+      .fillMaxWidth()
+      .height(1.dp)) {
     val canvasWidth = size.width
     drawLine(
         color = Color.Black,
         start =
-            if (pagerState.currentPage == 0) Offset(x = 0f, y = 0f)
-            else Offset(x = canvasWidth / 2, y = 0f),
+        when(pagerState.currentPage){
+            INVITATIONS.ordinal -> Offset(x = 0f, y = 0f)
+            MESSAGES.ordinal -> Offset(x = canvasWidth / 2, y = 0f)
+            else -> Offset(x = 0f, y = 0f)
+        },
         end =
-            if (pagerState.currentPage == 0) Offset(x = canvasWidth / 2, y = 0f)
-            else Offset(x = canvasWidth, y = 0f),
+        when(pagerState.currentPage){
+            INVITATIONS.ordinal -> Offset(x = canvasWidth / 2, y = 0f)
+            MESSAGES.ordinal -> Offset(x = canvasWidth, y = 0f)
+            else -> Offset(x = 0f, y = 0f)
+            },
         strokeWidth = 5f)
   }
   Spacer(modifier = Modifier.height(screenHeight / 30))
@@ -331,7 +350,9 @@ fun PageInvitationsNotifications(
   Column(
       verticalArrangement = Arrangement.Top,
       horizontalAlignment = Alignment.CenterHorizontally,
-      modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+      modifier = Modifier
+          .fillMaxSize()
+          .verticalScroll(rememberScrollState())) {
         listEvent.forEach { event ->
           InvitationsNotificationsWidget(
               event = event,
@@ -369,45 +390,15 @@ fun InvitationsNotificationsWidget(
   val smallTextSize = with(density) { screenWidth.toPx() / 85 }
   val bigTextSize = with(density) { screenWidth.toPx() / 60 }
 
-  val currentDate = Calendar.getInstance()
-  val startOfWeek = currentDate.clone() as Calendar
-  startOfWeek.set(Calendar.DAY_OF_WEEK, startOfWeek.firstDayOfWeek)
-  val endOfWeek = startOfWeek.clone() as Calendar
-  endOfWeek.add(Calendar.DAY_OF_WEEK, 6)
-
-  val eventCalendar =
-      Calendar.getInstance().apply {
-        time = Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant())
-      }
-
-  val isThisWeek = eventCalendar.after(currentDate) && eventCalendar.before(endOfWeek)
-  val isToday =
-      currentDate.get(Calendar.YEAR) == eventCalendar.get(Calendar.YEAR) &&
-          currentDate.get(Calendar.DAY_OF_YEAR) == eventCalendar.get(Calendar.DAY_OF_YEAR)
-
-  val dayFormat =
-      if (isThisWeek) {
-        SimpleDateFormat("EEEE", Locale.getDefault())
-      } else {
-        SimpleDateFormat("dd/MM/yy", Locale.getDefault())
-      }
-
-  val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-
-  val dayString =
-      if (isToday) {
-        "Today"
-      } else {
-        dayFormat.format(Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant()))
-      }
-  val timeString =
-      timeFormat.format(Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant()))
+  val dayString = getEventDateString(event.date)
+  val timeString = getEventTimeString(event.time)
 
   Card(
       modifier =
-          Modifier.fillMaxWidth()
-              .padding(start = 10.dp, top = 5.dp, end = 10.dp, bottom = 5.dp)
-              .testTag("EventCard"),
+      Modifier
+          .fillMaxWidth()
+          .padding(start = 10.dp, top = 5.dp, end = 10.dp, bottom = 5.dp)
+          .testTag("EventCard"),
       colors =
           CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)) {
         Row(
@@ -415,7 +406,9 @@ fun InvitationsNotificationsWidget(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceAround) {
               Column(
-                  modifier = Modifier.weight(4f).padding(15.dp),
+                  modifier = Modifier
+                      .weight(4f)
+                      .padding(15.dp),
                   horizontalAlignment = Alignment.Start,
                   verticalArrangement = Arrangement.Center) {
                     Text(
@@ -451,7 +444,9 @@ fun InvitationsNotificationsWidget(
                                         color = MaterialTheme.colorScheme.onBackground,
                                         letterSpacing = 0.15.sp,
                                     ),
-                                modifier = Modifier.padding(top = 5.dp).testTag("UserName"))
+                                modifier = Modifier
+                                    .padding(top = 5.dp)
+                                    .testTag("UserName"))
                           }
                         }
 
@@ -475,19 +470,22 @@ fun InvitationsNotificationsWidget(
                           id = R.drawable.gomeet_logo), // Use the event picture if available
                   contentDescription = "Event Picture",
                   modifier =
-                      Modifier.weight(3f)
-                          .fillMaxHeight()
-                          .aspectRatio(3f / 1.75f)
-                          .clipToBounds()
-                          .padding(0.dp)
-                          .testTag("EventPicture"),
+                  Modifier
+                      .weight(3f)
+                      .fillMaxHeight()
+                      .aspectRatio(3f / 1.75f)
+                      .clipToBounds()
+                      .padding(0.dp)
+                      .testTag("EventPicture"),
                   contentScale = ContentScale.Crop,
               )
             }
 
         // Accept and Decline buttons
         Row(
-            modifier = Modifier.fillMaxWidth().padding(10.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically) {
               Button(
@@ -504,7 +502,7 @@ fun InvitationsNotificationsWidget(
                   border = BorderStroke(1.dp, Color.Green),
                   enabled = !clicked,
                   modifier = Modifier.testTag("AcceptButton")) {
-                    Text("Accept")
+                    Text(ACCEPTED.button)
                   }
 
               Spacer(modifier = Modifier.width(10.dp))
@@ -522,8 +520,14 @@ fun InvitationsNotificationsWidget(
                   border = BorderStroke(1.dp, Color.Red),
                   enabled = !clicked,
                   modifier = Modifier.testTag("DeclineButton")) {
-                    Text("Decline")
+                    Text(REFUSED.button)
                   }
             }
       }
+}
+
+
+private enum class NotificationPagerState(val str: String) {
+  INVITATIONS("Invitations"),
+  MESSAGES("Messages");
 }

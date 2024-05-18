@@ -6,15 +6,11 @@ package com.github.se.gomeet.model.event
  *
  * @param formattedName The formatted name of the status.
  */
-enum class InviteStatus(val formattedName: String) {
+enum class InviteStatus(val formattedName: String, val button: String = "") {
   TO_INVITE("To Invite"),
   PENDING("Pending"),
-  ACCEPTED("Accepted"),
-  REFUSED("Refused");
-
-  override fun toString(): String {
-    return formattedName
-  }
+  ACCEPTED("Accepted", "Accept"),
+  REFUSED("Refused", "Refuse");
 }
 
 /**

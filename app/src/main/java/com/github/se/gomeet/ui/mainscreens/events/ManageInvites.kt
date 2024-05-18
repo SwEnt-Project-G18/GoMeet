@@ -83,7 +83,7 @@ fun ManageInvites(
     eventViewModel: EventViewModel
 ) {
 
-  val pagerState = rememberPagerState(pageCount = { 4 })
+  val pagerState = rememberPagerState(pageCount = { InviteStatus.entries.size })
   val screenHeight = LocalConfiguration.current.screenHeightDp.dp
   val coroutineScope = rememberCoroutineScope()
   val user = remember { mutableStateOf<GoMeetUser?>(null) }

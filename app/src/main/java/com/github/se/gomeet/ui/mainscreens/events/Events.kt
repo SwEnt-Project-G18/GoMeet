@@ -375,8 +375,4 @@ private enum class SelectedStatus(val formattedName: String) {
   FAVOURITES("Favourites"),
   MY_EVENTS("My Events"),
   ALL("All");
-
-  override fun toString(): String {
-    return formattedName
-  }
 }

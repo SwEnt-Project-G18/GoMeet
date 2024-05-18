@@ -72,7 +72,9 @@ import kotlinx.coroutines.tasks.await
  * Profile screen composable
  *
  * @param nav NavigationActions
+ * @param userId String
  * @param userViewModel UserViewModel
+ * @param eventViewModel EventViewModel
  */
 @Composable
 fun Profile(
@@ -82,13 +84,12 @@ fun Profile(
     eventViewModel: EventViewModel
 ) {
   val screenWidth = LocalConfiguration.current.screenWidthDp.dp
-
   val screenHeight = LocalConfiguration.current.screenHeightDp.dp
   val coroutineScope = rememberCoroutineScope()
   var isProfileLoaded by remember { mutableStateOf(false) }
   var currentUser by remember { mutableStateOf<GoMeetUser?>(null) }
-  var joinedEventsList = remember { mutableListOf<Event>() }
-  var myHistoryList = remember { mutableListOf<Event>() }
+  val joinedEventsList = remember { mutableListOf<Event>() }
+  val myHistoryList = remember { mutableListOf<Event>() }
 
   LaunchedEffect(Unit) {
     coroutineScope.launch {
@@ -105,6 +106,7 @@ fun Profile(
       isProfileLoaded = true
     }
   }
+
   Scaffold(
       modifier = Modifier.testTag("Profile"),
       bottomBar = {

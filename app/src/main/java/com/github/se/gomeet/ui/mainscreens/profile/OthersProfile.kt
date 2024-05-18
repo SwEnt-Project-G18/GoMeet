@@ -275,10 +275,10 @@ fun OthersProfile(
                     }
                 Spacer(modifier = Modifier.height(screenHeight / 40))
                 ProfileEventsList(
-                    (user!!.firstName) + "'s Events", rememberLazyListState(), myEventList, nav)
+                    "${user!!.firstName}'s Events", rememberLazyListState(), myEventList, nav)
                 Spacer(modifier = Modifier.height(screenHeight / 40))
                 ProfileEventsList(
-                    (user!!.firstName) + "'s History", rememberLazyListState(), myHistoryList, nav)
+                    "${user!!.firstName}'s History", rememberLazyListState(), myHistoryList, nav)
               }
         } else {
           LoadingText()
