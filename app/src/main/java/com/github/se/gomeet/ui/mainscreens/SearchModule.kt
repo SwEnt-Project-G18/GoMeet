@@ -20,16 +20,28 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.TabRowDefaults.Divider
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SearchBarDefaults
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -41,39 +53,62 @@ import com.github.se.gomeet.R
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.viewmodel.SearchViewModel
-import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
+import kotlinx.coroutines.launch
 
 @Composable
-fun SearchModule(nav: NavigationActions) {
+fun SearchModule(nav: NavigationActions, backgroundColor: Color, contentColor: Color) {
   val viewModel = viewModel<SearchViewModel>()
   val searchText by viewModel.searchText.collectAsState()
   val persons by viewModel.searchQuery.collectAsState()
   val isSearching by viewModel.isSearching.collectAsState()
   val coroutineScope = rememberCoroutineScope()
+  val focusRequester = remember { FocusRequester() }
+  val keyboardController = LocalSoftwareKeyboardController.current
 
-
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+  Column(modifier = Modifier
+      .fillMaxSize()
+      .padding(16.dp)) {
     TextField(
         value = searchText,
+        leadingIcon = {
+            IconButton(onClick = { nav.navigateToScreen(Route.MESSAGE_CHANNELS) }) {
+                Icon(
+                    ImageVector.vectorResource(R.drawable.gomeet_icon),
+                    contentDescription = null,
+                    tint = contentColor)
+            }
+        },
         onValueChange = viewModel::onSearchTextChange,
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .focusRequester(focusRequester),
         placeholder = { Text(text = "Search") },
-        keyboardOptions = KeyboardOptions.Default.copy(
-            imeAction = ImeAction.Search
-        )
-        )
+        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
+        keyboardActions =
+            KeyboardActions(
+                onSearch = {
+                  println("Search for $searchText triggered")
+                  keyboardController?.hide()
+                  coroutineScope.launch { viewModel.performSearch(searchText) }
+                })
+    )
+
     Spacer(modifier = Modifier.height(16.dp))
     if (isSearching) {
       Box(modifier = Modifier.fillMaxSize()) {
         CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
       }
     } else if (persons.isNotEmpty()) {
-      LazyColumn(modifier = Modifier.fillMaxWidth().weight(1f)) {
+      LazyColumn(modifier = Modifier
+          .fillMaxWidth()
+          .weight(1f)) {
         items(persons) { item ->
           SearchModuleSnippet(item, nav = nav)
           Divider(
-              color = Color.LightGray, thickness = 1.dp, modifier = Modifier.padding(vertical = 8.dp))
+              color = Color.LightGray,
+              thickness = 1.dp,
+              modifier = Modifier.padding(vertical = 8.dp))
         }
       }
     }
@@ -102,8 +137,10 @@ fun SearchModuleSnippet(item: SearchViewModel.SearchableItem, nav: NavigationAct
       Row(
           verticalAlignment = Alignment.CenterVertically,
           modifier =
-              Modifier.padding(vertical = 10.dp).clickable {
-                nav.navigateToScreen(Route.OTHERS_PROFILE.replace("{uid}", item.user.uid))
+          Modifier
+              .padding(vertical = 10.dp)
+              .clickable {
+                  nav.navigateToScreen(Route.OTHERS_PROFILE.replace("{uid}", item.user.uid))
               }) {
             Image(
                 painter = painter,
@@ -143,11 +180,11 @@ fun SearchModuleSnippet(item: SearchViewModel.SearchableItem, nav: NavigationAct
                 modifier = Modifier.size(64.dp))
             Spacer(modifier = Modifier.width(16.dp))
             Column {
+              Text(text = "${item.event.title}", modifier = Modifier.fillMaxWidth())
               Text(
                   text =
-                      "${item.event.title}",
+                      "${item.event.date.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))} - ${item.event.time.format(DateTimeFormatter.ofPattern("HH:mm"))}",
                   modifier = Modifier.fillMaxWidth())
-              Text(text = "${item.event.date.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))} - ${item.event.time.format(DateTimeFormatter.ofPattern("HH:mm"))}", modifier = Modifier.fillMaxWidth())
               Text("${item.event.description}", color = Color.Gray)
             }
           }
@@ -158,5 +195,5 @@ fun SearchModuleSnippet(item: SearchViewModel.SearchableItem, nav: NavigationAct
 @Preview
 @Composable
 fun PreviewSearchModule() {
-  SearchModule(nav = NavigationActions(rememberNavController()))
+  SearchModule(nav = NavigationActions(rememberNavController()), backgroundColor = MaterialTheme.colorScheme.background, contentColor = MaterialTheme.colorScheme.tertiary)
 }

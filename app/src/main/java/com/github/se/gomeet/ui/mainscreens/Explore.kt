@@ -212,8 +212,9 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
 
     Box(
         modifier =
-            Modifier.fillMaxSize()
-                .padding(bottom = innerPadding.calculateBottomPadding() * rowAlpha)) {
+        Modifier
+            .fillMaxSize()
+            .padding(bottom = innerPadding.calculateBottomPadding() * rowAlpha)) {
           BackdropScaffold(
               frontLayerBackgroundColor = MaterialTheme.colorScheme.background,
               backLayerBackgroundColor = MaterialTheme.colorScheme.background,
@@ -222,10 +223,14 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
               frontLayerScrimColor = Color.Unspecified,
               headerHeight = halfHeight.dp,
               peekHeight = 0.dp,
-              modifier = Modifier.testTag("MapSlider").padding(innerPadding),
+              modifier = Modifier
+                  .testTag("MapSlider")
+                  .padding(innerPadding),
               appBar = {},
               frontLayerContent = {
-                Column(modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
+                Column(modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp)) {
                   val listState = rememberLazyListState()
                   Spacer(modifier = Modifier.height(8.dp))
                   Box(modifier = Modifier.fillMaxSize()) {
@@ -247,12 +252,16 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
               },
               backLayerContent = {
                 Scaffold(
-                    modifier = Modifier.fillMaxSize().alpha(offset / halfHeightPx),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .alpha(offset / halfHeightPx),
                     floatingActionButton = {
                       if (locationPermitted.value == true && isButtonVisible.value) {
                         FloatingActionButton(
                             onClick = { moveToCurrentLocation.value = CameraAction.ANIMATE },
-                            modifier = Modifier.size(45.dp).testTag("CurrentLocationButton"),
+                            modifier = Modifier
+                                .size(45.dp)
+                                .testTag("CurrentLocationButton"),
                             containerColor = MaterialTheme.colorScheme.outlineVariant) {
                               Icon(
                                   imageVector =
@@ -266,7 +275,9 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
                       if (isMapLoaded) {
                         moveToCurrentLocation.value = CameraAction.MOVE
 
-                        Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
+                        Box(modifier = Modifier
+                            .padding(innerPadding)
+                            .fillMaxSize()) {
                           GoogleMapView(
                               currentPosition = currentPosition,
                               events = eventList,
@@ -283,11 +294,12 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
                               CircularProgressIndicator()
                             }
                       }
-                      GoMeetSearchBar(
-                          nav,
-                          query,
-                          MaterialTheme.colorScheme.background,
-                          MaterialTheme.colorScheme.tertiary)
+                        SearchModule(nav = nav, backgroundColor= MaterialTheme.colorScheme.background, contentColor = MaterialTheme.colorScheme.tertiary)
+                      //GoMeetSearchBar(
+                      //    nav,
+                      //    query,
+                      //    MaterialTheme.colorScheme.background,
+                      //    MaterialTheme.colorScheme.tertiary)
                     }
               }) {}
         }
@@ -330,18 +342,21 @@ private fun ContentInColumn(
             Card(
                 elevation = 4.dp,
                 modifier =
-                    Modifier.size(width = 360.dp, height = 200.dp).padding(8.dp).clickable {
-                      nav.navigateToEventInfo(
-                          eventId = event.eventID,
-                          title = event.title,
-                          date = getEventDateString(event.date),
-                          time = getEventTimeString(event.time),
-                          description = event.description,
-                          organizer = event.creator,
-                          loc = LatLng(event.location.latitude, event.location.longitude),
-                          rating = 0.0 // TODO: replace with actual rating
-                          // TODO: add image
-                          )
+                Modifier
+                    .size(width = 360.dp, height = 200.dp)
+                    .padding(8.dp)
+                    .clickable {
+                        nav.navigateToEventInfo(
+                            eventId = event.eventID,
+                            title = event.title,
+                            date = getEventDateString(event.date),
+                            time = getEventTimeString(event.time),
+                            description = event.description,
+                            organizer = event.creator,
+                            loc = LatLng(event.location.latitude, event.location.longitude),
+                            rating = 0.0 // TODO: replace with actual rating
+                            // TODO: add image
+                        )
                     }) {
                   val painter: Painter =
                       if (event.images.isNotEmpty()) {
@@ -403,22 +418,26 @@ fun ContentInRow(
       TopTitle(forColumn = false, alpha = rowAlpha)
       LazyRow(modifier = Modifier.alpha(rowAlpha), state = listState) {
         itemsIndexed(events) { _, event ->
-          Column(modifier = Modifier.padding(8.dp).fillMaxWidth()) {
+          Column(modifier = Modifier
+              .padding(8.dp)
+              .fillMaxWidth()) {
             Card(
                 elevation = 4.dp,
                 modifier =
-                    Modifier.size(width = 280.dp, height = screenHeight / 6).clickable {
-                      nav.navigateToEventInfo(
-                          eventId = event.eventID,
-                          title = event.title,
-                          date = getEventDateString(event.date),
-                          time = getEventTimeString(event.time),
-                          description = event.description,
-                          organizer = event.creator,
-                          loc = LatLng(event.location.latitude, event.location.longitude),
-                          rating = 0.0 // TODO: replace with actual rating
-                          // TODO: add image
-                          )
+                Modifier
+                    .size(width = 280.dp, height = screenHeight / 6)
+                    .clickable {
+                        nav.navigateToEventInfo(
+                            eventId = event.eventID,
+                            title = event.title,
+                            date = getEventDateString(event.date),
+                            time = getEventTimeString(event.time),
+                            description = event.description,
+                            organizer = event.creator,
+                            loc = LatLng(event.location.latitude, event.location.longitude),
+                            rating = 0.0 // TODO: replace with actual rating
+                            // TODO: add image
+                        )
                     }) {
                   val painter: Painter =
                       if (event.images.isNotEmpty()) {
@@ -462,17 +481,20 @@ fun ContentInRow(
 private fun TopTitle(forColumn: Boolean, alpha: Float) {
   Column(
       modifier =
-          Modifier.padding(
-                  top = if (forColumn) 34.dp else 12.dp,
-                  start = 10.dp) // status bar 24dp in material guidance
-              .alpha(alpha = alpha)
-              .fillMaxWidth()) {
+      Modifier
+          .padding(
+              top = if (forColumn) 34.dp else 12.dp,
+              start = 10.dp
+          ) // status bar 24dp in material guidance
+          .alpha(alpha = alpha)
+          .fillMaxWidth()) {
         Box(
             modifier =
-                Modifier.size(width = 48.dp, height = 3.dp)
-                    .clip(shape = RoundedCornerShape(12.dp))
-                    .background(color = Color.LightGray)
-                    .align(alignment = Alignment.CenterHorizontally))
+            Modifier
+                .size(width = 48.dp, height = 3.dp)
+                .clip(shape = RoundedCornerShape(12.dp))
+                .background(color = Color.LightGray)
+                .align(alignment = Alignment.CenterHorizontally))
         Spacer(modifier = Modifier.height(LocalConfiguration.current.screenHeightDp.dp / 80))
         Text(text = "Trending Around You", style = MaterialTheme.typography.titleMedium)
         Spacer(modifier = Modifier.height(LocalConfiguration.current.screenHeightDp.dp / 80))
