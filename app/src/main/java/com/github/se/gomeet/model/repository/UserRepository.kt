@@ -14,7 +14,7 @@ import kotlinx.coroutines.tasks.await
  *
  * @param db the Firestore database
  */
-class UserRepository(private val db: FirebaseFirestore) {
+class UserRepository(val db: FirebaseFirestore) {
   /**
    * Companion object for the UserFirebaseConnection class. Contains the constants for the class.
    */
