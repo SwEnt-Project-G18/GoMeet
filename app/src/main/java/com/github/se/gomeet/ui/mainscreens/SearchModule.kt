@@ -1,6 +1,7 @@
 package com.github.se.gomeet.ui.mainscreens
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -67,7 +68,6 @@ fun SearchModule(nav: NavigationActions, backgroundColor: Color, contentColor: C
   val keyboardController = LocalSoftwareKeyboardController.current
 
   Column(modifier = Modifier
-      .fillMaxSize()
       .padding(16.dp)) {
     TextField(
         value = searchText,
@@ -91,8 +91,7 @@ fun SearchModule(nav: NavigationActions, backgroundColor: Color, contentColor: C
                   println("Search for $searchText triggered")
                   keyboardController?.hide()
                   coroutineScope.launch { viewModel.performSearch(searchText) }
-                })
-    )
+                }))
 
     Spacer(modifier = Modifier.height(16.dp))
     if (isSearching) {
@@ -104,7 +103,7 @@ fun SearchModule(nav: NavigationActions, backgroundColor: Color, contentColor: C
           .fillMaxWidth()
           .weight(1f)) {
         items(persons) { item ->
-          SearchModuleSnippet(item, nav = nav)
+          SearchModuleSnippet(item, nav = nav, backgroundColor = backgroundColor)
           Divider(
               color = Color.LightGray,
               thickness = 1.dp,
@@ -116,7 +115,7 @@ fun SearchModule(nav: NavigationActions, backgroundColor: Color, contentColor: C
 }
 
 @Composable
-fun SearchModuleSnippet(item: SearchViewModel.SearchableItem, nav: NavigationActions) {
+fun SearchModuleSnippet(item: SearchViewModel.SearchableItem, nav: NavigationActions, backgroundColor: Color) {
   when (item) {
     is SearchViewModel.SearchableItem.User -> {
       val painter: Painter =
@@ -141,7 +140,7 @@ fun SearchModuleSnippet(item: SearchViewModel.SearchableItem, nav: NavigationAct
               .padding(vertical = 10.dp)
               .clickable {
                   nav.navigateToScreen(Route.OTHERS_PROFILE.replace("{uid}", item.user.uid))
-              }) {
+              }.background(backgroundColor)) {
             Image(
                 painter = painter,
                 contentDescription = "User Icon",
@@ -173,7 +172,7 @@ fun SearchModuleSnippet(item: SearchViewModel.SearchableItem, nav: NavigationAct
           }
       Row(
           verticalAlignment = Alignment.CenterVertically,
-          modifier = Modifier.padding(vertical = 10.dp)) {
+          modifier = Modifier.padding(vertical = 10.dp).background(backgroundColor)) {
             Image(
                 painter = painter,
                 contentDescription = "Event Icon",
@@ -192,6 +191,7 @@ fun SearchModuleSnippet(item: SearchViewModel.SearchableItem, nav: NavigationAct
   }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
 fun PreviewSearchModule() {
