@@ -38,8 +38,6 @@ import androidx.compose.ui.unit.sp
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.InviteStatus
-import com.github.se.gomeet.model.repository.EventRepository
-import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
@@ -47,8 +45,6 @@ import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import java.text.SimpleDateFormat
 import java.time.ZoneId
 import java.util.*
@@ -64,11 +60,10 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Notifications(nav: NavigationActions, currentUserID: String) {
+  val userViewModel = UserViewModel()
+  val eventViewModel = EventViewModel(null)
   val pagerState = rememberPagerState(pageCount = { 2 })
   val screenHeight = LocalConfiguration.current.screenHeightDp.dp
-
-  val userViewModel = UserViewModel(UserRepository(Firebase.firestore))
-  val eventViewModel = EventViewModel(null, EventRepository(Firebase.firestore))
 
   var isLoaded by remember { mutableStateOf(false) }
   val coroutineScope = rememberCoroutineScope()

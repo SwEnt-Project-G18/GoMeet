@@ -67,7 +67,6 @@ import com.github.se.gomeet.R
 import com.github.se.gomeet.model.TagsSelector
 import com.github.se.gomeet.model.event.location.Location
 import com.github.se.gomeet.model.repository.EventRepository
-import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.ui.mainscreens.DateTimePicker
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
@@ -75,8 +74,6 @@ import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import java.io.InputStream
 import java.time.LocalDate
 import java.time.LocalTime
@@ -96,9 +93,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
   val screenHeight = LocalConfiguration.current.screenHeightDp.dp
   val screenWidth = LocalConfiguration.current.screenWidthDp.dp
 
-  val eventRepository = EventRepository(Firebase.firestore)
-  val userRepository = UserRepository(Firebase.firestore)
-  val uid = eventRepository.getNewId()
+  val uid = EventRepository.getNewId()
   val titleState = remember { mutableStateOf("") }
   val descriptionState = remember { mutableStateOf("") }
   val locationState = remember { mutableStateOf("") }
@@ -210,6 +205,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                   singleLine = true,
                   colors = textFieldColors,
                   modifier = Modifier.fillMaxWidth().padding(start = 15.dp, end = 15.dp))
+
               LocationField(selectedLocation, locationState, eventViewModel)
 
               Spacer(modifier = Modifier.height(screenHeight / 30))
@@ -237,7 +233,8 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                   colors = textFieldColors,
                   modifier = Modifier.fillMaxWidth().padding(start = 15.dp, end = 15.dp))
 
-              Spacer(modifier = Modifier.height(16.dp))
+              Spacer(modifier = Modifier.height(screenHeight / 80))
+
               Row(
                   modifier = Modifier.fillMaxWidth().padding(start = 15.dp, top = 10.dp),
                   verticalAlignment = Alignment.CenterVertically) {
@@ -256,7 +253,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                             Modifier.clickable { showPopup.value = true }.testTag("TagsButton"))
                   }
 
-              Spacer(modifier = Modifier.height(16.dp))
+              Spacer(modifier = Modifier.height(screenHeight / 80))
 
               if (isPrivate) {
                 Row(
@@ -279,7 +276,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                                     Route.ADD_PARTICIPANTS.replace("{eventId}", uid))
                               })
                     }
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(screenHeight / 80))
               }
 
               Row(
@@ -307,7 +304,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                                 .testTag("AddImageButton"))
                   }
 
-              Spacer(modifier = Modifier.height(16.dp))
+              Spacer(modifier = Modifier.height(screenHeight / 80))
 
               var showDialog by remember { mutableStateOf(false) }
               imageUri?.let {
@@ -337,7 +334,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                 }
               }
 
-              Spacer(modifier = Modifier.height(16.dp))
+              Spacer(modifier = Modifier.height(screenHeight / 80))
 
               Button(
                   modifier = Modifier.width((screenWidth / 1.5.dp).dp).height(screenHeight / 17),
@@ -362,7 +359,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                                 listOf(),
                                 listOf(),
                                 imageUri,
-                                UserViewModel(userRepository),
+                                UserViewModel(),
                                 uid)
 
                             nav.goBack()
@@ -385,7 +382,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                             tags.value,
                             listOf(),
                             imageUri,
-                            UserViewModel(userRepository),
+                            UserViewModel(),
                             uid)
 
                         nav.goBack()
@@ -397,7 +394,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                         bitmap ->
                       // Handle the bitmap descriptor and bitmap as needed
                       val byteArray = customPins.bitmapToByteArray(bitmap)
-                      customPins.uploadEventIcon(context, byteArray, uid)
+                      customPins.uploadEventIcon(byteArray, uid)
                     }
                   },
                   shape = RoundedCornerShape(10.dp),

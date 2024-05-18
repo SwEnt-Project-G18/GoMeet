@@ -21,6 +21,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -43,22 +44,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.isPastEvent
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.LoadingText
+import com.github.se.gomeet.ui.mainscreens.events.SelectedStatus.*
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
@@ -87,7 +84,7 @@ fun Events(
   val screenWidth = LocalConfiguration.current.screenWidthDp.dp
   val screenHeight = LocalConfiguration.current.screenHeightDp.dp
   // State management for event filters and list
-  var selectedFilter by remember { mutableStateOf("All") }
+  var selectedFilter by remember { mutableStateOf(ALL) }
   val eventList = remember { mutableListOf<Event>() }
   val coroutineScope = rememberCoroutineScope()
   val query = remember { mutableStateOf("") }
@@ -113,8 +110,8 @@ fun Events(
 
   // Event filtering functionality
 
-  fun onFilterButtonClick(filterType: String) {
-    selectedFilter = if (selectedFilter == filterType) "All" else filterType
+  fun onFilterButtonClick(filterType: SelectedStatus) {
+    selectedFilter = if (selectedFilter == filterType) ALL else filterType
   }
 
   // Scaffold is a structure that supports top bar, content area, and bottom navigation
@@ -162,53 +159,28 @@ fun Events(
                   MaterialTheme.colorScheme.primaryContainer,
                   MaterialTheme.colorScheme.tertiary)
               Spacer(modifier = Modifier.height(5.dp))
-              Row(
+              Row( // Row to display filter buttons
                   verticalAlignment = Alignment.CenterVertically,
                   horizontalArrangement = Arrangement.SpaceEvenly,
                   modifier = Modifier.heightIn(min = 56.dp).fillMaxWidth()) {
                     Button(
                         modifier = Modifier.testTag("JoinedButton"),
-                        onClick = { onFilterButtonClick("Joined") },
-                        content = { Text("Joined Events") },
+                        onClick = { onFilterButtonClick(JOINED) },
+                        content = { Text(JOINED.formattedName) },
                         shape = RoundedCornerShape(10.dp),
-                        colors =
-                            if (selectedFilter == "Joined")
-                                ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.outlineVariant,
-                                    contentColor = Color.White)
-                            else
-                                ButtonDefaults.buttonColors(
-                                    MaterialTheme.colorScheme.primaryContainer,
-                                    MaterialTheme.colorScheme.tertiary))
-
+                        colors = eventsButtonColour(selectedFilter))
                     Button(
                         modifier = Modifier.testTag("FavouritesButton"),
-                        onClick = { onFilterButtonClick("Favourites") },
-                        content = { Text("Favourites") },
+                        onClick = { onFilterButtonClick(FAVOURITES) },
+                        content = { Text(FAVOURITES.formattedName) },
                         shape = RoundedCornerShape(10.dp),
-                        colors =
-                            if (selectedFilter == "Favourites")
-                                ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.outlineVariant,
-                                    contentColor = Color.White)
-                            else
-                                ButtonDefaults.buttonColors(
-                                    MaterialTheme.colorScheme.primaryContainer,
-                                    MaterialTheme.colorScheme.tertiary))
+                        colors = eventsButtonColour(selectedFilter))
                     Button(
                         modifier = Modifier.testTag("MyEventsButton"),
-                        onClick = { onFilterButtonClick("MyEvents") },
-                        content = { Text("My Events") },
+                        onClick = { onFilterButtonClick(MY_EVENTS) },
+                        content = { Text(MY_EVENTS.formattedName) },
                         shape = RoundedCornerShape(10.dp),
-                        colors =
-                            if (selectedFilter == "MyEvents")
-                                ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.outlineVariant,
-                                    contentColor = Color.White)
-                            else
-                                ButtonDefaults.buttonColors(
-                                    MaterialTheme.colorScheme.primaryContainer,
-                                    MaterialTheme.colorScheme.tertiary))
+                        colors = eventsButtonColour(selectedFilter))
                   }
 
               if (!eventsLoaded.value) {
@@ -219,11 +191,12 @@ fun Events(
                 Column(
                     modifier = Modifier.verticalScroll(rememberScrollState()).fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally) {
+
                       // Display joined events if 'All' or 'Joined' is selected
-                      if (selectedFilter == "All" || selectedFilter == "Joined") {
+                      if (selectedFilter == ALL || selectedFilter == JOINED) {
                         Spacer(modifier = Modifier.height(screenHeight / 40))
                         Text(
-                            text = "Joined Events",
+                            text = JOINED.formattedName,
                             style = MaterialTheme.typography.titleLarge,
                             modifier =
                                 Modifier.padding(horizontal = screenWidth / 15)
@@ -233,43 +206,19 @@ fun Events(
                         eventList
                             .filter { e -> user.value!!.joinedEvents.contains(e.eventID) }
                             .forEach { event ->
-                              if (event.title.contains(query.value, ignoreCase = true)) {
-                                val painter: Painter =
-                                    if (event.images.isNotEmpty()) {
-                                      rememberAsyncImagePainter(
-                                          ImageRequest.Builder(LocalContext.current)
-                                              .data(data = event.images[0])
-                                              .apply(
-                                                  block =
-                                                      fun ImageRequest.Builder.() {
-                                                        crossfade(true)
-                                                        placeholder(R.drawable.gomeet_logo)
-                                                      })
-                                              .build())
-                                    } else {
-                                      painterResource(id = R.drawable.gomeet_logo)
-                                    }
-                                // Reusable widget for displaying event details
-                                EventWidget(
-                                    userName = event.creator,
-                                    eventName = event.title,
-                                    eventId = event.eventID,
-                                    eventDescription = event.description,
-                                    eventDate = event.date,
-                                    eventTime = event.time,
-                                    eventPicture = painter,
-                                    eventLocation = event.location,
-                                    verified = false,
-                                    nav = nav) // verification to be done using user details
-                              }
+                              ShowWidgets(
+                                  event = event,
+                                  query = query.value,
+                                  nav = nav,
+                                  userVM = userViewModel)
                             }
                       }
 
                       // Display favourite events if 'All' or 'Favourites' is selected
-                      if (selectedFilter == "All" || selectedFilter == "Favourites") {
+                      if (selectedFilter == ALL || selectedFilter == FAVOURITES) {
                         Spacer(modifier = Modifier.height(screenHeight / 40))
                         Text(
-                            text = "Favourites",
+                            text = FAVOURITES.formattedName,
                             style = MaterialTheme.typography.titleLarge,
                             modifier =
                                 Modifier.padding(horizontal = screenWidth / 15)
@@ -279,42 +228,19 @@ fun Events(
                         eventList
                             .filter { e -> user.value!!.myFavorites.contains(e.eventID) }
                             .forEach { event ->
-                              if (event.title.contains(query.value, ignoreCase = true)) {
-                                val painter: Painter =
-                                    if (event.images.isNotEmpty()) {
-                                      rememberAsyncImagePainter(
-                                          ImageRequest.Builder(LocalContext.current)
-                                              .data(data = event.images[0])
-                                              .apply(
-                                                  block =
-                                                      fun ImageRequest.Builder.() {
-                                                        crossfade(true)
-                                                        placeholder(R.drawable.gomeet_logo)
-                                                      })
-                                              .build())
-                                    } else {
-                                      painterResource(id = R.drawable.gomeet_logo)
-                                    }
-                                EventWidget(
-                                    userName = event.creator,
-                                    eventId = event.eventID,
-                                    eventName = event.title,
-                                    eventDescription = event.description,
-                                    eventDate = event.date,
-                                    eventTime = event.time,
-                                    eventPicture = painter,
-                                    eventLocation = event.location,
-                                    verified = false,
-                                    nav = nav)
-                              }
+                              ShowWidgets(
+                                  event = event,
+                                  query = query.value,
+                                  nav = nav,
+                                  userVM = userViewModel)
                             }
                       }
 
                       // Display user's own events if 'All' or 'MyEvents' is selected
-                      if (selectedFilter == "All" || selectedFilter == "MyEvents") {
+                      if (selectedFilter == ALL || selectedFilter == MY_EVENTS) {
                         Spacer(modifier = Modifier.height(screenHeight / 40))
                         Text(
-                            text = "My Events",
+                            text = MY_EVENTS.formattedName,
                             style = MaterialTheme.typography.titleLarge,
                             modifier =
                                 Modifier.padding(horizontal = screenWidth / 15)
@@ -324,34 +250,11 @@ fun Events(
                         eventList
                             .filter { e -> e.creator == user.value!!.uid }
                             .forEach { event ->
-                              if (event.title.contains(query.value, ignoreCase = true)) {
-                                val painter: Painter =
-                                    if (event.images.isNotEmpty()) {
-                                      rememberAsyncImagePainter(
-                                          ImageRequest.Builder(LocalContext.current)
-                                              .data(data = event.images[0])
-                                              .apply(
-                                                  block =
-                                                      fun ImageRequest.Builder.() {
-                                                        crossfade(true)
-                                                        placeholder(R.drawable.gomeet_logo)
-                                                      })
-                                              .build())
-                                    } else {
-                                      painterResource(id = R.drawable.gomeet_logo)
-                                    }
-                                EventWidget(
-                                    userName = event.creator,
-                                    eventId = event.eventID,
-                                    eventName = event.title,
-                                    eventDescription = event.description,
-                                    eventDate = event.date,
-                                    eventTime = event.time,
-                                    eventPicture = painter,
-                                    eventLocation = event.location,
-                                    verified = false,
-                                    nav = nav)
-                              }
+                              ShowWidgets(
+                                  event = event,
+                                  query = query.value,
+                                  nav = nav,
+                                  userVM = userViewModel)
                             }
                       }
                     }
@@ -415,5 +318,65 @@ fun GoMeetSearchBar(
             ),
         onActiveChange = {},
         onSearch = {}) {}
+  }
+}
+
+/**
+ * Helper composable function to display the event widgets.
+ *
+ * @param event Event object to display
+ * @param query String object to store the search query
+ * @param nav NavigationActions object to handle navigation
+ * @param userVM UserViewModel object to handle users
+ */
+@Composable
+private fun ShowWidgets(
+    event: Event,
+    query: String,
+    nav: NavigationActions,
+    userVM: UserViewModel
+) {
+  if (event.title.contains(query, ignoreCase = true)) {
+    EventWidget(
+        event = event,
+        verified = false,
+        nav = nav,
+        userVM = userVM) // TODO: verification to be done using user details
+  }
+}
+
+/**
+ * Helper function to get the button colour based on the selected filter.
+ *
+ * @param selectedFilter SelectedStatus object to store the selected filter
+ * @return ButtonColors object representing the button colours
+ */
+@Composable
+private fun eventsButtonColour(selectedFilter: SelectedStatus): ButtonColors {
+  val selectedButtonColour =
+      ButtonDefaults.buttonColors(
+          containerColor = MaterialTheme.colorScheme.outlineVariant, contentColor = Color.White)
+
+  val unselectedButtonColour =
+      ButtonDefaults.buttonColors(
+          containerColor = MaterialTheme.colorScheme.primaryContainer,
+          contentColor = MaterialTheme.colorScheme.tertiary)
+
+  return if (selectedFilter == JOINED) selectedButtonColour else unselectedButtonColour
+}
+
+/**
+ * Enum class to represent the selected status of the events.
+ *
+ * @param formattedName String object representing the formatted name of the status
+ */
+private enum class SelectedStatus(val formattedName: String) {
+  JOINED("Joined Events"),
+  FAVOURITES("Favourites"),
+  MY_EVENTS("My Events"),
+  ALL("All");
+
+  override fun toString(): String {
+    return formattedName
   }
 }

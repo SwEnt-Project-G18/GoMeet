@@ -14,8 +14,6 @@ import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.MainActivity
 import com.github.se.gomeet.model.event.location.Location
-import com.github.se.gomeet.model.repository.EventRepository
-import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.screens.EventInfoScreen
 import com.github.se.gomeet.screens.FollowScreen
 import com.github.se.gomeet.screens.LoginScreenScreen
@@ -26,7 +24,6 @@ import com.github.se.gomeet.screens.WelcomeScreenScreen
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen
@@ -52,15 +49,15 @@ class EndToEndTest2 : TestCase() {
   companion object {
     private const val email1 = "user1@test2.com"
     private const val pwd1 = "123456"
-    private var uid1 = ""
+    private var uid1 = "uid1"
     private const val username1 = "test_user1"
 
     private const val email2 = "user2@test2.com"
     private const val pwd2 = "654321"
-    private var uid2 = ""
+    private var uid2 = "uid2"
     private const val username2 = "test_user2"
 
-    private val userVM = UserViewModel(UserRepository(Firebase.firestore))
+    private val userVM = UserViewModel()
     private lateinit var eventVM: EventViewModel
 
     @JvmStatic
@@ -110,7 +107,7 @@ class EndToEndTest2 : TestCase() {
           TimeUnit.SECONDS.sleep(1)
         }
 
-        eventVM = EventViewModel(uid1, EventRepository(Firebase.firestore))
+        eventVM = EventViewModel(uid1)
         eventVM.createEvent(
             "title",
             "description",
@@ -138,8 +135,38 @@ class EndToEndTest2 : TestCase() {
           TimeUnit.SECONDS.sleep(1)
         }
 
+        // user2 is used to create the second event
+        result = Firebase.auth.signInWithEmailAndPassword(email2, pwd2)
+        while (!result.isComplete) {
+          TimeUnit.SECONDS.sleep(1)
+        }
+
+        eventVM = EventViewModel(Firebase.auth.currentUser!!.uid)
+        eventVM.createEvent(
+            "title",
+            "description",
+            Location(0.0, 0.0, "location"),
+            LocalDate.of(2025, 3, 30),
+            LocalTime.now(),
+            0.0,
+            "url",
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            0,
+            true,
+            emptyList(),
+            emptyList(),
+            null,
+            userVM,
+            "eventuid2")
+        TimeUnit.SECONDS.sleep(3)
+
+        Firebase.auth.signOut()
+        TimeUnit.SECONDS.sleep(3)
+
         // user2 is used to log in and perform the tests
-        eventVM = EventViewModel(uid2, EventRepository(Firebase.firestore))
+        eventVM = EventViewModel(uid2)
       }
     }
 
@@ -203,7 +230,7 @@ class EndToEndTest2 : TestCase() {
         composeTestRule.waitUntil(timeoutMillis = 10000) {
           composeTestRule.onNodeWithTag("EventHeader").isDisplayed()
         }
-        eventHeader { composeTestRule.onNodeWithTag("Username").performClick() }
+        eventHeader { composeTestRule.onNodeWithTag("Username").assertIsDisplayed().performClick() }
       }
     }
 

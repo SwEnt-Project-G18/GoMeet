@@ -10,11 +10,8 @@ import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.github.se.gomeet.model.repository.EventRepository
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.runBlocking
 import org.junit.AfterClass
 import org.junit.Rule
@@ -27,7 +24,7 @@ class CreateEventTest {
 
   companion object {
     private val uid = "CreateEventTestUser"
-    private val eventVM = EventViewModel(uid, EventRepository(Firebase.firestore))
+    private val eventVM = EventViewModel(uid)
 
     @AfterClass
     @JvmStatic
@@ -40,8 +37,8 @@ class CreateEventTest {
   }
 
   @Test
-  fun testCreatePrivateEvent() {
-    val eventVM = EventViewModel(uid, EventRepository(Firebase.firestore))
+  fun testCratePrivateEvent() {
+    val eventVM = EventViewModel(uid)
 
     composeTestRule.setContent {
       CreateEvent(NavigationActions(rememberNavController()), eventVM, isPrivate = true)

@@ -90,7 +90,7 @@ fun Create(nav: NavigationActions) {
                         color = Color.White)
                   }
 
-              Spacer(modifier = Modifier.size(10.dp))
+              Spacer(modifier = Modifier.size(screenHeight / 50))
               OutlinedButton(
                   onClick = {
                     nav.navigateTo(CREATE_ITEMS.first { it.route == Route.PRIVATE_CREATE })

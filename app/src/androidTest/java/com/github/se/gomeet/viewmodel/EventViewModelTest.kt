@@ -2,10 +2,6 @@ package com.github.se.gomeet.viewmodel
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.model.event.location.Location
-import com.github.se.gomeet.model.repository.EventRepository
-import com.github.se.gomeet.model.repository.UserRepository
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import java.time.LocalDate
 import java.time.LocalTime
 import java.util.concurrent.TimeUnit
@@ -33,11 +29,11 @@ class EventViewModelTest {
     private val tags = emptyList<String>()
     private val images = emptyList<String>()
     private val imageUrl = null
-    private val userVM = UserViewModel(UserRepository(Firebase.firestore))
+    private val userVM = UserViewModel()
     private const val eventId = "EventViewModelTestEvent"
 
     private const val uid = "EventViewModelTestUser"
-    private val eventVM = EventViewModel(uid, EventRepository(Firebase.firestore))
+    private val eventVM = EventViewModel(uid)
 
     @BeforeClass
     @JvmStatic

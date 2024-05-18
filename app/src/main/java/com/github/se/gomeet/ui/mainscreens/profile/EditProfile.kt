@@ -27,7 +27,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -60,30 +59,24 @@ import androidx.compose.ui.window.Popup
 import coil.compose.rememberAsyncImagePainter
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.TagsSelector
-import com.github.se.gomeet.model.repository.UserRepository
+import com.github.se.gomeet.model.authentication.getCountries
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.authscreens.register.CountrySuggestionTextField
-import com.github.se.gomeet.ui.authscreens.register.getCountries
 import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.viewmodel.UserViewModel
-import com.google.firebase.auth.auth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.io.InputStream
 import kotlinx.coroutines.tasks.await
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun EditProfile(
-    nav: NavigationActions,
-    userViewModel: UserViewModel = UserViewModel(UserRepository(Firebase.firestore))
-) {
+fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel = UserViewModel()) {
 
   val countries = getCountries()
   val currentUser = remember { mutableStateOf<GoMeetUser?>(null) }

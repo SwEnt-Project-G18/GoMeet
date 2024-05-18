@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.user.GoMeetUser
+import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.mainscreens.events.GoMeetSearchBar
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
@@ -36,11 +37,16 @@ import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
+/**
+ * Composable for the add friend screen.
+ *
+ * @param nav The navigation actions.
+ * @param userViewModel The user view model.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddFriend(nav: NavigationActions, userViewModel: UserViewModel) {
 
-  val screenWidth = LocalConfiguration.current.screenWidthDp.dp
   val screenHeight = LocalConfiguration.current.screenHeightDp.dp
   val query = remember { mutableStateOf("") }
   var isLoading by remember { mutableStateOf(true) }
@@ -112,7 +118,7 @@ fun AddFriend(nav: NavigationActions, userViewModel: UserViewModel) {
       }) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
           if (isLoading) {
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            LoadingText()
           } else {
             Column {
               GoMeetSearchBar(
@@ -120,7 +126,7 @@ fun AddFriend(nav: NavigationActions, userViewModel: UserViewModel) {
                   query,
                   MaterialTheme.colorScheme.primaryContainer,
                   MaterialTheme.colorScheme.tertiary)
-              Spacer(modifier = Modifier.height(5.dp))
+              Spacer(modifier = Modifier.height(screenHeight / 40))
               LazyColumn(
                   contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                   verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -149,6 +155,13 @@ fun AddFriend(nav: NavigationActions, userViewModel: UserViewModel) {
       }
 }
 
+/**
+ * Composable to display a user's profile picture.
+ *
+ * @param userId The user's ID.
+ * @param modifier The modifier for the image.
+ * @param defaultImageResId The default image resource ID.
+ */
 @Composable
 fun ProfileImageUser(
     userId: String,
@@ -180,6 +193,14 @@ fun ProfileImageUser(
       contentScale = ContentScale.Crop)
 }
 
+/**
+ * Composable to display a user.
+ *
+ * @param user The user to display.
+ * @param followedUsers The set of followed users.
+ * @param nav The navigation actions.
+ * @param onFollowButtonClick The callback to handle follow button clicks
+ */
 @Composable
 fun UserItem(
     user: GoMeetUser,
@@ -188,6 +209,7 @@ fun UserItem(
     onFollowButtonClick: (String, Boolean) -> Unit
 ) {
   val isFollowing = followedUsers.contains(user.uid)
+  val screenWidth = LocalConfiguration.current.screenWidthDp.dp
 
   Row(
       modifier =
@@ -199,7 +221,7 @@ fun UserItem(
       horizontalArrangement = Arrangement.SpaceBetween) {
         Row(verticalAlignment = Alignment.CenterVertically) {
           ProfileImageUser(userId = user.uid)
-          Spacer(modifier = Modifier.width(16.dp))
+          Spacer(modifier = Modifier.width(screenWidth / 20))
           Column {
             Text(
                 text = "${user.firstName} ${user.lastName}",

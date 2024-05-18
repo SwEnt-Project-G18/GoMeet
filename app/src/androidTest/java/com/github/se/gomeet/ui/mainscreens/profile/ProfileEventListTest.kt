@@ -12,13 +12,10 @@ import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.location.Location
-import com.github.se.gomeet.model.repository.EventRepository
-import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.time.LocalDate
 import java.time.LocalTime
@@ -43,7 +40,7 @@ class ProfileEventListTest {
     private const val eventId = "ProfileEventListEvent"
     private lateinit var event: Event
 
-    private val userVM = UserViewModel(UserRepository(Firebase.firestore))
+    private val userVM = UserViewModel()
     private lateinit var eventVM: EventViewModel
 
     @JvmStatic
@@ -71,7 +68,7 @@ class ProfileEventListTest {
         }
 
         // Create an Event
-        eventVM = EventViewModel(uid, EventRepository(Firebase.firestore))
+        eventVM = EventViewModel(uid)
         eventVM.createEvent(
             "title",
             "description",
