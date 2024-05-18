@@ -284,7 +284,7 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
                       }
                       SearchModule(
                           nav = nav,
-                          backgroundColor = MaterialTheme.colorScheme.background,
+                          backgroundColor = MaterialTheme.colorScheme.primaryContainer,
                           contentColor = MaterialTheme.colorScheme.tertiary)
                       // GoMeetSearchBar(
                       //    nav,

@@ -18,13 +18,15 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SearchBar
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -86,12 +88,19 @@ fun SearchModule(nav: NavigationActions, backgroundColor: Color, contentColor: C
                 onSearch = {
                   keyboardController?.hide()
                   coroutineScope.launch { viewModel.performSearch(searchText) }
-                }))
+                }),
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = backgroundColor,
+            unfocusedContainerColor = backgroundColor,
+            disabledContainerColor = backgroundColor,
+
+        )
+    )
 
     Spacer(modifier = Modifier.height(16.dp))
     if (isSearching) {
       Box(modifier = Modifier.fillMaxSize()) {
-        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center), color = contentColor)
       }
     } else if (persons.isNotEmpty() && searchText.isNotEmpty()) {
       LazyColumn(modifier = Modifier.fillMaxWidth().weight(1f)) {
@@ -130,7 +139,7 @@ fun SearchModuleSnippet(
       Row(
           verticalAlignment = Alignment.CenterVertically,
           modifier =
-              Modifier.padding(vertical = 10.dp)
+              Modifier.padding(vertical = 8.dp)
                   .clickable {
                     nav.navigateToScreen(Route.OTHERS_PROFILE.replace("{uid}", item.user.uid))
                   }
@@ -138,13 +147,13 @@ fun SearchModuleSnippet(
             Image(
                 painter = painter,
                 contentDescription = "User Icon",
-                modifier = Modifier.size(24.dp).padding(8.dp))
+                modifier = Modifier.size(24.dp).padding(4.dp))
             Spacer(modifier = Modifier.width(16.dp))
             Column {
               Text(
                   text = "${item.user.firstName} ${item.user.lastName}",
                   modifier = Modifier.fillMaxWidth().padding(8.dp),
-                  color = Color.Black)
+                  color = MaterialTheme.colorScheme.onBackground)
               Text("@${item.user.username}", color = Color.Gray)
             }
           }
@@ -168,7 +177,7 @@ fun SearchModuleSnippet(
       Row(
           verticalAlignment = Alignment.CenterVertically,
           modifier =
-              Modifier.padding(vertical = 10.dp)
+              Modifier.padding(vertical = 8.dp)
                   .background(color = backgroundColor, shape = RoundedCornerShape(10.dp))
                   .clickable {
                     nav.navigateToEventInfo(
@@ -190,12 +199,13 @@ fun SearchModuleSnippet(
               Text(
                   text = "${item.event.title}",
                   modifier = Modifier.fillMaxWidth().padding(8.dp),
-                  color = Color.Black)
+                  color = MaterialTheme.colorScheme.onBackground)
               Text(
                   text =
                       "${item.event.date.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))} - ${item.event.time.format(DateTimeFormatter.ofPattern("HH:mm"))}",
                   modifier = Modifier.fillMaxWidth())
-              Text("${item.event.description}", color = Color.Gray)
+                val croppedDescription = if (item.event.description.length > 150) item.event.description.take(150) + "..." else item.event.description
+                Text(croppedDescription, color = Color.Gray)
             }
           }
     }
