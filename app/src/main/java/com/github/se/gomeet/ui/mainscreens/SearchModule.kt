@@ -15,18 +15,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.TabRowDefaults.Divider
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SearchBarDefaults
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -54,6 +52,7 @@ import com.github.se.gomeet.R
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.viewmodel.SearchViewModel
+import com.google.android.gms.maps.model.LatLng
 import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.launch
 
@@ -67,28 +66,24 @@ fun SearchModule(nav: NavigationActions, backgroundColor: Color, contentColor: C
   val focusRequester = remember { FocusRequester() }
   val keyboardController = LocalSoftwareKeyboardController.current
 
-  Column(modifier = Modifier
-      .padding(16.dp)) {
+  Column(modifier = Modifier.padding(16.dp)) {
     TextField(
         value = searchText,
         leadingIcon = {
-            IconButton(onClick = { nav.navigateToScreen(Route.MESSAGE_CHANNELS) }) {
-                Icon(
-                    ImageVector.vectorResource(R.drawable.gomeet_icon),
-                    contentDescription = null,
-                    tint = contentColor)
-            }
+          IconButton(onClick = { nav.navigateToScreen(Route.MESSAGE_CHANNELS) }) {
+            Icon(
+                ImageVector.vectorResource(R.drawable.gomeet_icon),
+                contentDescription = null,
+                tint = contentColor)
+          }
         },
         onValueChange = viewModel::onSearchTextChange,
-        modifier = Modifier
-            .fillMaxWidth()
-            .focusRequester(focusRequester),
+        modifier = Modifier.fillMaxWidth().focusRequester(focusRequester),
         placeholder = { Text(text = "Search") },
         keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
         keyboardActions =
             KeyboardActions(
                 onSearch = {
-                  println("Search for $searchText triggered")
                   keyboardController?.hide()
                   coroutineScope.launch { viewModel.performSearch(searchText) }
                 }))
@@ -98,16 +93,11 @@ fun SearchModule(nav: NavigationActions, backgroundColor: Color, contentColor: C
       Box(modifier = Modifier.fillMaxSize()) {
         CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
       }
-    } else if (persons.isNotEmpty()) {
-      LazyColumn(modifier = Modifier
-          .fillMaxWidth()
-          .weight(1f)) {
+    } else if (persons.isNotEmpty() && searchText.isNotEmpty()) {
+      LazyColumn(modifier = Modifier.fillMaxWidth().weight(1f)) {
         items(persons) { item ->
           SearchModuleSnippet(item, nav = nav, backgroundColor = backgroundColor)
-          Divider(
-              color = Color.LightGray,
-              thickness = 1.dp,
-              modifier = Modifier.padding(vertical = 8.dp))
+          Spacer(modifier = Modifier.height(8.dp))
         }
       }
     }
@@ -115,7 +105,11 @@ fun SearchModule(nav: NavigationActions, backgroundColor: Color, contentColor: C
 }
 
 @Composable
-fun SearchModuleSnippet(item: SearchViewModel.SearchableItem, nav: NavigationActions, backgroundColor: Color) {
+fun SearchModuleSnippet(
+    item: SearchViewModel.SearchableItem,
+    nav: NavigationActions,
+    backgroundColor: Color
+) {
   when (item) {
     is SearchViewModel.SearchableItem.User -> {
       val painter: Painter =
@@ -136,20 +130,21 @@ fun SearchModuleSnippet(item: SearchViewModel.SearchableItem, nav: NavigationAct
       Row(
           verticalAlignment = Alignment.CenterVertically,
           modifier =
-          Modifier
-              .padding(vertical = 10.dp)
-              .clickable {
-                  nav.navigateToScreen(Route.OTHERS_PROFILE.replace("{uid}", item.user.uid))
-              }.background(backgroundColor)) {
+              Modifier.padding(vertical = 10.dp)
+                  .clickable {
+                    nav.navigateToScreen(Route.OTHERS_PROFILE.replace("{uid}", item.user.uid))
+                  }
+                  .background(color = backgroundColor, shape = RoundedCornerShape(10.dp))) {
             Image(
                 painter = painter,
                 contentDescription = "User Icon",
-                modifier = Modifier.size(24.dp))
+                modifier = Modifier.size(24.dp).padding(8.dp))
             Spacer(modifier = Modifier.width(16.dp))
             Column {
               Text(
                   text = "${item.user.firstName} ${item.user.lastName}",
-                  modifier = Modifier.fillMaxWidth())
+                  modifier = Modifier.fillMaxWidth().padding(8.dp),
+                  color = Color.Black)
               Text("@${item.user.username}", color = Color.Gray)
             }
           }
@@ -172,14 +167,30 @@ fun SearchModuleSnippet(item: SearchViewModel.SearchableItem, nav: NavigationAct
           }
       Row(
           verticalAlignment = Alignment.CenterVertically,
-          modifier = Modifier.padding(vertical = 10.dp).background(backgroundColor)) {
+          modifier =
+              Modifier.padding(vertical = 10.dp)
+                  .background(color = backgroundColor, shape = RoundedCornerShape(10.dp))
+                  .clickable {
+                    nav.navigateToEventInfo(
+                        eventId = item.event.eventID,
+                        title = item.event.title,
+                        date = item.event.date.toString(),
+                        time = item.event.time.toString(),
+                        description = item.event.description,
+                        organizer = item.event.creator,
+                        loc = LatLng(item.event.location.latitude, item.event.location.longitude),
+                        rating = 0.0)
+                  }) {
             Image(
                 painter = painter,
                 contentDescription = "Event Icon",
-                modifier = Modifier.size(64.dp))
+                modifier = Modifier.size(64.dp).padding(8.dp))
             Spacer(modifier = Modifier.width(16.dp))
             Column {
-              Text(text = "${item.event.title}", modifier = Modifier.fillMaxWidth())
+              Text(
+                  text = "${item.event.title}",
+                  modifier = Modifier.fillMaxWidth().padding(8.dp),
+                  color = Color.Black)
               Text(
                   text =
                       "${item.event.date.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))} - ${item.event.time.format(DateTimeFormatter.ofPattern("HH:mm"))}",
@@ -195,5 +206,8 @@ fun SearchModuleSnippet(item: SearchViewModel.SearchableItem, nav: NavigationAct
 @Preview
 @Composable
 fun PreviewSearchModule() {
-  SearchModule(nav = NavigationActions(rememberNavController()), backgroundColor = MaterialTheme.colorScheme.background, contentColor = MaterialTheme.colorScheme.tertiary)
+  SearchModule(
+      nav = NavigationActions(rememberNavController()),
+      backgroundColor = MaterialTheme.colorScheme.background,
+      contentColor = MaterialTheme.colorScheme.tertiary)
 }
