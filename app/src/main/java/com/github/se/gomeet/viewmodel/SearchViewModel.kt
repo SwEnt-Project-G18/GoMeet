@@ -48,11 +48,11 @@ class SearchViewModel() : ViewModel() {
             filteredEvents.map { SearchableItem.Event(it) }
   }
 
-  private fun getAllUsers() {
+  fun getAllUsers() {
     // viewModelScope.launch { userRepository.getAllUsers { users -> allUsersList = users }}
-    userRepository.getAllUsers { users ->
+    userRepository.getAllUsers { users: List<GoMeetUser> ->
       allUsersList = users
-      // updateSearchQuery() 
+      // updateSearchQuery()
     }
   }
 
