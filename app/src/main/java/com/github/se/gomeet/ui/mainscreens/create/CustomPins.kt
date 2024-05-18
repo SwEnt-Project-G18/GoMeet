@@ -71,11 +71,10 @@ class CustomPins {
   /**
    * Upload the event icon to Firebase Storage.
    *
-   * @param context The context of the activity.
    * @param byteArray The byte array of the icon.
    * @param eventID The ID of the event.
    */
-  fun uploadEventIcon(context: Context, byteArray: ByteArray, eventID: String) {
+  fun uploadEventIcon(byteArray: ByteArray, eventID: String) {
     val storageRef = FirebaseStorage.getInstance().reference
     val iconRef = storageRef.child("event_icons/$eventID.png")
 

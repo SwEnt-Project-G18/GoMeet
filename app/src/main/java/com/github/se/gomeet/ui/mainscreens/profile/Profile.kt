@@ -48,7 +48,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
@@ -333,4 +335,14 @@ fun ProfileImage(
               .clip(CircleShape)
               .background(color = MaterialTheme.colorScheme.background),
       contentScale = ContentScale.Crop)
+}
+
+@Preview
+@Composable
+fun ProfilePreview() {
+  Profile(
+      nav = NavigationActions(rememberNavController()),
+      "John",
+      UserViewModel(),
+      EventViewModel("John"))
 }

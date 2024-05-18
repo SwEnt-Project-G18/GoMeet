@@ -25,6 +25,7 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -34,48 +35,28 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.github.se.gomeet.R
+import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.getEventDateString
 import com.github.se.gomeet.model.event.getEventTimeString
-import com.github.se.gomeet.model.event.location.Location
-import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.android.gms.maps.model.LatLng
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
-import java.time.LocalDate
-import java.time.LocalTime
 
 /**
  * A composable function that displays detailed information about an event in a card layout. This
  * widget is designed to present event details including the name, description, date, and an image
  * if available. The card is interactive and can be tapped to navigate to further event details.
  *
- * @param userName The name of the event creator.
- * @param eventId The unique identifier for the event.
- * @param eventName The name of the event.
- * @param eventDescription A short description of the event.
- * @param eventDate The day on which the event is scheduled.
- * @param eventTime The time at which the event is scheduled.
- * @param eventPicture A painter object that handles the rendering of the event's image.
- * @param verified A boolean indicating whether the event or the creator is verified. This could
- *   influence the visual representation.
- * @param nav NavigationActions object to handle navigation events such as tapping on the event
+ * @param event The event to display.
+ * @param verified True if the event organiser is verified, false otherwise.
+ * @param nav The navigation actions.
+ * @param userVM The user view model.
  */
 @Composable
-fun EventWidget(
-    userName: String,
-    eventId: String,
-    eventName: String,
-    eventDescription: String,
-    eventDate: LocalDate,
-    eventTime: LocalTime,
-    eventPicture: Painter,
-    eventLocation: Location,
-    verified: Boolean,
-    nav: NavigationActions,
-) {
+fun EventWidget(event: Event, verified: Boolean, nav: NavigationActions, userVM: UserViewModel) {
 
   val configuration = LocalConfiguration.current
   val screenWidth = configuration.screenWidthDp.dp
@@ -84,8 +65,22 @@ fun EventWidget(
   val smallTextSize = with(density) { screenWidth.toPx() / 85 }
   val bigTextSize = with(density) { screenWidth.toPx() / 60 }
 
-  val dayString = getEventDateString(eventDate)
-  val timeString = getEventTimeString(eventTime)
+  val dayString = getEventDateString(event.date)
+  val timeString = getEventTimeString(event.time)
+
+  val painter: Painter =
+      if (event.images.isNotEmpty()) {
+        rememberAsyncImagePainter(
+            ImageRequest.Builder(LocalContext.current)
+                .data(data = event.images[0])
+                .apply {
+                  crossfade(true)
+                  placeholder(R.drawable.gomeet_logo)
+                }
+                .build())
+      } else {
+        painterResource(id = R.drawable.gomeet_logo)
+      }
 
   Card(
       modifier =
@@ -94,15 +89,14 @@ fun EventWidget(
               .padding(start = 10.dp, top = 5.dp, end = 10.dp, bottom = 5.dp)
               .clickable {
                 nav.navigateToEventInfo(
-                    eventId = eventId,
-                    title = eventName,
+                    eventId = event.eventID,
+                    title = event.title,
                     date = dayString,
                     time = timeString,
-                    description = eventDescription,
-                    organizer = userName,
-                    loc = LatLng(eventLocation.latitude, eventLocation.longitude),
+                    description = event.description,
+                    organizer = event.creator,
+                    loc = LatLng(event.location.latitude, event.location.longitude),
                     rating = 0.0 // TODO: replace with actual rating
-                    // TODO: add image
                     )
               },
       colors =
@@ -117,7 +111,7 @@ fun EventWidget(
               horizontalAlignment = Alignment.Start, // Align text horizontally to center
               verticalArrangement = Arrangement.Center) {
                 Text(
-                    text = eventName,
+                    text = event.title,
                     style =
                         TextStyle(
                             fontSize = bigTextSize.sp,
@@ -133,10 +127,7 @@ fun EventWidget(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center) {
                       var username by remember { mutableStateOf<String?>("Loading...") }
-                      LaunchedEffect(userName) {
-                        username =
-                            UserViewModel(UserRepository(Firebase.firestore)).getUsername(userName)
-                      }
+                      LaunchedEffect(event.creator) { username = userVM.getUsername(event.creator) }
 
                       username?.let {
                         Text(
@@ -165,7 +156,7 @@ fun EventWidget(
                     }
 
                 Text(
-                    dayString + " - " + timeString,
+                    "$dayString - $timeString",
                     style =
                         TextStyle(
                             fontSize = smallTextSize.sp,
@@ -178,7 +169,7 @@ fun EventWidget(
                     modifier = Modifier.testTag("EventDate"))
               }
           Image(
-              painter = eventPicture,
+              painter = painter,
               contentDescription = "Event Picture",
               modifier =
                   Modifier.weight(3f)

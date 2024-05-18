@@ -10,13 +10,10 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.github.se.gomeet.model.repository.EventRepository
-import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
@@ -31,7 +28,7 @@ class ProfileTest {
   @get:Rule val composeTestRule = createComposeRule()
 
   companion object {
-    private val userVM = UserViewModel(UserRepository(Firebase.firestore))
+    private val userVM = UserViewModel()
     private lateinit var uid: String
 
     private val usr = "profile@test.com"
@@ -73,8 +70,8 @@ class ProfileTest {
       Profile(
           NavigationActions(rememberNavController()),
           userId = uid,
-          UserViewModel(UserRepository(Firebase.firestore)),
-          EventViewModel(uid, EventRepository(Firebase.firestore)))
+          UserViewModel(),
+          EventViewModel(uid))
     }
 
     // Wait for the page to load
