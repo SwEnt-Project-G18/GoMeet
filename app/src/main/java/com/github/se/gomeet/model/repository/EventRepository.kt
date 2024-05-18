@@ -15,7 +15,7 @@ import java.time.LocalTime
  *
  * @param db The database firebase instance
  */
-class EventRepository(val db: FirebaseFirestore) {
+class EventRepository(private val db: FirebaseFirestore) {
 
   private val localEventsList: MutableList<Event> = mutableListOf()
 
