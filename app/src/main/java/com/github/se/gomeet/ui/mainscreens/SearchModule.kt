@@ -19,13 +19,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SearchBar
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -89,13 +88,12 @@ fun SearchModule(nav: NavigationActions, backgroundColor: Color, contentColor: C
                   keyboardController?.hide()
                   coroutineScope.launch { viewModel.performSearch(searchText) }
                 }),
-        colors = TextFieldDefaults.colors(
-            focusedContainerColor = backgroundColor,
-            unfocusedContainerColor = backgroundColor,
-            disabledContainerColor = backgroundColor,
-
-        )
-    )
+        colors =
+            TextFieldDefaults.colors(
+                focusedContainerColor = backgroundColor,
+                unfocusedContainerColor = backgroundColor,
+                disabledContainerColor = backgroundColor,
+            ))
 
     Spacer(modifier = Modifier.height(16.dp))
     if (isSearching) {
@@ -204,8 +202,10 @@ fun SearchModuleSnippet(
                   text =
                       "${item.event.date.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))} - ${item.event.time.format(DateTimeFormatter.ofPattern("HH:mm"))}",
                   modifier = Modifier.fillMaxWidth())
-                val croppedDescription = if (item.event.description.length > 150) item.event.description.take(150) + "..." else item.event.description
-                Text(croppedDescription, color = Color.Gray)
+              val croppedDescription =
+                  if (item.event.description.length > 150) item.event.description.take(150) + "..."
+                  else item.event.description
+              Text(croppedDescription, color = Color.Gray)
             }
           }
     }
