@@ -4,9 +4,11 @@ import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
@@ -17,6 +19,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,25 +27,42 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
-import com.github.se.gomeet.model.repository.EventRepository
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.maps.android.compose.rememberMarkerState
 import kotlinx.coroutines.launch
 
+/**
+ * Composable function to display the details of an event.
+ *
+ * @param nav NavigationActions object to handle navigation
+ * @param title Title of the event
+ * @param eventId ID of the event
+ * @param date Date of the event
+ * @param time Time of the event
+ * @param organizerId ID of the organizer of the event
+ * @param rating Rating of the event
+ * @param description Description of the event
+ * @param loc Location of the event
+ * @param userViewModel UserViewModel object to interact with user data
+ * @param eventViewModel EventViewModel object to interact with event data
+ */
 @Composable
 fun MyEventInfo(
     nav: NavigationActions,
@@ -51,8 +71,7 @@ fun MyEventInfo(
     date: String = "",
     time: String = "",
     organizerId: String,
-    rating: Double = 0.0,
-    image: Painter = painterResource(id = R.drawable.gomeet_logo),
+    rating: Double = 0.0, // TODO: Implement rating system
     description: String = "",
     loc: LatLng = LatLng(0.0, 0.0),
     userViewModel: UserViewModel,
@@ -132,13 +151,7 @@ fun MyEventInfo(
                 Spacer(modifier = Modifier.height(20.dp))
 
                 var imageUrl by remember { mutableStateOf<String?>(null) }
-                LaunchedEffect(eventId) {
-                  imageUrl =
-                      EventViewModel(
-                              organizer.value!!.uid,
-                              eventRepository = EventRepository(Firebase.firestore))
-                          .getEventImageUrl(eventId)
-                }
+                LaunchedEffect(eventId) { imageUrl = eventViewModel.getEventImageUrl(eventId) }
                 EventImage(imageUrl = imageUrl)
                 Spacer(modifier = Modifier.height(20.dp))
                 EventDescription(text = description)
@@ -147,4 +160,44 @@ fun MyEventInfo(
               }
         }
       }
+}
+
+/**
+ * Helper function to display the map view of an event.
+ *
+ * @param loc Location of the event
+ * @param zoomLevel Zoom level of the map
+ */
+@Composable
+private fun MapViewComposable(
+    loc: LatLng,
+    zoomLevel: Float = 15f // Default zoom level for close-up of location
+) {
+  val cameraPositionState = rememberCameraPositionState {
+    position = CameraPosition.fromLatLngZoom(loc, zoomLevel)
+  }
+
+  val markerState = rememberMarkerState(position = loc)
+
+  // Set up the GoogleMap composable
+  GoogleMap(
+      modifier =
+          Modifier.testTag("MapView").fillMaxWidth().height(200.dp).clip(RoundedCornerShape(20.dp)),
+      cameraPositionState = cameraPositionState) {
+        Marker(
+            state = markerState,
+            title = "Marker in Location",
+            snippet = "This is the selected location")
+      }
+
+  // Initialize the map position once and avoid resetting on recomposition
+  DisposableEffect(loc) {
+    cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(loc, zoomLevel))
+    onDispose {}
+  }
+
+  DisposableEffect(loc) {
+    markerState.position = loc
+    onDispose {}
+  }
 }

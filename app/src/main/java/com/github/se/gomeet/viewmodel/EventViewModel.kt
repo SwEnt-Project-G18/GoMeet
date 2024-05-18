@@ -45,9 +45,7 @@ import org.json.JSONArray
  *
  * @param creatorId the id of the creator of the event
  */
-class EventViewModel(private val creatorId: String? = null, eventRepository: EventRepository) :
-    ViewModel() {
-  private val repository = eventRepository
+class EventViewModel(private val creatorId: String? = null) : ViewModel() {
   private val _bitmapDescriptors = mutableStateMapOf<String, BitmapDescriptor>()
   val bitmapDescriptors: MutableMap<String, BitmapDescriptor> = _bitmapDescriptors
 
@@ -145,7 +143,7 @@ class EventViewModel(private val creatorId: String? = null, eventRepository: Eve
   suspend fun getEvent(uid: String): Event? {
     return try {
       val event = CompletableDeferred<Event?>()
-      repository.getEvent(uid) { t -> event.complete(t) }
+      EventRepository.getEvent(uid) { t -> event.complete(t) }
       event.await()
     } catch (e: Exception) {
       null
@@ -201,7 +199,7 @@ class EventViewModel(private val creatorId: String? = null, eventRepository: Eve
   suspend fun getAllEvents(): List<Event>? {
     return try {
       val event = CompletableDeferred<List<Event>?>()
-      repository.getAllEvents { t -> event.complete(t) }
+      EventRepository.getAllEvents { t -> event.complete(t) }
       event.await()
     } catch (e: Exception) {
       null
@@ -224,7 +222,7 @@ class EventViewModel(private val creatorId: String? = null, eventRepository: Eve
    * @param tags the tags of the event
    * @param images the images of the event
    * @param imageUri the URI of the image of the event
-   * @param uid the UID of the event
+   * @param eventId the UID of the event
    */
   fun createEvent(
       title: String,
@@ -243,7 +241,7 @@ class EventViewModel(private val creatorId: String? = null, eventRepository: Eve
       images: List<String>,
       imageUri: Uri?,
       userViewModel: UserViewModel,
-      uid: String
+      eventId: String
   ) {
     Log.d("CreatorID", "Creator ID is $creatorId")
     CoroutineScope(Dispatchers.IO).launch {
@@ -252,7 +250,7 @@ class EventViewModel(private val creatorId: String? = null, eventRepository: Eve
         val updatedImages = images.toMutableList().apply { imageUrl?.let { add(it) } }
         val event =
             Event(
-                uid,
+                eventId,
                 creatorId!!,
                 title,
                 description,
@@ -269,7 +267,7 @@ class EventViewModel(private val creatorId: String? = null, eventRepository: Eve
                 tags,
                 updatedImages)
 
-        repository.addEvent(event)
+        EventRepository.addEvent(event)
         joinEvent(event, creatorId)
         userViewModel.joinEvent(event.eventID, creatorId)
         userViewModel.userCreatesEvent(event.eventID, creatorId)
@@ -285,7 +283,7 @@ class EventViewModel(private val creatorId: String? = null, eventRepository: Eve
    * @param event the event to edit
    */
   fun editEvent(event: Event) {
-    repository.updateEvent(event)
+    EventRepository.updateEvent(event)
   }
 
   /**
@@ -294,7 +292,7 @@ class EventViewModel(private val creatorId: String? = null, eventRepository: Eve
    * @param eventID the ID of the event to remove
    */
   fun removeEvent(eventID: String) {
-    repository.removeEvent(eventID)
+    EventRepository.removeEvent(eventID)
   }
 
   /**
@@ -310,7 +308,7 @@ class EventViewModel(private val creatorId: String? = null, eventRepository: Eve
       return
     }
 
-    repository.updateEvent(event.copy(participants = event.participants.plus(userId)))
+    EventRepository.updateEvent(event.copy(participants = event.participants.plus(userId)))
   }
 
   /**
@@ -326,7 +324,8 @@ class EventViewModel(private val creatorId: String? = null, eventRepository: Eve
       return
     }
 
-    repository.updateEvent(event.copy(pendingParticipants = event.pendingParticipants.plus(userId)))
+    EventRepository.updateEvent(
+        event.copy(pendingParticipants = event.pendingParticipants.plus(userId)))
   }
 
   /**
@@ -339,7 +338,7 @@ class EventViewModel(private val creatorId: String? = null, eventRepository: Eve
    */
   fun acceptInvitation(event: Event, userId: String) {
     assert(event.pendingParticipants.contains(userId))
-    repository.updateEvent(
+    EventRepository.updateEvent(
         event.copy(pendingParticipants = event.pendingParticipants.minus(userId)))
     joinEvent(event, userId)
   }
@@ -354,7 +353,7 @@ class EventViewModel(private val creatorId: String? = null, eventRepository: Eve
    */
   fun declineInvitation(event: Event, userId: String) {
     assert(event.pendingParticipants.contains(userId))
-    repository.updateEvent(
+    EventRepository.updateEvent(
         event.copy(pendingParticipants = event.pendingParticipants.minus(userId)))
   }
 
@@ -367,7 +366,7 @@ class EventViewModel(private val creatorId: String? = null, eventRepository: Eve
    */
   fun kickParticipant(event: Event, userId: String) {
     assert(event.participants.contains(userId))
-    repository.updateEvent(event.copy(participants = event.participants.minus(userId)))
+    EventRepository.updateEvent(event.copy(participants = event.participants.minus(userId)))
   }
 
   /**
@@ -384,7 +383,7 @@ class EventViewModel(private val creatorId: String? = null, eventRepository: Eve
       return
     }
 
-    repository.updateEvent(
+    EventRepository.updateEvent(
         event.copy(pendingParticipants = event.pendingParticipants.minus(userId)))
   }
 
@@ -442,5 +441,12 @@ class EventViewModel(private val creatorId: String? = null, eventRepository: Eve
       }
     }
     return locations
+  }
+
+  /** Events sorting enum, placed here because this is also where the sorting algorithm goes. */
+  enum class SortOption {
+    DEFAULT,
+    ALPHABETICAL,
+    DATE
   }
 }

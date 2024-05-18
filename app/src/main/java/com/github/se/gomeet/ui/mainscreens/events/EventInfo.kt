@@ -23,13 +23,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -56,16 +54,6 @@ import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
-import com.google.firebase.auth.auth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
-import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.Marker
-import com.google.maps.android.compose.rememberCameraPositionState
-import com.google.maps.android.compose.rememberMarkerState
 import kotlinx.coroutines.launch
 
 /**
@@ -83,7 +71,7 @@ fun EventHeader(
     title: String,
     currentUser: GoMeetUser,
     organizer: GoMeetUser,
-    rating: Double,
+    rating: Double, // TODO: Implement rating system
     nav: NavigationActions,
     date: String,
     time: String
@@ -214,7 +202,7 @@ fun EventDescription(text: String) {
  * organizer. Favorite toggling is also managed here.
  *
  * @param currentUser The currently logged-in user, as a GoMeetUser object.
- * @param organizer The organizer of the event, also a GoMeetUser object.
+ * @param organiser The organizer of the event, also a GoMeetUser object.
  * @param eventId The unique identifier of the event.
  * @param userViewModel An instance of UserViewModel for performing operations like editing user
  *   details.
@@ -223,14 +211,14 @@ fun EventDescription(text: String) {
 @Composable
 fun EventButtons(
     currentUser: GoMeetUser,
-    organizer: GoMeetUser,
+    organiser: GoMeetUser,
     eventId: String,
     userViewModel: UserViewModel,
     eventViewModel: EventViewModel,
     nav: NavigationActions
 ) {
   val coroutineScope = rememberCoroutineScope()
-  val isFavorite = remember { mutableStateOf(currentUser.myFavorites.contains(eventId)) }
+  val isFavourite = remember { mutableStateOf(currentUser.myFavorites.contains(eventId)) }
   val currentEvent = remember { mutableStateOf<Event?>(null) }
   val isJoined = remember { mutableStateOf(false) }
 
@@ -248,22 +236,14 @@ fun EventButtons(
       horizontalArrangement = Arrangement.SpaceBetween) {
         TextButton(
             onClick = {
-              if (organizer.uid.contentEquals(Firebase.auth.currentUser!!.uid)) {
-                // TODO: GO TO EDIT EVENT PARAMETERS SCREEN
-              } else {
-                if (!isJoined.value) {
-                  currentUser.joinedEvents = currentUser.joinedEvents.plus(eventId)
-                  currentEvent.value!!.participants =
-                      currentEvent.value!!.participants.plus(currentUser.uid)
-                } else {
-                  currentUser.joinedEvents = currentUser.joinedEvents.minus(eventId)
-                  currentEvent.value!!.participants =
-                      currentEvent.value!!.participants.minus(currentUser.uid)
-                }
-                userViewModel.editUser(currentUser)
-                eventViewModel.editEvent(currentEvent.value!!)
-                isJoined.value = !isJoined.value
-              }
+              eventAction(
+                  currentUser,
+                  organiser,
+                  eventId,
+                  userViewModel,
+                  eventViewModel,
+                  isJoined,
+                  currentEvent.value!!)
             },
             shape = RoundedCornerShape(20.dp),
             modifier = Modifier.weight(1f),
@@ -271,7 +251,7 @@ fun EventButtons(
                 ButtonDefaults.textButtonColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     contentColor = MaterialTheme.colorScheme.tertiary)) {
-              if (organizer.uid.contentEquals(Firebase.auth.currentUser!!.uid)) {
+              if (organiser.uid == currentUser.uid) {
                 Text("Edit My Event")
               } else {
                 if (isJoined.value) {
@@ -281,7 +261,7 @@ fun EventButtons(
                 }
               }
             }
-        if (organizer.uid.contentEquals(Firebase.auth.currentUser!!.uid)) {
+        if (organiser.uid == currentUser.uid) {
           Spacer(modifier = Modifier.width(5.dp))
           TextButton(
               onClick = {
@@ -295,11 +275,10 @@ fun EventButtons(
                       contentColor = MaterialTheme.colorScheme.tertiary)) {
                 Text("Add Participants")
               }
-        }
-        if (organizer.uid != com.google.firebase.Firebase.auth.currentUser!!.uid) {
+        } else {
           IconButton(
               onClick = {
-                nav.navigateToScreen(Route.MESSAGE.replace("{id}", Uri.encode(organizer.uid)))
+                nav.navigateToScreen(Route.MESSAGE.replace("{id}", Uri.encode(organiser.uid)))
               }) {
                 Icon(
                     imageVector =
@@ -310,68 +289,94 @@ fun EventButtons(
               }
         }
         IconButton(
-            onClick = {
-              if (!isFavorite.value) {
-                currentUser.myFavorites = currentUser.myFavorites.plus(eventId)
-              } else {
-                currentUser.myFavorites = currentUser.myFavorites.minus(eventId)
-              }
-              userViewModel.editUser(currentUser)
-              isFavorite.value = !isFavorite.value
-            }) {
-              if (!isFavorite.value) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.heart),
-                    contentDescription = "Add to Favorites",
-                    modifier = Modifier.size(30.dp),
-                    tint = MaterialTheme.colorScheme.outlineVariant)
-              } else {
-                Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.redheart),
-                    contentDescription = "Remove from favorites",
-                    modifier = Modifier.size(30.dp),
-                    tint = MaterialTheme.colorScheme.outlineVariant)
-              }
+            onClick = { favouriteAction(currentUser, eventId, userViewModel, isFavourite) }) {
+              FavouriteButton(isFavourite.value)
             }
       }
 }
 
 /**
- * MapViewComposable is a composable that displays the map view of an event.
+ * Helper function to perform the appropriate action when clicking the favourite button.
  *
- * @param loc Location of the event
- * @param zoomLevel Zoom level of the map
+ * @param currentUser Current user
+ * @param eventId Event ID
+ * @param userViewModel UserViewModel
+ * @param isFavourite Whether the event is a favourite
+ */
+private fun favouriteAction(
+    currentUser: GoMeetUser,
+    eventId: String,
+    userViewModel: UserViewModel,
+    isFavourite: MutableState<Boolean>
+) {
+  if (!isFavourite.value) {
+    currentUser.myFavorites = currentUser.myFavorites.plus(eventId)
+  } else {
+    currentUser.myFavorites = currentUser.myFavorites.minus(eventId)
+  }
+  userViewModel.editUser(currentUser)
+  isFavourite.value = !isFavourite.value
+}
+
+/**
+ * Helper function to show the favourite button composable.
+ *
+ * @param isFavourite Whether the event is a favourite.
  */
 @Composable
-fun MapViewComposable(
-    loc: LatLng,
-    zoomLevel: Float = 15f // Default zoom level for close-up of location
+private fun FavouriteButton(isFavourite: Boolean) {
+  val tint = MaterialTheme.colorScheme.outlineVariant
+  val iconSize = 30.dp
+  if (!isFavourite) {
+    Icon(
+        imageVector = ImageVector.vectorResource(id = R.drawable.heart),
+        contentDescription = "Add to Favorites",
+        modifier = Modifier.size(iconSize),
+        tint = tint)
+  } else {
+    Icon(
+        imageVector = ImageVector.vectorResource(id = R.drawable.redheart),
+        contentDescription = "Remove from favorites",
+        modifier = Modifier.size(iconSize),
+        tint = tint)
+  }
+}
+
+/**
+ * Helper function to perform the appropriate action when clicking the event button.
+ *
+ * @param currentUser Current user
+ * @param organiser Event organiser
+ * @param eventId Event ID
+ * @param userViewModel UserViewModel
+ * @param eventViewModel EventViewModel
+ * @param isJoined Whether the user has joined the event
+ * @param currentEvent The current event
+ */
+private fun eventAction(
+    currentUser: GoMeetUser,
+    organiser: GoMeetUser,
+    eventId: String,
+    userViewModel: UserViewModel,
+    eventViewModel: EventViewModel,
+    isJoined: MutableState<Boolean>,
+    currentEvent: Event
 ) {
-  val cameraPositionState = rememberCameraPositionState {
-    position = CameraPosition.fromLatLngZoom(loc, zoomLevel)
-  }
 
-  val markerState = rememberMarkerState(position = loc)
+  if (organiser.uid == currentUser.uid) {
+    // TODO: GO TO EDIT EVENT PARAMETERS SCREEN
+  } else {
 
-  // Set up the GoogleMap composable
-  GoogleMap(
-      modifier =
-          Modifier.testTag("MapView").fillMaxWidth().height(200.dp).clip(RoundedCornerShape(20.dp)),
-      cameraPositionState = cameraPositionState) {
-        Marker(
-            state = markerState,
-            title = "Marker in Location",
-            snippet = "This is the selected location")
-      }
+    if (!isJoined.value) {
+      currentUser.joinedEvents = currentUser.joinedEvents.plus(eventId)
+      currentEvent.participants = currentEvent.participants.plus(currentUser.uid)
+    } else {
+      currentUser.joinedEvents = currentUser.joinedEvents.minus(eventId)
+      currentEvent.participants = currentEvent.participants.minus(currentUser.uid)
+    }
 
-  // Initialize the map position once and avoid resetting on recomposition
-  DisposableEffect(loc) {
-    cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(loc, zoomLevel))
-    onDispose {}
-  }
-
-  DisposableEffect(loc) {
-    markerState.position = loc
-    onDispose {}
+    userViewModel.editUser(currentUser)
+    eventViewModel.editEvent(currentEvent)
+    isJoined.value = !isJoined.value
   }
 }

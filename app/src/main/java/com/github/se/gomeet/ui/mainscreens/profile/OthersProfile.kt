@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -45,7 +44,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.isPastEvent
 import com.github.se.gomeet.model.user.GoMeetUser
@@ -312,4 +313,11 @@ fun MoreActionsButton() {
           showMenu = false
         })
   }
+}
+
+@Preview
+@Composable
+fun OthersProfilePreview() {
+  OthersProfile(
+      nav = NavigationActions(rememberNavController()), "", UserViewModel(), EventViewModel(null))
 }
