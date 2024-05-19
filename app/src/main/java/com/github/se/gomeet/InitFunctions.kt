@@ -162,7 +162,7 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
               if (result.isSuccess) {
                 NavigationActions(nav)
                     .navigateTo(
-                        TOP_LEVEL_DESTINATIONS.first { it.route == Route.EXPLORE },
+                        TOP_LEVEL_DESTINATIONS.first { it.route == Route.CREATE },
                         clearBackStack = true)
               } else {
                 // Handle connection failure
@@ -173,14 +173,12 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
     }
     composable(Route.LOGIN) {
       LoginScreen(authViewModel = authViewModel, nav = NavigationActions(nav)) {
-        NavigationActions(nav)
-            .navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == Route.EXPLORE })
+        NavigationActions(nav).navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == Route.CREATE })
       }
     }
     composable(Route.REGISTER) {
       RegisterScreen(client, NavigationActions(nav), authViewModel, userViewModel) {
-        NavigationActions(nav)
-            .navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == Route.EXPLORE })
+        NavigationActions(nav).navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == Route.CREATE })
       }
     }
     composable(Route.EXPLORE) { Explore(navAction, eventViewModel) }
