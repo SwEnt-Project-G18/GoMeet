@@ -352,13 +352,17 @@ class UserViewModel : ViewModel() {
    * @param uid The uid of the user to follow.
    */
   fun follow(uid: String) {
+    val currentUser = Firebase.auth.currentUser!!
+    Log.d(ContentValues.TAG, "Follow: ${currentUser.uid} following $uid")
     CoroutineScope(Dispatchers.IO).launch {
       val senderUid = Firebase.auth.currentUser!!.uid
       val sender = getUser(senderUid)
       val receiver = getUser(uid)
-      if (!sender!!.following.contains(uid) && !receiver!!.following.contains(senderUid)) {
+      if (!sender!!.following.contains(uid) && !receiver!!.followers.contains(senderUid)) {
         editUser(sender.copy(following = sender.following.plus(uid)))
         editUser(receiver.copy(followers = receiver.followers.plus(senderUid)))
+      } else {
+        Log.w(ContentValues.TAG, "Couldn't follow the user: Already following")
       }
     }
   }
@@ -369,8 +373,10 @@ class UserViewModel : ViewModel() {
    * @param uid The uid of the user to unfollow.
    */
   fun unfollow(uid: String) {
+    val currentUser = Firebase.auth.currentUser!!
+    Log.d(ContentValues.TAG, "Unfollow: ${currentUser.uid} unfollowing $uid")
     CoroutineScope(Dispatchers.IO).launch {
-      val senderUid = Firebase.auth.currentUser!!.uid
+      val senderUid = currentUser.uid
       val sender = getUser(senderUid)
       val receiver = getUser(uid)
       editUser(sender!!.copy(following = sender.following.minus(uid)))

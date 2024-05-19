@@ -56,6 +56,8 @@ class EndToEndTest2 : TestCase() {
     private const val pwd2 = "654321"
     private var uid2 = "uid2"
     private const val username2 = "test_user2"
+    private const val firstname2 = "testfirstname2"
+    private const val lastname2 = "testlastname2"
 
     private val userVM = UserViewModel()
     private lateinit var eventVM: EventViewModel
@@ -90,13 +92,7 @@ class EndToEndTest2 : TestCase() {
           TimeUnit.SECONDS.sleep(1)
         }
         userVM.createUserIfNew(
-            uid2,
-            username2,
-            "testfirstname2",
-            "testlastname2",
-            email2,
-            "testphonenumber2",
-            "testcountry2")
+            uid2, username2, firstname2, lastname2, email2, "testphonenumber2", "testcountry2")
         while (userVM.getUser(uid2) == null) {
           TimeUnit.SECONDS.sleep(1)
         }
@@ -253,9 +249,9 @@ class EndToEndTest2 : TestCase() {
     ComposeScreen.onComposeScreen<FollowScreen>(composeTestRule) {
       step("Check that the event creator's followers list has been updated") {
         composeTestRule.waitUntil(timeoutMillis = 10000) {
-          composeTestRule.onNodeWithText(username2).isDisplayed()
+          composeTestRule.onNodeWithText(username2, substring = true).isDisplayed()
         }
-        composeTestRule.onNodeWithText(username2).assertIsDisplayed()
+        composeTestRule.onNodeWithText(username2, substring = true).assertIsDisplayed()
         composeTestRule.onNodeWithTag("GoBackFollower").assertIsDisplayed().performClick()
         composeTestRule.onNodeWithText("Profile").performClick()
       }
@@ -272,12 +268,12 @@ class EndToEndTest2 : TestCase() {
     ComposeScreen.onComposeScreen<FollowScreen>(composeTestRule) {
       step("Check that the current user's following list has been updated") {
         composeTestRule.waitUntil(timeoutMillis = 10000) {
-          composeTestRule.onNodeWithText(username1).isDisplayed()
+          composeTestRule.onNodeWithText(username1, substring = true).isDisplayed()
         }
-        composeTestRule.onNodeWithText(username1).assertIsDisplayed()
+        composeTestRule.onNodeWithText(username1, substring = true).assertIsDisplayed()
         composeTestRule.onNodeWithTag("UnfollowButton").assertIsDisplayed().performClick()
         TimeUnit.SECONDS.sleep(2)
-        composeTestRule.onNodeWithText(username1).performClick()
+        composeTestRule.onNodeWithText(username1, substring = true).performClick()
       }
     }
   }

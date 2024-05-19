@@ -23,7 +23,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -55,11 +54,11 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.user.GoMeetUser
+import com.github.se.gomeet.ui.mainscreens.LoadingText
+import com.github.se.gomeet.ui.mainscreens.profile.FollowingFollowerPage.*
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.viewmodel.UserViewModel
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 
 private var currentUser: GoMeetUser? = null
@@ -68,19 +67,25 @@ private var currentUser: GoMeetUser? = null
  * Composable function for a user's "following" list
  *
  * @param nav The navigation actions
- * @param uid the uid of the user whose "following" list is displayed
+ * @param uidOfFollowList the uid of the user whose "following" list is displayed
+ * @param currentUid The uid of the current user
  * @param userViewModel The user view model
+ * @param followingScreen A boolean indicating whether the "following" list is displayed. If false,
+ *   the "followers" list is displayed
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FollowingFollowers(
     nav: NavigationActions,
-    uid: String,
+    uidOfFollowList: String,
+    currentUid: String,
     userViewModel: UserViewModel,
     followingScreen: Boolean
 ) {
   val pagerState =
-      rememberPagerState(pageCount = { 2 }, initialPage = if (followingScreen) 0 else 1)
+      rememberPagerState(
+          pageCount = { FollowingFollowerPage.entries.size },
+          initialPage = if (followingScreen) FOLLOWING.ordinal else FOLLOWERS.ordinal)
   val coroutineScope = rememberCoroutineScope()
   var isLoaded by remember { mutableStateOf(false) }
   var username by remember { mutableStateOf("") }
@@ -91,7 +96,7 @@ fun FollowingFollowers(
 
   LaunchedEffect(Unit) {
     coroutineScope.launch {
-      currentUser = userViewModel.getUser(uid)
+      currentUser = userViewModel.getUser(uidOfFollowList)
       username = currentUser!!.username
       currentUser?.following?.forEach { uid ->
         val user = userViewModel.getUser(uid)
@@ -140,34 +145,40 @@ fun FollowingFollowers(
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier =
-                        Modifier.weight(1f).height(screenHeight / 20).clickable {
-                          coroutineScope.launch { pagerState.animateScrollToPage(0) }
+                        Modifier.height(screenHeight / 20).weight(1f).clickable {
+                          coroutineScope.launch {
+                            pagerState.animateScrollToPage(FOLLOWERS.ordinal)
+                          }
                         }) {
                       Text(
-                          text = "Following",
+                          text = FOLLOWERS.str,
                           style =
                               MaterialTheme.typography.bodyMedium.copy(
                                   fontWeight =
-                                      if (pagerState.currentPage == 0) FontWeight.Bold
+                                      if (pagerState.currentPage == FOLLOWERS.ordinal)
+                                          FontWeight.Bold
                                       else FontWeight.Normal))
                     }
 
-                // Right half of the screen
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier =
-                        Modifier.height(screenHeight / 20).weight(1f).clickable {
-                          coroutineScope.launch { pagerState.animateScrollToPage(1) }
+                        Modifier.weight(1f).height(screenHeight / 20).clickable {
+                          coroutineScope.launch {
+                            pagerState.animateScrollToPage(FOLLOWING.ordinal)
+                          }
                         }) {
                       Text(
-                          text = "Followers",
+                          text = FOLLOWING.str,
                           style =
                               MaterialTheme.typography.bodyMedium.copy(
                                   fontWeight =
-                                      if (pagerState.currentPage == 1) FontWeight.Bold
+                                      if (pagerState.currentPage == FOLLOWING.ordinal)
+                                          FontWeight.Bold
                                       else FontWeight.Normal))
                     }
               }
+
           Canvas(
               modifier =
                   Modifier.fillMaxWidth() // Ensures the Canvas takes up full screen width
@@ -177,10 +188,11 @@ fun FollowingFollowers(
                 drawLine(
                     color = Color.Black,
                     start =
-                        if (pagerState.currentPage == 0) Offset(x = 0f, y = 0f)
+                        if (pagerState.currentPage == FOLLOWERS.ordinal) Offset(x = 0f, y = 0f)
                         else Offset(x = canvasWidth / 2, y = 0f),
                     end =
-                        if (pagerState.currentPage == 0) Offset(x = canvasWidth / 2, y = 0f)
+                        if (pagerState.currentPage == FOLLOWERS.ordinal)
+                            Offset(x = canvasWidth / 2, y = 0f)
                         else Offset(x = canvasWidth, y = 0f),
                     strokeWidth = 5f)
               }
@@ -192,29 +204,39 @@ fun FollowingFollowers(
       HorizontalPager(
           state = pagerState, modifier = Modifier.fillMaxSize().padding(innerPadding)) { page ->
             when (page) {
-              0 -> PageUsers(following, nav, userViewModel, uid)
-              1 -> PageUsers(followers, nav, userViewModel, uid)
+              FOLLOWING.ordinal ->
+                  PageUsers(following, nav, userViewModel, uidOfFollowList, currentUid)
+              FOLLOWERS.ordinal ->
+                  PageUsers(followers, nav, userViewModel, uidOfFollowList, currentUid)
               else -> Text("Page not found")
             }
           }
     } else {
-      Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        CircularProgressIndicator()
-      }
+      Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { LoadingText() }
     }
   }
 }
 
+/**
+ * Composable function for displaying a list of followers or following
+ *
+ * @param users The list of users to display
+ * @param nav The navigation actions
+ * @param userViewModel The user view model
+ * @param uidOfFollowList The uid of the user whose followers/following are displayed
+ * @param currentUid The uid of the current user
+ */
 @Composable
 fun PageUsers(
     users: List<GoMeetUser>,
     nav: NavigationActions,
     userViewModel: UserViewModel,
-    uid: String
+    uidOfFollowList: String,
+    currentUid: String
 ) {
   Column(modifier = Modifier.fillMaxSize()) {
     users.forEach { user ->
-      var isFollowing by remember { mutableStateOf(true) }
+      var isFollowing by remember { mutableStateOf(user.followers.contains(currentUid)) }
       Row(
           modifier =
               Modifier.fillMaxWidth()
@@ -248,10 +270,10 @@ fun PageUsers(
                 contentDescription = "Profile picture",
                 contentScale = ContentScale.None)
             Column(modifier = Modifier.padding(start = 15.dp).weight(1f)) {
-              Text(text = user.username)
-              Text("@usertag")
+              Text(text = "${user.firstName} ${user.lastName}")
+              Text("@${user.username}")
             }
-            if (uid == Firebase.auth.currentUser!!.uid) {
+            if (uidOfFollowList == currentUid) {
               if (isFollowing) {
                 Button(
                     shape = RoundedCornerShape(10.dp),
@@ -295,5 +317,10 @@ fun PageUsers(
 @Preview
 @Composable
 fun FollowingPreview() {
-  FollowingFollowers(NavigationActions(rememberNavController()), "", UserViewModel(), true)
+  FollowingFollowers(NavigationActions(rememberNavController()), "", "", UserViewModel(), true)
+}
+
+private enum class FollowingFollowerPage(val str: String) {
+  FOLLOWERS("Followers"),
+  FOLLOWING("Following")
 }
