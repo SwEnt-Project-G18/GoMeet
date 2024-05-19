@@ -202,7 +202,8 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
       delay(5000) // map is updated every 5s
     }
   }
-  Scaffold(bottomBar = { BottomNavigationFun(nav) }) { innerPadding ->
+  Scaffold(bottomBar = { BottomNavigationFun(nav) },
+      modifier = Modifier.testTag("ExploreUI")) { innerPadding ->
     val backdropState = rememberBackdropScaffoldState(BackdropValue.Concealed)
     LaunchedEffect(backdropState) { backdropState.reveal() }
     val offset by backdropState.offset
