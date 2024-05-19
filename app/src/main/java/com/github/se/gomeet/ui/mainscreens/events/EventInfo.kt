@@ -256,8 +256,7 @@ fun EventButtons(
               } else {
                 if (isJoined.value) {
                   Text("Leave Event")
-                } else if (currentEvent.value?.public == true ||
-                    currentEvent.value?.visibleToIfPrivate?.contains(currentUser.uid) == true) {
+                } else {
                   Text("Join Event")
                 }
               }

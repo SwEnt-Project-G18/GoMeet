@@ -54,6 +54,7 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
+import com.github.se.gomeet.model.event.isJoinedEvent
 import com.github.se.gomeet.model.event.isPastEvent
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.LoadingText
@@ -96,7 +97,7 @@ fun Profile(
       val allEvents =
           eventViewModel.getAllEvents()!!.filter { e -> currentUser!!.myEvents.contains(e.eventID) }
       allEvents.forEach {
-        if (!isPastEvent(it)) {
+        if (!isPastEvent(it) || isJoinedEvent(it, userId)) {
           myEventList.add(it)
         } else {
           myHistoryList.add(it)
@@ -292,7 +293,7 @@ fun Profile(
                     }
 
                 Spacer(modifier = Modifier.height(screenHeight / 40))
-                ProfileEventsList("Joined My Events", rememberLazyListState(), myEventList, nav)
+                ProfileEventsList("My Events", rememberLazyListState(), myEventList, nav)
                 Spacer(modifier = Modifier.height(screenHeight / 30))
                 ProfileEventsList("My History", rememberLazyListState(), myHistoryList, nav)
               }
