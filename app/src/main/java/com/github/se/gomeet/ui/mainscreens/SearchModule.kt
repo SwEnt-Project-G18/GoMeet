@@ -72,43 +72,41 @@ fun SearchModule(nav: NavigationActions, backgroundColor: Color, contentColor: C
   val keyboardController = LocalSoftwareKeyboardController.current
 
   Column(modifier = Modifier.padding(16.dp)) {
-      TextField(
-          value = searchText,
-          leadingIcon = {
-              IconButton(onClick = { nav.navigateToScreen(Route.MESSAGE_CHANNELS) }) {
-                  Icon(
-                      ImageVector.vectorResource(R.drawable.gomeet_icon),
-                      contentDescription = null,
-                      tint = contentColor
-                  )
-              }
-          },
-          onValueChange = viewModel::onSearchTextChange,
-          modifier = Modifier
-              .fillMaxWidth()
-              .focusRequester(focusRequester)
-              .clip(RoundedCornerShape(10.dp))
-              .background(backgroundColor),
-          placeholder = { Text(text = "Search") },
-          keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
-          keyboardActions = KeyboardActions(
-              onSearch = {
+    TextField(
+        value = searchText,
+        leadingIcon = {
+          IconButton(onClick = { nav.navigateToScreen(Route.MESSAGE_CHANNELS) }) {
+            Icon(
+                ImageVector.vectorResource(R.drawable.gomeet_icon),
+                contentDescription = null,
+                tint = contentColor)
+          }
+        },
+        onValueChange = viewModel::onSearchTextChange,
+        modifier =
+            Modifier.fillMaxWidth()
+                .focusRequester(focusRequester)
+                .clip(RoundedCornerShape(10.dp))
+                .background(backgroundColor),
+        placeholder = { Text(text = "Search") },
+        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
+        keyboardActions =
+            KeyboardActions(
+                onSearch = {
                   keyboardController?.hide()
                   coroutineScope.launch { viewModel.performSearch(searchText) }
-              }
-          ),
-          colors = TextFieldDefaults.colors(
-              focusedTextColor = contentColor,
-              unfocusedTextColor = contentColor,
-              cursorColor = MaterialTheme.colorScheme.primary,
-              focusedContainerColor = Color.Transparent,
-              unfocusedContainerColor = Color.Transparent,
-              disabledContainerColor = Color.Transparent,
-              focusedIndicatorColor = Color.Transparent,
-              unfocusedIndicatorColor = Color.Transparent,
-              disabledIndicatorColor = Color.Transparent
-          )
-      )
+                }),
+        colors =
+            TextFieldDefaults.colors(
+                focusedTextColor = contentColor,
+                unfocusedTextColor = contentColor,
+                cursorColor = MaterialTheme.colorScheme.primary,
+                focusedContainerColor = Color.Transparent,
+                unfocusedContainerColor = Color.Transparent,
+                disabledContainerColor = Color.Transparent,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                disabledIndicatorColor = Color.Transparent))
 
     Spacer(modifier = Modifier.height(16.dp))
     if (isSearching) {
@@ -149,36 +147,28 @@ fun SearchModuleSnippet(
           } else {
             painterResource(id = R.drawable.gomeet_icon)
           }
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .padding(8.dp)
-                .clickable {
+      Row(
+          verticalAlignment = Alignment.CenterVertically,
+          modifier =
+              Modifier.padding(8.dp)
+                  .clickable {
                     nav.navigateToScreen(Route.OTHERS_PROFILE.replace("{uid}", item.user.uid))
-                }
-                .background(color = backgroundColor, shape = RoundedCornerShape(10.dp))
-        ) {
+                  }
+                  .background(color = backgroundColor, shape = RoundedCornerShape(10.dp))) {
             Spacer(modifier = Modifier.width(8.dp))
             Image(
                 painter = painter,
                 contentDescription = "User Icon",
                 contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(55.dp)
-                    .clip(CircleShape)
-            )
+                modifier = Modifier.size(55.dp).clip(CircleShape))
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.fillMaxWidth().padding(10.dp)) {
-                Text(
-                    text = "${item.user.firstName} ${item.user.lastName}",
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-                Text(
-                    text = "@${item.user.username}",
-                    color = Color.Gray
-                )
+              Text(
+                  text = "${item.user.firstName} ${item.user.lastName}",
+                  color = MaterialTheme.colorScheme.onBackground)
+              Text(text = "@${item.user.username}", color = Color.Gray)
             }
-        }
+          }
     }
     is SearchViewModel.SearchableItem.Event -> {
       val painter: Painter =
@@ -196,12 +186,12 @@ fun SearchModuleSnippet(
           } else {
             painterResource(id = R.drawable.gomeet_icon)
           }
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .padding(vertical = 8.dp)
-                .background(color = backgroundColor, shape = RoundedCornerShape(10.dp))
-                .clickable {
+      Row(
+          verticalAlignment = Alignment.CenterVertically,
+          modifier =
+              Modifier.padding(vertical = 8.dp)
+                  .background(color = backgroundColor, shape = RoundedCornerShape(10.dp))
+                  .clickable {
                     nav.navigateToEventInfo(
                         eventId = item.event.eventID,
                         title = item.event.title,
@@ -210,43 +200,41 @@ fun SearchModuleSnippet(
                         description = item.event.description,
                         organizer = item.event.creator,
                         loc = LatLng(item.event.location.latitude, item.event.location.longitude),
-                        rating = 0.0
-                    )
-                }
-        ) {
+                        rating = 0.0)
+                  }) {
             Image(
                 painter = painter,
                 contentDescription = "Event Icon",
-                modifier = Modifier
-                    .size(100.dp) // Make the image bigger
-                    .padding(8.dp)
-                    .clip(RoundedCornerShape(16.dp)),
-                contentScale = ContentScale.Crop
-            )
+                modifier =
+                    Modifier.size(100.dp) // Make the image bigger
+                        .padding(8.dp)
+                        .clip(RoundedCornerShape(16.dp)),
+                contentScale = ContentScale.Crop)
             Spacer(modifier = Modifier.width(16.dp))
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp) // Add vertical padding around the texts
-            ) {
-                Text(
-                    text = item.event.title,
-                    modifier = Modifier.fillMaxWidth(),
-                    color = MaterialTheme.colorScheme.onBackground,
-                    fontSize = 20.sp // Make the title text larger
-                )
-                Text(
-                    text = "${item.event.date.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))} - ${item.event.time.format(DateTimeFormatter.ofPattern("HH:mm"))}",
-                    modifier = Modifier.fillMaxWidth()
-                )
-                val croppedDescription = if (item.event.description.length > 150) {
-                    item.event.description.take(150) + "..."
-                } else {
-                    item.event.description
+                modifier =
+                    Modifier.fillMaxWidth()
+                        .padding(vertical = 8.dp) // Add vertical padding around the texts
+                ) {
+                  Text(
+                      text = item.event.title,
+                      modifier = Modifier.fillMaxWidth(),
+                      color = MaterialTheme.colorScheme.onBackground,
+                      fontSize = 20.sp // Make the title text larger
+                      )
+                  Text(
+                      text =
+                          "${item.event.date.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))} - ${item.event.time.format(DateTimeFormatter.ofPattern("HH:mm"))}",
+                      modifier = Modifier.fillMaxWidth())
+                  val croppedDescription =
+                      if (item.event.description.length > 150) {
+                        item.event.description.take(150) + "..."
+                      } else {
+                        item.event.description
+                      }
+                  Text(croppedDescription, color = Color.Gray)
                 }
-                Text(croppedDescription, color = Color.Gray)
-            }
-        }
+          }
     }
   }
 }
