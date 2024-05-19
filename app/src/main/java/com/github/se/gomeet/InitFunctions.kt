@@ -125,7 +125,7 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
   val userIdState = remember { mutableStateOf("") }
   val clientInitialisationState by client.clientState.initializationState.collectAsState()
   val authViewModel = AuthViewModel()
-  var eventViewModel = EventViewModel(null)
+  var eventViewModel = remember { mutableStateOf(EventViewModel(null)) }
   val userViewModel = UserViewModel()
 
   return NavHost(navController = nav, startDestination = Route.WELCOME) {
@@ -149,9 +149,10 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
               val phoneNumber = authViewModel.signInState.value.phoneNumberRegister
               val country = authViewModel.signInState.value.countryRegister
               val username = authViewModel.signInState.value.usernameRegister
-              eventViewModel = EventViewModel(uid)
               userViewModel.createUserIfNew(
                   uid, username, firstName, lastName, email, phoneNumber, country)
+              userIdState.value = currentUser.uid
+              eventViewModel.value = EventViewModel(userIdState.value)
             }
             val user =
                 User(
@@ -173,42 +174,47 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
     }
     composable(Route.LOGIN) {
       LoginScreen(authViewModel = authViewModel, nav = NavigationActions(nav)) {
+        userIdState.value = Firebase.auth.currentUser!!.uid
+        eventViewModel.value = EventViewModel(userIdState.value)
         NavigationActions(nav).navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == Route.CREATE })
       }
     }
     composable(Route.REGISTER) {
       RegisterScreen(client, NavigationActions(nav), authViewModel, userViewModel) {
+        userIdState.value = Firebase.auth.currentUser!!.uid
+        eventViewModel.value = EventViewModel(userIdState.value)
         NavigationActions(nav).navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == Route.CREATE })
       }
     }
-    composable(Route.EXPLORE) { Explore(navAction, eventViewModel) }
+    composable(Route.EXPLORE) { Explore(navAction, eventViewModel.value) }
     composable(Route.EVENTS) {
-      userIdState.value = Firebase.auth.currentUser!!.uid
-      Events(userIdState.value, navAction, UserViewModel(), eventViewModel)
+      Events(userIdState.value, navAction, userViewModel, eventViewModel.value)
     }
     composable(Route.TRENDS) {
-      Trends(userIdState.value, navAction, UserViewModel(), eventViewModel)
+      Trends(userIdState.value, navAction, userViewModel, eventViewModel.value)
     }
     composable(Route.CREATE) {
       userIdState.value = Firebase.auth.currentUser!!.uid
       Create(navAction)
     }
-    composable(Route.NOTIFICATIONS) { Notifications(navAction, currentUserID = userIdState.value) }
+    composable(Route.NOTIFICATIONS) {
+      Notifications(navAction, currentUserID = userIdState.value, userViewModel)
+    }
 
     composable(Route.PROFILE) {
-      Profile(navAction, userId = userIdState.value, userViewModel, eventViewModel)
+      Profile(navAction, userId = userIdState.value, userViewModel, eventViewModel.value)
     }
     composable(
         route = Route.OTHERS_PROFILE,
         arguments = listOf(navArgument("uid") { type = NavType.StringType })) {
           OthersProfile(
-              navAction, it.arguments?.getString("uid") ?: "", userViewModel, eventViewModel)
+              navAction, it.arguments?.getString("uid") ?: "", userViewModel, eventViewModel.value)
         }
     composable(Route.PRIVATE_CREATE) {
-      CreateEvent(navAction, EventViewModel(Firebase.auth.currentUser!!.uid), true)
+      CreateEvent(navAction, eventViewModel.value, true, userViewModel)
     }
     composable(Route.PUBLIC_CREATE) {
-      CreateEvent(navAction, EventViewModel(Firebase.auth.currentUser!!.uid), false)
+      CreateEvent(navAction, eventViewModel.value, false, userViewModel)
     }
 
     composable(
@@ -227,7 +233,7 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
         arguments = listOf(navArgument("eventId") { type = NavType.StringType })) { entry ->
           val eventId = entry.arguments?.getString("eventId") ?: ""
 
-          ManageInvites(userIdState.value, eventId, navAction, userViewModel, eventViewModel)
+          ManageInvites(userIdState.value, eventId, navAction, userViewModel, eventViewModel.value)
         }
 
     composable(
@@ -266,7 +272,7 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
               description,
               loc,
               userViewModel,
-              eventViewModel)
+              eventViewModel.value)
         }
 
     composable(

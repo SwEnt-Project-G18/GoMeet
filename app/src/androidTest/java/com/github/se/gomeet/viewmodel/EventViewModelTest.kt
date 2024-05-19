@@ -1,11 +1,14 @@
 package com.github.se.gomeet.viewmodel
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.se.gomeet.model.Tag
 import com.github.se.gomeet.model.event.location.Location
+import com.github.se.gomeet.model.user.GoMeetUser
 import java.time.LocalDate
 import java.time.LocalTime
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.junit.Test
@@ -26,11 +29,14 @@ class EventViewModelTest {
     private val visibleToIfPrivate = emptyList<String>()
     private const val maxParticipants = 1
     private const val public = false
-    private val tags = emptyList<String>()
+    private val tags = MutableList<String>(0) { "" }
     private val images = emptyList<String>()
     private val imageUrl = null
     private val userVM = UserViewModel()
     private const val eventId = "EventViewModelTestEvent"
+
+    // 6 tags
+    private val tagsList = listOf(Tag.Tag9, Tag.Tag0, Tag.Tag2, Tag.Tag5, Tag.Tag10, Tag.Tag12)
 
     private const val uid = "EventViewModelTestUser"
     private val eventVM = EventViewModel(uid)
@@ -38,6 +44,9 @@ class EventViewModelTest {
     @BeforeClass
     @JvmStatic
     fun setup() {
+
+      tagsList.forEach { tag -> tags.add(tag.tagName) }
+
       // Create an event
       runBlocking {
         eventVM.createEvent(
@@ -53,7 +62,7 @@ class EventViewModelTest {
             visibleToIfPrivate,
             maxParticipants,
             public,
-            tags,
+            tags.subList(0, 5), // 5 tags
             images,
             imageUrl,
             userVM,
@@ -68,8 +77,114 @@ class EventViewModelTest {
     @JvmStatic
     fun tearDown() {
       // Clean up the events
-      runBlocking { eventVM.getAllEvents()!!.forEach { eventVM.removeEvent(it.eventID) } }
+      //      runBlocking { eventVM.getAllEvents()!!.forEach { eventVM.removeEvent(it.eventID) } }
     }
+  }
+
+  @Test
+  fun testTrendsAlgo() = runTest {
+    val userID = "user1"
+    val username = "huge"
+    val firstName = "Hugh"
+    val lastName = "Jass"
+    val email = "big@455.com"
+    val phoneNumber = "12345"
+    val country = "Switzerland"
+    val currentUser =
+        GoMeetUser(
+            userID,
+            username,
+            firstName,
+            lastName,
+            email,
+            phoneNumber,
+            country,
+            emptyList(),
+            emptyList(),
+            emptySet(),
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            "",
+            tags)
+    userVM.createUserIfNew(userID, username, firstName, lastName, email, phoneNumber, country)
+
+    val eventViewModel = EventViewModel(userID)
+
+    val eid1 = "01"
+    val eid2 = "02"
+    val eid3 = "03"
+
+    val tags1 = tags.subList(0, 3) // 3 tags
+    val tags2 = tags.subList(2, 4) // 2 tags
+    val tags3 = tags // 6 tags
+    // -> expected order: event 3, event 1, event 2
+
+    eventViewModel.createEvent(
+        "event1",
+        "description",
+        Location(0.0, 0.0, "name"),
+        LocalDate.of(2024, 4, 29),
+        LocalTime.now(),
+        0.0,
+        "url",
+        emptyList(),
+        emptyList(),
+        emptyList(),
+        0,
+        false,
+        tags1,
+        emptyList(),
+        null,
+        userVM,
+        eid1)
+
+    eventViewModel.createEvent(
+        "event2",
+        "description",
+        Location(0.0, 0.0, "name"),
+        LocalDate.of(2024, 4, 29),
+        LocalTime.now(),
+        0.0,
+        "url",
+        emptyList(),
+        emptyList(),
+        emptyList(),
+        0,
+        true,
+        tags2,
+        emptyList(),
+        null,
+        UserViewModel(),
+        eid2)
+
+    eventViewModel.createEvent(
+        "event3",
+        "description",
+        Location(0.0, 0.0, "name"),
+        LocalDate.of(2024, 4, 29),
+        LocalTime.now(),
+        0.0,
+        "url",
+        emptyList(),
+        emptyList(),
+        emptyList(),
+        0,
+        true,
+        tags3,
+        emptyList(),
+        null,
+        UserViewModel(),
+        eid3)
+
+    TimeUnit.SECONDS.sleep(1)
+
+    val events = eventViewModel.getAllEvents()!!.toMutableList()
+    EventViewModel.sortEvents(currentUser.tags, events)
+    assert(events[0].eventID == eid3)
+    assert(events[1].eventID == eventId)
+    assert(events[2].eventID == eid1)
+    assert(events[3].eventID == eid2)
   }
 
   @Test
