@@ -224,10 +224,9 @@ class UserViewModel : ViewModel() {
         val updatedPendingRequests =
             goMeetUser.pendingRequests
                 .map {
-                  if (it.eventId == eventId) {
-                    it.copy(status = InviteStatus.PENDING)
-                  } else {
-                    it
+                  when (eventId) {
+                      it.eventId -> it.copy(status = InviteStatus.PENDING)
+                      else -> it
                   }
                 }
                 .toSet()
