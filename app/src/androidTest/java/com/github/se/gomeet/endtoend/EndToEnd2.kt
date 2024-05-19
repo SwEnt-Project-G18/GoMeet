@@ -47,12 +47,12 @@ class EndToEndTest2 : TestCase() {
   @get:Rule val composeTestRule = createAndroidComposeRule<MainActivity>()
 
   companion object {
-    private const val email1 = "user1@testfff23.com"
+    private const val email1 = "user1@test2.com"
     private const val pwd1 = "123456"
     private var uid1 = "uid1"
     private const val username1 = "test_user1"
 
-    private const val email2 = "user2@testfff23.com"
+    private const val email2 = "user2@test2.com"
     private const val pwd2 = "654321"
     private var uid2 = "uid2"
     private const val username2 = "test_user2"

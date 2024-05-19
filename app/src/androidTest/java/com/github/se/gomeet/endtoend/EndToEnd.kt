@@ -106,7 +106,7 @@ class EndToEndTest : TestCase() {
         composeTestRule.onNodeWithText("Log In").assertIsEnabled().performClick()
         composeTestRule.waitForIdle()
         composeTestRule.waitUntil(timeoutMillis = 10000) {
-          composeTestRule.onNodeWithTag("ExploreUI").isDisplayed()
+          composeTestRule.onNodeWithTag("CreateUI").isDisplayed()
         }
       }
     }
