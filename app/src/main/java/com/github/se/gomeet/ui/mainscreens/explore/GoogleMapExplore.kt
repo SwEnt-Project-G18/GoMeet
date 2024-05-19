@@ -46,8 +46,8 @@ import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.MarkerInfoWindowContent
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
-import kotlinx.coroutines.launch
 import java.time.LocalDate
+import kotlinx.coroutines.launch
 
 internal val defaultPosition = LatLng(46.51912357457158, 6.568023741881372)
 internal const val defaultZoom = 16f
@@ -59,9 +59,9 @@ internal const val defaultZoom = 16f
  * - ANIMATE: The camera animates to a new location.
  */
 internal enum class CameraAction {
-    NO_ACTION,
-    MOVE,
-    ANIMATE
+  NO_ACTION,
+  MOVE,
+  ANIMATE
 }
 
 internal val moveToCurrentLocation = mutableStateOf(CameraAction.NO_ACTION)
@@ -92,154 +92,152 @@ internal fun GoogleMapView(
     nav: NavigationActions
 ) {
 
-    val ctx = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
+  val ctx = LocalContext.current
+  val coroutineScope = rememberCoroutineScope()
 
-    val eventLocations =
-        events.value.map { event -> LatLng(event.location.latitude, event.location.longitude) }
-    val eventStates = eventLocations.map { location -> rememberMarkerState(position = location) }
+  val eventLocations =
+      events.value.map { event -> LatLng(event.location.latitude, event.location.longitude) }
+  val eventStates = eventLocations.map { location -> rememberMarkerState(position = location) }
 
-    val uiSettings by remember {
-        mutableStateOf(
-            MapUiSettings(
-                compassEnabled = false, zoomControlsEnabled = false, myLocationButtonEnabled = false)
-        )
-    }
-    val isDarkTheme = isSystemInDarkTheme()
-    val mapProperties by remember {
-        mutableStateOf(
-            MapProperties(
-                mapType = MapType.NORMAL,
-                isMyLocationEnabled = locationPermitted,
-                mapStyleOptions =
+  val uiSettings by remember {
+    mutableStateOf(
+        MapUiSettings(
+            compassEnabled = false, zoomControlsEnabled = false, myLocationButtonEnabled = false))
+  }
+  val isDarkTheme = isSystemInDarkTheme()
+  val mapProperties by remember {
+    mutableStateOf(
+        MapProperties(
+            mapType = MapType.NORMAL,
+            isMyLocationEnabled = locationPermitted,
+            mapStyleOptions =
                 MapStyleOptions.loadRawResourceStyle(
-                    ctx, if (isDarkTheme) R.raw.map_style_dark else R.raw.map_style_light))
-        )
+                    ctx, if (isDarkTheme) R.raw.map_style_dark else R.raw.map_style_light)))
+  }
+  val mapVisible by remember { mutableStateOf(true) }
+  val cameraPositionState = rememberCameraPositionState()
+
+  LaunchedEffect(moveToCurrentLocation.value, Unit) {
+    if (moveToCurrentLocation.value == CameraAction.MOVE) {
+      coroutineScope.launch {
+        cameraPositionState.move(
+            update =
+                CameraUpdateFactory.newCameraPosition(
+                    CameraPosition.fromLatLngZoom(currentPosition.value, defaultZoom)))
+        moveToCurrentLocation.value = CameraAction.NO_ACTION
+      }
+    } else if (moveToCurrentLocation.value == CameraAction.ANIMATE) {
+      coroutineScope.launch {
+        cameraPositionState.animate(
+            update =
+                CameraUpdateFactory.newCameraPosition(
+                    CameraPosition.fromLatLngZoom(currentPosition.value, defaultZoom)),
+            durationMs = 1000)
+        moveToCurrentLocation.value = CameraAction.NO_ACTION
+      }
     }
-    val mapVisible by remember { mutableStateOf(true) }
-    val cameraPositionState = rememberCameraPositionState()
+  }
 
-    LaunchedEffect(moveToCurrentLocation.value, Unit) {
-        if (moveToCurrentLocation.value == CameraAction.MOVE) {
-            coroutineScope.launch {
-                cameraPositionState.move(
-                    update =
-                    CameraUpdateFactory.newCameraPosition(
-                        CameraPosition.fromLatLngZoom(currentPosition.value, defaultZoom)))
-                moveToCurrentLocation.value = CameraAction.NO_ACTION
-            }
-        } else if (moveToCurrentLocation.value == CameraAction.ANIMATE) {
-            coroutineScope.launch {
-                cameraPositionState.animate(
-                    update =
-                    CameraUpdateFactory.newCameraPosition(
-                        CameraPosition.fromLatLngZoom(currentPosition.value, defaultZoom)),
-                    durationMs = 1000)
-                moveToCurrentLocation.value = CameraAction.NO_ACTION
-            }
-        }
+  val context = LocalContext.current
+
+  LaunchedEffect(events.value) {
+    Log.d("ViewModel", "Loading custom pins for ${events.value.size} events.")
+    eventViewModel.loadCustomPins(context, events.value)
+  }
+
+  val isLoading by eventViewModel.loading.observeAsState(false)
+
+  LaunchedEffect(isLoading) {
+    if (!isLoading) {
+      Log.d("ViewModel", "Loading complete, map is now displayed.")
     }
+  }
 
-    val context = LocalContext.current
+  if (mapVisible) {
+    Box(Modifier.fillMaxSize()) {
+      if (isLoading) {
+        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+      } else {
+        GoogleMap(
+            modifier = modifier,
+            cameraPositionState = cameraPositionState,
+            properties = mapProperties,
+            uiSettings = uiSettings,
+            onMapLoaded = onMapLoaded,
+            onMapClick = { isButtonVisible.value = true },
+            onPOIClick = {}) {
+              val markerClick: (Marker) -> Boolean = {
+                isButtonVisible.value = false
+                false
+              }
 
-    LaunchedEffect(events.value) {
-        Log.d("ViewModel", "Loading custom pins for ${events.value.size} events.")
-        eventViewModel.loadCustomPins(context, events.value)
-    }
+              events.value.forEachIndexed { index, event ->
+                val today = LocalDate.now()
+                val oneWeekLater = today.plusWeeks(1)
 
-    val isLoading by eventViewModel.loading.observeAsState(false)
+                val isEventThisWeek =
+                    event.date.isAfter(today.minusDays(1)) &&
+                        event.date.isBefore(oneWeekLater.plusDays(1))
 
-    LaunchedEffect(isLoading) {
-        if (!isLoading) {
-            Log.d("ViewModel", "Loading complete, map is now displayed.")
-        }
-    }
+                val stablePins = remember { eventViewModel.bitmapDescriptors }
+                val originalBitmap =
+                    BitmapFactory.decodeResource(context.resources, R.drawable.default_pin)
 
-    if (mapVisible) {
-        Box(Modifier.fillMaxSize()) {
-            if (isLoading) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-            } else {
-                GoogleMap(
-                    modifier = modifier,
-                    cameraPositionState = cameraPositionState,
-                    properties = mapProperties,
-                    uiSettings = uiSettings,
-                    onMapLoaded = onMapLoaded,
-                    onMapClick = { isButtonVisible.value = true },
-                    onPOIClick = {}) {
-                    val markerClick: (Marker) -> Boolean = {
-                        isButtonVisible.value = false
-                        false
-                    }
+                val desiredWidth = 94
+                val desiredHeight = 140
 
-                    events.value.forEachIndexed { index, event ->
-                        val today = LocalDate.now()
-                        val oneWeekLater = today.plusWeeks(1)
+                val scaledBitmap =
+                    Bitmap.createScaledBitmap(originalBitmap, desiredWidth, desiredHeight, true)
 
-                        val isEventThisWeek =
-                            event.date.isAfter(today.minusDays(1)) &&
-                                    event.date.isBefore(oneWeekLater.plusDays(1))
+                val scaledPin = BitmapDescriptorFactory.fromBitmap(scaledBitmap)
 
-                        val stablePins = remember { eventViewModel.bitmapDescriptors }
-                        val originalBitmap =
-                            BitmapFactory.decodeResource(context.resources, R.drawable.default_pin)
+                val customPinBitmapDescriptor =
+                    if (isEventThisWeek) stablePins[event.eventID] else scaledPin
 
-                        val desiredWidth = 94
-                        val desiredHeight = 140
-
-                        val scaledBitmap =
-                            Bitmap.createScaledBitmap(originalBitmap, desiredWidth, desiredHeight, true)
-
-                        val scaledPin = BitmapDescriptorFactory.fromBitmap(scaledBitmap)
-
-                        val customPinBitmapDescriptor =
-                            if (isEventThisWeek) stablePins[event.eventID] else scaledPin
-
-                        MarkerInfoWindowContent(
-                            state = eventStates[index],
-                            title = event.title,
-                            icon =
-                            customPinBitmapDescriptor
-                                ?: BitmapDescriptorFactory.defaultMarker(
-                                    BitmapDescriptorFactory.HUE_RED),
-                            onClick = markerClick,
-                            onInfoWindowClick = {
-                                nav.navigateToEventInfo(
-                                    eventId = event.eventID,
-                                    title = event.title,
-                                    date = getEventDateString(event.date),
-                                    time = getEventTimeString(event.time),
-                                    description = event.description,
-                                    organizer = event.creator,
-                                    loc = LatLng(event.location.latitude, event.location.longitude),
-                                    rating = 0.0 // TODO: replace with actual rating
-                                    // TODO: add image
-                                )
-                            },
-                            visible = event.title.contains(query.value, ignoreCase = true)) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Column(Modifier.padding(20.dp)) {
-                                    Text(
-                                        event.title,
-                                        color = MaterialTheme.colorScheme.secondary,
-                                        style = MaterialTheme.typography.titleMedium)
-                                    Text(
-                                        getEventDateString(event.date),
-                                        color = MaterialTheme.colorScheme.secondary,
-                                        style = MaterialTheme.typography.bodyMedium)
-                                }
-                                Icon(
-                                    imageVector = Icons.Filled.Info,
-                                    tint = MaterialTheme.colorScheme.secondary,
-                                    contentDescription = "See More",
-                                    modifier = Modifier.padding(end = 20.dp))
-                            }
+                MarkerInfoWindowContent(
+                    state = eventStates[index],
+                    title = event.title,
+                    icon =
+                        customPinBitmapDescriptor
+                            ?: BitmapDescriptorFactory.defaultMarker(
+                                BitmapDescriptorFactory.HUE_RED),
+                    onClick = markerClick,
+                    onInfoWindowClick = {
+                      nav.navigateToEventInfo(
+                          eventId = event.eventID,
+                          title = event.title,
+                          date = getEventDateString(event.date),
+                          time = getEventTimeString(event.time),
+                          description = event.description,
+                          organizer = event.creator,
+                          loc = LatLng(event.location.latitude, event.location.longitude),
+                          rating = 0.0 // TODO: replace with actual rating
+                          // TODO: add image
+                          )
+                    },
+                    visible = event.title.contains(query.value, ignoreCase = true)) {
+                      Row(verticalAlignment = Alignment.CenterVertically) {
+                        Column(Modifier.padding(20.dp)) {
+                          Text(
+                              event.title,
+                              color = MaterialTheme.colorScheme.secondary,
+                              style = MaterialTheme.typography.titleMedium)
+                          Text(
+                              getEventDateString(event.date),
+                              color = MaterialTheme.colorScheme.secondary,
+                              style = MaterialTheme.typography.bodyMedium)
                         }
+                        Icon(
+                            imageVector = Icons.Filled.Info,
+                            tint = MaterialTheme.colorScheme.secondary,
+                            contentDescription = "See More",
+                            modifier = Modifier.padding(end = 20.dp))
+                      }
                     }
-                }
-                content()
+              }
             }
-        }
+        content()
+      }
     }
+  }
 }

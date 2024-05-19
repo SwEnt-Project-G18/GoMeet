@@ -225,8 +225,8 @@ class UserViewModel : ViewModel() {
             goMeetUser.pendingRequests
                 .map {
                   when (eventId) {
-                      it.eventId -> it.copy(status = InviteStatus.PENDING)
-                      else -> it
+                    it.eventId -> it.copy(status = InviteStatus.PENDING)
+                    else -> it
                   }
                 }
                 .toSet()

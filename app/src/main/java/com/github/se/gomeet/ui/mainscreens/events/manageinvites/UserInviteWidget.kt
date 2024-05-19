@@ -39,7 +39,6 @@ import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.InviteStatus
 import com.github.se.gomeet.model.user.GoMeetUser
 
-
 /**
  * This composable function represents the user invite widget when the user can be invited to an
  * event.
@@ -59,34 +58,34 @@ fun UserInviteWidget(
     callback: (GoMeetUser) -> Unit
 ) {
 
-    var clicked by rememberSaveable { mutableStateOf(initialClicked) }
-    Row(
-        modifier =
-        Modifier.fillMaxWidth()
-            .padding(start = 15.dp, end = 15.dp)
-            .height(50.dp)
-            .testTag("UserInviteWidget"),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically) {
+  var clicked by rememberSaveable { mutableStateOf(initialClicked) }
+  Row(
+      modifier =
+          Modifier.fillMaxWidth()
+              .padding(start = 15.dp, end = 15.dp)
+              .height(50.dp)
+              .testTag("UserInviteWidget"),
+      horizontalArrangement = Arrangement.SpaceBetween,
+      verticalAlignment = Alignment.CenterVertically) {
         val painter: Painter =
             if (event.images.isNotEmpty()) {
-                rememberAsyncImagePainter(
-                    ImageRequest.Builder(LocalContext.current)
-                        .data(data = user.profilePicture)
-                        .apply {
-                            crossfade(true)
-                            placeholder(R.drawable.gomeet_logo)
-                        }
-                        .build())
+              rememberAsyncImagePainter(
+                  ImageRequest.Builder(LocalContext.current)
+                      .data(data = user.profilePicture)
+                      .apply {
+                        crossfade(true)
+                        placeholder(R.drawable.gomeet_logo)
+                      }
+                      .build())
             } else {
-                painterResource(id = R.drawable.gomeet_logo)
+              painterResource(id = R.drawable.gomeet_logo)
             }
         // Profile picture
         Image(
             modifier =
-            Modifier.size(40.dp)
-                .clip(CircleShape)
-                .background(color = MaterialTheme.colorScheme.background),
+                Modifier.size(40.dp)
+                    .clip(CircleShape)
+                    .background(color = MaterialTheme.colorScheme.background),
             painter = painter,
             contentDescription = "profile picture",
             contentScale = ContentScale.None)
@@ -97,52 +96,52 @@ fun UserInviteWidget(
         // Status text
         Text(
             text =
-            when (status) {
-                InviteStatus.PENDING -> InviteStatus.PENDING.formattedName
-                InviteStatus.ACCEPTED -> InviteStatus.ACCEPTED.formattedName
-                InviteStatus.REFUSED -> InviteStatus.REFUSED.formattedName
-                else -> ""
-            },
+                when (status) {
+                  InviteStatus.PENDING -> InviteStatus.PENDING.formattedName
+                  InviteStatus.ACCEPTED -> InviteStatus.ACCEPTED.formattedName
+                  InviteStatus.REFUSED -> InviteStatus.REFUSED.formattedName
+                  else -> ""
+                },
             modifier = Modifier.width(80.dp).testTag("InviteStatus"),
             color =
-            when (status) {
-                InviteStatus.PENDING ->
-                    if (clicked) MaterialTheme.colorScheme.onBackground
-                    else MaterialTheme.colorScheme.primary
-                InviteStatus.ACCEPTED -> Color.Green
-                InviteStatus.REFUSED -> Color.Red
-                else -> MaterialTheme.colorScheme.onBackground
-            })
+                when (status) {
+                  InviteStatus.PENDING ->
+                      if (clicked) MaterialTheme.colorScheme.onBackground
+                      else MaterialTheme.colorScheme.primary
+                  InviteStatus.ACCEPTED -> Color.Green
+                  InviteStatus.REFUSED -> Color.Red
+                  else -> MaterialTheme.colorScheme.onBackground
+                })
 
         // Button to invite or cancel invitation
         Button(
             onClick = {
-                clicked = !clicked
-                val toAdd =
-                    (clicked && (status == null || status == InviteStatus.REFUSED)) ||
-                            (!clicked && (status == InviteStatus.PENDING || status == InviteStatus.ACCEPTED))
-                Log.d("ManageInvites", "toAdd: $toAdd, clicked: $clicked, status: $status")
-                callback(user.copy(pendingRequests = pendingRequests(user, event, status, toAdd)))
+              clicked = !clicked
+              val toAdd =
+                  (clicked && (status == null || status == InviteStatus.REFUSED)) ||
+                      (!clicked &&
+                          (status == InviteStatus.PENDING || status == InviteStatus.ACCEPTED))
+              Log.d("ManageInvites", "toAdd: $toAdd, clicked: $clicked, status: $status")
+              callback(user.copy(pendingRequests = pendingRequests(user, event, status, toAdd)))
             },
             modifier = Modifier.height(26.dp).width(82.dp),
             contentPadding = PaddingValues(vertical = 2.dp),
             shape = RoundedCornerShape(10.dp),
-            colors = manageInvitesButtonColour(status, clicked)
-        ) {
-            Text(
-                text =
-                when (status) {
-                    InviteStatus.PENDING,
-                    InviteStatus.ACCEPTED -> if (clicked) "Invite" else "Cancel"
-                    else -> if (!clicked) "Invite" else "Cancel"
-                },
-                color =
-                when (status) {
-                    InviteStatus.PENDING,
-                    InviteStatus.ACCEPTED -> if (clicked) Color.White else Color.DarkGray
-                    else -> if (!clicked) Color.White else Color.DarkGray
-                },
-                fontSize = 12.sp)
-        }
-    }
+            colors = manageInvitesButtonColour(status, clicked)) {
+              Text(
+                  text =
+                      when (status) {
+                        InviteStatus.PENDING,
+                        InviteStatus.ACCEPTED -> if (clicked) "Invite" else "Cancel"
+                        else -> if (!clicked) "Invite" else "Cancel"
+                      },
+                  color =
+                      when (status) {
+                        InviteStatus.PENDING,
+                        InviteStatus.ACCEPTED -> if (clicked) Color.White else Color.DarkGray
+                        else -> if (!clicked) Color.White else Color.DarkGray
+                      },
+                  fontSize = 12.sp)
+            }
+      }
 }

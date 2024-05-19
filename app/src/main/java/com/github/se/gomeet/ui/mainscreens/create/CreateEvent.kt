@@ -347,31 +347,32 @@ fun CreateEvent(
                   onClick = {
                     if (titleState.value.isNotEmpty()) {
                       when (selectedLocation.value == null) {
-                        true -> eventViewModel.location(locationState.value, 1) { locations ->
-                          if (locations.isNotEmpty()) {
-                            eventViewModel.createEvent(
-                                titleState.value,
-                                descriptionState.value,
-                                locations[0],
-                                pickedDate.value,
-                                pickedTime.value,
-                                price,
-                                url.value,
-                                listOf(),
-                                listOf(),
-                                listOf(),
-                                0,
-                                !isPrivateEvent.value,
-                                listOf(),
-                                listOf(),
-                                imageUri,
-                                userViewModel,
-                                uid)
+                        true ->
+                            eventViewModel.location(locationState.value, 1) { locations ->
+                              if (locations.isNotEmpty()) {
+                                eventViewModel.createEvent(
+                                    titleState.value,
+                                    descriptionState.value,
+                                    locations[0],
+                                    pickedDate.value,
+                                    pickedTime.value,
+                                    price,
+                                    url.value,
+                                    listOf(),
+                                    listOf(),
+                                    listOf(),
+                                    0,
+                                    !isPrivateEvent.value,
+                                    listOf(),
+                                    listOf(),
+                                    imageUri,
+                                    userViewModel,
+                                    uid)
 
-                            nav.goBack()
-                          }
-                        }
-                      false -> {
+                                nav.goBack()
+                              }
+                            }
+                        false -> {
                           eventViewModel.createEvent(
                               titleState.value,
                               descriptionState.value,
@@ -389,10 +390,9 @@ fun CreateEvent(
                               listOf(),
                               imageUri,
                               userViewModel,
-                              uid
-                          )
+                              uid)
                           nav.goBack()
-                      }
+                        }
                       }
                     }
 

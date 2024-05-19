@@ -53,76 +53,76 @@ internal fun ContentInColumn(
     eventList: MutableState<List<Event>>,
     nav: NavigationActions
 ) {
-    val offset by backdropState.offset
+  val offset by backdropState.offset
 
-    val columnAlpha = ((halfHeightPx - offset) / halfHeightPx).coerceIn(0f..1f)
-    val events = eventList.value
-    if (columnAlpha > 0) {
-        Column {
-            TopTitle(forColumn = true, alpha = columnAlpha)
+  val columnAlpha = ((halfHeightPx - offset) / halfHeightPx).coerceIn(0f..1f)
+  val events = eventList.value
+  if (columnAlpha > 0) {
+    Column {
+      TopTitle(forColumn = true, alpha = columnAlpha)
 
-            LazyColumn(
-                modifier = Modifier.alpha(columnAlpha),
-                state = listState,
-                horizontalAlignment = Alignment.CenterHorizontally) {
-                itemsIndexed(events) { _, event ->
-                    Column {
-                        val configuration = LocalConfiguration.current
-                        val screenWidth = configuration.screenWidthDp.dp
+      LazyColumn(
+          modifier = Modifier.alpha(columnAlpha),
+          state = listState,
+          horizontalAlignment = Alignment.CenterHorizontally) {
+            itemsIndexed(events) { _, event ->
+              Column {
+                val configuration = LocalConfiguration.current
+                val screenWidth = configuration.screenWidthDp.dp
 
-                        Card(
-                            shape = RoundedCornerShape(16.dp),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-                            modifier =
-                            Modifier.width(screenWidth / 0.6f).aspectRatio(3f / 1.75f).clickable {
-                                nav.navigateToEventInfo(
-                                    eventId = event.eventID,
-                                    title = event.title,
-                                    date = getEventDateString(event.date),
-                                    time = getEventTimeString(event.time),
-                                    description = event.description,
-                                    organizer = event.creator,
-                                    loc = LatLng(event.location.latitude, event.location.longitude),
-                                    rating = 0.0 // TODO: replace with actual rating
-                                    // TODO: add image
-                                )
-                            }) {
-                            val painter: Painter =
-                                if (event.images.isNotEmpty()) {
-                                    rememberAsyncImagePainter(
-                                        ImageRequest.Builder(LocalContext.current)
-                                            .data(data = event.images[0])
-                                            .apply {
-                                                crossfade(true)
-                                                placeholder(R.drawable.gomeet_logo)
-                                            }
-                                            .build())
-                                } else {
-                                    painterResource(id = R.drawable.gomeet_logo)
-                                }
-                            Image(
-                                painter = painter,
-                                contentDescription = "Event Image",
-                                alignment = Alignment.Center,
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(16.dp)))
-                        }
-                        Spacer(Modifier.height(8.dp))
-                        Column(modifier = Modifier.padding(8.dp)) {
-                            Text(
-                                text = event.title,
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.tertiary)
-                            Text(
-                                text = eventMomentToString(event.date, event.time),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.tertiary)
-                        }
+                Card(
+                    shape = RoundedCornerShape(16.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+                    modifier =
+                        Modifier.width(screenWidth / 0.6f).aspectRatio(3f / 1.75f).clickable {
+                          nav.navigateToEventInfo(
+                              eventId = event.eventID,
+                              title = event.title,
+                              date = getEventDateString(event.date),
+                              time = getEventTimeString(event.time),
+                              description = event.description,
+                              organizer = event.creator,
+                              loc = LatLng(event.location.latitude, event.location.longitude),
+                              rating = 0.0 // TODO: replace with actual rating
+                              // TODO: add image
+                              )
+                        }) {
+                      val painter: Painter =
+                          if (event.images.isNotEmpty()) {
+                            rememberAsyncImagePainter(
+                                ImageRequest.Builder(LocalContext.current)
+                                    .data(data = event.images[0])
+                                    .apply {
+                                      crossfade(true)
+                                      placeholder(R.drawable.gomeet_logo)
+                                    }
+                                    .build())
+                          } else {
+                            painterResource(id = R.drawable.gomeet_logo)
+                          }
+                      Image(
+                          painter = painter,
+                          contentDescription = "Event Image",
+                          alignment = Alignment.Center,
+                          contentScale = ContentScale.Crop,
+                          modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(16.dp)))
                     }
-                    HorizontalDivider(
-                        color = Color.Gray, modifier = Modifier.padding(top = 0.dp, bottom = 16.dp))
+                Spacer(Modifier.height(8.dp))
+                Column(modifier = Modifier.padding(8.dp)) {
+                  Text(
+                      text = event.title,
+                      style = MaterialTheme.typography.bodyLarge,
+                      color = MaterialTheme.colorScheme.tertiary)
+                  Text(
+                      text = eventMomentToString(event.date, event.time),
+                      style = MaterialTheme.typography.bodyMedium,
+                      color = MaterialTheme.colorScheme.tertiary)
                 }
+              }
+              HorizontalDivider(
+                  color = Color.Gray, modifier = Modifier.padding(top = 0.dp, bottom = 16.dp))
             }
-        }
+          }
     }
+  }
 }

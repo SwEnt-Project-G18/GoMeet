@@ -140,4 +140,3 @@ fun AddFriend(nav: NavigationActions, userViewModel: UserViewModel) {
         }
       }
 }
-

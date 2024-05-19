@@ -28,12 +28,12 @@ fun PageUserInvites(
     initialClicked: Boolean
 ) {
 
-    Column(
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxSize()) {
+  Column(
+      verticalArrangement = Arrangement.Top,
+      horizontalAlignment = Alignment.CenterHorizontally,
+      modifier = Modifier.fillMaxSize()) {
         list.forEach { follower ->
-            UserInviteWidget(follower, currentEvent, status, initialClicked, callback)
+          UserInviteWidget(follower, currentEvent, status, initialClicked, callback)
         }
-    }
+      }
 }

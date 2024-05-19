@@ -12,7 +12,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -71,8 +70,8 @@ import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.tasks.await
 import java.io.InputStream
+import kotlinx.coroutines.tasks.await
 
 @Composable
 fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel = UserViewModel()) {
@@ -241,129 +240,123 @@ fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel = UserViewM
       },
       content = { innerPadding ->
         when (isLoaded) {
-            true -> Box(modifier = Modifier.padding(innerPadding)) {
+          true ->
+              Box(modifier = Modifier.padding(innerPadding)) {
                 Column(
                     modifier =
-                    Modifier.padding(start = 15.dp, end = 15.dp)
-                        .verticalScroll(rememberScrollState(0))
-                        .fillMaxSize(),
+                        Modifier.padding(start = 15.dp, end = 15.dp)
+                            .verticalScroll(rememberScrollState(0))
+                            .fillMaxSize(),
                     verticalArrangement = Arrangement.Top,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Image(
-                        painter =
-                        if (imageBitmap != null) {
-                            androidx.compose.ui.graphics.painter.BitmapPainter(imageBitmap!!)
-                        } else if (!profilePictureUrl.isNullOrEmpty()) {
-                            rememberAsyncImagePainter(profilePictureUrl)
-                        } else {
-                            painterResource(id = R.drawable.gomeet_logo)
-                        },
-                        contentDescription = "Profile picture",
-                        modifier =
-                        Modifier.padding(start = 15.dp, end = 15.dp, top = 30.dp, bottom = 15.dp)
-                            .width(101.dp)
-                            .height(101.dp)
-                            .clickable { imagePickerLauncher.launch("image/*") }
-                            .clip(CircleShape)
-                            .background(color = MaterialTheme.colorScheme.background)
-                            .align(Alignment.CenterHorizontally)
-                            .testTag("Profile Picture"),
-                        contentScale = ContentScale.Crop)
+                    horizontalAlignment = Alignment.CenterHorizontally) {
+                      Image(
+                          painter =
+                              if (imageBitmap != null) {
+                                androidx.compose.ui.graphics.painter.BitmapPainter(imageBitmap!!)
+                              } else if (!profilePictureUrl.isNullOrEmpty()) {
+                                rememberAsyncImagePainter(profilePictureUrl)
+                              } else {
+                                painterResource(id = R.drawable.gomeet_logo)
+                              },
+                          contentDescription = "Profile picture",
+                          modifier =
+                              Modifier.padding(
+                                      start = 15.dp, end = 15.dp, top = 30.dp, bottom = 15.dp)
+                                  .width(101.dp)
+                                  .height(101.dp)
+                                  .clickable { imagePickerLauncher.launch("image/*") }
+                                  .clip(CircleShape)
+                                  .background(color = MaterialTheme.colorScheme.background)
+                                  .align(Alignment.CenterHorizontally)
+                                  .testTag("Profile Picture"),
+                          contentScale = ContentScale.Crop)
 
-                    Spacer(modifier = Modifier.size(16.dp))
+                      Spacer(modifier = Modifier.size(16.dp))
 
-                    TextField(
-                        value = firstName.value,
-                        onValueChange = { newValue -> firstName.value = newValue },
-                        label = { Text("First Name") },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = textFieldColors
-                    )
-                    if (!firstNameValid && !firstClick) {
+                      TextField(
+                          value = firstName.value,
+                          onValueChange = { newValue -> firstName.value = newValue },
+                          label = { Text("First Name") },
+                          singleLine = true,
+                          modifier = Modifier.fillMaxWidth(),
+                          colors = textFieldColors)
+                      if (!firstNameValid && !firstClick) {
                         Text(text = "First Name is not valid", color = Color.Red)
-                    }
-                    Spacer(modifier = Modifier.size(16.dp))
+                      }
+                      Spacer(modifier = Modifier.size(16.dp))
 
-                    TextField(
-                        value = lastName.value,
-                        onValueChange = { newValue -> lastName.value = newValue },
-                        label = { Text("Last Name") },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = textFieldColors
-                    )
+                      TextField(
+                          value = lastName.value,
+                          onValueChange = { newValue -> lastName.value = newValue },
+                          label = { Text("Last Name") },
+                          singleLine = true,
+                          modifier = Modifier.fillMaxWidth(),
+                          colors = textFieldColors)
 
-                    if (!lastNameValid && !firstClick) {
+                      if (!lastNameValid && !firstClick) {
                         Text(text = "Last Name is not valid", color = Color.Red)
-                    }
+                      }
 
-                    Spacer(modifier = Modifier.size(16.dp))
+                      Spacer(modifier = Modifier.size(16.dp))
 
-                    TextField(
-                        value = username.value,
-                        onValueChange = { newValue -> username.value = newValue },
-                        label = { Text("Username") },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = textFieldColors
-                    )
+                      TextField(
+                          value = username.value,
+                          onValueChange = { newValue -> username.value = newValue },
+                          label = { Text("Username") },
+                          singleLine = true,
+                          modifier = Modifier.fillMaxWidth(),
+                          colors = textFieldColors)
 
-                    if (!firstClick && !usernameValid) {
+                      if (!firstClick && !usernameValid) {
                         Text(text = "The Username is not valid or already taken", color = Color.Red)
-                    }
+                      }
 
-                    Spacer(modifier = Modifier.size(16.dp))
+                      Spacer(modifier = Modifier.size(16.dp))
 
-                    TextField(
-                        value = phoneNumber.value,
-                        onValueChange = { newValue -> phoneNumber.value = newValue },
-                        label = { Text("Phone Number") },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = textFieldColors
-                    )
+                      TextField(
+                          value = phoneNumber.value,
+                          onValueChange = { newValue -> phoneNumber.value = newValue },
+                          label = { Text("Phone Number") },
+                          singleLine = true,
+                          modifier = Modifier.fillMaxWidth(),
+                          colors = textFieldColors)
 
-                    if (!phoneNumberValid && !firstClick) {
+                      if (!phoneNumberValid && !firstClick) {
                         Text(text = "Phone Number is not valid", color = Color.Red)
-                    }
-                    Spacer(modifier = Modifier.size(16.dp))
+                      }
+                      Spacer(modifier = Modifier.size(16.dp))
 
-                    CountrySuggestionTextField(countries, textFieldColors, country.value) {
+                      CountrySuggestionTextField(countries, textFieldColors, country.value) {
                         country.value = it
-                    }
+                      }
 
-                    if (!countryValid && !firstClick) {
+                      if (!countryValid && !firstClick) {
                         Text(text = "Country is not valid", color = Color.Red)
+                      }
+
+                      Spacer(modifier = Modifier.size(16.dp))
+
+                      Row(
+                          modifier = Modifier.fillMaxWidth().padding(top = 15.dp, bottom = 10.dp),
+                          verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = "Edit Tags",
+                                color = MaterialTheme.colorScheme.onBackground,
+                                fontStyle = FontStyle.Normal,
+                                fontWeight = FontWeight.Normal,
+                                fontFamily = FontFamily.Default,
+                                textAlign = TextAlign.Start,
+                                style = MaterialTheme.typography.bodyMedium)
+                            Icon(
+                                Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                                null,
+                                modifier =
+                                    Modifier.clickable { showPopup.value = true }
+                                        .testTag("EditTagsButton"))
+                          }
                     }
-
-                    Spacer(modifier = Modifier.size(16.dp))
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(top = 15.dp, bottom = 10.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Edit Tags",
-                            color = MaterialTheme.colorScheme.onBackground,
-                            fontStyle = FontStyle.Normal,
-                            fontWeight = FontWeight.Normal,
-                            fontFamily = FontFamily.Default,
-                            textAlign = TextAlign.Start,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                        Icon(
-                            Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                            null,
-                            modifier =
-                            Modifier.clickable { showPopup.value = true }
-                                .testTag("EditTagsButton"))
-                    }
-                }
-            }
-
-            false -> LoadingText()
+              }
+          false -> LoadingText()
         }
 
         if (showPopup.value) {

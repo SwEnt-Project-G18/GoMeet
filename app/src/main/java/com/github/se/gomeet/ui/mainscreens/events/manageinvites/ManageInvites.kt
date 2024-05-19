@@ -155,8 +155,7 @@ fun ManageInvites(
                           text = TO_INVITE.formattedName,
                           style =
                               MaterialTheme.typography.bodyMedium.copy(
-                                  fontWeight = pagerWeight(pagerState, TO_INVITE.formattedName)
-                              ))
+                                  fontWeight = pagerWeight(pagerState, TO_INVITE.formattedName)))
                     }
 
                 // Pending invitations
@@ -170,8 +169,7 @@ fun ManageInvites(
                           text = PENDING.formattedName,
                           style =
                               MaterialTheme.typography.bodyMedium.copy(
-                                  fontWeight = pagerWeight(pagerState, PENDING.formattedName)
-                              ))
+                                  fontWeight = pagerWeight(pagerState, PENDING.formattedName)))
                     }
 
                 // Accepted invitations
@@ -185,8 +183,7 @@ fun ManageInvites(
                           text = ACCEPTED.formattedName,
                           style =
                               MaterialTheme.typography.bodyMedium.copy(
-                                  fontWeight = pagerWeight(pagerState, ACCEPTED.formattedName)
-                              ))
+                                  fontWeight = pagerWeight(pagerState, ACCEPTED.formattedName)))
                     }
 
                 // Refused invitations
@@ -200,8 +197,7 @@ fun ManageInvites(
                           text = REFUSED.formattedName,
                           style =
                               MaterialTheme.typography.bodyMedium.copy(
-                                  fontWeight = pagerWeight(pagerState, REFUSED.formattedName)
-                              ))
+                                  fontWeight = pagerWeight(pagerState, REFUSED.formattedName)))
                     }
               }
           Canvas(
@@ -291,7 +287,6 @@ fun ManageInvites(
         }
       }
 }
-
 
 /**
  * This function updates the list of users to invite to an event.

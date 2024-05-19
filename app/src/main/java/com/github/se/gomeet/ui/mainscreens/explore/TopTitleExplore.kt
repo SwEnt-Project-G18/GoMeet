@@ -22,21 +22,21 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 internal fun TopTitle(forColumn: Boolean, alpha: Float) {
-    Column(
-        modifier =
-        Modifier.padding(
-            top = if (forColumn) 34.dp else 12.dp,
-            start = 10.dp) // status bar 24dp in material guidance
-            .alpha(alpha = alpha)
-            .fillMaxWidth()) {
+  Column(
+      modifier =
+          Modifier.padding(
+                  top = if (forColumn) 34.dp else 12.dp,
+                  start = 10.dp) // status bar 24dp in material guidance
+              .alpha(alpha = alpha)
+              .fillMaxWidth()) {
         Box(
             modifier =
-            Modifier.size(width = 48.dp, height = 3.dp)
-                .clip(shape = RoundedCornerShape(12.dp))
-                .background(color = Color.LightGray)
-                .align(alignment = Alignment.CenterHorizontally))
+                Modifier.size(width = 48.dp, height = 3.dp)
+                    .clip(shape = RoundedCornerShape(12.dp))
+                    .background(color = Color.LightGray)
+                    .align(alignment = Alignment.CenterHorizontally))
         Spacer(modifier = Modifier.height(LocalConfiguration.current.screenHeightDp.dp / 80))
         Text(text = "Trending Around You", style = MaterialTheme.typography.titleMedium)
         Spacer(modifier = Modifier.height(LocalConfiguration.current.screenHeightDp.dp / 80))
-    }
+      }
 }
