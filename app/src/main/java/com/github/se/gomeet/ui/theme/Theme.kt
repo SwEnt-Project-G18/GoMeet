@@ -37,7 +37,7 @@ private val LightColorScheme =
         tertiaryContainer = Color(0xFFEEEEEE),
         outline = Cyan,
         outlineVariant = DodgerBlue,
-    )
+        onBackground = Color.Black)
 
 @Composable
 fun GoMeetTheme(
