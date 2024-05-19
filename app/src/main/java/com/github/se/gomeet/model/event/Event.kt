@@ -39,8 +39,20 @@ data class Event(
     val maxParticipants: Int, // Maximum number of Participants of the event
     val public: Boolean, // True if the event is public, false if it's private
     val tags: List<String>, // Tags of the event
-    val images: List<String>, // Is it the right type?
-)
+    val images: List<String> // Is it the right type?
+) {
+  fun doesMatchSearchQuery(query: String): Boolean {
+    val matchingCombinations =
+        listOf(
+            "$title$description",
+            "$title $description",
+            "${title.first()} ${description.first()}",
+            creator,
+            location.toString())
+
+    return matchingCombinations.any { it.contains(query, ignoreCase = true) }
+  }
+}
 
 /**
  * This function decides whether an event is in the past or not.
