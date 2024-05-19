@@ -282,15 +282,19 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
                               CircularProgressIndicator()
                             }
                       }
-                      SearchModule(
-                          nav = nav,
-                          backgroundColor = MaterialTheme.colorScheme.primaryContainer,
-                          contentColor = MaterialTheme.colorScheme.tertiary)
-                      // GoMeetSearchBar(
-                      //    nav,
-                      //    query,
-                      //    MaterialTheme.colorScheme.background,
-                      //    MaterialTheme.colorScheme.tertiary)
+
+                    val isDarkTheme = isSystemInDarkTheme()
+                    val backgroundColor = if (isDarkTheme) {
+                        MaterialTheme.colorScheme.primaryContainer
+                    } else {
+                        MaterialTheme.colorScheme.background
+                    }
+
+                    SearchModule(
+                        nav = nav,
+                        backgroundColor = backgroundColor,
+                        contentColor = MaterialTheme.colorScheme.tertiary
+                    )
                     }
               }) {}
         }

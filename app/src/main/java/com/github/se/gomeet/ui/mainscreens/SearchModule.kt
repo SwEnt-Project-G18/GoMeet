@@ -33,6 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
@@ -68,32 +69,43 @@ fun SearchModule(nav: NavigationActions, backgroundColor: Color, contentColor: C
   val keyboardController = LocalSoftwareKeyboardController.current
 
   Column(modifier = Modifier.padding(16.dp)) {
-    TextField(
-        value = searchText,
-        leadingIcon = {
-          IconButton(onClick = { nav.navigateToScreen(Route.MESSAGE_CHANNELS) }) {
-            Icon(
-                ImageVector.vectorResource(R.drawable.gomeet_icon),
-                contentDescription = null,
-                tint = contentColor)
-          }
-        },
-        onValueChange = viewModel::onSearchTextChange,
-        modifier = Modifier.fillMaxWidth().focusRequester(focusRequester),
-        placeholder = { Text(text = "Search") },
-        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
-        keyboardActions =
-            KeyboardActions(
-                onSearch = {
+      TextField(
+          value = searchText,
+          leadingIcon = {
+              IconButton(onClick = { nav.navigateToScreen(Route.MESSAGE_CHANNELS) }) {
+                  Icon(
+                      ImageVector.vectorResource(R.drawable.gomeet_icon),
+                      contentDescription = null,
+                      tint = contentColor
+                  )
+              }
+          },
+          onValueChange = viewModel::onSearchTextChange,
+          modifier = Modifier
+              .fillMaxWidth()
+              .focusRequester(focusRequester)
+              .clip(RoundedCornerShape(10.dp))  // Set the desired corner radius here
+              .background(backgroundColor),  // Apply the background color here
+          placeholder = { Text(text = "Search") },
+          keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
+          keyboardActions = KeyboardActions(
+              onSearch = {
                   keyboardController?.hide()
                   coroutineScope.launch { viewModel.performSearch(searchText) }
-                }),
-        colors =
-            TextFieldDefaults.colors(
-                focusedContainerColor = backgroundColor,
-                unfocusedContainerColor = backgroundColor,
-                disabledContainerColor = backgroundColor,
-            ))
+              }
+          ),
+          colors = TextFieldDefaults.colors(
+              focusedTextColor = contentColor,
+              unfocusedTextColor = contentColor,
+              cursorColor = MaterialTheme.colorScheme.primary,
+              focusedContainerColor = Color.Transparent,
+              unfocusedContainerColor = Color.Transparent,
+              disabledContainerColor = Color.Transparent,
+              focusedIndicatorColor = Color.Transparent,
+              unfocusedIndicatorColor = Color.Transparent,
+              disabledIndicatorColor = Color.Transparent
+          )
+      )
 
     Spacer(modifier = Modifier.height(16.dp))
     if (isSearching) {
