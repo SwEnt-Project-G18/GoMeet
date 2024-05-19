@@ -59,8 +59,7 @@ import kotlinx.coroutines.launch
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun Notifications(nav: NavigationActions, currentUserID: String) {
-  val userViewModel = UserViewModel()
+fun Notifications(nav: NavigationActions, currentUserID: String, userViewModel: UserViewModel) {
   val eventViewModel = EventViewModel(null)
   val pagerState = rememberPagerState(pageCount = { 2 })
   val screenHeight = LocalConfiguration.current.screenHeightDp.dp

@@ -156,7 +156,8 @@ class EventRepository private constructor() {
           "maxParticipants" to maxParticipants,
           "public" to public,
           "tags" to tags,
-          "images" to images)
+          "images" to images,
+      )
     }
 
     /**
@@ -190,7 +191,8 @@ class EventRepository private constructor() {
           maxParticipants = (this["maxParticipants"] as? String)?.toIntOrNull() ?: 0,
           public = this["public"] as? Boolean ?: false,
           tags = this["tags"] as? List<String> ?: emptyList(),
-          images = this["images"] as? List<String> ?: emptyList())
+          images = this["images"] as? List<String> ?: emptyList(),
+      )
     }
 
     /**

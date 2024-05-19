@@ -88,17 +88,20 @@ fun Profile(
   val coroutineScope = rememberCoroutineScope()
   var isProfileLoaded by remember { mutableStateOf(false) }
   var currentUser by remember { mutableStateOf<GoMeetUser?>(null) }
-  val myEventList = remember { mutableListOf<Event>() }
+  val joinedEventsList = remember { mutableListOf<Event>() }
   val myHistoryList = remember { mutableListOf<Event>() }
 
   LaunchedEffect(Unit) {
     coroutineScope.launch {
       currentUser = userViewModel.getUser(userId)
       val allEvents =
-          eventViewModel.getAllEvents()!!.filter { e -> currentUser!!.myEvents.contains(e.eventID) }
+          (eventViewModel.getAllEvents() ?: emptyList()).filter { e ->
+            currentUser!!.joinedEvents.contains(e.eventID)
+          }
       allEvents.forEach {
-        if (!isPastEvent(it) || isJoinedEvent(it, userId)) {
-          myEventList.add(it)
+
+        if (!isPastEvent(it)) {
+          joinedEventsList.add(it)
         } else {
           myHistoryList.add(it)
         }
@@ -293,7 +296,8 @@ fun Profile(
                     }
 
                 Spacer(modifier = Modifier.height(screenHeight / 40))
-                ProfileEventsList("My Events", rememberLazyListState(), myEventList, nav)
+
+                ProfileEventsList("Joined Events", rememberLazyListState(), joinedEventsList, nav)
                 Spacer(modifier = Modifier.height(screenHeight / 30))
                 ProfileEventsList("My History", rememberLazyListState(), myHistoryList, nav)
               }

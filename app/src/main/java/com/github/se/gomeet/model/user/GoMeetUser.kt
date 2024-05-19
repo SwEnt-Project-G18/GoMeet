@@ -38,4 +38,14 @@ data class GoMeetUser(
     var profilePicture: String = "",
     var tags: List<String>
     // can add more things later
-)
+) {
+  fun doesMatchSearchQuery(query: String): Boolean {
+    val matchingCombinations =
+        listOf(
+            "$firstName$lastName", "$firstName $lastName", username, email
+            // "${firstName.first()} ${lastName.first()}",
+            )
+
+    return matchingCombinations.any { it.contains(query, ignoreCase = true) }
+  }
+}

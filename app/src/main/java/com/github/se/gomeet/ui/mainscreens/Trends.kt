@@ -1,6 +1,7 @@
 package com.github.se.gomeet.ui.mainscreens
 
 import EventWidget
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -44,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.github.se.gomeet.R
+import com.github.se.gomeet.model.Tag
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.isPastEvent
 import com.github.se.gomeet.ui.mainscreens.events.GoMeetSearchBar
@@ -52,7 +54,7 @@ import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.viewmodel.EventViewModel
-import com.github.se.gomeet.viewmodel.EventViewModel.SortOption
+import com.github.se.gomeet.viewmodel.EventViewModel.SortOption.*
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
@@ -67,14 +69,13 @@ import java.util.Locale
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-// TODO : This class has only been implemented for testing purposes!
-//  It is showing ALL EVENTS IN FIREBASE,
-//  THIS IS NOT THE IMPLEMENTATION OF TRENDS
-
 /**
  * Trends screen composable. This is where the popular trends are displayed.
  *
+ * @param currentUserId The current user ID.
  * @param nav Navigation actions.
+ * @param userViewModel The user view model.
+ * @param eventViewModel The event view model.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -82,7 +83,7 @@ fun Trends(
     currentUserId: String,
     nav: NavigationActions,
     userViewModel: UserViewModel,
-    eventViewModel: EventViewModel
+    eventViewModel: EventViewModel,
 ) {
   val eventList = remember { mutableStateListOf<Event>() }
   val coroutineScope = rememberCoroutineScope()
@@ -90,9 +91,14 @@ fun Trends(
   val eventsLoaded = remember { mutableStateOf(false) }
   val screenWidth = LocalConfiguration.current.screenWidthDp.dp
   val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+  val userTags = remember { mutableStateListOf<Tag>() }
 
   LaunchedEffect(Unit) {
     coroutineScope.launch {
+      val currentUser = userViewModel.getUser(currentUserId)
+      if (currentUser != null)
+          userTags.addAll(Tag.entries.filter { currentUser.tags.contains(it.tagName) })
+      Log.d("Trends", "Current user: $currentUser with ${userTags.size} tags")
       val allEvents = eventViewModel.getAllEvents()!!.filter { !isPastEvent(it) }
       if (allEvents.isNotEmpty()) {
         eventList.addAll(allEvents)
@@ -134,7 +140,7 @@ fun Trends(
                   MaterialTheme.colorScheme.tertiary)
               Spacer(modifier = Modifier.height(5.dp))
 
-              SortButton(eventList)
+              SortButton(eventList, userTags)
 
               if (!eventsLoaded.value) {
                 LoadingText()
@@ -276,11 +282,12 @@ fun EventCarousel(events: List<Event>, nav: NavigationActions) {
  * Sort button composable. This is where the user can sort the events.
  *
  * @param eventList The list of events to sort.
+ * @param userTags The list of the current user's tags.
  */
 @Composable
-fun SortButton(eventList: MutableList<Event>) {
+fun SortButton(eventList: MutableList<Event>, userTags: List<Tag>) {
   var expanded by remember { mutableStateOf(false) }
-  var selectedOption by remember { mutableStateOf(EventViewModel.SortOption.DEFAULT) }
+  var selectedOption by remember { mutableStateOf(DEFAULT) }
 
   Box(
       contentAlignment = Alignment.Center,
@@ -304,37 +311,37 @@ fun SortButton(eventList: MutableList<Event>) {
               DropdownMenuItem(
                   text = { Text("Popularity") },
                   onClick = {
-                    // TODO: Implement popularity sorting
-                    selectedOption = SortOption.DEFAULT
+                    EventViewModel.sortEvents(Tag.tagListToString(userTags), eventList)
+                    selectedOption = DEFAULT
                     expanded = false
                   },
                   modifier =
                       Modifier.background(
-                          if (selectedOption == SortOption.DEFAULT)
+                          if (selectedOption == DEFAULT)
                               MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
                           else Color.Transparent))
               DropdownMenuItem(
                   text = { Text("Name") },
                   onClick = {
-                    selectedOption = SortOption.ALPHABETICAL
+                    selectedOption = ALPHABETICAL
                     eventList.sortBy { it.title }
                     expanded = false
                   },
                   modifier =
                       Modifier.background(
-                          if (selectedOption == SortOption.ALPHABETICAL)
+                          if (selectedOption == ALPHABETICAL)
                               MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
                           else Color.Transparent))
               DropdownMenuItem(
                   text = { Text("Date") },
                   onClick = {
-                    selectedOption = SortOption.DATE
+                    selectedOption = DATE
                     eventList.sortBy { it.date }
                     expanded = false
                   },
                   modifier =
                       Modifier.background(
-                          if (selectedOption == SortOption.DATE)
+                          if (selectedOption == DATE)
                               MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
                           else Color.Transparent))
             }

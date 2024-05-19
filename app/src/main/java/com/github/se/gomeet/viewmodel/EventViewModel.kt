@@ -49,7 +49,7 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
   private val _bitmapDescriptors = mutableStateMapOf<String, BitmapDescriptor>()
   val bitmapDescriptors: MutableMap<String, BitmapDescriptor> = _bitmapDescriptors
 
-  private var lastLoadedEvents: List<Event>? = null
+  private var lastLoadedEvents: List<Event> = emptyList()
   private val _loading = MutableLiveData(false)
   val loading: LiveData<Boolean> = _loading
 
@@ -246,6 +246,8 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
     Log.d("CreatorID", "Creator ID is $creatorId")
     CoroutineScope(Dispatchers.IO).launch {
       try {
+        val participantsWithCreator =
+            if (participants.contains(creatorId)) participants else participants.plus(creatorId!!)
         val imageUrl = imageUri?.let { uploadImageAndGetUrl(it) }
         val updatedImages = images.toMutableList().apply { imageUrl?.let { add(it) } }
         val event =
@@ -260,7 +262,7 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
                 price,
                 url,
                 pendingParticipants,
-                participants,
+                participantsWithCreator,
                 visibleToIfPrivate,
                 maxParticipants,
                 public,
@@ -268,7 +270,7 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
                 updatedImages)
 
         EventRepository.addEvent(event)
-        joinEvent(event, creatorId)
+        lastLoadedEvents = lastLoadedEvents.plus(event)
         userViewModel.joinEvent(event.eventID, creatorId)
         userViewModel.userCreatesEvent(event.eventID, creatorId)
       } catch (e: Exception) {
@@ -283,6 +285,8 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
    * @param event the event to edit
    */
   fun editEvent(event: Event) {
+    lastLoadedEvents = lastLoadedEvents.filter { it.eventID != event.eventID }
+    lastLoadedEvents = lastLoadedEvents.plus(event)
     EventRepository.updateEvent(event)
   }
 
@@ -292,6 +296,7 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
    * @param eventID the ID of the event to remove
    */
   fun removeEvent(eventID: String) {
+    lastLoadedEvents = lastLoadedEvents.filter { it.eventID != eventID }
     EventRepository.removeEvent(eventID)
   }
 
@@ -441,6 +446,35 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
       }
     }
     return locations
+  }
+
+  /** Companion object containing static methods. */
+  companion object {
+    /**
+     * Sort the events depending on the user's preferences according to their tags.
+     *
+     * @param userTags the user's tags
+     * @param eventsList the list of events to sort
+     */
+    fun sortEvents(
+        userTags: List<String>,
+        eventsList: MutableList<Event>,
+    ) {
+
+      // Only attempt to sort if user has tags
+      if (userTags.isNotEmpty()) {
+        val eventScoreList: MutableMap<String, Int> = mutableMapOf()
+        eventsList.forEach { event ->
+          val tagsInCommon = event.tags.intersect(userTags.toSet()).size
+          eventScoreList[event.eventID] = tagsInCommon
+        }
+        eventsList.sortByDescending { eventScoreList[it.eventID] }
+
+        Log.d("EventViewModel", "Sort success.")
+      } else {
+        Log.d("EventViewModel", "User has no tags, no sorting done.")
+      }
+    }
   }
 
   /** Events sorting enum, placed here because this is also where the sorting algorithm goes. */

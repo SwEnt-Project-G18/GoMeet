@@ -44,11 +44,12 @@ class UserViewModel : ViewModel() {
       phoneNumber: String,
       country: String,
       pfp: String = ""
-  ) {
+  ): GoMeetUser? {
+    var user: GoMeetUser? = null
     CoroutineScope(Dispatchers.IO).launch {
       if (getUser(uid) == null) {
         try {
-          val user =
+          user =
               GoMeetUser(
                   uid = uid,
                   username = username,
@@ -66,12 +67,13 @@ class UserViewModel : ViewModel() {
                   profilePicture = pfp,
                   tags = emptyList())
           currentUser.value = user
-          UserRepository.addUser(user)
+          UserRepository.addUser(user!!)
         } catch (e: Exception) {
           Log.w(ContentValues.TAG, "Error adding user", e)
         }
       }
     }
+    return user
   }
 
   suspend fun getFollowers(uid: String): List<GoMeetUser> {

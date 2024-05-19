@@ -77,8 +77,42 @@ enum class Tag(val tagName: String) {
   Tag29("Charity Event");
 
   companion object {
+
+    /**
+     * Returns the Tag object that corresponds to the given tag name.
+     *
+     * @param tagName: The name of the tag to find.
+     * @return The Tag object that corresponds to the given tag name, or null if no such tag exists.
+     */
     fun fromTagName(tagName: String): Tag? {
       return entries.find { it.tagName == tagName }
+    }
+
+    /**
+     * Returns the list of strings corresponding to the given list of tags.
+     *
+     * @param tagName: The name of the tag to find.
+     * @return The Tag object that corresponds to the given tag name, or null if no such tag exists.
+     */
+    fun tagListToString(tagList: List<Tag>): List<String> {
+      val tags = mutableListOf<String>()
+      tagList.forEach { tag -> tags.add(tag.tagName) }
+      return tags
+    }
+
+    /**
+     * Returns the list of tags corresponding to the given list of strings.
+     *
+     * @param stringList: The list of strings to convert to tags.
+     * @return The list of tags corresponding to the given list of strings.
+     */
+    fun stringListToTags(stringList: List<String>): List<Tag> {
+      val tags = mutableListOf<Tag>()
+      stringList.forEach { string ->
+        val tag = fromTagName(string)
+        if (tag != null) tags.add(tag)
+      }
+      return tags
     }
   }
 }
