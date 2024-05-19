@@ -17,7 +17,7 @@ class MainActivity : ComponentActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-//debug()
+    // debug()
     MapsInitializer.initialize(this)
     initCache()
     val client = initChatClient(applicationContext)
