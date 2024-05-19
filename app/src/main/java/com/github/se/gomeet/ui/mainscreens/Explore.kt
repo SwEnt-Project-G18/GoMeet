@@ -38,9 +38,9 @@ import androidx.compose.material.rememberBackdropScaffoldState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -392,7 +392,8 @@ private fun ContentInColumn(
                       color = MaterialTheme.colorScheme.tertiary)
                 }
               }
-              Divider(modifier = Modifier.padding(top = 0.dp, bottom = 16.dp))
+              HorizontalDivider(
+                  color = Color.Gray, modifier = Modifier.padding(top = 0.dp, bottom = 16.dp))
             }
           }
     }
