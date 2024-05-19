@@ -48,13 +48,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.Invitation
@@ -356,13 +360,26 @@ fun UserInviteWidget(
               .testTag("UserInviteWidget"),
       horizontalArrangement = Arrangement.SpaceBetween,
       verticalAlignment = Alignment.CenterVertically) {
+        val painter: Painter =
+            if (event.images.isNotEmpty()) {
+              rememberAsyncImagePainter(
+                  ImageRequest.Builder(LocalContext.current)
+                      .data(data = user.profilePicture)
+                      .apply {
+                        crossfade(true)
+                        placeholder(R.drawable.gomeet_logo)
+                      }
+                      .build())
+            } else {
+              painterResource(id = R.drawable.gomeet_logo)
+            }
         // Profile picture
         Image(
             modifier =
                 Modifier.size(40.dp)
                     .clip(CircleShape)
                     .background(color = MaterialTheme.colorScheme.background),
-            painter = painterResource(id = R.drawable.gomeet_logo),
+            painter = painter,
             contentDescription = "profile picture",
             contentScale = ContentScale.None)
 
