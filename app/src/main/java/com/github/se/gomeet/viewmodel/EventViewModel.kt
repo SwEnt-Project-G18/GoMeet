@@ -11,7 +11,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.se.gomeet.model.Tag
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.location.Location
 import com.github.se.gomeet.model.repository.EventRepository
@@ -458,7 +457,7 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
      * @param eventsList the list of events to sort
      */
     fun sortEvents(
-        userTags: List<Tag>,
+        userTags: List<String>,
         eventsList: MutableList<Event>,
     ) {
 

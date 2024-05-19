@@ -96,8 +96,9 @@ fun Trends(
 
   LaunchedEffect(Unit) {
     coroutineScope.launch {
-      val currentUser = userViewModel.getUser(currentUserId)!!
-      userTags.addAll(Tag.entries.filter { currentUser.tags.contains(it.tagName) })
+      val currentUser = userViewModel.getUser(currentUserId)
+      if (currentUser != null)
+          userTags.addAll(Tag.entries.filter { currentUser.tags.contains(it.tagName) })
       Log.d("Trends", "Current user: $currentUser with ${userTags.size} tags")
       val allEvents = eventViewModel.getAllEvents()!!.filter { !isPastEvent(it) }
       if (allEvents.isNotEmpty()) {
@@ -308,7 +309,7 @@ fun SortButton(eventList: MutableList<Event>, userTags: List<Tag>) {
               DropdownMenuItem(
                   text = { Text("Popularity") },
                   onClick = {
-                    EventViewModel.sortEvents(userTags, eventList)
+                    EventViewModel.sortEvents(Tag.tagListToString(userTags), eventList)
                     selectedOption = DEFAULT
                     expanded = false
                   },

@@ -82,7 +82,7 @@ fun OthersProfile(
   var followerCount by remember { mutableIntStateOf(0) }
   val coroutineScope = rememberCoroutineScope()
   var isProfileLoaded by remember { mutableStateOf(false) }
-  val myEventList = remember { mutableListOf<Event>() }
+  val joinedEventsList = remember { mutableListOf<Event>() }
   val myHistoryList = remember { mutableListOf<Event>() }
   val screenWidth = LocalConfiguration.current.screenWidthDp.dp
   val screenHeight = LocalConfiguration.current.screenHeightDp.dp
@@ -94,11 +94,12 @@ fun OthersProfile(
       followerCount = user?.followers?.size ?: 0
 
       val allEvents =
-          eventViewModel.getAllEvents()
-              ?: emptyList<Event>().filter { e -> user!!.myEvents.contains(e.eventID) && e.public }
+          (eventViewModel.getAllEvents() ?: emptyList()).filter { e ->
+            user!!.joinedEvents.contains(e.eventID) && e.public
+          }
       allEvents.forEach {
         if (!isPastEvent(it)) {
-          myEventList.add(it)
+          joinedEventsList.add(it)
         } else {
           myHistoryList.add(it)
         }
@@ -274,7 +275,10 @@ fun OthersProfile(
                     }
                 Spacer(modifier = Modifier.height(screenHeight / 40))
                 ProfileEventsList(
-                    (user!!.firstName) + "'s Events", rememberLazyListState(), myEventList, nav)
+                    (user!!.firstName) + "'s joined Events",
+                    rememberLazyListState(),
+                    joinedEventsList,
+                    nav)
                 Spacer(modifier = Modifier.height(screenHeight / 40))
                 ProfileEventsList(
                     (user!!.firstName) + "'s History", rememberLazyListState(), myHistoryList, nav)
