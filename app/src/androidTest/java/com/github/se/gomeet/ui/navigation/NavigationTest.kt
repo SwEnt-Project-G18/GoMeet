@@ -6,10 +6,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.github.se.gomeet.ui.mainscreens.Explore
 import com.github.se.gomeet.ui.mainscreens.Trends
 import com.github.se.gomeet.ui.mainscreens.create.Create
 import com.github.se.gomeet.ui.mainscreens.events.Events
+import com.github.se.gomeet.ui.mainscreens.explore.Explore
 import com.github.se.gomeet.ui.mainscreens.profile.Profile
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
