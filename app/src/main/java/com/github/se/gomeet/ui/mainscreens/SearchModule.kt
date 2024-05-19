@@ -48,6 +48,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
@@ -118,7 +119,6 @@ fun SearchModule(nav: NavigationActions, backgroundColor: Color, contentColor: C
       LazyColumn(modifier = Modifier.fillMaxWidth().weight(1f)) {
         items(persons) { item ->
           SearchModuleSnippet(item, nav = nav, backgroundColor = backgroundColor)
-          Spacer(modifier = Modifier.height(8.dp))
         }
       }
     }
@@ -195,12 +195,12 @@ fun SearchModuleSnippet(
           } else {
             painterResource(id = R.drawable.gomeet_icon)
           }
-      Row(
-          verticalAlignment = Alignment.CenterVertically,
-          modifier =
-              Modifier.padding(vertical = 8.dp)
-                  .background(color = backgroundColor, shape = RoundedCornerShape(10.dp))
-                  .clickable {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .padding(vertical = 8.dp)
+                .background(color = backgroundColor, shape = RoundedCornerShape(10.dp))
+                .clickable {
                     nav.navigateToEventInfo(
                         eventId = item.event.eventID,
                         title = item.event.title,
@@ -209,28 +209,43 @@ fun SearchModuleSnippet(
                         description = item.event.description,
                         organizer = item.event.creator,
                         loc = LatLng(item.event.location.latitude, item.event.location.longitude),
-                        rating = 0.0)
-                  }) {
+                        rating = 0.0
+                    )
+                }
+        ) {
             Image(
                 painter = painter,
                 contentDescription = "Event Icon",
-                modifier = Modifier.size(64.dp).padding(8.dp))
+                modifier = Modifier
+                    .size(100.dp) // Make the image bigger
+                    .padding(8.dp)
+                    .clip(RoundedCornerShape(16.dp)),
+                contentScale = ContentScale.Crop
+            )
             Spacer(modifier = Modifier.width(16.dp))
-            Column {
-              Text(
-                  text = "${item.event.title}",
-                  modifier = Modifier.fillMaxWidth().padding(8.dp),
-                  color = MaterialTheme.colorScheme.onBackground)
-              Text(
-                  text =
-                      "${item.event.date.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))} - ${item.event.time.format(DateTimeFormatter.ofPattern("HH:mm"))}",
-                  modifier = Modifier.fillMaxWidth())
-              val croppedDescription =
-                  if (item.event.description.length > 150) item.event.description.take(150) + "..."
-                  else item.event.description
-              Text(croppedDescription, color = Color.Gray)
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp) // Add vertical padding around the texts
+            ) {
+                Text(
+                    text = item.event.title,
+                    modifier = Modifier.fillMaxWidth(),
+                    color = MaterialTheme.colorScheme.onBackground,
+                    fontSize = 20.sp // Make the title text larger
+                )
+                Text(
+                    text = "${item.event.date.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))} - ${item.event.time.format(DateTimeFormatter.ofPattern("HH:mm"))}",
+                    modifier = Modifier.fillMaxWidth()
+                )
+                val croppedDescription = if (item.event.description.length > 150) {
+                    item.event.description.take(150) + "..."
+                } else {
+                    item.event.description
+                }
+                Text(croppedDescription, color = Color.Gray)
             }
-          }
+        }
     }
   }
 }
