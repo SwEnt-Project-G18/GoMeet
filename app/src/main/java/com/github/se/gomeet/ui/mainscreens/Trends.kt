@@ -45,6 +45,8 @@ import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
+import com.github.se.gomeet.model.event.getEventDateString
+import com.github.se.gomeet.model.event.getEventTimeString
 import com.github.se.gomeet.model.event.isPastEvent
 import com.github.se.gomeet.ui.mainscreens.events.GoMeetSearchBar
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
@@ -191,37 +193,8 @@ fun EventCarousel(events: List<Event>, nav: NavigationActions) {
             painterResource(id = R.drawable.gomeet_logo)
           }
 
-      val eventDate = Date.from(event.date.atStartOfDay(ZoneId.systemDefault()).toInstant())
-
-      val currentDate = Calendar.getInstance()
-      val startOfWeek = currentDate.clone() as Calendar
-      startOfWeek.set(Calendar.DAY_OF_WEEK, startOfWeek.firstDayOfWeek)
-      val endOfWeek = startOfWeek.clone() as Calendar
-      endOfWeek.add(Calendar.DAY_OF_WEEK, 6)
-
-      val eventCalendar = Calendar.getInstance().apply { time = eventDate }
-
-      val isThisWeek = eventCalendar.after(currentDate) && eventCalendar.before(endOfWeek)
-      val isToday =
-          currentDate.get(Calendar.YEAR) == eventCalendar.get(Calendar.YEAR) &&
-              currentDate.get(Calendar.DAY_OF_YEAR) == eventCalendar.get(Calendar.DAY_OF_YEAR)
-
-      val dayFormat =
-          if (isThisWeek) {
-            SimpleDateFormat("EEEE", Locale.getDefault())
-          } else {
-            SimpleDateFormat("dd/MM/yy", Locale.getDefault())
-          }
-
-      val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-
-      val dayString =
-          if (isToday) {
-            "Today"
-          } else {
-            dayFormat.format(eventDate)
-          }
-      val timeString = timeFormat.format(eventDate)
+        val dayString = getEventDateString(event.date)
+        val timeString = getEventTimeString(event.time)
 
       Box(
           modifier =
