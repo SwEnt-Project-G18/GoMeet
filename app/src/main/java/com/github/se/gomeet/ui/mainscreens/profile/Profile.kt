@@ -54,7 +54,6 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
-import com.github.se.gomeet.model.event.isJoinedEvent
 import com.github.se.gomeet.model.event.isPastEvent
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.LoadingText
@@ -99,7 +98,6 @@ fun Profile(
             currentUser!!.joinedEvents.contains(e.eventID)
           }
       allEvents.forEach {
-
         if (!isPastEvent(it)) {
           joinedEventsList.add(it)
         } else {
