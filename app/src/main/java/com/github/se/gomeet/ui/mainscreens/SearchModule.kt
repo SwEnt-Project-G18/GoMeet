@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -39,6 +40,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -84,8 +86,8 @@ fun SearchModule(nav: NavigationActions, backgroundColor: Color, contentColor: C
           modifier = Modifier
               .fillMaxWidth()
               .focusRequester(focusRequester)
-              .clip(RoundedCornerShape(10.dp))  // Set the desired corner radius here
-              .background(backgroundColor),  // Apply the background color here
+              .clip(RoundedCornerShape(10.dp))
+              .background(backgroundColor),
           placeholder = { Text(text = "Search") },
           keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
           keyboardActions = KeyboardActions(
@@ -146,27 +148,36 @@ fun SearchModuleSnippet(
           } else {
             painterResource(id = R.drawable.gomeet_icon)
           }
-      Row(
-          verticalAlignment = Alignment.CenterVertically,
-          modifier =
-              Modifier.padding(vertical = 8.dp)
-                  .clickable {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .padding(8.dp)
+                .clickable {
                     nav.navigateToScreen(Route.OTHERS_PROFILE.replace("{uid}", item.user.uid))
-                  }
-                  .background(color = backgroundColor, shape = RoundedCornerShape(10.dp))) {
+                }
+                .background(color = backgroundColor, shape = RoundedCornerShape(10.dp))
+        ) {
+            Spacer(modifier = Modifier.width(8.dp))
             Image(
                 painter = painter,
                 contentDescription = "User Icon",
-                modifier = Modifier.size(24.dp).padding(4.dp))
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(55.dp)
+                    .clip(CircleShape)
+            )
             Spacer(modifier = Modifier.width(16.dp))
-            Column {
-              Text(
-                  text = "${item.user.firstName} ${item.user.lastName}",
-                  modifier = Modifier.fillMaxWidth().padding(8.dp),
-                  color = MaterialTheme.colorScheme.onBackground)
-              Text("@${item.user.username}", color = Color.Gray)
+            Column(modifier = Modifier.fillMaxWidth().padding(10.dp)) {
+                Text(
+                    text = "${item.user.firstName} ${item.user.lastName}",
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+                Text(
+                    text = "@${item.user.username}",
+                    color = Color.Gray
+                )
             }
-          }
+        }
     }
     is SearchViewModel.SearchableItem.Event -> {
       val painter: Painter =
