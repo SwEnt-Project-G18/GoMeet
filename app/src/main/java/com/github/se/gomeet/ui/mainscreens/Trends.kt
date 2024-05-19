@@ -85,7 +85,6 @@ fun Trends(
     userViewModel: UserViewModel,
     eventViewModel: EventViewModel,
 ) {
-
   val eventList = remember { mutableStateListOf<Event>() }
   val coroutineScope = rememberCoroutineScope()
   val query = remember { mutableStateOf("") }
@@ -153,8 +152,11 @@ fun Trends(
                 Column(modifier = Modifier.fillMaxSize()) {
                   // TODO: Remove the top 5 events from the list
                   eventList.forEach { event ->
-                    if (event.title.contains(query.value, ignoreCase = true)) {
-
+                    if (event.title.contains(query.value, ignoreCase = true) &&
+                        !isPastEvent(event) &&
+                        (event.public ||
+                            event.visibleToIfPrivate.contains(currentUserId) ||
+                            event.creator == currentUserId)) {
                       EventWidget(
                           event = event, verified = false, nav = nav, userVM = userViewModel)
                     }

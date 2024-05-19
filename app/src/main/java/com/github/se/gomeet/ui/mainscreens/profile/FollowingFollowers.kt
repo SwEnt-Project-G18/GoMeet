@@ -41,14 +41,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.navigation.NavigationActions
@@ -221,14 +225,27 @@ fun PageUsers(
                   .testTag("FollowingUser"),
           horizontalArrangement = Arrangement.SpaceBetween,
           verticalAlignment = Alignment.CenterVertically) {
+            val painter: Painter =
+                if (user.profilePicture.isNotEmpty()) {
+                  rememberAsyncImagePainter(
+                      ImageRequest.Builder(LocalContext.current)
+                          .data(data = user.profilePicture)
+                          .apply {
+                            crossfade(true)
+                            placeholder(R.drawable.gomeet_logo)
+                          }
+                          .build())
+                } else {
+                  painterResource(id = R.drawable.gomeet_logo)
+                }
             Image(
                 modifier =
                     Modifier.width(60.dp)
                         .height(60.dp)
                         .clip(CircleShape)
                         .background(color = MaterialTheme.colorScheme.background),
-                painter = painterResource(id = R.drawable.gomeet_logo),
-                contentDescription = "image description",
+                painter = painter,
+                contentDescription = "Profile picture",
                 contentScale = ContentScale.None)
             Column(modifier = Modifier.padding(start = 15.dp).weight(1f)) {
               Text(text = user.username)

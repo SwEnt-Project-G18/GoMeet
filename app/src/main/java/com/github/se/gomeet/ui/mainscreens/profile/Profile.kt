@@ -294,6 +294,7 @@ fun Profile(
                     }
 
                 Spacer(modifier = Modifier.height(screenHeight / 40))
+
                 ProfileEventsList("Joined Events", rememberLazyListState(), joinedEventsList, nav)
                 Spacer(modifier = Modifier.height(screenHeight / 30))
                 ProfileEventsList("My History", rememberLazyListState(), myHistoryList, nav)

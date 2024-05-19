@@ -64,6 +64,10 @@ fun isPastEvent(event: Event): Boolean {
   return event.date.isBefore(LocalDate.now()) && event.date != LocalDate.now()
 }
 
+fun isJoinedEvent(event: Event, userId: String): Boolean {
+  return event.participants.contains(userId)
+}
+
 /**
  * Converts the time of an event to a string.
  *
