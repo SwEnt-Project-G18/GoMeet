@@ -143,7 +143,7 @@ class EndToEndTest3 : TestCase() {
         userVM.deleteUser(uid1)
         userVM.deleteUser(uid2)
 
-        val result = Firebase.auth.signInWithEmailAndPassword(email1, pwd1)
+        val result = Firebase.auth.signInWithEmailAndPassword(email2, pwd2)
         while (!result.isComplete) {
           TimeUnit.SECONDS.sleep(1)
         }

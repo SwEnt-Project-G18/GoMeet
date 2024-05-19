@@ -333,12 +333,22 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
     composable(
         route = Route.FOLLOWERS,
         arguments = listOf(navArgument("uid") { type = NavType.StringType })) {
-          FollowingFollowers(navAction, it.arguments?.getString("uid") ?: "", userViewModel, false)
+          FollowingFollowers(
+              navAction,
+              it.arguments?.getString("uid") ?: "",
+              userIdState.value,
+              userViewModel,
+              false)
         }
     composable(
         route = Route.FOLLOWING,
         arguments = listOf(navArgument("uid") { type = NavType.StringType })) {
-          FollowingFollowers(navAction, it.arguments?.getString("uid") ?: "", userViewModel, true)
+          FollowingFollowers(
+              navAction,
+              it.arguments?.getString("uid") ?: "",
+              userIdState.value,
+              userViewModel,
+              true)
         }
     composable(Route.MESSAGE_CHANNELS) {
       ChatTheme {
