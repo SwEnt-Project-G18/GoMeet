@@ -119,6 +119,7 @@ fun SearchModule(nav: NavigationActions, backgroundColor: Color, contentColor: C
       LazyColumn(modifier = Modifier.fillMaxWidth().weight(1f)) {
         items(persons) { item ->
           SearchModuleSnippet(item, nav = nav, backgroundColor = backgroundColor)
+          Spacer(modifier = Modifier.height(100.dp))
         }
       }
     }
