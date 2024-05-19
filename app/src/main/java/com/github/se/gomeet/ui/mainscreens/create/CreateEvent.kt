@@ -346,52 +346,53 @@ fun CreateEvent(
                   modifier = Modifier.width((screenWidth / 1.5.dp).dp).height(screenHeight / 17),
                   onClick = {
                     if (titleState.value.isNotEmpty()) {
-                      if (selectedLocation.value == null) {
-                        eventViewModel.location(locationState.value, 1) { locations ->
-                          if (locations.isNotEmpty()) {
-                            eventViewModel.createEvent(
-                                titleState.value,
-                                descriptionState.value,
-                                locations[0],
-                                pickedDate.value,
-                                pickedTime.value,
-                                price,
-                                url.value,
-                                listOf(),
-                                listOf(),
-                                listOf(),
-                                0,
-                                !isPrivateEvent.value,
-                                listOf(),
-                                listOf(),
-                                imageUri,
-                                userViewModel,
-                                uid)
+                      when (selectedLocation.value == null) {
+                        true ->
+                            eventViewModel.location(locationState.value, 1) { locations ->
+                              if (locations.isNotEmpty()) {
+                                eventViewModel.createEvent(
+                                    titleState.value,
+                                    descriptionState.value,
+                                    locations[0],
+                                    pickedDate.value,
+                                    pickedTime.value,
+                                    price,
+                                    url.value,
+                                    listOf(),
+                                    listOf(),
+                                    listOf(),
+                                    0,
+                                    !isPrivateEvent.value,
+                                    listOf(),
+                                    listOf(),
+                                    imageUri,
+                                    userViewModel,
+                                    uid)
 
-                            nav.goBack()
-                          }
+                                nav.goBack()
+                              }
+                            }
+                        false -> {
+                          eventViewModel.createEvent(
+                              titleState.value,
+                              descriptionState.value,
+                              selectedLocation.value!!,
+                              pickedDate.value,
+                              pickedTime.value,
+                              price,
+                              url.value,
+                              listOf(),
+                              listOf(),
+                              listOf(),
+                              0,
+                              !isPrivateEvent.value,
+                              tags.value,
+                              listOf(),
+                              imageUri,
+                              userViewModel,
+                              uid)
+                          nav.goBack()
                         }
-                      } else {
-                        eventViewModel.createEvent(
-                            titleState.value,
-                            descriptionState.value,
-                            selectedLocation.value!!,
-                            pickedDate.value,
-                            pickedTime.value,
-                            price,
-                            url.value,
-                            listOf(),
-                            listOf(),
-                            listOf(),
-                            0,
-                            !isPrivateEvent.value,
-                            tags.value,
-                            listOf(),
-                            imageUri,
-                            userViewModel,
-                            uid)
-
-                        nav.goBack()
                       }
                     }
 

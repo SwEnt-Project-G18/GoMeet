@@ -17,14 +17,14 @@ import androidx.navigation.navArgument
 import com.github.se.gomeet.ui.authscreens.LoginScreen
 import com.github.se.gomeet.ui.authscreens.WelcomeScreen
 import com.github.se.gomeet.ui.authscreens.register.RegisterScreen
-import com.github.se.gomeet.ui.mainscreens.Explore
 import com.github.se.gomeet.ui.mainscreens.Trends
 import com.github.se.gomeet.ui.mainscreens.create.Create
 import com.github.se.gomeet.ui.mainscreens.create.CreateEvent
 import com.github.se.gomeet.ui.mainscreens.events.AddParticipants
 import com.github.se.gomeet.ui.mainscreens.events.Events
-import com.github.se.gomeet.ui.mainscreens.events.ManageInvites
 import com.github.se.gomeet.ui.mainscreens.events.MyEventInfo
+import com.github.se.gomeet.ui.mainscreens.events.manageinvites.ManageInvites
+import com.github.se.gomeet.ui.mainscreens.explore.Explore
 import com.github.se.gomeet.ui.mainscreens.profile.AddFriend
 import com.github.se.gomeet.ui.mainscreens.profile.EditProfile
 import com.github.se.gomeet.ui.mainscreens.profile.FollowingFollowers
