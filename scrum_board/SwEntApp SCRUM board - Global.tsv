@@ -1,0 +1,58 @@
+Title	Status	Task Type	Nature	Epic	Assignees	Sprint	Length Estimate (hours)
+As an Event Creator, I want to be able to share my event with a QR code so I can share it to other users easily	Sprint Backlog		User Story	As a GoMeetUser, I want to be able to share users and events easily, so I can share informations for potential users easier (for example if we put a poster in EPFL)		Sprint 9	
+As a User I want to share my profile with a QR code so I can add new friends easily	Sprint Backlog		User Story	As a GoMeetUser, I want to be able to share users and events easily, so I can share informations for potential users easier (for example if we put a poster in EPFL)		Sprint 9	
+As a User I want to see a rating for the creator of an event so I can decide wether to join or not	Sprint Backlog		User Story	As a GoMeetUser, I want to be able to give and see ratings of events and users of the app so that I can have more trust in the events or users I plan to interact with		Sprint 9	
+As a User I want to easily rate all events I attended so I can give feedback on how an event went	Sprint Backlog		User Story	As a GoMeetUser, I want to be able to give and see ratings of events and users of the app so that I can have more trust in the events or users I plan to interact with		Sprint 9	
+As the creator of an event, I would like to post news about my event and notify all the attendees	Sprint Backlog		User Story	As a GoMeetUser, I want to be able to receive notifications of events in a near future, so that I don't miss them	chorfiyoussef	Sprint 9	
+Cache Firebase for offlline use and performance	Done in “Sprint #7”	Backend	Sprint Task		Antoine444	Sprint 7	5
+As a user, I want to be able to message any user I follow and not the organizer of an event so I can chat with my friends	Done in “Sprint #7”	Backend	User Story	As a GoMeetSocial app user, I want to be able to communicate and interact socially within the app so that I can maintain privacy while engaging with my friends and not necessarily the event organizers.			
+As a user, I would like to upload and update my profile picture so that I can personalize my profile and make it more recognizable to other users.	Done in “Sprint #7”	Backend	User Story	As a GoMeetSocial app user, I want comprehensive control over my profile and settings to tailor my experience and manage my privacy within the app.			
+Implement the logic to send and cancel invitations	Done in “Sprint #7”	Backend	Sprint Task		Antoine444	Sprint 7	5
+Add a custom profile picture	Done in “Sprint #7”	Frontend	Sprint Task		albertfares	Sprint 7	3
+Events History in my Profile	Done in “Sprint #7”	Backend	Sprint Task		koma2323	Sprint 7	5
+Advanced filtering events	In Development	Backend	Sprint Task		vladdancau	Sprint 7	10
+Payments system	In Development	Backend	Sprint Task		vladdancau	Sprint 8	8
+Start the PRD	In Development						
+Move MyEvents From Events to Profile	Done in “Sprint #7”	Frontend	Sprint Task		chorfiyoussef	Sprint 7	2
+Guided RegisterScreen	Done in “Sprint #7”	Frontend	Sprint Task		chorfiyoussef	Sprint 7	12
+Implement a message channel list	Done in “Sprint #7”	Frontend	Sprint Task		chorfiyoussef	Sprint 7	2
+As a user, I would like to customize my profile information and settings, including my name, contact details, and preferences, so that I can control how I present myself to others and manage how I interact with the app.	Product Backlog	Backend	User Story	As a GoMeetSocial app user, I want comprehensive control over my profile and settings to tailor my experience and manage my privacy within the app.			
+As a user, I want to be able to see public events from official and verified organizations so I can join them later	Product Backlog	Frontend	User Story	As a GoMeetSocial app user, I want to discover events organized by verified entities to ensure the authenticity and reliability of the events I choose to join.			
+Start implementing tags	Done in “Sprint #7”	Backend	Sprint Task		koma2323	Sprint 7	5
+Check aspect ratios across screens	Done in “Sprint #8”	Frontend	Sprint Task		albertfares, eloibressaud	Sprint 8	4
+As a user, I want to be able to access to informations of an event from the map so that I can navigate easily between the two screens	Done in “Sprint #8”	Frontend	User Story	As a GoMeetSocial app user, I want to seamlessly discover and navigate to events so that I can efficiently plan my attendance and access event information directly from the map interface.			
+A user searchbar (look up for Users)	Done in “Sprint #8”	Frontend	Sprint Task		vladdancau	Sprint 7	2
+Fix bugs & improve cognitive complexity	Done in “Sprint #8”	Backend	Sprint Task		vladdancau	Sprint 8	4
+Code Refactoring for M1/2	Done in “Sprint #8”	Backend	Sprint Task		DanThePol	Sprint 8	12
+Redesign UI	Done in “Sprint #8”	Frontend	Sprint Task		albertfares, chorfiyoussef, koma2323	Sprint 8	14
+UI Trends	Done in “Sprint #8”	Frontend	Sprint Task		albertfares	Sprint 7	8
+As a user, I want to be able accept or refuse invitations to an event so I can manage my invitations	Done in “Sprint #8”	Frontend	User Story	As a GoMeetSocial app user, I want to be able to customize my social network so I can personalize my events and message people in private	Antoine444	Sprint 7	
+As a private event organizer, I want to see which of my invitees plan on coming so it is easier for me to organize the event	Done in “Sprint #8”	Frontend	User Story	As a GoMeetSocial app user, I want to be able to customize my social network so I can personalize my events and message people in private	Antoine444	Sprint 7	
+Finish to implement the UI for ManageInvites with the new logic for the invitations	Done in “Sprint #8”	Frontend	Sprint Task		Antoine444	Sprint 8	10
+Profile Settings Logic (Device Permissions / Help / About)	Done in “Sprint #8”	Backend	Sprint Task		eloibressaud	Sprint 7	10
+UI MyProfile/OtherProfile/EditProfile/Following/Followers Enhancements	Done in “Sprint #8”	Frontend	Sprint Task		chorfiyoussef	Sprint 8	9
+UI WelcomeScreen/Create/BottomBarMenu/Events Enhancements	Done in “Sprint #8”	Frontend	Sprint Task		chorfiyoussef	Sprint 8	9
+improve test coverage	Done in “Sprint #8”		Sprint Task		koma2323	Sprint 8	12
+Fix innerPadding in Explore and map darkmode	Done in “Sprint #8”	Frontend	Sprint Task		chorfiyoussef	Sprint 8	4
+Implement the logic to accept or refuse invitations and use it for the Notifications screen	Done in “Sprint #8”	Backend	Sprint Task		Antoine444	Sprint 8	6
+Algorithm for Trends Screen	Done in “Sprint #7”	Backend	Sprint Task		DanThePol	Sprint 7	7
+Add calendar to replace date text field	Done in “Sprint #8”	Frontend	Sprint Task		DanThePol	Sprint 8	3
+As a user, I want to be able to have an itinerary of a potential event I'm interested in so I can plan on how to get there	Done in “Sprint #8”	Frontend	User Story	As a GoMeetSocial app user, I want to seamlessly discover and navigate to events so that I can efficiently plan my attendance and access event information directly from the map interface.		Sprint 8	
+Find User UI + logic	Done in “Sprint #8”	Frontend			albertfares	Sprint 8	6
+Make M3 video	Done in “Sprint #8”	Frontend	Sprint Task		albertfares	Sprint 8	2
+Fix issues	Tasks		Sprint Task		albertfares, Antoine444, chorfiyoussef, DanThePol, eloibressaud, koma2323, vladdancau		
+Modify event and user cards to show image from Firebase everywhere	Tasks	Frontend	Sprint Task		Antoine444	Sprint 9	6
+Check edge cases for debugging with user inputs	Tasks	Backend	Sprint Task			Sprint 8	4
+Edit event screen	Tasks	Frontend	Sprint Task		Antoine444	Sprint 9	6
+Event/user ratings logic	Tasks	Backend	Sprint Task		DanThePol	Sprint 9	6
+QR code UI	Tasks	Frontend	Sprint Task		eloibressaud	Sprint 8	8
+QR code logic	Tasks	Backend	Sprint Task		albertfares, eloibressaud	Sprint 8	8
+Finish Stripe payment system	Tasks	Backend	Sprint Task		vladdancau	Sprint 9	4
+Log out/delete account/stay signed in when leaving the app	Tasks	Backend	Sprint Task		DanThePol	Sprint 8	4
+Sanitise inputs in Create Event (Public and Private)	Tasks	Backend	Sprint Task		DanThePol	Sprint 9	4
+Replace the create bottom bar by notifications	Tasks	Frontend	Sprint Task		Antoine444	Sprint 9	2
+Share profile and share event buttons	Tasks	Backend	Sprint Task		albertfares, eloibressaud	Sprint 9	6
+Change Pins	Tasks	Frontend	Sprint Task		albertfares	Sprint 9	2
+Change app logo	Tasks	Frontend	Sprint Task		albertfares	Sprint 9	2
+Update figma	Tasks						
+Fix Issues (description)	In Review		Sprint Task		chorfiyoussef	Sprint 8	10
