@@ -14,6 +14,7 @@ import androidx.lifecycle.viewModelScope
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.location.Location
 import com.github.se.gomeet.model.repository.EventRepository
+import com.github.se.gomeet.model.user.GoMeetUser
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.firebase.firestore.FirebaseFirestore
@@ -454,20 +455,18 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
     /**
      * Sort the events depending on the user's preferences according to their tags.
      *
-     * @param userViewModel the userViewModel to get the user's tags
+     * @param currentUser the current user
      * @param eventsList the list of events to sort
-     * @param currentUserId the id of the current user
      */
     fun sortEvents(
-        userViewModel: UserViewModel,
+        currentUser: GoMeetUser?,
         eventsList: MutableList<Event>,
-        currentUserId: String
     ) {
 
-      // Assume that creatorId is the current user's ID
-      val currentUser = runBlocking { userViewModel.getUser(currentUserId) }
+        Log.d("EventViewModel", "Sorting ${eventsList.size} events for user ${currentUser?.uid}.")
 
-      if (currentUser != null) {
+      // Only attempt to sort if user has tags
+      if (currentUser != null && currentUser.tags.isNotEmpty()) {
         val tags = currentUser.tags
         val eventScoreList: MutableMap<String, Int> = mutableMapOf()
         eventsList.forEach { event ->
@@ -475,6 +474,10 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
           eventScoreList[event.eventID] = tagsInCommon
         }
         eventsList.sortByDescending { eventScoreList[it.eventID] }
+
+          Log.d("EventViewModel", "Sort success.")
+      } else {
+            Log.d("EventViewModel", "User has no tags or user was null, no sorting done.")
       }
     }
   }
