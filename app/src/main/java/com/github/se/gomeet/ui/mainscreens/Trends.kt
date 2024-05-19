@@ -52,7 +52,7 @@ import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.viewmodel.EventViewModel
-import com.github.se.gomeet.viewmodel.EventViewModel.SortOption
+import com.github.se.gomeet.viewmodel.EventViewModel.SortOption.*
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
@@ -67,14 +67,13 @@ import java.util.Locale
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-// TODO : This class has only been implemented for testing purposes!
-//  It is showing ALL EVENTS IN FIREBASE,
-//  THIS IS NOT THE IMPLEMENTATION OF TRENDS
-
 /**
  * Trends screen composable. This is where the popular trends are displayed.
  *
+ * @param currentUserId The current user ID.
  * @param nav Navigation actions.
+ * @param userViewModel The user view model.
+ * @param eventViewModel The event view model.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -135,7 +134,7 @@ fun Trends(
                   MaterialTheme.colorScheme.tertiary)
               Spacer(modifier = Modifier.height(5.dp))
 
-              SortButton(eventList)
+              SortButton(eventList, userViewModel, currentUserId)
 
               if (!eventsLoaded.value) {
                 LoadingText()
@@ -276,9 +275,9 @@ fun EventCarousel(events: List<Event>, nav: NavigationActions) {
  * @param eventList The list of events to sort.
  */
 @Composable
-fun SortButton(eventList: MutableList<Event>) {
+fun SortButton(eventList: MutableList<Event>, userViewModel: UserViewModel, currentUserId: String) {
   var expanded by remember { mutableStateOf(false) }
-  var selectedOption by remember { mutableStateOf(EventViewModel.SortOption.DEFAULT) }
+  var selectedOption by remember { mutableStateOf(DEFAULT) }
 
   Box(
       contentAlignment = Alignment.Center,
@@ -302,37 +301,37 @@ fun SortButton(eventList: MutableList<Event>) {
               DropdownMenuItem(
                   text = { Text("Popularity") },
                   onClick = {
-                    // TODO: Implement popularity sorting
-                    selectedOption = SortOption.DEFAULT
+                    EventViewModel.sortEvents(userViewModel, eventList, currentUserId)
+                    selectedOption = DEFAULT
                     expanded = false
                   },
                   modifier =
                       Modifier.background(
-                          if (selectedOption == SortOption.DEFAULT)
+                          if (selectedOption == DEFAULT)
                               MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
                           else Color.Transparent))
               DropdownMenuItem(
                   text = { Text("Name") },
                   onClick = {
-                    selectedOption = SortOption.ALPHABETICAL
+                    selectedOption = ALPHABETICAL
                     eventList.sortBy { it.title }
                     expanded = false
                   },
                   modifier =
                       Modifier.background(
-                          if (selectedOption == SortOption.ALPHABETICAL)
+                          if (selectedOption == ALPHABETICAL)
                               MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
                           else Color.Transparent))
               DropdownMenuItem(
                   text = { Text("Date") },
                   onClick = {
-                    selectedOption = SortOption.DATE
+                    selectedOption = DATE
                     eventList.sortBy { it.date }
                     expanded = false
                   },
                   modifier =
                       Modifier.background(
-                          if (selectedOption == SortOption.DATE)
+                          if (selectedOption == DATE)
                               MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
                           else Color.Transparent))
             }

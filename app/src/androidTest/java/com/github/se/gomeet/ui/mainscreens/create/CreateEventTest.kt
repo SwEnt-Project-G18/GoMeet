@@ -12,6 +12,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
+import com.github.se.gomeet.viewmodel.UserViewModel
 import kotlinx.coroutines.runBlocking
 import org.junit.AfterClass
 import org.junit.Rule
@@ -41,7 +42,8 @@ class CreateEventTest {
     val eventVM = EventViewModel(uid)
 
     composeTestRule.setContent {
-      CreateEvent(NavigationActions(rememberNavController()), eventVM, isPrivate = true)
+      CreateEvent(
+          NavigationActions(rememberNavController()), eventVM, isPrivate = true, UserViewModel())
     }
 
     composeTestRule.waitForIdle()
@@ -84,7 +86,8 @@ class CreateEventTest {
   @Test
   fun testCreatePublicEvent() {
     composeTestRule.setContent {
-      CreateEvent(NavigationActions(rememberNavController()), eventVM, isPrivate = false)
+      CreateEvent(
+          NavigationActions(rememberNavController()), eventVM, isPrivate = false, UserViewModel())
     }
 
     composeTestRule.waitForIdle()

@@ -99,7 +99,9 @@ class NotificationsTest {
 
   @Test
   fun testNotifications() {
-    composeTestRule.setContent { Notifications(NavigationActions(rememberNavController()), uid) }
+    composeTestRule.setContent {
+      Notifications(NavigationActions(rememberNavController()), uid, userVM)
+    }
 
     composeTestRule.waitForIdle()
 
@@ -123,7 +125,9 @@ class NotificationsTest {
 
   @Test
   fun testAcceptButton() {
-    composeTestRule.setContent { Notifications(NavigationActions(rememberNavController()), uid) }
+    composeTestRule.setContent {
+      Notifications(NavigationActions(rememberNavController()), uid, userVM)
+    }
     composeTestRule.waitUntil(timeoutMillis = 10000) {
       composeTestRule.onNodeWithText("Accept").isDisplayed()
     }

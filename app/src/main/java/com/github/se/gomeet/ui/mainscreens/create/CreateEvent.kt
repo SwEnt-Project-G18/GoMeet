@@ -87,9 +87,15 @@ private const val NUMBER_OF_SUGGESTIONS = 3
  * @param nav The navigation actions.
  * @param eventViewModel The event view model.
  * @param isPrivate The boolean value to determine if the event is private or not.
+ * @param userViewModel The user view model.
  */
 @Composable
-fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivate: Boolean) {
+fun CreateEvent(
+    nav: NavigationActions,
+    eventViewModel: EventViewModel,
+    isPrivate: Boolean,
+    userViewModel: UserViewModel
+) {
   val screenHeight = LocalConfiguration.current.screenHeightDp.dp
   val screenWidth = LocalConfiguration.current.screenWidthDp.dp
 
@@ -359,7 +365,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                                 listOf(),
                                 listOf(),
                                 imageUri,
-                                UserViewModel(),
+                                userViewModel,
                                 uid)
 
                             nav.goBack()
@@ -382,7 +388,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                             tags.value,
                             listOf(),
                             imageUri,
-                            UserViewModel(),
+                            userViewModel,
                             uid)
 
                         nav.goBack()

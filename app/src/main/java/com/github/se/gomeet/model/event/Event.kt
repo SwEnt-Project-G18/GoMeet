@@ -40,7 +40,6 @@ data class Event(
     val public: Boolean, // True if the event is public, false if it's private
     val tags: List<String>, // Tags of the event
     val images: List<String>, // Is it the right type?
-    val nViews: Int = 0 // Number of views of the event
 )
 
 /**

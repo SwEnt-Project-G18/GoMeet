@@ -14,11 +14,9 @@ import androidx.lifecycle.viewModelScope
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.location.Location
 import com.github.se.gomeet.model.repository.EventRepository
-import com.github.se.gomeet.model.repository.UserRepository
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
@@ -56,12 +54,7 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
   private val _loading = MutableLiveData(false)
   val loading: LiveData<Boolean> = _loading
 
-//  private val currentUser = if(creatorId != null) runBlocking { UserViewModel(UserRepository(Firebase.firestore)).getUser(creatorId) } else null
-    // The weight that the user tags will have compared to the number of views (for the sorting
-    // algorithm)
-  private val relevanceFactor = 0.5
-
-    /**
+  /**
    * Load custom pins for the events.
    *
    * @param context the context of the application
@@ -254,7 +247,8 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
     Log.d("CreatorID", "Creator ID is $creatorId")
     CoroutineScope(Dispatchers.IO).launch {
       try {
-          val participantsWithCreator = if(participants.contains(creatorId)) participants else participants.plus(creatorId!!)
+        val participantsWithCreator =
+            if (participants.contains(creatorId)) participants else participants.plus(creatorId!!)
         val imageUrl = imageUri?.let { uploadImageAndGetUrl(it) }
         val updatedImages = images.toMutableList().apply { imageUrl?.let { add(it) } }
         val event =
@@ -277,7 +271,7 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
                 updatedImages)
 
         EventRepository.addEvent(event)
-          lastLoadedEvents = lastLoadedEvents.plus(event)
+        lastLoadedEvents = lastLoadedEvents.plus(event)
         userViewModel.joinEvent(event.eventID, creatorId)
         userViewModel.userCreatesEvent(event.eventID, creatorId)
       } catch (e: Exception) {
@@ -429,19 +423,6 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
     }
   }
 
-    /**
-     * Update the number of views of an event.
-     *
-     * @param eventID the id of the event to update
-     */
-    fun sawEvent(eventID: String) {
-        val event = lastLoadedEvents.find { it.eventID == eventID } ?: return
-        lastLoadedEvents = lastLoadedEvents.filter { it.eventID != eventID}
-        lastLoadedEvents = lastLoadedEvents.plus(event.copy(nViews = event.nViews + 1))
-        EventRepository.updateEvent(event.copy(nViews = event.nViews + 1))
-        Log.d("ViewModel", "Saw event $eventID")
-    }
-
   /**
    * Helper function to parse the location response.
    *
@@ -468,49 +449,35 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
     return locations
   }
 
+  /** Companion object containing static methods. */
+  companion object {
     /**
-     * Sort the events depending on the number of event views and the user's preferences. Called each
-     * time getAllEvents() is called or when loadCustomPins() is called. If currentUser is null, the
-     * events are only sorted by descending order of nViews. This method is like O(n^3) lmao, but hey
-     * it works so don't worry about it too much bro
+     * Sort the events depending on the user's preferences according to their tags.
+     *
+     * @param userViewModel the userViewModel to get the user's tags
+     * @param eventsList the list of events to sort
+     * @param currentUserId the id of the current user
      */
-    private fun sortEvents() {
+    fun sortEvents(
+        userViewModel: UserViewModel,
+        eventsList: MutableList<Event>,
+        currentUserId: String
+    ) {
 
-        // Sort events by descending order of nViews
-        val currentUser = if(creatorId != null) runBlocking { UserViewModel().getUser(creatorId) } else null
+      // Assume that creatorId is the current user's ID
+      val currentUser = runBlocking { userViewModel.getUser(currentUserId) }
 
-        if (currentUser != null) {
-            val tags = currentUser.tags
-            val eventScoreList: Map<String, Pair<Int, Int>> = mutableMapOf()
-            var maxTags = 0
-            var maxViews = 0
-            lastLoadedEvents.forEach { event ->
-                eventScoreList.plus(Pair(event.eventID, Pair(0, 0)))
-                // Check if the event has any of the user's preferred tags
-                event.tags.forEach { tag ->
-                    if (tags.contains(tag)) {
-                        eventScoreList[event.eventID]?.first?.plus(event.nViews)
-                        eventScoreList[event.eventID]?.second?.plus(1)
-                    }
-                }
-                val nTags = eventScoreList[event.eventID]?.second ?: 0
-                if (nTags > maxTags) maxTags = nTags
-                if (event.nViews > maxViews) maxViews = event.nViews
-            }
-
-            val sortedEvents =
-                lastLoadedEvents.sortedByDescending { event ->
-                    val tagScore: Double =
-                        (eventScoreList[event.eventID]?.second?.toDouble() ?: 0.0) / (maxTags.toDouble())
-                    val viewScore: Double = (event.nViews.toDouble() / maxViews.toDouble())
-                    (1 - relevanceFactor) * viewScore + relevanceFactor * tagScore
-                }
-
-            lastLoadedEvents = sortedEvents
-        } else {
-            lastLoadedEvents = lastLoadedEvents.sortedByDescending { event -> event.nViews }
+      if (currentUser != null) {
+        val tags = currentUser.tags
+        val eventScoreList: MutableMap<String, Int> = mutableMapOf()
+        eventsList.forEach { event ->
+          val tagsInCommon = event.tags.intersect(tags.toSet()).size
+          eventScoreList[event.eventID] = tagsInCommon
         }
+        eventsList.sortByDescending { eventScoreList[it.eventID] }
+      }
     }
+  }
 
   /** Events sorting enum, placed here because this is also where the sorting algorithm goes. */
   enum class SortOption {

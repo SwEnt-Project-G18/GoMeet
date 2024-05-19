@@ -184,16 +184,16 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
     composable(Route.EXPLORE) { Explore(navAction, eventViewModel) }
     composable(Route.EVENTS) {
       userIdState.value = Firebase.auth.currentUser!!.uid
-      Events(userIdState.value, navAction, UserViewModel(), eventViewModel)
+      Events(userIdState.value, navAction, userViewModel, eventViewModel)
     }
-    composable(Route.TRENDS) {
-      Trends(userIdState.value, navAction, UserViewModel(), eventViewModel)
-    }
+    composable(Route.TRENDS) { Trends(userIdState.value, navAction, userViewModel, eventViewModel) }
     composable(Route.CREATE) {
       userIdState.value = Firebase.auth.currentUser!!.uid
       Create(navAction)
     }
-    composable(Route.NOTIFICATIONS) { Notifications(navAction, currentUserID = userIdState.value) }
+    composable(Route.NOTIFICATIONS) {
+      Notifications(navAction, currentUserID = userIdState.value, userViewModel)
+    }
 
     composable(Route.PROFILE) {
       Profile(navAction, userId = userIdState.value, userViewModel, eventViewModel)
@@ -204,12 +204,8 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
           OthersProfile(
               navAction, it.arguments?.getString("uid") ?: "", userViewModel, eventViewModel)
         }
-    composable(Route.PRIVATE_CREATE) {
-      CreateEvent(navAction, EventViewModel(Firebase.auth.currentUser!!.uid), true)
-    }
-    composable(Route.PUBLIC_CREATE) {
-      CreateEvent(navAction, EventViewModel(Firebase.auth.currentUser!!.uid), false)
-    }
+    composable(Route.PRIVATE_CREATE) { CreateEvent(navAction, eventViewModel, true, userViewModel) }
+    composable(Route.PUBLIC_CREATE) { CreateEvent(navAction, eventViewModel, false, userViewModel) }
 
     composable(
         route = Route.ADD_PARTICIPANTS,
