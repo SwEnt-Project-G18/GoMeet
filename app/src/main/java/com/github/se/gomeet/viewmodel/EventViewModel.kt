@@ -11,10 +11,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.github.se.gomeet.model.Tag
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.location.Location
 import com.github.se.gomeet.model.repository.EventRepository
-import com.github.se.gomeet.model.user.GoMeetUser
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.firebase.firestore.FirebaseFirestore
@@ -33,7 +33,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
@@ -455,29 +454,26 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
     /**
      * Sort the events depending on the user's preferences according to their tags.
      *
-     * @param currentUser the current user
+     * @param userTags the user's tags
      * @param eventsList the list of events to sort
      */
     fun sortEvents(
-        currentUser: GoMeetUser?,
+        userTags: List<Tag>,
         eventsList: MutableList<Event>,
     ) {
 
-        Log.d("EventViewModel", "Sorting ${eventsList.size} events for user ${currentUser?.uid}.")
-
       // Only attempt to sort if user has tags
-      if (currentUser != null && currentUser.tags.isNotEmpty()) {
-        val tags = currentUser.tags
+      if (userTags.isNotEmpty()) {
         val eventScoreList: MutableMap<String, Int> = mutableMapOf()
         eventsList.forEach { event ->
-          val tagsInCommon = event.tags.intersect(tags.toSet()).size
+          val tagsInCommon = event.tags.intersect(userTags.toSet()).size
           eventScoreList[event.eventID] = tagsInCommon
         }
         eventsList.sortByDescending { eventScoreList[it.eventID] }
 
-          Log.d("EventViewModel", "Sort success.")
+        Log.d("EventViewModel", "Sort success.")
       } else {
-            Log.d("EventViewModel", "User has no tags or user was null, no sorting done.")
+        Log.d("EventViewModel", "User has no tags, no sorting done.")
       }
     }
   }

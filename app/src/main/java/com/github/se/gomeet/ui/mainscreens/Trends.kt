@@ -45,9 +45,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.github.se.gomeet.R
+import com.github.se.gomeet.model.Tag
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.isPastEvent
-import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.events.GoMeetSearchBar
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
@@ -92,12 +92,13 @@ fun Trends(
   val eventsLoaded = remember { mutableStateOf(false) }
   val screenWidth = LocalConfiguration.current.screenWidthDp.dp
   val screenHeight = LocalConfiguration.current.screenHeightDp.dp
-    var currentUser: GoMeetUser? = remember{ null }
+  val userTags = remember { mutableStateListOf<Tag>() }
 
   LaunchedEffect(Unit) {
     coroutineScope.launch {
-        currentUser = userViewModel.getUser(currentUserId)!!
-        Log.d("Trends", "Current user: $currentUser")
+      val currentUser = userViewModel.getUser(currentUserId)!!
+      userTags.addAll(Tag.entries.filter { currentUser.tags.contains(it.tagName) })
+      Log.d("Trends", "Current user: $currentUser with ${userTags.size} tags")
       val allEvents = eventViewModel.getAllEvents()!!.filter { !isPastEvent(it) }
       if (allEvents.isNotEmpty()) {
         eventList.addAll(allEvents)
@@ -139,7 +140,7 @@ fun Trends(
                   MaterialTheme.colorScheme.tertiary)
               Spacer(modifier = Modifier.height(5.dp))
 
-              SortButton(eventList, currentUser)
+              SortButton(eventList, userTags)
 
               if (!eventsLoaded.value) {
                 LoadingText()
@@ -278,9 +279,10 @@ fun EventCarousel(events: List<Event>, nav: NavigationActions) {
  * Sort button composable. This is where the user can sort the events.
  *
  * @param eventList The list of events to sort.
+ * @param userTags The list of the current user's tags.
  */
 @Composable
-fun SortButton(eventList: MutableList<Event>, currentUser: GoMeetUser?) {
+fun SortButton(eventList: MutableList<Event>, userTags: List<Tag>) {
   var expanded by remember { mutableStateOf(false) }
   var selectedOption by remember { mutableStateOf(DEFAULT) }
 
@@ -306,7 +308,7 @@ fun SortButton(eventList: MutableList<Event>, currentUser: GoMeetUser?) {
               DropdownMenuItem(
                   text = { Text("Popularity") },
                   onClick = {
-                    EventViewModel.sortEvents(currentUser, eventList)
+                    EventViewModel.sortEvents(userTags, eventList)
                     selectedOption = DEFAULT
                     expanded = false
                   },

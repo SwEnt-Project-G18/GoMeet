@@ -45,7 +45,7 @@ class UserViewModel : ViewModel() {
       country: String,
       pfp: String = ""
   ): GoMeetUser? {
-      var user: GoMeetUser? = null
+    var user: GoMeetUser? = null
     CoroutineScope(Dispatchers.IO).launch {
       if (getUser(uid) == null) {
         try {
@@ -73,7 +73,7 @@ class UserViewModel : ViewModel() {
         }
       }
     }
-      return user
+    return user
   }
 
   suspend fun getFollowers(uid: String): List<GoMeetUser> {
