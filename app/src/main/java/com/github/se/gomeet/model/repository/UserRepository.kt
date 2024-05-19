@@ -10,15 +10,10 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
 
-/**
- * Class that connects to the Firebase Firestore database to get, add, update and remove users.
- *
- * @param db the Firestore database
- */
-class UserRepository(private val db: FirebaseFirestore) {
-  /**
-   * Companion object for the UserFirebaseConnection class. Contains the constants for the class.
-   */
+/** Class that connects to the Firebase Firestore database to get, add, update and remove users. */
+class UserRepository private constructor() {
+
+  /** This companion object contains the functions in the repository */
   companion object {
     private const val TAG = "UserRepository"
     private const val USERS_COLLECTION = "users"

@@ -6,8 +6,6 @@ import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.repository.EventRepository
 import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.model.user.GoMeetUser
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,11 +19,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @OptIn(FlowPreview::class)
-class SearchViewModel() : ViewModel() {
+class SearchViewModel : ViewModel() {
   private val _searchText = MutableStateFlow("")
   val searchText = _searchText.asStateFlow()
-  private val userRepository = UserRepository(Firebase.firestore)
-  private val eventsRepository = EventRepository(Firebase.firestore)
   private var allUsersList: List<GoMeetUser>? = emptyList()
   private var allPublicEventsList: List<Event>? = emptyList()
   private val _searchQuery = MutableStateFlow<List<SearchableItem>>(emptyList())
@@ -50,7 +46,7 @@ class SearchViewModel() : ViewModel() {
 
   fun getAllUsers() {
     // viewModelScope.launch { userRepository.getAllUsers { users -> allUsersList = users }}
-    userRepository.getAllUsers { users: List<GoMeetUser> ->
+    UserRepository.getAllUsers { users: List<GoMeetUser> ->
       allUsersList = users
       // updateSearchQuery()
     }
@@ -66,7 +62,7 @@ class SearchViewModel() : ViewModel() {
     // viewModelScope.launch {
     //    eventsRepository.getAllEvents { events -> allPublicEventsList = events }
     // }
-    eventsRepository.getAllEvents { events ->
+    EventRepository.getAllEvents { events ->
       allPublicEventsList = events
       // updateSearchQuery()
     }

@@ -14,7 +14,7 @@ import java.time.LocalTime
  * This class represents the repository for the events. A repository is a class that communicates
  * with the data source.
  */
-class EventRepository(private val db: FirebaseFirestore) {
+class EventRepository private constructor() {
 
   /** This companion object contains the functions in the repository */
   companion object {
