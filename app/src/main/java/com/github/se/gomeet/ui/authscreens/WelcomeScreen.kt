@@ -94,7 +94,7 @@ fun WelcomeScreen(
             contentDescription = "GoMeet Logo")
 
         Image(
-            painter = painterResource(id = R.drawable.welcomeimage),
+            painter = painterResource(id = R.drawable.welcome2),
             contentDescription = "Welcome Image")
 
         Text(
