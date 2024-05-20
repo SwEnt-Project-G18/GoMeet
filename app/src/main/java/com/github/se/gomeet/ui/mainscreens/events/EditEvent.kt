@@ -38,6 +38,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,7 +55,6 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.Popup
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.TagsSelector
@@ -68,8 +68,6 @@ import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.viewmodel.EventViewModel
 import java.io.InputStream
-import java.time.LocalDate
-import java.time.LocalTime
 import kotlinx.coroutines.launch
 
 @Composable
@@ -79,6 +77,7 @@ fun EditEvent(
     eventId: String
 ) {
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
 
     var event by remember { mutableStateOf<Event?>(null) }
 
@@ -149,20 +148,28 @@ fun EditEvent(
                         style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
                         modifier = Modifier.padding(end = 15.dp).clickable {
                             if (titleState.value.isNotEmpty() && descriptionState.value.isNotEmpty() && locationState.value.isNotEmpty() && priceText.isNotEmpty() && url.value.isNotEmpty()) {
-                                eventViewModel.editEvent(
-                                    event!!.copy(
-                                        title = titleState.value,
-                                        description = descriptionState.value,
-                                        location = selectedLocation.value!!,
-                                        date = pickedDate.value,
-                                        time = pickedTime.value,
-                                        price = price,
-                                        url = url.value,
-                                        tags = tags.value,
-                                        images = imageUri?.let { listOf(it.toString()) } ?: event!!.images
-                                    )
+                                val updatedEvent = event!!.copy(
+                                    title = titleState.value,
+                                    description = descriptionState.value,
+                                    location = selectedLocation.value!!,
+                                    date = pickedDate.value,
+                                    time = pickedTime.value,
+                                    price = price,
+                                    url = url.value,
+                                    tags = tags.value
                                 )
-                                nav.goBack()
+
+                                coroutineScope.launch {
+                                    // Upload image and update event
+                                    val finalEvent = if (imageUri != null) {
+                                        val imageUrl = eventViewModel.uploadImageAndGetUrl(imageUri!!)
+                                        updatedEvent.copy(images = listOf(imageUrl))
+                                    } else {
+                                        updatedEvent
+                                    }
+                                    eventViewModel.editEvent(finalEvent)
+                                    nav.goBack()
+                                }
                             }
                         }
                     )
@@ -174,7 +181,7 @@ fun EditEvent(
                         nav.navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == selectedTab })
                     },
                     tabList = TOP_LEVEL_DESTINATIONS,
-                    selectedItem = Route.PROFILE
+                    selectedItem = Route.EVENTS
                 )
             },
             content = { innerPadding ->
