@@ -62,6 +62,7 @@ import com.github.se.gomeet.model.TagsSelector
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.location.Location
 import com.github.se.gomeet.ui.mainscreens.DateTimePicker
+import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.mainscreens.create.LocationField
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
@@ -149,32 +150,41 @@ fun EditEvent(
                     Text(
                         text = "Done",
                         style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
-                        modifier = Modifier.padding(end = 15.dp).clickable {
-                            if (titleState.value.isNotEmpty() && descriptionState.value.isNotEmpty() && locationState.value.isNotEmpty() && priceText.isNotEmpty() && url.value.isNotEmpty()) {
-                                val updatedEvent = event!!.copy(
-                                    title = titleState.value,
-                                    description = descriptionState.value,
-                                    location = selectedLocation.value!!,
-                                    date = pickedDate.value,
-                                    time = pickedTime.value,
-                                    price = price,
-                                    url = url.value,
-                                    tags = tags.value
-                                )
+                        modifier = Modifier
+                            .padding(end = 15.dp)
+                            .clickable {
+                                if (titleState.value.isNotEmpty() && descriptionState.value.isNotEmpty() && locationState.value.isNotEmpty() && priceText.isNotEmpty() && url.value.isNotEmpty()) {
+                                    val updatedEvent = event!!.copy(
+                                        title = titleState.value,
+                                        description = descriptionState.value,
+                                        location = selectedLocation.value!!,
+                                        date = pickedDate.value,
+                                        time = pickedTime.value,
+                                        price = price,
+                                        url = url.value,
+                                        tags = tags.value
+                                    )
 
-                                coroutineScope.launch {
-                                    // Upload image and update event
-                                    val finalEvent = if (imageUri != null) {
-                                        val imageUrl = eventViewModel.uploadImageAndGetUrl(imageUri!!)
-                                        updatedEvent.copy(images = listOf(imageUrl))
-                                    } else {
-                                        updatedEvent
+                                    coroutineScope.launch {
+                                        // Upload image and update event
+                                        val finalEvent = if (imageUri != null) {
+                                            val imageUrl =
+                                                eventViewModel.uploadImageAndGetUrl(imageUri!!)
+                                            val updatedImages = event!!.images.toMutableList()
+                                            if (updatedImages.isNotEmpty()) {
+                                                updatedImages[0] = imageUrl
+                                            } else {
+                                                updatedImages.add(imageUrl)
+                                            }
+                                            updatedEvent.copy(images = updatedImages)
+                                        } else {
+                                            updatedEvent
+                                        }
+                                        eventViewModel.editEvent(finalEvent)
+                                        nav.goBack()
                                     }
-                                    eventViewModel.editEvent(finalEvent)
-                                    nav.goBack()
                                 }
                             }
-                        }
                     )
                 }
             },
@@ -190,7 +200,8 @@ fun EditEvent(
             content = { innerPadding ->
                 Box(modifier = Modifier.padding(innerPadding)) {
                     Column(
-                        modifier = Modifier.padding(start = 15.dp, end = 15.dp)
+                        modifier = Modifier
+                            .padding(start = 15.dp, end = 15.dp)
                             .verticalScroll(rememberScrollState(0))
                             .fillMaxSize(),
                         verticalArrangement = Arrangement.Top,
@@ -205,7 +216,8 @@ fun EditEvent(
                                 painterResource(id = R.drawable.gomeet_logo)
                             },
                             contentDescription = "Event picture",
-                            modifier = Modifier.padding(start = 15.dp, end = 15.dp, top = 30.dp, bottom = 15.dp)
+                            modifier = Modifier
+                                .padding(start = 15.dp, end = 15.dp, top = 30.dp, bottom = 15.dp)
                                 .width(101.dp)
                                 .height(101.dp)
                                 .clickable { imagePickerLauncher.launch("image/*") }
@@ -268,7 +280,9 @@ fun EditEvent(
                         Spacer(modifier = Modifier.size(16.dp))
 
                         Row(
-                            modifier = Modifier.fillMaxWidth().padding(top = 15.dp, bottom = 10.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 15.dp, bottom = 10.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
@@ -283,7 +297,8 @@ fun EditEvent(
                             Icon(
                                 Icons.AutoMirrored.Filled.KeyboardArrowRight,
                                 null,
-                                modifier = Modifier.clickable { showPopup.value = true }
+                                modifier = Modifier
+                                    .clickable { showPopup.value = true }
                                     .testTag("EditTagsButton")
                             )
                         }
@@ -303,7 +318,6 @@ fun EditEvent(
             }
         )
     } else {
-        // Display loading or error state
-        Text("Loading event details...")
+        LoadingText()
     }
 }
