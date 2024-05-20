@@ -21,6 +21,7 @@ import com.github.se.gomeet.ui.mainscreens.Trends
 import com.github.se.gomeet.ui.mainscreens.create.Create
 import com.github.se.gomeet.ui.mainscreens.create.CreateEvent
 import com.github.se.gomeet.ui.mainscreens.events.AddParticipants
+import com.github.se.gomeet.ui.mainscreens.events.EditEvent
 import com.github.se.gomeet.ui.mainscreens.events.Events
 import com.github.se.gomeet.ui.mainscreens.events.MyEventInfo
 import com.github.se.gomeet.ui.mainscreens.events.manageinvites.ManageInvites
@@ -115,7 +116,6 @@ fun initChatClient(applicationContext: Context): ChatClient {
  * Set up the navigation for the app.
  *
  * @param nav The NavHostController.
- * @param db The Firestore database.
  * @param client The chat client.
  * @param applicationContext The application text.
  */
@@ -125,7 +125,7 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
   val userIdState = remember { mutableStateOf("") }
   val clientInitialisationState by client.clientState.initializationState.collectAsState()
   val authViewModel = AuthViewModel()
-  var eventViewModel = remember { mutableStateOf(EventViewModel(null)) }
+  val eventViewModel = remember { mutableStateOf(EventViewModel(null)) }
   val userViewModel = UserViewModel()
 
   return NavHost(navController = nav, startDestination = Route.WELCOME) {
@@ -134,12 +134,12 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
           onNavToLogin = { NavigationActions(nav).navigateTo(LOGIN_ITEMS[1]) },
           onNavToRegister = { NavigationActions(nav).navigateTo(LOGIN_ITEMS[2]) },
           onSignInSuccess = {
-              userId: String,
-              username: String,
-              email: String,
-              firstName: String,
-              lastName: String,
-              phoneNumber: String ->
+                  userId: String,
+                  _: String,
+                  _: String,
+                  _: String,
+                  _: String,
+                  _: String ->
             val currentUser = Firebase.auth.currentUser
             if (currentUser != null) {
               val uid = currentUser.uid
@@ -377,6 +377,13 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
           }
         }
     composable(route = Route.ADD_FRIEND) { AddFriend(navAction, userViewModel) }
+      composable(
+          route = Route.EDIT_EVENT,
+          arguments = listOf(navArgument("eventId") { type = NavType.StringType })) { entry ->
+          val eventId = entry.arguments?.getString("eventId") ?: ""
+
+          EditEvent(nav = navAction, eventViewModel = eventViewModel.value, eventId = eventId)
+      }
   }
 }
 
