@@ -133,13 +133,8 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
       WelcomeScreen(
           onNavToLogin = { NavigationActions(nav).navigateTo(LOGIN_ITEMS[1]) },
           onNavToRegister = { NavigationActions(nav).navigateTo(LOGIN_ITEMS[2]) },
-          onSignInSuccess = {
-                  userId: String,
-                  _: String,
-                  _: String,
-                  _: String,
-                  _: String,
-                  _: String ->
+          onSignInSuccess = { userId: String, _: String, _: String, _: String, _: String, _: String
+            ->
             val currentUser = Firebase.auth.currentUser
             if (currentUser != null) {
               val uid = currentUser.uid
@@ -377,13 +372,13 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
           }
         }
     composable(route = Route.ADD_FRIEND) { AddFriend(navAction, userViewModel) }
-      composable(
-          route = Route.EDIT_EVENT,
-          arguments = listOf(navArgument("eventId") { type = NavType.StringType })) { entry ->
+    composable(
+        route = Route.EDIT_EVENT,
+        arguments = listOf(navArgument("eventId") { type = NavType.StringType })) { entry ->
           val eventId = entry.arguments?.getString("eventId") ?: ""
 
           EditEvent(nav = navAction, eventViewModel = eventViewModel.value, eventId = eventId)
-      }
+        }
   }
 }
 

@@ -66,7 +66,7 @@ object Route {
   const val MESSAGE_CHANNELS = "MessageChannel"
   const val CHANNEL = "Channel/{id}"
   const val ADD_FRIEND = "AddFriend"
-    const val EDIT_EVENT = "EditEvent/{eventId}"
+  const val EDIT_EVENT = "EditEvent/{eventId}"
 }
 
 val CREATE_ITEMS =

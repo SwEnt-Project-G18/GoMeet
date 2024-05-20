@@ -73,251 +73,234 @@ import java.io.InputStream
 import kotlinx.coroutines.launch
 
 @Composable
-fun EditEvent(
-    nav: NavigationActions,
-    eventViewModel: EventViewModel,
-    eventId: String
-) {
-    val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
+fun EditEvent(nav: NavigationActions, eventViewModel: EventViewModel, eventId: String) {
+  val context = LocalContext.current
+  val coroutineScope = rememberCoroutineScope()
 
-    var event by remember { mutableStateOf<Event?>(null) }
-    var profilePictureUrl by remember { mutableStateOf<String?>(null) }
+  var event by remember { mutableStateOf<Event?>(null) }
+  var profilePictureUrl by remember { mutableStateOf<String?>(null) }
 
-    LaunchedEffect(eventId) {
-        eventViewModel.getEvent(eventId)?.let {
-            event = it
-            profilePictureUrl = it.images.firstOrNull()
+  LaunchedEffect(eventId) {
+    eventViewModel.getEvent(eventId)?.let {
+      event = it
+      profilePictureUrl = it.images.firstOrNull()
+    }
+  }
+
+  if (event != null) {
+    val titleState = remember { mutableStateOf(event!!.title) }
+    val descriptionState = remember { mutableStateOf(event!!.description) }
+    val locationState = remember { mutableStateOf(event!!.location.name) }
+    var price by remember { mutableDoubleStateOf(event!!.price) }
+    var priceText by remember { mutableStateOf(event!!.price.toString()) }
+    val url = remember { mutableStateOf(event!!.url) }
+
+    val pickedTime = remember { mutableStateOf(event!!.time) }
+    val pickedDate = remember { mutableStateOf(event!!.date) }
+
+    val selectedLocation: MutableState<Location?> = remember { mutableStateOf(event!!.location) }
+    val tags = remember { mutableStateOf(event!!.tags) }
+    val showPopup = remember { mutableStateOf(false) }
+
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
+    var imageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
+
+    val imagePickerLauncher =
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) {
+            uri: Uri? ->
+          imageUri = uri
+          uri?.let { uriNonNull ->
+            val inputStream: InputStream? =
+                try {
+                  context.contentResolver.openInputStream(uriNonNull)
+                } catch (e: Exception) {
+                  e.printStackTrace()
+                  null
+                }
+            inputStream?.let {
+              val bitmap = BitmapFactory.decodeStream(it)
+              imageBitmap = bitmap.asImageBitmap()
+            }
+          }
         }
-    }
 
-    if (event != null) {
-        val titleState = remember { mutableStateOf(event!!.title) }
-        val descriptionState = remember { mutableStateOf(event!!.description) }
-        val locationState = remember { mutableStateOf(event!!.location.name) }
-        var price by remember { mutableDoubleStateOf(event!!.price) }
-        var priceText by remember { mutableStateOf(event!!.price.toString()) }
-        val url = remember { mutableStateOf(event!!.url) }
+    val textFieldColors =
+        TextFieldDefaults.colors(
+            focusedTextColor = MaterialTheme.colorScheme.onBackground,
+            unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+            unfocusedContainerColor = Color.Transparent,
+            focusedContainerColor = Color.Transparent,
+            cursorColor = MaterialTheme.colorScheme.outlineVariant,
+            focusedLabelColor = MaterialTheme.colorScheme.tertiary,
+            unfocusedLabelColor = MaterialTheme.colorScheme.tertiary,
+            focusedIndicatorColor = MaterialTheme.colorScheme.tertiary,
+            unfocusedIndicatorColor = MaterialTheme.colorScheme.tertiary)
 
-        val pickedTime = remember { mutableStateOf(event!!.time) }
-        val pickedDate = remember { mutableStateOf(event!!.date) }
-
-        val selectedLocation: MutableState<Location?> = remember { mutableStateOf(event!!.location) }
-        val tags = remember { mutableStateOf(event!!.tags) }
-        val showPopup = remember { mutableStateOf(false) }
-
-        var imageUri by remember { mutableStateOf<Uri?>(null) }
-        var imageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
-
-        val imagePickerLauncher =
-            rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
-                imageUri = uri
-                uri?.let { uriNonNull ->
-                    val inputStream: InputStream? =
-                        try {
-                            context.contentResolver.openInputStream(uriNonNull)
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                            null
-                        }
-                    inputStream?.let {
-                        val bitmap = BitmapFactory.decodeStream(it)
-                        imageBitmap = bitmap.asImageBitmap()
-                    }
-                }
+    Scaffold(
+        topBar = {
+          Row(verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = { nav.goBack() }) {
+              Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Go back")
             }
+            Spacer(modifier = Modifier.weight(1f))
+            Text(
+                text = "Done",
+                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
+                modifier =
+                    Modifier.padding(end = 15.dp).clickable {
+                      if (titleState.value.isNotEmpty() &&
+                          descriptionState.value.isNotEmpty() &&
+                          locationState.value.isNotEmpty() &&
+                          priceText.isNotEmpty() &&
+                          url.value.isNotEmpty()) {
+                        val updatedEvent =
+                            event!!.copy(
+                                title = titleState.value,
+                                description = descriptionState.value,
+                                location = selectedLocation.value!!,
+                                date = pickedDate.value,
+                                time = pickedTime.value,
+                                price = price,
+                                url = url.value,
+                                tags = tags.value)
 
-        val textFieldColors =
-            TextFieldDefaults.colors(
-                focusedTextColor = MaterialTheme.colorScheme.onBackground,
-                unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
-                unfocusedContainerColor = Color.Transparent,
-                focusedContainerColor = Color.Transparent,
-                cursorColor = MaterialTheme.colorScheme.outlineVariant,
-                focusedLabelColor = MaterialTheme.colorScheme.tertiary,
-                unfocusedLabelColor = MaterialTheme.colorScheme.tertiary,
-                focusedIndicatorColor = MaterialTheme.colorScheme.tertiary,
-                unfocusedIndicatorColor = MaterialTheme.colorScheme.tertiary
-            )
-
-        Scaffold(
-            topBar = {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    IconButton(onClick = { nav.goBack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Go back")
-                    }
-                    Spacer(modifier = Modifier.weight(1f))
-                    Text(
-                        text = "Done",
-                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
-                        modifier = Modifier
-                            .padding(end = 15.dp)
-                            .clickable {
-                                if (titleState.value.isNotEmpty() && descriptionState.value.isNotEmpty() && locationState.value.isNotEmpty() && priceText.isNotEmpty() && url.value.isNotEmpty()) {
-                                    val updatedEvent = event!!.copy(
-                                        title = titleState.value,
-                                        description = descriptionState.value,
-                                        location = selectedLocation.value!!,
-                                        date = pickedDate.value,
-                                        time = pickedTime.value,
-                                        price = price,
-                                        url = url.value,
-                                        tags = tags.value
-                                    )
-
-                                    coroutineScope.launch {
-                                        // Upload image and update event
-                                        val finalEvent = if (imageUri != null) {
-                                            val imageUrl =
-                                                eventViewModel.uploadImageAndGetUrl(imageUri!!)
-                                            val updatedImages = event!!.images.toMutableList()
-                                            if (updatedImages.isNotEmpty()) {
-                                                updatedImages[0] = imageUrl
-                                            } else {
-                                                updatedImages.add(imageUrl)
-                                            }
-                                            updatedEvent.copy(images = updatedImages)
-                                        } else {
-                                            updatedEvent
-                                        }
-                                        eventViewModel.editEvent(finalEvent)
-                                        nav.goBack()
-                                    }
+                        coroutineScope.launch {
+                          // Upload image and update event
+                          val finalEvent =
+                              if (imageUri != null) {
+                                val imageUrl = eventViewModel.uploadImageAndGetUrl(imageUri!!)
+                                val updatedImages = event!!.images.toMutableList()
+                                if (updatedImages.isNotEmpty()) {
+                                  updatedImages[0] = imageUrl
+                                } else {
+                                  updatedImages.add(imageUrl)
                                 }
-                            }
-                    )
-                }
-            },
-            bottomBar = {
-                BottomNavigationMenu(
-                    onTabSelect = { selectedTab ->
-                        nav.navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == selectedTab })
-                    },
-                    tabList = TOP_LEVEL_DESTINATIONS,
-                    selectedItem = Route.EVENTS
-                )
-            },
-            content = { innerPadding ->
-                Box(modifier = Modifier.padding(innerPadding)) {
-                    Column(
-                        modifier = Modifier
-                            .padding(start = 15.dp, end = 15.dp)
-                            .verticalScroll(rememberScrollState(0))
-                            .fillMaxSize(),
-                        verticalArrangement = Arrangement.Top,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Image(
-                            painter = if (imageBitmap != null) {
-                                androidx.compose.ui.graphics.painter.BitmapPainter(imageBitmap!!)
-                            } else if (!profilePictureUrl.isNullOrEmpty()) {
-                                rememberAsyncImagePainter(profilePictureUrl)
-                            } else {
-                                painterResource(id = R.drawable.gomeet_logo)
-                            },
-                            contentDescription = "Event picture",
-                            modifier = Modifier
-                                .padding(start = 15.dp, end = 15.dp, top = 30.dp, bottom = 15.dp)
-                                .width(101.dp)
-                                .height(101.dp)
-                                .clickable { imagePickerLauncher.launch("image/*") }
-                                .clip(CircleShape)
-                                .background(color = MaterialTheme.colorScheme.background)
-                                .align(Alignment.CenterHorizontally)
-                                .testTag("Event Picture"),
-                            contentScale = ContentScale.Crop
-                        )
-
-                        Spacer(modifier = Modifier.size(16.dp))
-
-                        TextField(
-                            value = titleState.value,
-                            onValueChange = { newValue -> titleState.value = newValue },
-                            label = { Text("Title") },
-                            singleLine = true,
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = textFieldColors
-                        )
-                        Spacer(modifier = Modifier.size(16.dp))
-
-                        TextField(
-                            value = descriptionState.value,
-                            onValueChange = { newValue -> descriptionState.value = newValue },
-                            label = { Text("Description") },
-                            singleLine = true,
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = textFieldColors
-                        )
-                        Spacer(modifier = Modifier.size(16.dp))
-
-                        LocationField(selectedLocation, locationState, eventViewModel)
-                        Spacer(modifier = Modifier.size(16.dp))
-
-                        DateTimePicker(pickedTime = pickedTime, pickedDate = pickedDate)
-                        Spacer(modifier = Modifier.size(16.dp))
-
-                        TextField(
-                            value = priceText,
-                            onValueChange = { newVal ->
-                                priceText = newVal
-                                newVal.toDoubleOrNull()?.let { price = it }
-                            },
-                            label = { Text("Price") },
-                            singleLine = true,
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = textFieldColors
-                        )
-                        Spacer(modifier = Modifier.size(16.dp))
-
-                        TextField(
-                            value = url.value,
-                            onValueChange = { newVal -> url.value = newVal },
-                            label = { Text("Link") },
-                            singleLine = true,
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = textFieldColors
-                        )
-                        Spacer(modifier = Modifier.size(16.dp))
-
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 15.dp, bottom = 10.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "Edit Tags",
-                                color = MaterialTheme.colorScheme.onBackground,
-                                fontStyle = FontStyle.Normal,
-                                fontWeight = FontWeight.Normal,
-                                fontFamily = FontFamily.Default,
-                                textAlign = TextAlign.Start,
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                            Icon(
-                                Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                                null,
-                                modifier = Modifier
-                                    .clickable { showPopup.value = true }
-                                    .testTag("EditTagsButton")
-                            )
+                                updatedEvent.copy(images = updatedImages)
+                              } else {
+                                updatedEvent
+                              }
+                          eventViewModel.editEvent(finalEvent)
+                          nav.goBack()
                         }
-                    }
-                }
+                      }
+                    })
+          }
+        },
+        bottomBar = {
+          BottomNavigationMenu(
+              onTabSelect = { selectedTab ->
+                nav.navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == selectedTab })
+              },
+              tabList = TOP_LEVEL_DESTINATIONS,
+              selectedItem = Route.EVENTS)
+        },
+        content = { innerPadding ->
+          Box(modifier = Modifier.padding(innerPadding)) {
+            Column(
+                modifier =
+                    Modifier.padding(start = 15.dp, end = 15.dp)
+                        .verticalScroll(rememberScrollState(0))
+                        .fillMaxSize(),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally) {
+                  Image(
+                      painter =
+                          if (imageBitmap != null) {
+                            androidx.compose.ui.graphics.painter.BitmapPainter(imageBitmap!!)
+                          } else if (!profilePictureUrl.isNullOrEmpty()) {
+                            rememberAsyncImagePainter(profilePictureUrl)
+                          } else {
+                            painterResource(id = R.drawable.gomeet_logo)
+                          },
+                      contentDescription = "Event picture",
+                      modifier =
+                          Modifier.padding(start = 15.dp, end = 15.dp, top = 30.dp, bottom = 15.dp)
+                              .width(101.dp)
+                              .height(101.dp)
+                              .clickable { imagePickerLauncher.launch("image/*") }
+                              .clip(CircleShape)
+                              .background(color = MaterialTheme.colorScheme.background)
+                              .align(Alignment.CenterHorizontally)
+                              .testTag("Event Picture"),
+                      contentScale = ContentScale.Crop)
 
-                if (showPopup.value) {
-                    Popup(
-                        alignment = Alignment.Center,
-                        onDismissRequest = { showPopup.value = !showPopup.value }
-                    ) {
-                        TagsSelector("Edit Tags", tags) {
-                            showPopup.value = false
-                        }
-                    }
+                  Spacer(modifier = Modifier.size(16.dp))
+
+                  TextField(
+                      value = titleState.value,
+                      onValueChange = { newValue -> titleState.value = newValue },
+                      label = { Text("Title") },
+                      singleLine = true,
+                      modifier = Modifier.fillMaxWidth(),
+                      colors = textFieldColors)
+                  Spacer(modifier = Modifier.size(16.dp))
+
+                  TextField(
+                      value = descriptionState.value,
+                      onValueChange = { newValue -> descriptionState.value = newValue },
+                      label = { Text("Description") },
+                      singleLine = true,
+                      modifier = Modifier.fillMaxWidth(),
+                      colors = textFieldColors)
+                  Spacer(modifier = Modifier.size(16.dp))
+
+                  LocationField(selectedLocation, locationState, eventViewModel)
+                  Spacer(modifier = Modifier.size(16.dp))
+
+                  DateTimePicker(pickedTime = pickedTime, pickedDate = pickedDate)
+                  Spacer(modifier = Modifier.size(16.dp))
+
+                  TextField(
+                      value = priceText,
+                      onValueChange = { newVal ->
+                        priceText = newVal
+                        newVal.toDoubleOrNull()?.let { price = it }
+                      },
+                      label = { Text("Price") },
+                      singleLine = true,
+                      modifier = Modifier.fillMaxWidth(),
+                      colors = textFieldColors)
+                  Spacer(modifier = Modifier.size(16.dp))
+
+                  TextField(
+                      value = url.value,
+                      onValueChange = { newVal -> url.value = newVal },
+                      label = { Text("Link") },
+                      singleLine = true,
+                      modifier = Modifier.fillMaxWidth(),
+                      colors = textFieldColors)
+                  Spacer(modifier = Modifier.size(16.dp))
+
+                  Row(
+                      modifier = Modifier.fillMaxWidth().padding(top = 15.dp, bottom = 10.dp),
+                      verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = "Edit Tags",
+                            color = MaterialTheme.colorScheme.onBackground,
+                            fontStyle = FontStyle.Normal,
+                            fontWeight = FontWeight.Normal,
+                            fontFamily = FontFamily.Default,
+                            textAlign = TextAlign.Start,
+                            style = MaterialTheme.typography.bodyMedium)
+                        Icon(
+                            Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                            null,
+                            modifier =
+                                Modifier.clickable { showPopup.value = true }
+                                    .testTag("EditTagsButton"))
+                      }
                 }
-            }
-        )
-    } else {
-        LoadingText()
-    }
+          }
+
+          if (showPopup.value) {
+            Popup(
+                alignment = Alignment.Center,
+                onDismissRequest = { showPopup.value = !showPopup.value }) {
+                  TagsSelector("Edit Tags", tags) { showPopup.value = false }
+                }
+          }
+        })
+  } else {
+    LoadingText()
+  }
 }
