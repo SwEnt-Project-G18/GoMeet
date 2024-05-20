@@ -56,6 +56,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
+import coil.compose.rememberAsyncImagePainter
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.TagsSelector
 import com.github.se.gomeet.model.event.Event
@@ -80,10 +81,12 @@ fun EditEvent(
     val coroutineScope = rememberCoroutineScope()
 
     var event by remember { mutableStateOf<Event?>(null) }
+    var profilePictureUrl by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(eventId) {
         eventViewModel.getEvent(eventId)?.let {
             event = it
+            profilePictureUrl = it.images.firstOrNull()
         }
     }
 
@@ -194,7 +197,13 @@ fun EditEvent(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Image(
-                            painter = painterResource(id = R.drawable.gomeet_logo),
+                            painter = if (imageBitmap != null) {
+                                androidx.compose.ui.graphics.painter.BitmapPainter(imageBitmap!!)
+                            } else if (!profilePictureUrl.isNullOrEmpty()) {
+                                rememberAsyncImagePainter(profilePictureUrl)
+                            } else {
+                                painterResource(id = R.drawable.gomeet_logo)
+                            },
                             contentDescription = "Event picture",
                             modifier = Modifier.padding(start = 15.dp, end = 15.dp, top = 30.dp, bottom = 15.dp)
                                 .width(101.dp)
