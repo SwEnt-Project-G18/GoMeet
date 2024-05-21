@@ -7,9 +7,14 @@ val Cyan = Color(0xFF127581)
 val DodgerBlue = Color(0xFF1E90FF)
 val TranslucentCyan = Color(0x03B3C7C9)
 val DarkerCyan = Color(0xFF073F57)
-val SomewhatWhite = Color(0xFFFEFBFF)
+val SomewhatWhite = Color(0xFFFBFEFF)
 val DarkModeBackground = Color(0xFF1A1B21)
 val LightGray = Color(0xFFECEFF1)
+val MidLightGray = Color(0xFFD3D3D3)
+
+
+val VeryLightBlue = Color(0xFFF5FAFF)
+val DarkerBlue = Color(0xFF00796B)
 
 val NavBarUnselected = Color(216, 223, 225)
 val NavBarSelected = Color(191, 206, 208, 255)
