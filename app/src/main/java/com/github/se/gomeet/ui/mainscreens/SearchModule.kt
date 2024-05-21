@@ -79,7 +79,8 @@ fun SearchModule(nav: NavigationActions, backgroundColor: Color, contentColor: C
             Icon(
                 ImageVector.vectorResource(R.drawable.gomeet_icon),
                 contentDescription = null,
-                tint = contentColor)
+                tint = contentColor,
+                modifier = Modifier.size(24.dp))
           }
         },
         onValueChange = viewModel::onSearchTextChange,
