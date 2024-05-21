@@ -73,7 +73,12 @@ import java.io.InputStream
 import kotlinx.coroutines.launch
 
 @Composable
-fun EditEvent(nav: NavigationActions, eventViewModel: EventViewModel, eventId: String) {
+fun EditEvent(
+    nav: NavigationActions,
+    eventViewModel: EventViewModel,
+    eventId: String,
+    refreshEvent: (Event) -> Unit
+) {
   val context = LocalContext.current
   val coroutineScope = rememberCoroutineScope()
 
@@ -180,7 +185,7 @@ fun EditEvent(nav: NavigationActions, eventViewModel: EventViewModel, eventId: S
                                 updatedEvent
                               }
                           eventViewModel.editEvent(finalEvent)
-                          nav.goBack()
+                          refreshEvent(finalEvent)
                         }
                       }
                     })

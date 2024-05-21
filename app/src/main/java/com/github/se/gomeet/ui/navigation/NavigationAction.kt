@@ -202,7 +202,8 @@ class NavigationActions(val navController: NavHostController) {
             .replace("{description}", Uri.encode(description))
             .replace("{latitude}", loc.latitude.toString())
             .replace("{longitude}", loc.longitude.toString())
-    navController.navigate(route)
+
+    navController.navigate(route) { popUpTo(Route.EVENTS) { inclusive = false } }
   }
 
   /** Navigates to the previous screen. */

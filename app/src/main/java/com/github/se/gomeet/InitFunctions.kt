@@ -128,7 +128,7 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
   val eventViewModel = remember { mutableStateOf(EventViewModel(null)) }
   val userViewModel = UserViewModel()
 
-  return NavHost(navController = nav, startDestination = Route.WELCOME) {
+  NavHost(navController = nav, startDestination = Route.WELCOME) {
     composable(Route.WELCOME) {
       WelcomeScreen(
           onNavToLogin = { NavigationActions(nav).navigateTo(LOGIN_ITEMS[1]) },
@@ -377,7 +377,19 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
         arguments = listOf(navArgument("eventId") { type = NavType.StringType })) { entry ->
           val eventId = entry.arguments?.getString("eventId") ?: ""
 
-          EditEvent(nav = navAction, eventViewModel = eventViewModel.value, eventId = eventId)
+          EditEvent(nav = navAction, eventViewModel = eventViewModel.value, eventId = eventId) {
+              updatedEvent ->
+            // Navigate to the updated event info
+            navAction.navigateToEventInfo(
+                eventId = updatedEvent.eventID,
+                title = updatedEvent.title,
+                date = updatedEvent.date.toString(),
+                time = updatedEvent.time.toString(),
+                organizer = updatedEvent.creator,
+                rating = 0.0,
+                description = updatedEvent.description,
+                loc = LatLng(updatedEvent.location.latitude, updatedEvent.location.longitude))
+          }
         }
   }
 }
