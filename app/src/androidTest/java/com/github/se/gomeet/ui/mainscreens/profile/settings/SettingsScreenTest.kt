@@ -21,7 +21,7 @@ class SettingsScreenTest {
 
   @Test
   fun testSettingsScreen() {
-    composeTestRule.setContent { SettingsScreen(NavigationActions(rememberNavController())) }
+    composeTestRule.setContent { SettingsScreen(NavigationActions(rememberNavController())) {} }
 
     composeTestRule.waitForIdle()
 
