@@ -25,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -38,6 +39,7 @@ import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.InviteStatus
 import com.github.se.gomeet.model.user.GoMeetUser
+import com.github.se.gomeet.ui.theme.DarkerGreen
 
 /**
  * This composable function represents the user invite widget when the user can be invited to an
@@ -106,9 +108,8 @@ fun UserInviteWidget(
             color =
                 when (status) {
                   InviteStatus.PENDING ->
-                      if (clicked) MaterialTheme.colorScheme.onBackground
-                      else MaterialTheme.colorScheme.primary
-                  InviteStatus.ACCEPTED -> Color.Green
+                      if (clicked) Gray else MaterialTheme.colorScheme.onBackground
+                  InviteStatus.ACCEPTED -> DarkerGreen
                   InviteStatus.REFUSED -> Color.Red
                   else -> MaterialTheme.colorScheme.onBackground
                 })

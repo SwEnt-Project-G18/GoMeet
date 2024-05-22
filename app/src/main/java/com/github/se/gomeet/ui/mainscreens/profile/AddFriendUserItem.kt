@@ -110,6 +110,7 @@ fun UserItem(
           Column {
             Text(
                 text = "${user.firstName} ${user.lastName}",
+                color = MaterialTheme.colorScheme.onBackground,
                 style = MaterialTheme.typography.bodyLarge)
             Text(
                 text = user.username,

@@ -17,3 +17,4 @@ val DarkGrey = Color(17, 17, 17)
 val White = Color(255, 255, 255)
 val Black = Color(0, 0, 0)
 val Grey = Color.Gray
+val DarkerGreen = Color(15, 166, 70)
