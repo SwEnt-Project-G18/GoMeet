@@ -29,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -225,16 +226,18 @@ fun MyEventInfo(
                   Spacer(Modifier.height(screenHeight / 50))
                 } else {
                   Spacer(Modifier.height(10.dp))
-                  myEvent.value!!.posts.forEach {
-                    EventPost(
-                        nav = nav,
-                        event = myEvent.value!!,
-                        post = it,
-                        userViewModel = userViewModel,
-                        eventViewModel = eventViewModel,
-                        currentUser = currentUser.value!!.uid)
-                    HorizontalDivider(color = MaterialTheme.colorScheme.primaryContainer)
-                    Spacer(Modifier.height(10.dp))
+                  myEvent.value!!.posts.forEach { post ->
+                    key(post.date.toString() + post.time.toString()) {
+                      EventPost(
+                          nav = nav,
+                          event = myEvent.value!!,
+                          post = post,
+                          userViewModel = userViewModel,
+                          eventViewModel = eventViewModel,
+                          currentUser = currentUser.value!!.uid)
+                      HorizontalDivider(color = MaterialTheme.colorScheme.primaryContainer)
+                      Spacer(Modifier.height(10.dp))
+                    }
                   }
                 }
                 Spacer(Modifier.height(screenHeight / 10))
