@@ -12,7 +12,6 @@ val DarkModeBackground = Color(0xFF1A1B21)
 val LightGray = Color(0xFFECEFF1)
 val MidLightGray = Color(0xFFD3D3D3)
 
-
 val VeryLightBlue = Color(0xFFF5FAFF)
 val DarkerBlue = Color(0xFF00796B)
 

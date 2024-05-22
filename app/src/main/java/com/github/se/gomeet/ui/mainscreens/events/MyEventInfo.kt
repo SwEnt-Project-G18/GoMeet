@@ -1,8 +1,6 @@
 package com.github.se.gomeet.ui.mainscreens.events
 
-import android.net.Uri
 import android.util.Log
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,7 +23,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -181,13 +178,14 @@ fun MyEventInfo(
                   AddPost(
                       callbackCancel = { addPost = false },
                       callbackPost = { post ->
-                            coroutineScope.launch {
-                              eventViewModel.editEvent(
-                                  myEvent.value!!.copy(posts = myEvent.value!!.posts.plus(post).reversed()))
-                              myEvent.value = eventViewModel.getEvent(eventId)
-                            }
-                            addPost = false
-                          },
+                        coroutineScope.launch {
+                          eventViewModel.editEvent(
+                              myEvent.value!!.copy(
+                                  posts = myEvent.value!!.posts.plus(post).reversed()))
+                          myEvent.value = eventViewModel.getEvent(eventId)
+                        }
+                        addPost = false
+                      },
                       user = currentUser.value!!,
                       userViewModel = userViewModel)
                 }
@@ -200,7 +198,9 @@ fun MyEventInfo(
                     verticalAlignment = Alignment.Top) {
                       Text(
                           text = "Posts",
-                          style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.SemiBold))
+                          style =
+                              MaterialTheme.typography.headlineSmall.copy(
+                                  fontWeight = FontWeight.SemiBold))
 
                       Spacer(modifier = Modifier.weight(1f))
                       if (!addPost && organizer.value!!.uid == currentUser.value!!.uid) {
@@ -223,11 +223,17 @@ fun MyEventInfo(
                       style = MaterialTheme.typography.bodyLarge)
                   Spacer(Modifier.height(screenHeight / 50))
                 } else {
+                  Spacer(Modifier.height(10.dp))
+                  myEvent.value!!.posts.forEach {
+                    EventPost(
+                        nav = nav,
+                        event = myEvent.value!!,
+                        post = it,
+                        userViewModel = userViewModel,
+                        eventViewModel = eventViewModel,
+                        currentUser = currentUser.value!!.uid)
+                    HorizontalDivider(color = MaterialTheme.colorScheme.primaryContainer)
                     Spacer(Modifier.height(10.dp))
-                    myEvent.value!!.posts.forEach {
-                        EventPost(nav = nav, event = myEvent.value!!, post = it, userViewModel = userViewModel, eventViewModel = eventViewModel, currentUser = currentUser.value!!.uid)
-                        HorizontalDivider(color = MaterialTheme.colorScheme.primaryContainer)
-                        Spacer(Modifier.height(10.dp))
                   }
                 }
                 Spacer(Modifier.height(screenHeight / 10))

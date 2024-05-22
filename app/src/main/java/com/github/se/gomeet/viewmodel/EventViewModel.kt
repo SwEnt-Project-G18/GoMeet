@@ -291,17 +291,24 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
     EventRepository.updateEvent(event)
   }
 
-
-    fun editPost(event : Event, oldPost : Post, newPost: Post){
-        val updatedPosts = event.posts.map { currentPost ->
-            if (currentPost == oldPost) {
-                newPost
-            } else {
-                currentPost
-            }
+  /**
+   * Edits a post in the specified event.
+   *
+   * @param event The event containing the post to be edited
+   * @param oldPost The original post to be edited
+   * @param newPost The new post data
+   */
+  fun editPost(event: Event, oldPost: Post, newPost: Post) {
+    val updatedPosts =
+        event.posts.map { currentPost ->
+          if (currentPost == oldPost) {
+            newPost
+          } else {
+            currentPost
+          }
         }
-        editEvent(event.copy(posts = updatedPosts))
-    }
+    editEvent(event.copy(posts = updatedPosts))
+  }
 
   /**
    * Remove an event by its UID.

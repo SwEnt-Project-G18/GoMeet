@@ -1,6 +1,5 @@
 package com.github.se.gomeet.ui.mainscreens.events.posts
 
-import android.annotation.SuppressLint
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
@@ -33,7 +32,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -67,198 +65,191 @@ import java.io.InputStream
 import java.time.LocalDate
 import java.time.LocalTime
 
-@SuppressLint("SuspiciousIndentation")
+/**
+ * Composable function to display a UI for adding a post.
+ *
+ * @param user GoMeetUser object representing the user adding the post
+ * @param callbackCancel Lambda function to be called when the close button is pressed
+ * @param callbackPost Lambda function to be called when the post button is pressed, taking a Post
+ *   object as a parameter
+ * @param userViewModel UserViewModel object to interact with user data
+ */
 @Composable
-fun AddPost(user: GoMeetUser, callbackCancel: () -> Unit, callbackPost: (Post) -> Unit, userViewModel: UserViewModel) {
-    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
-    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+fun AddPost(
+    user: GoMeetUser,
+    callbackCancel: () -> Unit,
+    callbackPost: (Post) -> Unit,
+    userViewModel: UserViewModel
+) {
+  val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+  val screenWidth = LocalConfiguration.current.screenWidthDp.dp
 
-    val titleState by remember { mutableStateOf("") }
-    var contentState by remember { mutableStateOf("") }
-    var uriString by remember { mutableStateOf("") }
+  val titleState by remember { mutableStateOf("") }
+  var contentState by remember { mutableStateOf("") }
+  var uriString by remember { mutableStateOf("") }
 
-    val context = LocalContext.current
+  val context = LocalContext.current
 
-    var imageUri by remember { mutableStateOf<Uri?>(null) }
-    var imageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
-    val imagePickerLauncher =
-        rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri?
-            ->
-            imageUri = uri
-            uri?.let { uriNonNull ->
-                val inputStream: InputStream? =
-                    try {
-                        context.contentResolver.openInputStream(uriNonNull)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        null
-                    }
-                inputStream?.let {
-                    val bitmap = BitmapFactory.decodeStream(it)
-                    imageBitmap = bitmap.asImageBitmap()
-                    uriString = uriNonNull.toString()
-                }
-            }
+  var imageUri by remember { mutableStateOf<Uri?>(null) }
+  var imageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
+  val imagePickerLauncher =
+      rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri?
+        ->
+        imageUri = uri
+        uri?.let { uriNonNull ->
+          val inputStream: InputStream? =
+              try {
+                context.contentResolver.openInputStream(uriNonNull)
+              } catch (e: Exception) {
+                e.printStackTrace()
+                null
+              }
+          inputStream?.let {
+            val bitmap = BitmapFactory.decodeStream(it)
+            imageBitmap = bitmap.asImageBitmap()
+            uriString = uriNonNull.toString()
+          }
         }
+      }
 
-    val textFieldColors =
-        TextFieldDefaults.colors(
-            focusedTextColor = MaterialTheme.colorScheme.onBackground,
-            unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
-            unfocusedContainerColor = Color.Transparent,
-            focusedContainerColor = Color.Transparent,
-            cursorColor = MaterialTheme.colorScheme.outlineVariant,
-            focusedLabelColor = MaterialTheme.colorScheme.tertiary,
-            unfocusedLabelColor = MaterialTheme.colorScheme.tertiary,
-            focusedIndicatorColor = MaterialTheme.colorScheme.tertiary,
-            unfocusedIndicatorColor = MaterialTheme.colorScheme.tertiary)
-
-    Box(
-        modifier =
-        Modifier
-            .border(
-                BorderStroke(4.dp, MaterialTheme.colorScheme.primaryContainer),
-                RoundedCornerShape(10.dp)
-            )
-            .background(MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(10.dp))) {
+  Box(
+      modifier =
+          Modifier.border(
+                  BorderStroke(4.dp, MaterialTheme.colorScheme.primaryContainer),
+                  RoundedCornerShape(10.dp))
+              .background(MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(10.dp))) {
         IconButton(onClick = { callbackCancel() }) {
-            Icon(Icons.Filled.Close, contentDescription = "Cancel")
+          Icon(Icons.Filled.Close, contentDescription = "Cancel")
         }
         Column(modifier = Modifier.padding(top = 10.dp)) {
-            Text(
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                text = "Add a Post",
-                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.SemiBold))
+          Text(
+              modifier = Modifier.align(Alignment.CenterHorizontally),
+              text = "Add a Post",
+              style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.SemiBold))
 
-            Spacer(modifier = Modifier.height(screenHeight / 40))
+          Spacer(modifier = Modifier.height(screenHeight / 40))
 
-            Row(
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag("UserInfo")
-                    .padding(start = 15.dp)) {
+          Row(
+              horizontalArrangement = Arrangement.Start,
+              verticalAlignment = Alignment.CenterVertically,
+              modifier = Modifier.fillMaxWidth().testTag("UserInfo").padding(start = 15.dp)) {
                 ProfileImage(
-                    userId = user.uid,
-                    modifier = Modifier.testTag("Profile Picture"),
-                    size = 50.dp)
+                    userId = user.uid, modifier = Modifier.testTag("Profile Picture"), size = 50.dp)
 
-                Column(horizontalAlignment = Alignment.Start, modifier = Modifier.padding(start = 10.dp)) {
-                    Text(
-                        (user.firstName + " " + user.lastName),
-                        textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.tertiary
-                    )
+                Column(
+                    horizontalAlignment = Alignment.Start,
+                    modifier = Modifier.padding(start = 10.dp)) {
+                      Text(
+                          (user.firstName + " " + user.lastName),
+                          textAlign = TextAlign.Center,
+                          style = MaterialTheme.typography.bodyLarge,
+                          color = MaterialTheme.colorScheme.tertiary)
 
-                    Text(text = "@" + (user.username),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.tertiary)
-                }
-            }
+                      Text(
+                          text = "@" + (user.username),
+                          style = MaterialTheme.typography.bodySmall,
+                          color = MaterialTheme.colorScheme.tertiary)
+                    }
+              }
 
-            OutlinedTextField(
-                value = contentState,
-                onValueChange = { newVal -> contentState = newVal },
-                placeholder = { Text("What's new ?") },
-                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color.Transparent, unfocusedBorderColor = Color.Transparent),
-                modifier = Modifier
-                    .fillMaxWidth())
+          OutlinedTextField(
+              value = contentState,
+              onValueChange = { newVal -> contentState = newVal },
+              placeholder = { Text("What's new ?") },
+              colors =
+                  OutlinedTextFieldDefaults.colors(
+                      focusedBorderColor = Color.Transparent,
+                      unfocusedBorderColor = Color.Transparent),
+              modifier = Modifier.fillMaxWidth())
 
-            if (uriString.isNotEmpty()) {
-                Image(
-                    painter =
+          if (uriString.isNotEmpty()) {
+            Image(
+                painter =
                     if (imageBitmap != null) {
-                        BitmapPainter(imageBitmap!!)
+                      BitmapPainter(imageBitmap!!)
                     } else if (uriString.isNotEmpty()) {
-                        rememberAsyncImagePainter(uriString)
+                      rememberAsyncImagePainter(uriString)
                     } else {
-                        painterResource(id = R.drawable.gomeet_logo)
+                      painterResource(id = R.drawable.gomeet_logo)
                     },
-                    contentDescription = "Post Image",
-                    contentScale = ContentScale.Crop,
-                    modifier =
-                    Modifier
-                        .padding(horizontal = 20.dp)
+                contentDescription = "Post Image",
+                contentScale = ContentScale.Crop,
+                modifier =
+                    Modifier.padding(horizontal = 20.dp)
                         .aspectRatio(2f)
                         .clickable { imagePickerLauncher.launch("image/*") }
                         .clip(RoundedCornerShape(20.dp)))
-                    Spacer(modifier = Modifier.height(screenHeight / 60))
-            }
+            Spacer(modifier = Modifier.height(screenHeight / 60))
+          }
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 20.dp, end = 20.dp, bottom = 20.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween) {
+          Row(
+              modifier =
+                  Modifier.fillMaxWidth().padding(start = 20.dp, end = 20.dp, bottom = 20.dp),
+              verticalAlignment = Alignment.CenterVertically,
+              horizontalArrangement = Arrangement.SpaceBetween) {
                 if (uriString.isNotEmpty()) {
-                    IconButton(
-                        modifier = Modifier.size(30.dp),
-                        onClick = { uriString = "" }) {
-                        Icon(
-                            ImageVector.vectorResource(R.drawable.image_delete_icon),
-                            contentDescription = "Add Image",
-                            tint = MaterialTheme.colorScheme.tertiary)
-                    }
-                }else {
-                    IconButton(
-                        modifier = Modifier
-                            .size(26.dp),
-                        onClick = { imagePickerLauncher.launch("image/*") }) {
+                  IconButton(modifier = Modifier.size(30.dp), onClick = { uriString = "" }) {
+                    Icon(
+                        ImageVector.vectorResource(R.drawable.image_delete_icon),
+                        contentDescription = "Add Image",
+                        tint = MaterialTheme.colorScheme.tertiary)
+                  }
+                } else {
+                  IconButton(
+                      modifier = Modifier.size(26.dp),
+                      onClick = { imagePickerLauncher.launch("image/*") }) {
                         Icon(
                             ImageVector.vectorResource(R.drawable.image_add_icon),
                             contentDescription = "Add Image",
                             tint = MaterialTheme.colorScheme.tertiary)
-                    }
+                      }
                 }
                 Button(
                     modifier = Modifier.width(screenWidth / 3),
                     shape = RoundedCornerShape(10.dp),
                     onClick = {
-                        var url = ""
-                        if (uriString != "") {
-                            userViewModel.uploadImageAndGetUrl(
-                                userId = user.uid,
-                                imageUri = Uri.parse(uriString),
-                                onSuccess = { imageUrl ->
-                                    url = imageUrl
-                                    callbackPost(
-                                        Post(
-                                            user.uid,
-                                            titleState,
-                                            contentState,
-                                            LocalDate.now(),
-                                            LocalTime.now(),
-                                            url,
-                                            emptyList(),
-                                            emptyList()))
-                                },
-                                onError = { exception ->
-                                    Log.e(
-                                        "ProfileUpdate", "Failed to upload new image: ${exception.message}")
-                                })
-                        } else {
-                            callbackPost(
-                                Post(
-                                    user.uid,
-                                    titleState,
-                                    contentState,
-                                    LocalDate.now(),
-                                    LocalTime.now(),
-                                    url,
-                                    emptyList(),
-                                    emptyList()))
-                        }
-
+                      var url = ""
+                      if (uriString != "") {
+                        userViewModel.uploadImageAndGetUrl(
+                            userId = user.uid,
+                            imageUri = Uri.parse(uriString),
+                            onSuccess = { imageUrl ->
+                              url = imageUrl
+                              callbackPost(
+                                  Post(
+                                      user.uid,
+                                      titleState,
+                                      contentState,
+                                      LocalDate.now(),
+                                      LocalTime.now(),
+                                      url,
+                                      emptyList(),
+                                      emptyList()))
+                            },
+                            onError = { exception ->
+                              Log.e(
+                                  "ProfileUpdate",
+                                  "Failed to upload new image: ${exception.message}")
+                            })
+                      } else {
+                        callbackPost(
+                            Post(
+                                user.uid,
+                                titleState,
+                                contentState,
+                                LocalDate.now(),
+                                LocalTime.now(),
+                                url,
+                                emptyList(),
+                                emptyList()))
+                      }
                     },
                     colors =
-                    ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.outlineVariant)) {
-                    Text(text = "Post", color = White)
-                }
-            }
+                        ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.outlineVariant)) {
+                      Text(text = "Post", color = White)
+                    }
+              }
         }
-    }
+      }
 }
