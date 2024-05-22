@@ -15,6 +15,8 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.github.se.gomeet.model.event.getEventDateString
+import com.github.se.gomeet.model.event.getEventTimeString
 import com.github.se.gomeet.ui.authscreens.LoginScreen
 import com.github.se.gomeet.ui.authscreens.WelcomeScreen
 import com.github.se.gomeet.ui.authscreens.register.RegisterScreen
@@ -22,6 +24,7 @@ import com.github.se.gomeet.ui.mainscreens.Trends
 import com.github.se.gomeet.ui.mainscreens.create.Create
 import com.github.se.gomeet.ui.mainscreens.create.CreateEvent
 import com.github.se.gomeet.ui.mainscreens.events.AddParticipants
+import com.github.se.gomeet.ui.mainscreens.events.EditEvent
 import com.github.se.gomeet.ui.mainscreens.events.Events
 import com.github.se.gomeet.ui.mainscreens.events.MyEventInfo
 import com.github.se.gomeet.ui.mainscreens.events.manageinvites.ManageInvites
@@ -113,7 +116,6 @@ fun initChatClient(applicationContext: Context): ChatClient {
  * Set up the navigation for the app.
  *
  * @param nav The NavHostController.
- * @param db The Firestore database.
  * @param client The chat client.
  * @param applicationContext The application text.
  */
@@ -153,8 +155,6 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
               val username = authViewModel.signInState.value.usernameRegister
               userViewModel.createUserIfNew(
                   uid, username, firstName, lastName, email, phoneNumber, country)
-              userIdState.value = currentUser.uid
-              eventViewModel.value = EventViewModel(userIdState.value)
             }
             val user =
                 User(
@@ -163,9 +163,11 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
 
             client.connectUser(user = user, token = client.devToken(userId)).enqueue { result ->
               if (result.isSuccess) {
-                navAction.navigateTo(
-                    TOP_LEVEL_DESTINATIONS.first { it.route == postLoginScreen },
-                    clearBackStack = true)
+                  onNavToPostLogin(
+                      eventViewModel,
+                      userIdState,
+                      TOP_LEVEL_DESTINATIONS.first { it.route == postLoginScreen },
+                      navAction)
               } else {
                 // Handle connection failure
                 Log.e("ChatClient", "Failed to connect user: $userId")
@@ -387,6 +389,25 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
           }
         }
     composable(route = Route.ADD_FRIEND) { AddFriend(navAction, userViewModel) }
+    composable(
+        route = Route.EDIT_EVENT,
+        arguments = listOf(navArgument("eventId") { type = NavType.StringType })) { entry ->
+          val eventId = entry.arguments?.getString("eventId") ?: ""
+
+          EditEvent(nav = navAction, eventViewModel = eventViewModel.value, eventId = eventId) {
+              updatedEvent ->
+            // Navigate to the updated event info
+            navAction.navigateToEventInfo(
+                eventId = updatedEvent.eventID,
+                title = updatedEvent.title,
+                date = getEventDateString(updatedEvent.date),
+                time = getEventTimeString(updatedEvent.time),
+                organizer = updatedEvent.creator,
+                rating = 0.0,
+                description = updatedEvent.description,
+                loc = LatLng(updatedEvent.location.latitude, updatedEvent.location.longitude))
+          }
+        }
   }
 }
 
