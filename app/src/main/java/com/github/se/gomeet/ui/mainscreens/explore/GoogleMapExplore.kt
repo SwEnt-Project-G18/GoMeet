@@ -37,6 +37,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.Marker
 import com.google.maps.android.compose.GoogleMap
@@ -83,8 +84,8 @@ internal val isButtonVisible = mutableStateOf(true)
 internal fun GoogleMapView(
     modifier: Modifier = Modifier,
     currentPosition: MutableState<LatLng>,
-    onMapLoaded: () -> Unit = {},
     content: @Composable () -> Unit = {},
+    allEvents: MutableState<List<Event>>,
     events: MutableState<List<Event>>,
     query: MutableState<String>,
     locationPermitted: Boolean,
@@ -118,6 +119,7 @@ internal fun GoogleMapView(
   val cameraPositionState = rememberCameraPositionState()
 
   LaunchedEffect(moveToCurrentLocation.value, Unit) {
+
     if (moveToCurrentLocation.value == CameraAction.MOVE) {
       coroutineScope.launch {
         cameraPositionState.move(
@@ -152,6 +154,13 @@ internal fun GoogleMapView(
       Log.d("ViewModel", "Loading complete, map is now displayed.")
     }
   }
+    LaunchedEffect(cameraPositionState.isMoving) {
+        val visibleRegion = cameraPositionState.projection?.visibleRegion
+        if (visibleRegion != null) {
+            val bounds = LatLngBounds(visibleRegion.nearLeft, visibleRegion.farRight)
+            events.value = allEvents.value.filter { e -> bounds.contains(LatLng(e.location.latitude, e.location.longitude)) }
+        }
+    }
 
   if (mapVisible) {
     Box(Modifier.fillMaxSize()) {
@@ -163,7 +172,13 @@ internal fun GoogleMapView(
             cameraPositionState = cameraPositionState,
             properties = mapProperties,
             uiSettings = uiSettings,
-            onMapLoaded = onMapLoaded,
+            onMapLoaded = {
+                val visibleRegion = cameraPositionState.projection?.visibleRegion
+                if (visibleRegion != null) {
+                    val bounds = LatLngBounds(visibleRegion.nearLeft, visibleRegion.farRight)
+                    events.value = allEvents.value.filter { e -> bounds.contains(LatLng(e.location.latitude, e.location.longitude)) }
+                }
+            },
             onMapClick = { isButtonVisible.value = true },
             onPOIClick = {}) {
               val markerClick: (Marker) -> Boolean = {

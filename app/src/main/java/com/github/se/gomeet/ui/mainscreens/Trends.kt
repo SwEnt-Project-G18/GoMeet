@@ -54,20 +54,22 @@ import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.viewmodel.EventViewModel
-import com.github.se.gomeet.viewmodel.EventViewModel.SortOption.*
+import com.github.se.gomeet.viewmodel.EventViewModel.SortOption.ALPHABETICAL
+import com.github.se.gomeet.viewmodel.EventViewModel.SortOption.DATE
+import com.github.se.gomeet.viewmodel.EventViewModel.SortOption.DEFAULT
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.rememberPagerState
 import com.google.android.gms.maps.model.LatLng
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.time.ZoneId
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 /**
  * Trends screen composable. This is where the popular trends are displayed.
@@ -99,10 +101,12 @@ fun Trends(
       if (currentUser != null)
           userTags.addAll(Tag.entries.filter { currentUser.tags.contains(it.tagName) })
       Log.d("Trends", "Current user: $currentUser with ${userTags.size} tags")
-      val allEvents = eventViewModel.getAllEvents()!!.filter { !isPastEvent(it) }
-      if (allEvents.isNotEmpty()) {
-        eventList.addAll(allEvents)
-      }
+      val allEvents = eventViewModel.getAllEvents()
+        if (allEvents != null) {
+            if (allEvents.isNotEmpty()) {
+                eventList.addAll(allEvents.filter { !isPastEvent(it) })
+            }
+        }
       eventsLoaded.value = true
     }
   }

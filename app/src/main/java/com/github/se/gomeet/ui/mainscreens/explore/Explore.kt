@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -97,7 +96,7 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
             }
           })
   val locationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
-    val allEvent = remember { mutableStateOf<List<Event>>(emptyList()) }
+    val nonFilteredEvents = remember { mutableStateOf<List<Event>>(emptyList()) }
   val eventList = remember { mutableStateOf<List<Event>>(emptyList()) }
   val query = remember { mutableStateOf("") }
   val currentPosition = remember { mutableStateOf(defaultPosition) }
@@ -112,7 +111,7 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
 
     val allEvents = eventViewModel.getAllEvents()
     if (allEvents != null) {
-      eventList.value = allEvents.filter { e -> !isPastEvent(e) }
+        nonFilteredEvents.value =allEvents.filter { e -> !isPastEvent(e) }
     }
 
     // wait for user input
@@ -206,13 +205,10 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
                     bottomBar = {}) { innerPadding ->
                       if (isMapLoaded) {
                         moveToCurrentLocation.value = CameraAction.MOVE
-
                         Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
                           GoogleMapView(
-                              onMapLoaded = {
-
-                              },
                               currentPosition = currentPosition,
+                              allEvents = nonFilteredEvents,
                               events = eventList,
                               modifier = Modifier.testTag("Map"),
                               query = query,
