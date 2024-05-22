@@ -52,14 +52,15 @@ import com.github.se.gomeet.model.event.getEventDateString
 import com.github.se.gomeet.model.event.getEventTimeString
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.profile.ProfileImage
+import com.github.se.gomeet.ui.navigation.NavigationActions
+import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable fun EventPost(event: Event, post: Post, userViewModel: UserViewModel, eventViewModel: EventViewModel, currentUser: String) {
+@Composable fun EventPost(nav : NavigationActions, event: Event, post: Post, userViewModel: UserViewModel, eventViewModel: EventViewModel, currentUser: String) {
     var poster by remember { mutableStateOf<GoMeetUser?>(null) }
     var liked by remember { mutableStateOf(false) }
     var likes by remember { mutableIntStateOf(0) }
@@ -80,7 +81,14 @@ import kotlinx.coroutines.launch
                     horizontalArrangement = Arrangement.Start,
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .clickable {
+                            if (currentUser == post.userId){
+                                nav.navigateToScreen(Route.PROFILE)
+                            } else{
+                                nav.navigateToScreen(Route.OTHERS_PROFILE.replace("{uid}", post.userId))
+                            }
+
+                        }
                         .testTag("UserInfo")) {
                     ProfileImage(
                         userId = poster!!.uid,

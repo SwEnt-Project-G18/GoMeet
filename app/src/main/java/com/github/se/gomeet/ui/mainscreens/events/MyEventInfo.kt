@@ -225,7 +225,7 @@ fun MyEventInfo(
                 } else {
                     Spacer(Modifier.height(10.dp))
                     myEvent.value!!.posts.forEach {
-                        EventPost(event = myEvent.value!!, post = it, userViewModel = userViewModel, eventViewModel = eventViewModel, currentUser = currentUser.value!!.uid)
+                        EventPost(nav = nav, event = myEvent.value!!, post = it, userViewModel = userViewModel, eventViewModel = eventViewModel, currentUser = currentUser.value!!.uid)
                         HorizontalDivider(color = MaterialTheme.colorScheme.primaryContainer)
                         Spacer(Modifier.height(10.dp))
                   }
