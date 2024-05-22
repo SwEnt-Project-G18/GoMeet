@@ -91,7 +91,8 @@ fun WelcomeScreen(
         Image(
             colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.tertiary),
             painter = painterResource(id = R.drawable.gomeet_text),
-            contentDescription = "GoMeet Logo")
+            contentDescription = "GoMeet Logo",
+            modifier = Modifier.size(width = 200.dp, height = 100.dp))
 
         Image(
             painter = painterResource(id = R.drawable.welcome2),
