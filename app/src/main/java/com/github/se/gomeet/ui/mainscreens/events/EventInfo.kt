@@ -237,6 +237,7 @@ fun EventButtons(
         TextButton(
             onClick = {
               eventAction(
+                  nav,
                   currentUser,
                   organiser,
                   eventId,
@@ -354,6 +355,7 @@ private fun FavouriteButton(isFavourite: Boolean) {
  * @param currentEvent The current event
  */
 private fun eventAction(
+    nav: NavigationActions,
     currentUser: GoMeetUser,
     organiser: GoMeetUser,
     eventId: String,
@@ -364,7 +366,7 @@ private fun eventAction(
 ) {
 
   if (organiser.uid == currentUser.uid) {
-    // TODO: GO TO EDIT EVENT PARAMETERS SCREEN
+    nav.navigateToScreen(Route.EDIT_EVENT.replace("{eventId}", eventId))
   } else {
 
     if (!isJoined.value) {

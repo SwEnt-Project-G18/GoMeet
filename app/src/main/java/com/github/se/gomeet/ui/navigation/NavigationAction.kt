@@ -66,6 +66,7 @@ object Route {
   const val MESSAGE_CHANNELS = "MessageChannel"
   const val CHANNEL = "Channel/{id}"
   const val ADD_FRIEND = "AddFriend"
+  const val EDIT_EVENT = "EditEvent/{eventId}"
 }
 
 val CREATE_ITEMS =
@@ -123,6 +124,8 @@ val SECOND_LEVEL_DESTINATION =
             Route.EDIT_PROFILE, icon = Icons.Default.Person, textId = Route.EDIT_PROFILE),
         TopLevelDestination(
             route = Route.ADD_FRIEND, icon = Icons.Default.Person, textId = Route.ADD_FRIEND),
+        TopLevelDestination(
+            route = Route.EDIT_EVENT, icon = Icons.Default.Person, textId = Route.EDIT_EVENT),
     )
 
 val SETTINGS =
@@ -199,7 +202,8 @@ class NavigationActions(val navController: NavHostController) {
             .replace("{description}", Uri.encode(description))
             .replace("{latitude}", loc.latitude.toString())
             .replace("{longitude}", loc.longitude.toString())
-    navController.navigate(route)
+
+    navController.navigate(route) { popUpTo(Route.EVENTS) { inclusive = false } }
   }
 
   /** Navigates to the previous screen. */
