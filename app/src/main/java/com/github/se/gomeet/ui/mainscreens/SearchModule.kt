@@ -101,7 +101,7 @@ fun SearchModule(nav: NavigationActions, backgroundColor: Color, contentColor: C
             TextFieldDefaults.colors(
                 focusedTextColor = contentColor,
                 unfocusedTextColor = contentColor,
-                cursorColor = MaterialTheme.colorScheme.primary,
+                cursorColor = MaterialTheme.colorScheme.outlineVariant,
                 focusedContainerColor = Color.Transparent,
                 unfocusedContainerColor = Color.Transparent,
                 disabledContainerColor = Color.Transparent,
