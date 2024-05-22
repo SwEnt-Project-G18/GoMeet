@@ -14,6 +14,8 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.github.se.gomeet.model.event.getEventDateString
+import com.github.se.gomeet.model.event.getEventTimeString
 import com.github.se.gomeet.ui.authscreens.LoginScreen
 import com.github.se.gomeet.ui.authscreens.WelcomeScreen
 import com.github.se.gomeet.ui.authscreens.register.RegisterScreen
@@ -383,8 +385,8 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
             navAction.navigateToEventInfo(
                 eventId = updatedEvent.eventID,
                 title = updatedEvent.title,
-                date = updatedEvent.date.toString(),
-                time = updatedEvent.time.toString(),
+                date = getEventDateString( updatedEvent.date),
+                time = getEventTimeString(updatedEvent.time),
                 organizer = updatedEvent.creator,
                 rating = 0.0,
                 description = updatedEvent.description,
