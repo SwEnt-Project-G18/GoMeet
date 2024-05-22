@@ -14,6 +14,8 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.github.se.gomeet.model.event.getEventDateString
+import com.github.se.gomeet.model.event.getEventTimeString
 import com.github.se.gomeet.ui.authscreens.LoginScreen
 import com.github.se.gomeet.ui.authscreens.WelcomeScreen
 import com.github.se.gomeet.ui.authscreens.register.RegisterScreen
@@ -21,6 +23,7 @@ import com.github.se.gomeet.ui.mainscreens.Trends
 import com.github.se.gomeet.ui.mainscreens.create.Create
 import com.github.se.gomeet.ui.mainscreens.create.CreateEvent
 import com.github.se.gomeet.ui.mainscreens.events.AddParticipants
+import com.github.se.gomeet.ui.mainscreens.events.EditEvent
 import com.github.se.gomeet.ui.mainscreens.events.Events
 import com.github.se.gomeet.ui.mainscreens.events.MyEventInfo
 import com.github.se.gomeet.ui.mainscreens.events.manageinvites.ManageInvites
@@ -115,7 +118,6 @@ fun initChatClient(applicationContext: Context): ChatClient {
  * Set up the navigation for the app.
  *
  * @param nav The NavHostController.
- * @param db The Firestore database.
  * @param client The chat client.
  * @param applicationContext The application text.
  */
@@ -125,21 +127,16 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
   val userIdState = remember { mutableStateOf("") }
   val clientInitialisationState by client.clientState.initializationState.collectAsState()
   val authViewModel = AuthViewModel()
-  var eventViewModel = remember { mutableStateOf(EventViewModel(null)) }
+  val eventViewModel = remember { mutableStateOf(EventViewModel(null)) }
   val userViewModel = UserViewModel()
 
-  return NavHost(navController = nav, startDestination = Route.WELCOME) {
+  NavHost(navController = nav, startDestination = Route.WELCOME) {
     composable(Route.WELCOME) {
       WelcomeScreen(
           onNavToLogin = { NavigationActions(nav).navigateTo(LOGIN_ITEMS[1]) },
           onNavToRegister = { NavigationActions(nav).navigateTo(LOGIN_ITEMS[2]) },
-          onSignInSuccess = {
-              userId: String,
-              username: String,
-              email: String,
-              firstName: String,
-              lastName: String,
-              phoneNumber: String ->
+          onSignInSuccess = { userId: String, _: String, _: String, _: String, _: String, _: String
+            ->
             val currentUser = Firebase.auth.currentUser
             if (currentUser != null) {
               val uid = currentUser.uid
@@ -163,7 +160,7 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
               if (result.isSuccess) {
                 NavigationActions(nav)
                     .navigateTo(
-                        TOP_LEVEL_DESTINATIONS.first { it.route == Route.CREATE },
+                        TOP_LEVEL_DESTINATIONS.first { it.route == Route.EXPLORE },
                         clearBackStack = true)
               } else {
                 // Handle connection failure
@@ -176,14 +173,16 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
       LoginScreen(authViewModel = authViewModel, nav = NavigationActions(nav)) {
         userIdState.value = Firebase.auth.currentUser!!.uid
         eventViewModel.value = EventViewModel(userIdState.value)
-        NavigationActions(nav).navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == Route.CREATE })
+        NavigationActions(nav)
+            .navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == Route.EXPLORE })
       }
     }
     composable(Route.REGISTER) {
       RegisterScreen(client, NavigationActions(nav), authViewModel, userViewModel) {
         userIdState.value = Firebase.auth.currentUser!!.uid
         eventViewModel.value = EventViewModel(userIdState.value)
-        NavigationActions(nav).navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == Route.CREATE })
+        NavigationActions(nav)
+            .navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == Route.EXPLORE })
       }
     }
     composable(Route.EXPLORE) { Explore(navAction, eventViewModel.value) }
@@ -377,6 +376,25 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
           }
         }
     composable(route = Route.ADD_FRIEND) { AddFriend(navAction, userViewModel) }
+    composable(
+        route = Route.EDIT_EVENT,
+        arguments = listOf(navArgument("eventId") { type = NavType.StringType })) { entry ->
+          val eventId = entry.arguments?.getString("eventId") ?: ""
+
+          EditEvent(nav = navAction, eventViewModel = eventViewModel.value, eventId = eventId) {
+              updatedEvent ->
+            // Navigate to the updated event info
+            navAction.navigateToEventInfo(
+                eventId = updatedEvent.eventID,
+                title = updatedEvent.title,
+                date = getEventDateString(updatedEvent.date),
+                time = getEventTimeString(updatedEvent.time),
+                organizer = updatedEvent.creator,
+                rating = 0.0,
+                description = updatedEvent.description,
+                loc = LatLng(updatedEvent.location.latitude, updatedEvent.location.longitude))
+          }
+        }
   }
 }
 
