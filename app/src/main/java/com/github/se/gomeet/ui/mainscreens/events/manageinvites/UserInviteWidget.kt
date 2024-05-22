@@ -90,7 +90,7 @@ fun UserInviteWidget(
                     .background(color = MaterialTheme.colorScheme.background),
             painter = painter,
             contentDescription = "profile picture",
-            contentScale = ContentScale.None)
+            contentScale = ContentScale.FillBounds)
 
         // Username text
         Text(text = user.username, color = MaterialTheme.colorScheme.onBackground)

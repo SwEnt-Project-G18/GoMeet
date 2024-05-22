@@ -75,7 +75,7 @@ fun ProfileImageUser(
           },
       contentDescription = "Profile picture",
       modifier = modifier.size(55.dp).clip(CircleShape).background(color = Color.Gray),
-      contentScale = ContentScale.Crop)
+      contentScale = ContentScale.FillBounds)
 }
 
 /**

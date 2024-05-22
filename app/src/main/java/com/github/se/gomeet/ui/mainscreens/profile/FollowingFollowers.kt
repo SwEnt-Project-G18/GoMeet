@@ -274,7 +274,7 @@ fun PageUsers(
                         .background(color = MaterialTheme.colorScheme.background),
                 painter = painter,
                 contentDescription = "Profile picture",
-                contentScale = ContentScale.None)
+                contentScale = ContentScale.FillBounds)
             Column(modifier = Modifier.padding(start = 15.dp).weight(1f)) {
               Text(
                   text = "${user.firstName} ${user.lastName}",
