@@ -178,13 +178,13 @@ fun MyEventInfo(
                   AddPost(
                       callbackCancel = { addPost = false },
                       callbackPost = { post ->
+                        addPost = false
                         coroutineScope.launch {
                           eventViewModel.editEvent(
                               myEvent.value!!.copy(
                                   posts = myEvent.value!!.posts.plus(post).reversed()))
                           myEvent.value = eventViewModel.getEvent(eventId)
                         }
-                        addPost = false
                       },
                       user = currentUser.value!!,
                       userViewModel = userViewModel)
