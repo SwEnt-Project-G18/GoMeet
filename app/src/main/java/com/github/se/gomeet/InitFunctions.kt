@@ -164,7 +164,7 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
             client.connectUser(user = user, token = client.devToken(userId)).enqueue { result ->
               if (result.isSuccess) {
                 navAction.navigateTo(
-                    TOP_LEVEL_DESTINATIONS.first { it.route == Route.CREATE },
+                    TOP_LEVEL_DESTINATIONS.first { it.route == postLoginScreen },
                     clearBackStack = true)
               } else {
                 // Handle connection failure
