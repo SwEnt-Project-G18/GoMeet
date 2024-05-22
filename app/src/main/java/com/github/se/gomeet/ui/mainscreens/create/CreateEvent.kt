@@ -106,7 +106,6 @@ fun CreateEvent(
   var price by remember { mutableDoubleStateOf(0.0) }
   var priceText by remember { mutableStateOf("") }
   val url = remember { mutableStateOf("") }
-  val isPrivateEvent = remember { mutableStateOf(false) }
 
   val pickedTime = remember { mutableStateOf(LocalTime.now()) }
   val pickedDate = remember { mutableStateOf(LocalDate.now()) }
@@ -366,7 +365,7 @@ fun CreateEvent(
                                     listOf(),
                                     listOf(),
                                     0,
-                                    !isPrivateEvent.value,
+                                    !isPrivate,
                                     listOf(),
                                     listOf(),
                                     imageUri,
@@ -389,7 +388,7 @@ fun CreateEvent(
                               listOf(),
                               listOf(),
                               0,
-                              !isPrivateEvent.value,
+                              !isPrivate,
                               tags.value,
                               listOf(),
                               imageUri,
