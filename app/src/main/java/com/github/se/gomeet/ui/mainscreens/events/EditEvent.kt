@@ -16,10 +16,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -82,7 +80,7 @@ fun EditEvent(
 ) {
   val context = LocalContext.current
   val coroutineScope = rememberCoroutineScope()
-    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+  val screenHeight = LocalConfiguration.current.screenHeightDp.dp
 
   var event by remember { mutableStateOf<Event?>(null) }
   var profilePictureUrl by remember { mutableStateOf<String?>(null) }
@@ -222,16 +220,16 @@ fun EditEvent(
                       contentDescription = "Event picture",
                       modifier =
                           Modifier.padding(start = 15.dp, end = 15.dp, top = 30.dp, bottom = 15.dp)
-                              .width(101.dp)
-                              .height(101.dp)
+                              .fillMaxWidth()
+                              .height(200.dp)
                               .clickable { imagePickerLauncher.launch("image/*") }
-                              .clip(CircleShape)
+                              .clip(RoundedCornerShape(12.dp))
                               .background(color = MaterialTheme.colorScheme.background)
                               .align(Alignment.CenterHorizontally)
                               .testTag("Event Picture"),
                       contentScale = ContentScale.Crop)
 
-                Spacer(modifier = Modifier.height(screenHeight / 80))
+                  Spacer(modifier = Modifier.height(screenHeight / 80))
 
                   TextField(
                       value = titleState.value,
@@ -241,7 +239,7 @@ fun EditEvent(
                       modifier = Modifier.fillMaxWidth().padding(start = 15.dp, end = 15.dp),
                       colors = textFieldColors)
 
-                Spacer(modifier = Modifier.height(screenHeight / 80))
+                  Spacer(modifier = Modifier.height(screenHeight / 80))
 
                   TextField(
                       value = descriptionState.value,
@@ -251,11 +249,11 @@ fun EditEvent(
                       modifier = Modifier.fillMaxWidth().padding(start = 15.dp, end = 15.dp),
                       colors = textFieldColors)
 
-                Spacer(modifier = Modifier.height(screenHeight / 80))
+                  Spacer(modifier = Modifier.height(screenHeight / 80))
 
                   LocationField(selectedLocation, locationState, eventViewModel)
 
-                Spacer(modifier = Modifier.height(screenHeight / 30))
+                  Spacer(modifier = Modifier.height(screenHeight / 30))
 
                   DateTimePicker(pickedTime = pickedTime, pickedDate = pickedDate)
 
@@ -270,7 +268,7 @@ fun EditEvent(
                       modifier = Modifier.fillMaxWidth().padding(start = 15.dp, end = 15.dp),
                       colors = textFieldColors)
 
-                Spacer(modifier = Modifier.height(screenHeight / 80))
+                  Spacer(modifier = Modifier.height(screenHeight / 80))
 
                   TextField(
                       value = url.value,
@@ -280,7 +278,7 @@ fun EditEvent(
                       modifier = Modifier.fillMaxWidth().padding(start = 15.dp, end = 15.dp),
                       colors = textFieldColors)
 
-                Spacer(modifier = Modifier.height(screenHeight / 80))
+                  Spacer(modifier = Modifier.height(screenHeight / 80))
 
                   Row(
                       modifier = Modifier.fillMaxWidth().padding(start = 15.dp, top = 10.dp),

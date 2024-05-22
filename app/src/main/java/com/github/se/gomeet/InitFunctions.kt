@@ -385,7 +385,7 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
             navAction.navigateToEventInfo(
                 eventId = updatedEvent.eventID,
                 title = updatedEvent.title,
-                date = getEventDateString( updatedEvent.date),
+                date = getEventDateString(updatedEvent.date),
                 time = getEventTimeString(updatedEvent.time),
                 organizer = updatedEvent.creator,
                 rating = 0.0,
