@@ -94,9 +94,9 @@ fun EventPost(
                       nav.navigateToScreen(Route.OTHERS_PROFILE.replace("{uid}", post.userId))
                     }
                   }
-                  .testTag("UserInfo")) {
+                  .testTag("EventPostUserInfo")) {
             ProfileImage(
-                userId = poster!!.uid, modifier = Modifier.testTag("Profile Picture"), size = 50.dp)
+                userId = poster!!.uid, modifier = Modifier.testTag("Event Post Profile Picture"), size = 50.dp)
 
             Column(
                 horizontalAlignment = Alignment.Start, modifier = Modifier.padding(start = 10.dp)) {

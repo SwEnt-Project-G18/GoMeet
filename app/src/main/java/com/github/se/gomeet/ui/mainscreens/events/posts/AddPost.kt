@@ -132,9 +132,9 @@ fun AddPost(
           Row(
               horizontalArrangement = Arrangement.Start,
               verticalAlignment = Alignment.CenterVertically,
-              modifier = Modifier.fillMaxWidth().testTag("UserInfo").padding(start = 15.dp)) {
+              modifier = Modifier.fillMaxWidth().testTag("AddPostUserInfo").padding(start = 15.dp)) {
                 ProfileImage(
-                    userId = user.uid, modifier = Modifier.testTag("Profile Picture"), size = 50.dp)
+                    userId = user.uid, modifier = Modifier.testTag("AddPostProfile Picture"), size = 50.dp)
 
                 Column(
                     horizontalAlignment = Alignment.Start,
