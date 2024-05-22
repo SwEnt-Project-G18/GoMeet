@@ -36,7 +36,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -156,25 +155,24 @@ fun EventDateTime(day: String, time: String) {
 @Composable
 fun EventImage(imageUrl: String?) {
   if (imageUrl != null) {
-      val imagePainter = rememberAsyncImagePainter(
-        ImageRequest.Builder(LocalContext.current)
-            .data(data = imageUrl)
-            .apply(
-                block =
-                    fun ImageRequest.Builder.() {
-                      placeholder(R.drawable.gomeet_logo)
-                    })
-            .build())
-      Column(modifier = Modifier.fillMaxWidth().testTag("EventImage").padding(top = 10.dp)) {
-          Image(
-              painter = imagePainter,
-              contentDescription = "Event Image",
-              contentScale = ContentScale.Crop,
-              modifier = Modifier.aspectRatio(3f / 1.75f).clip(RoundedCornerShape(20.dp)))
-      }
+    val imagePainter =
+        rememberAsyncImagePainter(
+            ImageRequest.Builder(LocalContext.current)
+                .data(data = imageUrl)
+                .apply(
+                    block =
+                        fun ImageRequest.Builder.() {
+                          placeholder(R.drawable.gomeet_logo)
+                        })
+                .build())
+    Column(modifier = Modifier.fillMaxWidth().testTag("EventImage").padding(top = 10.dp)) {
+      Image(
+          painter = imagePainter,
+          contentDescription = "Event Image",
+          contentScale = ContentScale.Crop,
+          modifier = Modifier.aspectRatio(3f / 1.75f).clip(RoundedCornerShape(20.dp)))
+    }
   }
-
-
 }
 
 /**
@@ -243,25 +241,25 @@ fun EventButtons(
             shape = RoundedCornerShape(10.dp),
             modifier = Modifier.weight(1f),
             colors =
-            if (organiser.uid == currentUser.uid || isJoined.value) {
-                ButtonDefaults.textButtonColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.tertiary)
-            } else {
-                ButtonDefaults.textButtonColors(
-                    containerColor = MaterialTheme.colorScheme.outlineVariant,
-                    contentColor = White)
-            }){
-                    if (organiser.uid == currentUser.uid) {
-                        Text("Edit My Event")
-                    } else {
-                        if (isJoined.value) {
-                            Text("Leave Event")
-                        } else {
-                            Text("Join Event")
-                        }
-                    }
+                if (organiser.uid == currentUser.uid || isJoined.value) {
+                  ButtonDefaults.textButtonColors(
+                      containerColor = MaterialTheme.colorScheme.primaryContainer,
+                      contentColor = MaterialTheme.colorScheme.tertiary)
+                } else {
+                  ButtonDefaults.textButtonColors(
+                      containerColor = MaterialTheme.colorScheme.outlineVariant,
+                      contentColor = White)
+                }) {
+              if (organiser.uid == currentUser.uid) {
+                Text("Edit My Event")
+              } else {
+                if (isJoined.value) {
+                  Text("Leave Event")
+                } else {
+                  Text("Join Event")
                 }
+              }
+            }
         if (organiser.uid == currentUser.uid) {
           Spacer(modifier = Modifier.width(5.dp))
           TextButton(
