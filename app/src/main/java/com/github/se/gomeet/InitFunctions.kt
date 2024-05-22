@@ -66,6 +66,14 @@ import io.getstream.chat.android.models.User
 import io.getstream.chat.android.offline.plugin.factory.StreamOfflinePluginFactory
 import io.getstream.chat.android.state.plugin.config.StatePluginConfig
 import io.getstream.chat.android.state.plugin.factory.StreamStatePluginFactory
+import io.getstream.result.call.doOnResult
+import io.getstream.result.call.launch
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+
+private const val chatClientTag = "ChatClient"
 
 /** Initialize the cache. */
 fun initCache() {
@@ -122,18 +130,23 @@ fun initChatClient(applicationContext: Context): ChatClient {
 @Composable
 fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContext: Context) {
   val navAction = NavigationActions(nav)
-  val userIdState = remember { mutableStateOf("") }
   val clientInitialisationState by client.clientState.initializationState.collectAsState()
   val authViewModel = AuthViewModel()
-  val eventViewModel = remember { mutableStateOf(EventViewModel(null)) }
   val userViewModel = UserViewModel()
-  val postLoginScreen = Route.TRENDS
-  val startScreen = Route.WELCOME
+  val startScreen = Route.WELCOME // The screen that gets navigated to when the app starts
+  val postLoginScreen =
+      Route.EXPLORE // The screen that gets navigated to after logging in/signing up
+  val applicationScope = CoroutineScope(Job() + Dispatchers.Default)
+
+  val userIdState = remember { mutableStateOf("") }
+  val eventViewModel = remember { mutableStateOf(EventViewModel(null)) }
   val startDestination = remember { mutableStateOf(startScreen) }
+  val chatDisconnected = remember { mutableStateOf(true) }
 
   if (Firebase.auth.currentUser != null) {
     userIdState.value = Firebase.auth.currentUser!!.uid
     eventViewModel.value = EventViewModel(userIdState.value)
+    // If the user is logged in already, the app should start at the post-login screen
     startDestination.value = postLoginScreen
   }
 
@@ -163,17 +176,18 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
 
             client.connectUser(user = user, token = client.devToken(userId)).enqueue { result ->
               if (result.isSuccess) {
-                  onNavToPostLogin(
-                      eventViewModel,
-                      userIdState,
-                      TOP_LEVEL_DESTINATIONS.first { it.route == postLoginScreen },
-                      navAction)
+                onNavToPostLogin(
+                    eventViewModel,
+                    userIdState,
+                    TOP_LEVEL_DESTINATIONS.first { it.route == postLoginScreen },
+                    navAction)
               } else {
                 // Handle connection failure
-                Log.e("ChatClient", "Failed to connect user: $userId")
+                Log.e(chatClientTag, "Failed to connect user: $userId")
               }
             }
-          })
+          },
+          chatClientDisconnected = chatDisconnected)
     }
     composable(Route.LOGIN) {
       LoginScreen(authViewModel = authViewModel, nav = navAction) {
@@ -291,7 +305,9 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
 
           when (clientInitialisationState) {
             InitializationState.COMPLETE -> {
-              Log.d("Sign in", "Sign in to chat works, $id, and ${Firebase.auth.currentUser!!.uid}")
+              Log.d(
+                  chatClientTag,
+                  "Sign in to chat works, $id, and ${Firebase.auth.currentUser!!.uid}")
               client
                   .createChannel(
                       channelType = "messaging",
@@ -299,9 +315,11 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
                       memberIds = listOf(id, Firebase.auth.currentUser!!.uid),
                       extraData = emptyMap())
                   .enqueue { res ->
-                    res.onError { error -> Log.d("Creating channel", "Failed, Error: $error") }
+                    res.onError { error ->
+                      Log.e(chatClientTag, "Create channel failed, Error: $error")
+                    }
                     res.onSuccess { result ->
-                      Log.d("Creating channel", "Success !")
+                      Log.d(chatClientTag, "Create channel success")
                       success.value = true
                       channelId.value =
                           "messaging:${result.id}" // Correct format "channelType:channelId"
@@ -322,20 +340,27 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
               }
             }
             InitializationState.INITIALIZING -> {
-              Log.d("Initializing", "Sign in to Chat is initializing")
+              Log.d(chatClientTag, "Sign in to Chat is initializing")
               Text(text = "Initializing...")
             }
             InitializationState.NOT_INITIALIZED -> {
-              Log.d("Not initialized", "Sign in to Chat doesn't work, not initialized")
+              Log.e(chatClientTag, "Sign in to Chat doesn't work, not initialized")
               Text(text = "Not initialized...")
             }
           }
         }
 
     composable(Route.SETTINGS) {
-      SettingsScreen(navAction, authViewModel) {
-        navigateToStart(
-            navAction, LOGIN_ITEMS.first { it.route == startScreen }, eventViewModel, userIdState)
+      SettingsScreen(navAction) {
+        logOut(
+            navAction,
+            LOGIN_ITEMS.first { it.route == startScreen },
+            eventViewModel,
+            userIdState,
+            authViewModel,
+            client,
+            chatDisconnected,
+            applicationScope)
       }
     }
     composable(Route.ABOUT) { SettingsAbout(navAction) }
@@ -378,7 +403,7 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
         arguments = listOf(navArgument("id") { type = NavType.StringType })) {
           val id = it.arguments?.getString("id") ?: ""
           ChatTheme {
-            Log.d("id is", id)
+            Log.d(chatClientTag, "ID is: $id")
             MessagesScreen(
                 viewModelFactory =
                     MessagesViewModelFactory(
@@ -411,6 +436,14 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
   }
 }
 
+/**
+ * Function to be called upon a successful sign in/register
+ *
+ * @param eventViewModel The event view model state.
+ * @param userIdState The user ID state.
+ * @param postLogin The screen that will be navigated to upon logging in/signing up.
+ * @param navigationActions The navigation actions.
+ */
 private fun onNavToPostLogin(
     eventViewModel: MutableState<EventViewModel>,
     userIdState: MutableState<String>,
@@ -422,15 +455,47 @@ private fun onNavToPostLogin(
   navigationActions.navigateTo(postLogin)
 }
 
-private fun navigateToStart(
+/**
+ * Log out the user.
+ *
+ * @param navigationActions The navigation actions.
+ * @param startScreen The screen that will be navigated to after logging out.
+ * @param eventViewModel The event view model state.
+ * @param userIdState The user ID state.
+ * @param authViewModel The authentication view model.
+ * @param client The chat client.
+ * @param chatDisconnected Whether the chat is disconnected fully or not.
+ * @param scope The coroutine scope.
+ */
+private fun logOut(
     navigationActions: NavigationActions,
     startScreen: TopLevelDestination,
     eventViewModel: MutableState<EventViewModel>,
-    userIdState: MutableState<String>
+    userIdState: MutableState<String>,
+    authViewModel: AuthViewModel,
+    client: ChatClient,
+    chatDisconnected: MutableState<Boolean>,
+    scope: CoroutineScope
 ) {
   navigationActions.navigateTo(startScreen)
   userIdState.value = ""
   eventViewModel.value = EventViewModel()
+  authViewModel.signOut()
+  chatDisconnected.value = false
+  Log.d(chatClientTag, "Starting full disconnect")
+  scope.launch {
+    try {
+      client
+          .disconnect(false)
+          .doOnResult(scope) {
+            Log.d(chatClientTag, "Full disconnect complete")
+            chatDisconnected.value = true
+          }
+          .await()
+    } catch (e: Exception) {
+      Log.e(chatClientTag, "Error during disconnect: ${e.message}")
+    }
+  }
 }
 
 /**

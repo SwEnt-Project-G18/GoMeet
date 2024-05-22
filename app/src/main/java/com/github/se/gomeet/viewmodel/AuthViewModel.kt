@@ -246,6 +246,8 @@ class AuthViewModel : ViewModel() {
   /** Sign out the user. */
   fun signOut() {
     AuthRepository.signOut()
+    // Reset sign in state after logging out
+    _signInState.value = SignInState()
   }
 
   /** Delete the current user. */
