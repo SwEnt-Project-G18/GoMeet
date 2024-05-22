@@ -183,7 +183,7 @@ fun MyEventInfo(
                         coroutineScope.launch {
                           eventViewModel.editEvent(
                               myEvent.value!!.copy(
-                                  posts = myEvent.value!!.posts.plus(post).reversed()))
+                                  posts = myEvent.value!!.posts.reversed().plus(post).reversed()))
                           myEvent.value = eventViewModel.getEvent(eventId)
                         }
                       },
