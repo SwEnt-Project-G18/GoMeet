@@ -35,8 +35,6 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
-import com.github.se.gomeet.model.event.getEventDateString
-import com.github.se.gomeet.model.event.getEventTimeString
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.google.android.gms.maps.model.LatLng
 
@@ -78,14 +76,11 @@ fun ProfileEventsList(
             Column(
                 modifier =
                     Modifier.width(170.dp).clickable {
-                      val dayString = getEventDateString(event.date)
-                      val timeString = getEventTimeString(event.time)
-
                       nav.navigateToEventInfo(
                           eventId = event.eventID,
                           title = event.title,
-                          date = dayString,
-                          time = timeString,
+                          date = event.getDateString(),
+                          time = event.getTimeString(),
                           description = event.description,
                           organizer = event.creator,
                           loc = LatLng(event.location.latitude, event.location.longitude),

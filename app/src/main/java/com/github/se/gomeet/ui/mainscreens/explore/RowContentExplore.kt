@@ -34,9 +34,6 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
-import com.github.se.gomeet.model.event.eventMomentToString
-import com.github.se.gomeet.model.event.getEventDateString
-import com.github.se.gomeet.model.event.getEventTimeString
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.google.android.gms.maps.model.LatLng
 
@@ -69,8 +66,8 @@ fun ContentInRow(
                       nav.navigateToEventInfo(
                           eventId = event.eventID,
                           title = event.title,
-                          date = getEventDateString(event.date),
-                          time = getEventTimeString(event.time),
+                          date = event.getDateString(),
+                          time = event.getTimeString(),
                           description = event.description,
                           organizer = event.creator,
                           loc = LatLng(event.location.latitude, event.location.longitude),
@@ -104,7 +101,7 @@ fun ContentInRow(
                   style = MaterialTheme.typography.bodyLarge,
                   color = MaterialTheme.colorScheme.tertiary)
               Text(
-                  text = eventMomentToString(event.date, event.time),
+                  text = event.momentToString(),
                   style = MaterialTheme.typography.bodyMedium,
                   color = MaterialTheme.colorScheme.tertiary)
             }

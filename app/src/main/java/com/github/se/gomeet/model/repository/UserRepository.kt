@@ -150,7 +150,8 @@ class UserRepository private constructor() {
           "myEvents" to myEvents,
           "myFavorites" to myFavorites,
           "profilePicture" to profilePicture,
-          "tags" to tags)
+          "tags" to tags,
+          "rating" to rating)
     }
 
     /**
@@ -175,7 +176,8 @@ class UserRepository private constructor() {
           joinedEvents = (this["joinedEvents"] as? List<String>) ?: emptyList(),
           myEvents = (this["myEvents"] as? List<String>) ?: emptyList(),
           myFavorites = (this["myFavorites"] as? List<String>) ?: emptyList(),
-          tags = (this["tags"] as? List<String>) ?: emptyList())
+          tags = (this["tags"] as? List<String>) ?: emptyList(),
+          rating = this["rating"] as? Double ?: GoMeetUser.NO_RATING)
     }
 
     private fun convertToInvitationsList(data: Any?): List<Invitation> {

@@ -47,7 +47,6 @@ import coil.compose.rememberAsyncImagePainter
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.Tag
 import com.github.se.gomeet.model.event.Event
-import com.github.se.gomeet.model.event.isPastEvent
 import com.github.se.gomeet.ui.mainscreens.events.GoMeetSearchBar
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
@@ -99,7 +98,7 @@ fun Trends(
       if (currentUser != null)
           userTags.addAll(Tag.entries.filter { currentUser.tags.contains(it.tagName) })
       Log.d("Trends", "Current user: $currentUser with ${userTags.size} tags")
-      val allEvents = eventViewModel.getAllEvents()!!.filter { !isPastEvent(it) }
+      val allEvents = eventViewModel.getAllEvents()!!.filter { !it.isPastEvent() }
       if (allEvents.isNotEmpty()) {
         eventList.addAll(allEvents)
       }
@@ -153,7 +152,7 @@ fun Trends(
                   // TODO: Remove the top 5 events from the list
                   eventList.forEach { event ->
                     if (event.title.contains(query.value, ignoreCase = true) &&
-                        !isPastEvent(event) &&
+                        !event.isPastEvent() &&
                         (event.public ||
                             event.visibleToIfPrivate.contains(currentUserId) ||
                             event.creator == currentUserId)) {

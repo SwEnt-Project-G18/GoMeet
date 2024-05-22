@@ -53,7 +53,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
-import com.github.se.gomeet.model.event.isPastEvent
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.mainscreens.events.SelectedStatus.*
@@ -100,7 +99,7 @@ fun Events(
           (eventViewModel.getAllEvents() ?: emptyList()).filter { e ->
             (user.value!!.myEvents.contains(e.eventID) ||
                 user.value!!.myFavorites.contains(e.eventID) ||
-                user.value!!.joinedEvents.contains(e.eventID)) && !isPastEvent(e)
+                user.value!!.joinedEvents.contains(e.eventID)) && !e.isPastEvent()
           }
       if (allEvents.isNotEmpty()) {
         eventList.addAll(allEvents)

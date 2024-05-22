@@ -45,7 +45,6 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
-import com.github.se.gomeet.model.event.isPastEvent
 import com.github.se.gomeet.ui.mainscreens.SearchModule
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
@@ -112,7 +111,7 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
 
     val allEvents = eventViewModel.getAllEvents()
     if (allEvents != null) {
-      eventList.value = allEvents.filter { e -> !isPastEvent(e) }
+      eventList.value = allEvents.filter { e -> !e.isPastEvent() }
     }
 
     // wait for user input

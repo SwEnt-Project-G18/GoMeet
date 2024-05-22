@@ -157,7 +157,7 @@ class EventRepository private constructor() {
           "public" to public,
           "tags" to tags,
           "images" to images,
-      )
+          "eventRatings" to eventRatings)
     }
 
     /**
@@ -192,7 +192,7 @@ class EventRepository private constructor() {
           public = this["public"] as? Boolean ?: false,
           tags = this["tags"] as? List<String> ?: emptyList(),
           images = this["images"] as? List<String> ?: emptyList(),
-      )
+          eventRatings = this["eventRatings"] as? Map<String, Int> ?: emptyMap())
     }
 
     /**

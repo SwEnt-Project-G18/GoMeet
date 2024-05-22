@@ -48,7 +48,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.model.event.Event
-import com.github.se.gomeet.model.event.isPastEvent
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
@@ -98,7 +97,7 @@ fun OthersProfile(
             user!!.joinedEvents.contains(e.eventID) && e.public
           }
       allEvents.forEach {
-        if (!isPastEvent(it)) {
+        if (!it.isPastEvent()) {
           joinedEventsList.add(it)
         } else {
           myHistoryList.add(it)

@@ -39,8 +39,16 @@ data class Event(
     val maxParticipants: Int, // Maximum number of Participants of the event
     val public: Boolean, // True if the event is public, false if it's private
     val tags: List<String>, // Tags of the event
-    val images: List<String> // Is it the right type?
+    val images: List<String>, // Is it the right type?
+    val eventRatings: Map<String, Int> // Ratings of the event by each user (i.e. userID -> rating)
 ) {
+
+  /**
+   * This function checks if the event matches the search query.
+   *
+   * @param query The search query.
+   * @return true if the event matches the search query, false otherwise.
+   */
   fun doesMatchSearchQuery(query: String): Boolean {
     val matchingCombinations =
         listOf(
@@ -52,54 +60,54 @@ data class Event(
 
     return matchingCombinations.any { it.contains(query, ignoreCase = true) }
   }
-}
+  /**
+   * This function decides whether an event is in the past or not.
+   *
+   * @return true if the event is today or in the future, false otherwise.
+   */
+  fun isPastEvent(): Boolean {
+    return this.date.isBefore(LocalDate.now()) && this.date != LocalDate.now()
+  }
 
-/**
- * This function decides whether an event is in the past or not.
- *
- * @param event The event to check.
- * @return true if the event is today or in the future, false otherwise.
- */
-fun isPastEvent(event: Event): Boolean {
-  return event.date.isBefore(LocalDate.now()) && event.date != LocalDate.now()
-}
+  /**
+   * This function returns whether a user has joined an event or not.
+   *
+   * @param userId The user's id.
+   * @return true if the user has joined the event, false otherwise.
+   */
+  fun hasUserJoined(userId: String): Boolean {
+    return this.participants.contains(userId)
+  }
 
-fun isJoinedEvent(event: Event, userId: String): Boolean {
-  return event.participants.contains(userId)
-}
+  /**
+   * Converts the time of an event to a string.
+   *
+   * @return The string representation of the time.
+   */
+  fun getTimeString(): String {
+    val minutes = if (this.time.minute < 9) "0${this.time.minute}" else this.time.minute
+    val hours = if (this.time.hour < 9) "0${this.time.hour}" else this.time.hour
+    return "${hours}:${minutes}"
+  }
 
-/**
- * Converts the time of an event to a string.
- *
- * @param eventTime The event's time.
- * @return The string representation of the time.
- */
-fun getEventTimeString(eventTime: LocalTime): String {
-  val minutes = if (eventTime.minute < 9) "0${eventTime.minute}" else eventTime.minute
-  val hours = if (eventTime.hour < 9) "0${eventTime.hour}" else eventTime.hour
-  return "${hours}:${minutes}"
-}
+  /**
+   * Converts the date of an event to a string.
+   *
+   * @return The string representation of the date.
+   */
+  fun getDateString(): String {
+    val date =
+        if (this.date == LocalDate.now()) "Today"
+        else "${this.date.dayOfMonth}/${this.date.monthValue}/${this.date.year}"
+    return date
+  }
 
-/**
- * Converts the date of an event to a string.
- *
- * @param eventDate The event's date.
- * @return The string representation of the date.
- */
-fun getEventDateString(eventDate: LocalDate): String {
-  val date =
-      if (eventDate == LocalDate.now()) "Today"
-      else "${eventDate.dayOfMonth}/${eventDate.monthValue}/${eventDate.year}"
-  return date
-}
-
-/**
- * Converts an event's date and time to a string.
- *
- * @param eventDate The event's date.
- * @param eventTime The event's time.
- * @return The string representation of the date and time.
- */
-fun eventMomentToString(eventDate: LocalDate, eventTime: LocalTime): String {
-  return "${getEventDateString(eventDate)} at ${getEventTimeString(eventTime)}"
+  /**
+   * Converts an event's date and time to a string.
+   *
+   * @return The string representation of the date and time.
+   */
+  fun momentToString(): String {
+    return "${this.getDateString()} at ${this.getTimeString()}"
+  }
 }

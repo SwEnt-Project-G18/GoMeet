@@ -39,8 +39,6 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
-import com.github.se.gomeet.model.event.getEventDateString
-import com.github.se.gomeet.model.event.getEventTimeString
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.android.gms.maps.model.LatLng
@@ -65,8 +63,8 @@ fun EventWidget(event: Event, verified: Boolean, nav: NavigationActions, userVM:
   val smallTextSize = with(density) { screenWidth.toPx() / 85 }
   val bigTextSize = with(density) { screenWidth.toPx() / 60 }
 
-  val dayString = getEventDateString(event.date)
-  val timeString = getEventTimeString(event.time)
+  val dayString = event.getDateString()
+  val timeString = event.getTimeString()
 
   val painter: Painter =
       if (event.images.isNotEmpty()) {

@@ -20,6 +20,7 @@ import com.github.se.gomeet.model.event.Invitation
  * @param myFavorites The list of events that the user added to favorites
  * @param profilePicture The profile picture of the user
  * @param tags The list of tags that the user is interested in
+ * @param rating The rating of the user
  */
 data class GoMeetUser(
     val uid: String,
@@ -36,9 +37,16 @@ data class GoMeetUser(
     var myEvents: List<String>,
     var myFavorites: List<String>,
     var profilePicture: String = "",
-    var tags: List<String>
-    // can add more things later
+    var tags: List<String>,
+    var rating: Double = NO_RATING,
 ) {
+
+  /**
+   * This function checks if the user matches the search query.
+   *
+   * @param query The search query
+   * @return true if the user matches the search query, false otherwise
+   */
   fun doesMatchSearchQuery(query: String): Boolean {
     val matchingCombinations =
         listOf(
@@ -47,5 +55,10 @@ data class GoMeetUser(
             )
 
     return matchingCombinations.any { it.contains(query, ignoreCase = true) }
+  }
+
+  companion object {
+    // The user's default "no rating" value
+    const val NO_RATING = -1.0
   }
 }
