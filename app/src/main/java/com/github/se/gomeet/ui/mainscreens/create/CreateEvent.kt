@@ -155,7 +155,7 @@ fun CreateEvent(
 
   Scaffold(
       topBar = {
-        Column {
+        Column(modifier = Modifier.padding(bottom = screenHeight / 90)) {
           TopAppBar(
               modifier = Modifier.testTag("TopBar"),
               backgroundColor = MaterialTheme.colorScheme.background,
@@ -177,6 +177,7 @@ fun CreateEvent(
               modifier = Modifier.padding(start = 18.dp)) {
                 Text(
                     text = "Create",
+                    color = MaterialTheme.colorScheme.onBackground,
                     style =
                         MaterialTheme.typography.headlineSmall.copy(
                             fontWeight = FontWeight.SemiBold))
@@ -255,6 +256,7 @@ fun CreateEvent(
                     Icon(
                         Icons.AutoMirrored.Filled.KeyboardArrowRight,
                         null,
+                        tint = MaterialTheme.colorScheme.onBackground,
                         modifier =
                             Modifier.clickable { showPopup.value = true }.testTag("TagsButton"))
                   }
@@ -276,6 +278,7 @@ fun CreateEvent(
                       Icon(
                           Icons.AutoMirrored.Filled.KeyboardArrowRight,
                           null,
+                          tint = MaterialTheme.colorScheme.onBackground,
                           modifier =
                               Modifier.clickable {
                                 nav.navigateToScreen(
@@ -299,6 +302,7 @@ fun CreateEvent(
                     Icon(
                         Icons.AutoMirrored.Filled.KeyboardArrowRight,
                         null,
+                        tint = MaterialTheme.colorScheme.onBackground,
                         modifier =
                             Modifier.clickable {
                                   if (imageUri != null) {

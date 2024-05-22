@@ -114,6 +114,7 @@ fun Trends(
             modifier = Modifier.padding(start = screenWidth / 15, top = screenHeight / 30)) {
               Text(
                   text = "Trends",
+                  color = MaterialTheme.colorScheme.onBackground,
                   style =
                       MaterialTheme.typography.headlineMedium.copy(
                           fontWeight = FontWeight.SemiBold))

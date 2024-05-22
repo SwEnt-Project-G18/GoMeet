@@ -16,7 +16,7 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -124,8 +124,9 @@ fun ManageInvites(
                         inviteAction(toUpdate, event, nav, userViewModel, eventViewModel)
                       }) {
                         Icon(
-                            Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                            contentDescription = "Go back")
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Go back",
+                            tint = MaterialTheme.colorScheme.onBackground)
                       }
                 }
             Row(
@@ -134,6 +135,7 @@ fun ManageInvites(
                 horizontalArrangement = Arrangement.Center) {
                   Text(
                       text = "Manage Invites",
+                      color = MaterialTheme.colorScheme.onBackground,
                       style =
                           MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold))
                 }
@@ -153,6 +155,7 @@ fun ManageInvites(
                         }) {
                       Text(
                           text = TO_INVITE.formattedName,
+                          color = MaterialTheme.colorScheme.onBackground,
                           style =
                               MaterialTheme.typography.bodyMedium.copy(
                                   fontWeight = pagerWeight(pagerState, TO_INVITE.formattedName)))
@@ -167,6 +170,7 @@ fun ManageInvites(
                         }) {
                       Text(
                           text = PENDING.formattedName,
+                          color = MaterialTheme.colorScheme.onBackground,
                           style =
                               MaterialTheme.typography.bodyMedium.copy(
                                   fontWeight = pagerWeight(pagerState, PENDING.formattedName)))
@@ -181,6 +185,7 @@ fun ManageInvites(
                         }) {
                       Text(
                           text = ACCEPTED.formattedName,
+                          color = MaterialTheme.colorScheme.onBackground,
                           style =
                               MaterialTheme.typography.bodyMedium.copy(
                                   fontWeight = pagerWeight(pagerState, ACCEPTED.formattedName)))
@@ -195,6 +200,7 @@ fun ManageInvites(
                         }) {
                       Text(
                           text = REFUSED.formattedName,
+                          color = MaterialTheme.colorScheme.onBackground,
                           style =
                               MaterialTheme.typography.bodyMedium.copy(
                                   fontWeight = pagerWeight(pagerState, REFUSED.formattedName)))

@@ -125,6 +125,7 @@ fun Profile(
                     .testTag("TopBar")) {
               Text(
                   text = "My Profile",
+                  color = MaterialTheme.colorScheme.onBackground,
                   style =
                       MaterialTheme.typography.headlineMedium.copy(
                           fontWeight = FontWeight.SemiBold))
@@ -172,10 +173,12 @@ fun Profile(
                         Text(
                             (currentUser?.firstName + " " + currentUser?.lastName),
                             textAlign = TextAlign.Center,
+                            color = MaterialTheme.colorScheme.onBackground,
                             style = MaterialTheme.typography.titleLarge)
 
                         Text(
                             text = ("@" + currentUser?.username),
+                            color = MaterialTheme.colorScheme.onBackground,
                             style = MaterialTheme.typography.bodyLarge)
                       }
                     }
@@ -232,10 +235,12 @@ fun Profile(
                               }) {
                             Text(
                                 text = currentUser?.myEvents?.size.toString(),
+                                color = MaterialTheme.colorScheme.onBackground,
                                 style = MaterialTheme.typography.titleLarge,
                                 modifier = Modifier.align(Alignment.CenterHorizontally))
                             Text(
                                 text = "Events",
+                                color = MaterialTheme.colorScheme.onBackground,
                                 style = MaterialTheme.typography.bodyMedium,
                                 modifier = Modifier.align(Alignment.CenterHorizontally))
                           }
@@ -246,10 +251,12 @@ fun Profile(
                               }) {
                             Text(
                                 text = currentUser?.followers?.size.toString(),
+                                color = MaterialTheme.colorScheme.onBackground,
                                 style = MaterialTheme.typography.titleLarge,
                                 modifier = Modifier.align(Alignment.CenterHorizontally))
                             Text(
                                 text = "Followers",
+                                color = MaterialTheme.colorScheme.onBackground,
                                 style = MaterialTheme.typography.bodyMedium,
                                 modifier = Modifier.align(Alignment.CenterHorizontally))
                           }
@@ -260,10 +267,12 @@ fun Profile(
                               }) {
                             Text(
                                 text = currentUser?.following?.size.toString(),
+                                color = MaterialTheme.colorScheme.onBackground,
                                 style = MaterialTheme.typography.titleLarge,
                                 modifier = Modifier.align(Alignment.CenterHorizontally))
                             Text(
                                 text = "Following",
+                                color = MaterialTheme.colorScheme.onBackground,
                                 style = MaterialTheme.typography.bodyMedium,
                                 modifier = Modifier.align(Alignment.CenterHorizontally))
                           }
@@ -282,6 +291,7 @@ fun Profile(
                             content = {
                               Text(
                                   text = currentUser!!.tags[index],
+                                  color = MaterialTheme.colorScheme.onBackground,
                                   style = MaterialTheme.typography.labelLarge)
                             },
                             colors =

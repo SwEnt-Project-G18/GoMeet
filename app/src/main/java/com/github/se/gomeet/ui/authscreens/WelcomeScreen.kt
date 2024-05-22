@@ -102,6 +102,7 @@ fun WelcomeScreen(
             text = "See what's happening around you right now.",
             modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
             textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onBackground,
             style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.SemiBold))
 
         Spacer(modifier = Modifier.size(screenHeight / 70))

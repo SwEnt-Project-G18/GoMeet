@@ -137,7 +137,8 @@ fun Events(
                   text = "Events",
                   style =
                       MaterialTheme.typography.headlineMedium.copy(
-                          fontWeight = FontWeight.SemiBold))
+                          fontWeight = FontWeight.SemiBold),
+                  color = MaterialTheme.colorScheme.onBackground)
               Spacer(Modifier.weight(1f))
             }
       },
@@ -199,6 +200,7 @@ fun Events(
                         Text(
                             text = JOINED.formattedName,
                             style = MaterialTheme.typography.titleLarge,
+                            color = MaterialTheme.colorScheme.onBackground,
                             modifier =
                                 Modifier.padding(horizontal = screenWidth / 15)
                                     .testTag("JoinedTitle"))
@@ -221,6 +223,7 @@ fun Events(
                         Text(
                             text = FAVOURITES.formattedName,
                             style = MaterialTheme.typography.titleLarge,
+                            color = MaterialTheme.colorScheme.onBackground,
                             modifier =
                                 Modifier.padding(horizontal = screenWidth / 15)
                                     .testTag("FavouritesTitle"))
@@ -243,6 +246,7 @@ fun Events(
                         Text(
                             text = MY_EVENTS.formattedName,
                             style = MaterialTheme.typography.titleLarge,
+                            color = MaterialTheme.colorScheme.onBackground,
                             modifier =
                                 Modifier.padding(horizontal = screenWidth / 15)
                                     .testTag("MyEventsTitle"))

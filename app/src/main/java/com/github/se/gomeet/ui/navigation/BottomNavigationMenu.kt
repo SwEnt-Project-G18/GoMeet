@@ -11,6 +11,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -59,8 +60,8 @@ fun BottomNavigationMenu(
           onClick = { onTabSelect(destination.route) },
           colors =
               NavigationBarItemDefaults.colors(
-                  unselectedIconColor = MaterialTheme.colorScheme.primary,
-                  unselectedTextColor = MaterialTheme.colorScheme.primary,
+                  unselectedIconColor = Gray,
+                  unselectedTextColor = Gray,
                   selectedTextColor = MaterialTheme.colorScheme.tertiary,
                   selectedIconColor = MaterialTheme.colorScheme.tertiary,
                   indicatorColor = TranslucentCyan))

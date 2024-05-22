@@ -68,6 +68,7 @@ fun RegisterPfp(callback: (Uri?) -> Unit, name: String) {
     Text(
         text = if (pfp.isEmpty()) "Hi $name!\nWhat about a Profile Picture ?" else "You look good!",
         modifier = Modifier.fillMaxWidth().testTag("Text"),
+        color = MaterialTheme.colorScheme.onBackground,
         style = MaterialTheme.typography.titleMedium,
         textAlign = TextAlign.Center)
 

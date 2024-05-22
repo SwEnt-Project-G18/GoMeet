@@ -49,6 +49,7 @@ fun Create(nav: NavigationActions) {
             modifier = Modifier.padding(start = screenWidth / 15, top = screenHeight / 30)) {
               Text(
                   text = "Create",
+                  color = MaterialTheme.colorScheme.onBackground,
                   style =
                       MaterialTheme.typography.headlineMedium.copy(
                           fontWeight = FontWeight.SemiBold))
@@ -69,7 +70,11 @@ fun Create(nav: NavigationActions) {
             horizontalAlignment = Alignment.CenterHorizontally) {
               Spacer(modifier = Modifier.height(screenHeight / 6))
 
-              Text(text = "Choose your audience", style = MaterialTheme.typography.headlineSmall)
+              Text(
+                  text = "Choose your audience",
+                  style = MaterialTheme.typography.headlineSmall,
+                  color = MaterialTheme.colorScheme.onBackground,
+              )
 
               Spacer(modifier = Modifier.height(screenHeight / 6))
               OutlinedButton(
