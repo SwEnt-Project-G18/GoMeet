@@ -11,6 +11,7 @@ import androidx.compose.ui.test.performScrollTo
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.ui.navigation.NavigationActions
+import com.github.se.gomeet.viewmodel.AuthViewModel
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -21,7 +22,9 @@ class SettingsScreenTest {
 
   @Test
   fun testSettingsScreen() {
-    composeTestRule.setContent { SettingsScreen(NavigationActions(rememberNavController())) }
+    composeTestRule.setContent {
+      SettingsScreen(NavigationActions(rememberNavController()), AuthViewModel())
+    }
 
     composeTestRule.waitForIdle()
 

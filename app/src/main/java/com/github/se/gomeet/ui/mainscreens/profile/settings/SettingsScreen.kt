@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.TextButton
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -36,15 +37,20 @@ import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
+import com.github.se.gomeet.viewmodel.AuthViewModel
 
 /**
  * Composable function for the profile Settings screen.
  *
  * @param nav The navigation actions for the screen.
+ * @param authViewModel The view model for the authentication (for signing out)
+ * @param navToStartScreen The navigation action to go back to the start screen after signing out.
  */
 @Composable
 fun SettingsScreen(
     nav: NavigationActions, /*userViewModel: UserViewModel*/
+    authViewModel: AuthViewModel,
+    navToStartScreen: () -> Unit
 ) {
   val screenHeight = LocalConfiguration.current.screenHeightDp.dp
   val screenWidth = LocalConfiguration.current.screenWidthDp.dp
@@ -125,25 +131,33 @@ fun SettingsScreen(
               SettingsComposable(
                   R.drawable.gomeet_icon, "About", true, { nav.navigateToScreen(Route.ABOUT) })
 
-              Text(
-                  text = "Log out",
-                  modifier = Modifier.padding(start = 15.dp),
-                  color = Color.Red,
-                  fontStyle = FontStyle.Normal,
-                  fontWeight = FontWeight.SemiBold,
-                  fontFamily = FontFamily.Default,
-                  textAlign = TextAlign.Start,
-                  style = MaterialTheme.typography.bodySmall)
+              TextButton(
+                  onClick = {
+                    authViewModel.signOut()
+                    navToStartScreen()
+                  }) {
+                    Text(
+                        text = "Log out",
+                        modifier = Modifier.padding(start = 15.dp),
+                        color = Color.Red,
+                        fontStyle = FontStyle.Normal,
+                        fontWeight = FontWeight.SemiBold,
+                        fontFamily = FontFamily.Default,
+                        textAlign = TextAlign.Start,
+                        style = MaterialTheme.typography.bodySmall)
+                  }
 
-              Text(
-                  text = "Delete account",
-                  modifier = Modifier.padding(start = 15.dp),
-                  color = Color.Red,
-                  fontStyle = FontStyle.Normal,
-                  fontWeight = FontWeight.SemiBold,
-                  fontFamily = FontFamily.Default,
-                  textAlign = TextAlign.Start,
-                  style = MaterialTheme.typography.bodySmall)
+              TextButton(onClick = { /* TODO */}) {
+                Text(
+                    text = "Delete account",
+                    modifier = Modifier.padding(start = 15.dp),
+                    color = Color.Red,
+                    fontStyle = FontStyle.Normal,
+                    fontWeight = FontWeight.SemiBold,
+                    fontFamily = FontFamily.Default,
+                    textAlign = TextAlign.Start,
+                    style = MaterialTheme.typography.bodySmall)
+              }
             }
       }
 }

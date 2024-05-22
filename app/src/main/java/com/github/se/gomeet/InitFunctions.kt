@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,6 +40,7 @@ import com.github.se.gomeet.ui.navigation.LOGIN_ITEMS
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
+import com.github.se.gomeet.ui.navigation.TopLevelDestination
 import com.github.se.gomeet.viewmodel.AuthViewModel
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
@@ -62,11 +64,7 @@ import io.getstream.chat.android.offline.plugin.factory.StreamOfflinePluginFacto
 import io.getstream.chat.android.state.plugin.config.StatePluginConfig
 import io.getstream.chat.android.state.plugin.factory.StreamStatePluginFactory
 
-/**
- * Initialize the cache.
- *
- * @param db The Firestore databse.
- */
+/** Initialize the cache. */
 fun initCache() {
   val cacheSize = 1024L * 1024L * 100L
 
@@ -125,21 +123,25 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
   val userIdState = remember { mutableStateOf("") }
   val clientInitialisationState by client.clientState.initializationState.collectAsState()
   val authViewModel = AuthViewModel()
-  var eventViewModel = remember { mutableStateOf(EventViewModel(null)) }
+  val eventViewModel = remember { mutableStateOf(EventViewModel(null)) }
   val userViewModel = UserViewModel()
+  val postLoginScreen = Route.TRENDS
+  val startScreen = Route.WELCOME
+  val startDestination = remember { mutableStateOf(startScreen) }
 
-  return NavHost(navController = nav, startDestination = Route.WELCOME) {
+  if (Firebase.auth.currentUser != null) {
+    userIdState.value = Firebase.auth.currentUser!!.uid
+    eventViewModel.value = EventViewModel(userIdState.value)
+    startDestination.value = postLoginScreen
+  }
+
+  return NavHost(navController = nav, startDestination = startDestination.value) {
     composable(Route.WELCOME) {
       WelcomeScreen(
-          onNavToLogin = { NavigationActions(nav).navigateTo(LOGIN_ITEMS[1]) },
-          onNavToRegister = { NavigationActions(nav).navigateTo(LOGIN_ITEMS[2]) },
-          onSignInSuccess = {
-              userId: String,
-              username: String,
-              email: String,
-              firstName: String,
-              lastName: String,
-              phoneNumber: String ->
+          onNavToLogin = { navAction.navigateTo(LOGIN_ITEMS[1]) },
+          onNavToRegister = { navAction.navigateTo(LOGIN_ITEMS[2]) },
+          onSignInSuccess = { userId: String, _: String, _: String, _: String, _: String, _: String
+            ->
             val currentUser = Firebase.auth.currentUser
             if (currentUser != null) {
               val uid = currentUser.uid
@@ -161,10 +163,9 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
 
             client.connectUser(user = user, token = client.devToken(userId)).enqueue { result ->
               if (result.isSuccess) {
-                NavigationActions(nav)
-                    .navigateTo(
-                        TOP_LEVEL_DESTINATIONS.first { it.route == Route.CREATE },
-                        clearBackStack = true)
+                navAction.navigateTo(
+                    TOP_LEVEL_DESTINATIONS.first { it.route == Route.CREATE },
+                    clearBackStack = true)
               } else {
                 // Handle connection failure
                 Log.e("ChatClient", "Failed to connect user: $userId")
@@ -173,17 +174,21 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
           })
     }
     composable(Route.LOGIN) {
-      LoginScreen(authViewModel = authViewModel, nav = NavigationActions(nav)) {
-        userIdState.value = Firebase.auth.currentUser!!.uid
-        eventViewModel.value = EventViewModel(userIdState.value)
-        NavigationActions(nav).navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == Route.CREATE })
+      LoginScreen(authViewModel = authViewModel, nav = navAction) {
+        onNavToPostLogin(
+            eventViewModel,
+            userIdState,
+            TOP_LEVEL_DESTINATIONS.first { it.route == postLoginScreen },
+            navAction)
       }
     }
     composable(Route.REGISTER) {
-      RegisterScreen(client, NavigationActions(nav), authViewModel, userViewModel) {
-        userIdState.value = Firebase.auth.currentUser!!.uid
-        eventViewModel.value = EventViewModel(userIdState.value)
-        NavigationActions(nav).navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == Route.CREATE })
+      RegisterScreen(client, navAction, authViewModel, userViewModel) {
+        onNavToPostLogin(
+            eventViewModel,
+            userIdState,
+            TOP_LEVEL_DESTINATIONS.first { it.route == postLoginScreen },
+            navAction)
       }
     }
     composable(Route.EXPLORE) { Explore(navAction, eventViewModel.value) }
@@ -262,7 +267,7 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
           val loc = LatLng(latitude.toDouble(), longitude.toDouble())
 
           MyEventInfo(
-              NavigationActions(nav),
+              navAction,
               title,
               eventId,
               date,
@@ -310,7 +315,7 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
                               channelId = channelId.value, // Make sure this is in
                               // "channelType:channelId" format
                               messageLimit = 30),
-                      onBackPressed = { NavigationActions(nav).goBack() })
+                      onBackPressed = { navAction.goBack() })
                 }
               }
             }
@@ -325,7 +330,12 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
           }
         }
 
-    composable(Route.SETTINGS) { SettingsScreen(navAction) }
+    composable(Route.SETTINGS) {
+      SettingsScreen(navAction, authViewModel) {
+        navigateToStart(
+            navAction, LOGIN_ITEMS.first { it.route == startScreen }, eventViewModel, userIdState)
+      }
+    }
     composable(Route.ABOUT) { SettingsAbout(navAction) }
     composable(Route.HELP) { SettingsHelp(navAction) }
     composable(Route.PERMISSIONS) { SettingsPermissions(navAction) }
@@ -373,11 +383,33 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
                         context = applicationContext,
                         channelId = "messaging:${id}",
                         messageLimit = 30),
-                onBackPressed = { NavigationActions(nav).goBack() })
+                onBackPressed = { navAction.goBack() })
           }
         }
     composable(route = Route.ADD_FRIEND) { AddFriend(navAction, userViewModel) }
   }
+}
+
+private fun onNavToPostLogin(
+    eventViewModel: MutableState<EventViewModel>,
+    userIdState: MutableState<String>,
+    postLogin: TopLevelDestination,
+    navigationActions: NavigationActions
+) {
+  userIdState.value = Firebase.auth.currentUser!!.uid
+  eventViewModel.value = EventViewModel(userIdState.value)
+  navigationActions.navigateTo(postLogin)
+}
+
+private fun navigateToStart(
+    navigationActions: NavigationActions,
+    startScreen: TopLevelDestination,
+    eventViewModel: MutableState<EventViewModel>,
+    userIdState: MutableState<String>
+) {
+  navigationActions.navigateTo(startScreen)
+  userIdState.value = ""
+  eventViewModel.value = EventViewModel()
 }
 
 /**
