@@ -153,21 +153,22 @@ fun MyEventInfo(
                     nav = nav,
                     date = date,
                     time = time)
-                Spacer(modifier = Modifier.height(20.dp))
-                EventButtons(
+
+              Spacer(modifier = Modifier.height(20.dp))
+              EventButtons(
                     currentUser.value!!,
                     organizer.value!!,
                     eventId,
                     userViewModel,
                     eventViewModel,
                     nav)
-                Spacer(modifier = Modifier.height(20.dp))
 
                 var imageUrl by remember { mutableStateOf<String?>(null) }
                 LaunchedEffect(eventId) { imageUrl = eventViewModel.getEventImageUrl(eventId) }
                 EventImage(imageUrl = imageUrl)
-                Spacer(modifier = Modifier.height(20.dp))
-                EventDescription(text = description)
+                  Spacer(modifier = Modifier.height(20.dp))
+
+                  EventDescription(text = description)
                 Spacer(modifier = Modifier.height(20.dp))
                 MapViewComposable(loc = loc)
                 if (addPost) {

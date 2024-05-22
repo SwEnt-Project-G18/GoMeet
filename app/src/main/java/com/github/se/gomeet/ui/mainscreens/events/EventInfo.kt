@@ -52,6 +52,7 @@ import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
+import com.github.se.gomeet.ui.theme.White
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import kotlinx.coroutines.launch
@@ -77,7 +78,7 @@ fun EventHeader(
     time: String
 ) {
   Row(
-      modifier = Modifier.fillMaxWidth().testTag("EventHeader"),
+      modifier = Modifier.fillMaxWidth().testTag("EventHeader").padding(10.dp),
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.SpaceBetween) {
         Column {
@@ -154,27 +155,26 @@ fun EventDateTime(day: String, time: String) {
  */
 @Composable
 fun EventImage(imageUrl: String?) {
-  val defaultImagePainter = painterResource(id = R.drawable.gomeet_logo)
-  val imagePainter =
-      if (imageUrl != null) {
-        rememberAsyncImagePainter(
-            ImageRequest.Builder(LocalContext.current)
-                .data(data = imageUrl)
-                .apply(
-                    block =
-                        fun ImageRequest.Builder.() {
-                          placeholder(R.drawable.gomeet_logo)
-                        })
-                .build())
-      } else defaultImagePainter
-
-  Column(modifier = Modifier.fillMaxWidth().testTag("EventImage")) {
-    Image(
-        painter = imagePainter,
-        contentDescription = "Event Image",
-        contentScale = ContentScale.Crop,
-        modifier = Modifier.aspectRatio(3f / 1.75f).clip(RoundedCornerShape(20.dp)))
+  if (imageUrl != null) {
+      val imagePainter = rememberAsyncImagePainter(
+        ImageRequest.Builder(LocalContext.current)
+            .data(data = imageUrl)
+            .apply(
+                block =
+                    fun ImageRequest.Builder.() {
+                      placeholder(R.drawable.gomeet_logo)
+                    })
+            .build())
+      Column(modifier = Modifier.fillMaxWidth().testTag("EventImage").padding(top = 10.dp)) {
+          Image(
+              painter = imagePainter,
+              contentDescription = "Event Image",
+              contentScale = ContentScale.Crop,
+              modifier = Modifier.aspectRatio(3f / 1.75f).clip(RoundedCornerShape(20.dp)))
+      }
   }
+
+
 }
 
 /**
@@ -186,14 +186,8 @@ fun EventImage(imageUrl: String?) {
 fun EventDescription(text: String) {
   Text(
       text = text,
-      style =
-          TextStyle(
-              fontSize = 13.sp,
-              color = MaterialTheme.colorScheme.onBackground,
-              fontFamily = FontFamily(Font(R.font.roboto)),
-              fontWeight = FontWeight.SemiBold,
-              letterSpacing = 0.5.sp),
-      modifier = Modifier.testTag("EventDescription"))
+      style = MaterialTheme.typography.bodyLarge,
+      modifier = Modifier.testTag("EventDescription").padding(horizontal = 10.dp))
 }
 
 /**
@@ -246,29 +240,35 @@ fun EventButtons(
                   isJoined,
                   currentEvent.value!!)
             },
-            shape = RoundedCornerShape(20.dp),
+            shape = RoundedCornerShape(10.dp),
             modifier = Modifier.weight(1f),
             colors =
+            if (organiser.uid == currentUser.uid || isJoined.value) {
                 ButtonDefaults.textButtonColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.tertiary)) {
-              if (organiser.uid == currentUser.uid) {
-                Text("Edit My Event")
-              } else {
-                if (isJoined.value) {
-                  Text("Leave Event")
-                } else {
-                  Text("Join Event")
+                    contentColor = MaterialTheme.colorScheme.tertiary)
+            } else {
+                ButtonDefaults.textButtonColors(
+                    containerColor = MaterialTheme.colorScheme.outlineVariant,
+                    contentColor = White)
+            }){
+                    if (organiser.uid == currentUser.uid) {
+                        Text("Edit My Event")
+                    } else {
+                        if (isJoined.value) {
+                            Text("Leave Event")
+                        } else {
+                            Text("Join Event")
+                        }
+                    }
                 }
-              }
-            }
         if (organiser.uid == currentUser.uid) {
           Spacer(modifier = Modifier.width(5.dp))
           TextButton(
               onClick = {
                 nav.navigateToScreen(Route.MANAGE_INVITES.replace("{eventId}", eventId))
               },
-              shape = RoundedCornerShape(20.dp),
+              shape = RoundedCornerShape(10.dp),
               modifier = Modifier.weight(1f),
               colors =
                   ButtonDefaults.textButtonColors(
