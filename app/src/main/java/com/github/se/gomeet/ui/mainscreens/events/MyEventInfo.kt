@@ -1,6 +1,9 @@
 package com.github.se.gomeet.ui.mainscreens.events
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.util.Log
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -29,8 +32,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.LoadingText
@@ -38,11 +43,16 @@ import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapProperties
+import com.google.maps.android.compose.MapType
+import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
@@ -173,31 +183,63 @@ private fun MapViewComposable(
     loc: LatLng,
     zoomLevel: Float = 15f // Default zoom level for close-up of location
 ) {
-  val cameraPositionState = rememberCameraPositionState {
-    position = CameraPosition.fromLatLngZoom(loc, zoomLevel)
-  }
+    val ctx = LocalContext.current
+    val isDarkTheme = isSystemInDarkTheme()
+    val cameraPositionState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(loc, zoomLevel)
+    }
+    val markerState = rememberMarkerState(position = loc)
 
-  val markerState = rememberMarkerState(position = loc)
+    val uiSettings by remember {
+        mutableStateOf(
+            MapUiSettings(
+                compassEnabled = false, zoomControlsEnabled = false, myLocationButtonEnabled = false
+            )
+        )
+    }
+    val mapProperties by remember {
+        mutableStateOf(
+            MapProperties(
+                mapType = MapType.NORMAL,
+                mapStyleOptions = MapStyleOptions.loadRawResourceStyle(
+                    ctx, if (isDarkTheme) R.raw.map_style_dark else R.raw.map_style_light
+                )
+            )
+        )
+    }
 
-  // Set up the GoogleMap composable
-  GoogleMap(
-      modifier =
-          Modifier.testTag("MapView").fillMaxWidth().height(200.dp).clip(RoundedCornerShape(20.dp)),
-      cameraPositionState = cameraPositionState) {
+    // Load custom pin bitmap
+    val originalBitmap = BitmapFactory.decodeResource(ctx.resources, R.drawable.default_pin)
+    val desiredWidth = 94
+    val desiredHeight = 140
+    val scaledBitmap = Bitmap.createScaledBitmap(originalBitmap, desiredWidth, desiredHeight, true)
+    val customPin = BitmapDescriptorFactory.fromBitmap(scaledBitmap)
+
+    // Set up the GoogleMap composable
+    GoogleMap(
+        modifier = Modifier
+            .testTag("MapView")
+            .fillMaxWidth()
+            .height(200.dp)
+            .clip(RoundedCornerShape(20.dp)),
+        cameraPositionState = cameraPositionState,
+        properties = mapProperties,
+        uiSettings = uiSettings
+    ) {
         Marker(
             state = markerState,
-            title = "Marker in Location",
-            snippet = "This is the selected location")
-      }
+            icon = customPin
+        )
+    }
 
-  // Initialize the map position once and avoid resetting on recomposition
-  DisposableEffect(loc) {
-    cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(loc, zoomLevel))
-    onDispose {}
-  }
+    // Initialize the map position once and avoid resetting on recomposition
+    DisposableEffect(loc) {
+        cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(loc, zoomLevel))
+        onDispose {}
+    }
 
-  DisposableEffect(loc) {
-    markerState.position = loc
-    onDispose {}
-  }
+    DisposableEffect(loc) {
+        markerState.position = loc
+        onDispose {}
+    }
 }
