@@ -97,7 +97,7 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
             }
           })
   val locationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
-
+    val allEvent = remember { mutableStateOf<List<Event>>(emptyList()) }
   val eventList = remember { mutableStateOf<List<Event>>(emptyList()) }
   val query = remember { mutableStateOf("") }
   val currentPosition = remember { mutableStateOf(defaultPosition) }
@@ -209,6 +209,9 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
 
                         Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
                           GoogleMapView(
+                              onMapLoaded = {
+
+                              },
                               currentPosition = currentPosition,
                               events = eventList,
                               modifier = Modifier.testTag("Map"),
