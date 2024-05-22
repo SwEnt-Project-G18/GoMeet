@@ -3,6 +3,7 @@ package com.github.se.gomeet.ui.mainscreens.events.posts
 import android.annotation.SuppressLint
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
@@ -61,19 +62,20 @@ import com.github.se.gomeet.model.event.Post
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.profile.ProfileImage
 import com.github.se.gomeet.ui.theme.White
+import com.github.se.gomeet.viewmodel.UserViewModel
 import java.io.InputStream
 import java.time.LocalDate
 import java.time.LocalTime
 
 @SuppressLint("SuspiciousIndentation")
 @Composable
-fun AddPost(user: GoMeetUser, callbackCancel: () -> Unit, callbackPost: (Post) -> Unit) {
+fun AddPost(user: GoMeetUser, callbackCancel: () -> Unit, callbackPost: (Post) -> Unit, userViewModel: UserViewModel) {
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
 
-    var titleState by remember { mutableStateOf("") }
+    val titleState by remember { mutableStateOf("") }
     var contentState by remember { mutableStateOf("") }
-    var url by remember { mutableStateOf("") }
+    var uriString by remember { mutableStateOf("") }
 
     val context = LocalContext.current
 
@@ -94,7 +96,7 @@ fun AddPost(user: GoMeetUser, callbackCancel: () -> Unit, callbackPost: (Post) -
                 inputStream?.let {
                     val bitmap = BitmapFactory.decodeStream(it)
                     imageBitmap = bitmap.asImageBitmap()
-                    url = uriNonNull.toString()
+                    uriString = uriNonNull.toString()
                 }
             }
         }
@@ -118,7 +120,7 @@ fun AddPost(user: GoMeetUser, callbackCancel: () -> Unit, callbackPost: (Post) -
                 BorderStroke(4.dp, MaterialTheme.colorScheme.primaryContainer),
                 RoundedCornerShape(10.dp)
             )
-            .background(MaterialTheme.colorScheme.secondaryContainer, RoundedCornerShape(10.dp))) {
+            .background(MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(10.dp))) {
         IconButton(onClick = { callbackCancel() }) {
             Icon(Icons.Filled.Close, contentDescription = "Cancel")
         }
@@ -135,7 +137,7 @@ fun AddPost(user: GoMeetUser, callbackCancel: () -> Unit, callbackPost: (Post) -
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .testTag("UserInfo")) {
+                    .testTag("UserInfo").padding(start = 15.dp)) {
                 ProfileImage(
                     userId = user.uid,
                     modifier = Modifier.testTag("Profile Picture"),
@@ -163,13 +165,13 @@ fun AddPost(user: GoMeetUser, callbackCancel: () -> Unit, callbackPost: (Post) -
                 modifier = Modifier
                     .fillMaxWidth())
 
-            if (url.isNotEmpty()) {
+            if (uriString.isNotEmpty()) {
                 Image(
                     painter =
                     if (imageBitmap != null) {
                         BitmapPainter(imageBitmap!!)
-                    } else if (url.isNotEmpty()) {
-                        rememberAsyncImagePainter(url)
+                    } else if (uriString.isNotEmpty()) {
+                        rememberAsyncImagePainter(uriString)
                     } else {
                         painterResource(id = R.drawable.gomeet_logo)
                     },
@@ -189,10 +191,10 @@ fun AddPost(user: GoMeetUser, callbackCancel: () -> Unit, callbackPost: (Post) -
                     .padding(20.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween) {
-                if (url.isNotEmpty()) {
+                if (uriString.isNotEmpty()) {
                     IconButton(
                         modifier = Modifier.size(30.dp),
-                        onClick = { url = "" }) {
+                        onClick = { uriString = "" }) {
                         Icon(
                             ImageVector.vectorResource(R.drawable.image_delete_icon),
                             contentDescription = "Add Image",
@@ -213,16 +215,41 @@ fun AddPost(user: GoMeetUser, callbackCancel: () -> Unit, callbackPost: (Post) -
                     modifier = Modifier.width(screenWidth / 3),
                     shape = RoundedCornerShape(10.dp),
                     onClick = {
-                        callbackPost(
-                            Post(
-                                user.uid,
-                                titleState,
-                                contentState,
-                                LocalDate.now(),
-                                LocalTime.now(),
-                                url,
-                                emptyList(),
-                                emptyList()))
+                        var url = ""
+                        if (uriString != "") {
+                            userViewModel.uploadImageAndGetUrl(
+                                userId = user.uid,
+                                imageUri = Uri.parse(uriString),
+                                onSuccess = { imageUrl ->
+                                    url = imageUrl
+                                    callbackPost(
+                                        Post(
+                                            user.uid,
+                                            titleState,
+                                            contentState,
+                                            LocalDate.now(),
+                                            LocalTime.now(),
+                                            url,
+                                            emptyList(),
+                                            emptyList()))
+                                },
+                                onError = { exception ->
+                                    Log.e(
+                                        "ProfileUpdate", "Failed to upload new image: ${exception.message}")
+                                })
+                        } else {
+                            callbackPost(
+                                Post(
+                                    user.uid,
+                                    titleState,
+                                    contentState,
+                                    LocalDate.now(),
+                                    LocalTime.now(),
+                                    url,
+                                    emptyList(),
+                                    emptyList()))
+                        }
+
                     },
                     colors =
                     ButtonDefaults.buttonColors(

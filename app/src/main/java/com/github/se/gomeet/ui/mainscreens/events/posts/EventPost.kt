@@ -98,13 +98,14 @@ import kotlinx.coroutines.launch
                         )
                     }
                 }
+            if (post.content.isNotEmpty()){
 
-            Spacer(modifier = Modifier.height(screenHeight / 60))
+                Spacer(modifier = Modifier.height(screenHeight / 60))
+                Text(text = post.content,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.tertiary)
+            }
 
-            Spacer(modifier = Modifier.height(screenHeight / 60))
-            Text(text = post.content,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.tertiary)
 
             Spacer(modifier = Modifier.height(screenHeight / 60))
 
@@ -118,8 +119,8 @@ import kotlinx.coroutines.launch
                         .padding(horizontal = 20.dp)
                         .aspectRatio(2f)
                         .clip(RoundedCornerShape(20.dp)))
+                Spacer(modifier = Modifier.height(screenHeight / 60))
             }
-            Spacer(modifier = Modifier.height(screenHeight / 60))
             Row (verticalAlignment = Alignment.CenterVertically)  {
                 IconButton(onClick = {
                     liked = !liked

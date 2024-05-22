@@ -179,26 +179,15 @@ fun MyEventInfo(
                   AddPost(
                       callbackCancel = { addPost = false },
                       callbackPost = { post ->
-                          if (post.image != "") {
-                              userViewModel.uploadImageAndGetUrl(
-                                  userId = currentUser.value!!.uid,
-                                  imageUri = Uri.parse(post.image),
-                                  onSuccess = { imageUrl ->
-                                      post.image = imageUrl
-                                  },
-                                  onError = { exception ->
-                                      Log.e(
-                                          "ProfileUpdate", "Failed to upload new image: ${exception.message}")
-                                  })
-                          }
                             coroutineScope.launch {
                               eventViewModel.editEvent(
-                                  myEvent.value!!.copy(posts = myEvent.value!!.posts.plus(post)))
+                                  myEvent.value!!.copy(posts = myEvent.value!!.posts.plus(post).reversed()))
                               myEvent.value = eventViewModel.getEvent(eventId)
                             }
                             addPost = false
                           },
-                      user = currentUser.value!!)
+                      user = currentUser.value!!,
+                      userViewModel = userViewModel)
                 }
                 Spacer(Modifier.height(screenHeight / 80))
                 HorizontalDivider(
