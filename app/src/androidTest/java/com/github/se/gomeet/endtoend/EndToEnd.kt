@@ -71,7 +71,6 @@ class EndToEndTest : TestCase() {
         while (userVM.getUser(uid) == null) {
           TimeUnit.SECONDS.sleep(1)
         }
-
         // Sign in
         result = Firebase.auth.signInWithEmailAndPassword(email, pwd)
         while (!result.isComplete) {
