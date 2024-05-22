@@ -21,26 +21,27 @@ import java.time.LocalTime
  * @param maxParticipants Maximum number of Participants of the event
  * @param public True if the event is public, false if it's private
  * @param tags Tags of the event
- * @param images Is it the right type?
+ * @param images List of urls of images of the event
+ * @param eventRatings Ratings of the event by each user (i.e. userID -> rating)
  */
 data class Event(
-    val eventID: String, // Event's uid
-    val creator: String, // Creator of the event
-    val title: String, // title of the event
-    val description: String, // Description of the event
-    val location: Location, // Location of the event
-    val date: LocalDate, // Date of the event
-    val time: LocalTime, // Time of the event
-    val price: Double, // price of the Event
-    val url: String, // Website of the event (can be ticketLink)
-    val pendingParticipants: List<String>, // Pending users invitations to the event
-    var participants: List<String>, // People participating to the event
-    val visibleToIfPrivate: List<String>, // People that can enter the event if it's private
-    val maxParticipants: Int, // Maximum number of Participants of the event
-    val public: Boolean, // True if the event is public, false if it's private
-    val tags: List<String>, // Tags of the event
-    val images: List<String>, // Is it the right type?
-    val eventRatings: Map<String, Int> // Ratings of the event by each user (i.e. userID -> rating)
+    val eventID: String,
+    val creator: String,
+    val title: String,
+    val description: String,
+    val location: Location,
+    val date: LocalDate,
+    val time: LocalTime,
+    val price: Double,
+    val url: String = "",
+    val pendingParticipants: List<String> = emptyList(),
+    var participants: List<String>,
+    val visibleToIfPrivate: List<String> = emptyList(),
+    val maxParticipants: Int,
+    val public: Boolean,
+    val tags: List<String> = emptyList(),
+    val images: List<String> = emptyList(),
+    val eventRatings: Map<String, Int> = emptyMap()
 ) {
 
   /**

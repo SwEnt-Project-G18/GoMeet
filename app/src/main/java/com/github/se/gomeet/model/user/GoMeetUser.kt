@@ -20,7 +20,7 @@ import com.github.se.gomeet.model.event.Invitation
  * @param myFavorites The list of events that the user added to favorites
  * @param profilePicture The profile picture of the user
  * @param tags The list of tags that the user is interested in
- * @param rating The rating of the user
+ * @param rating The average rating of the user (total rating, number of ratings)
  */
 data class GoMeetUser(
     val uid: String,
@@ -32,13 +32,13 @@ data class GoMeetUser(
     val country: String,
     val following: List<String>,
     val followers: List<String>,
-    val pendingRequests: Set<Invitation>, // For now, the requests are just invitations
+    val pendingRequests: Set<Invitation>,
     var joinedEvents: List<String>,
     var myEvents: List<String>,
     var myFavorites: List<String>,
     var profilePicture: String = "",
     var tags: List<String>,
-    var rating: Double = NO_RATING,
+    var rating: Pair<Int, Int> = Pair(0, 0),
 ) {
 
   /**
@@ -55,10 +55,5 @@ data class GoMeetUser(
             )
 
     return matchingCombinations.any { it.contains(query, ignoreCase = true) }
-  }
-
-  companion object {
-    // The user's default "no rating" value
-    const val NO_RATING = -1.0
   }
 }

@@ -177,7 +177,7 @@ class UserRepository private constructor() {
           myEvents = (this["myEvents"] as? List<String>) ?: emptyList(),
           myFavorites = (this["myFavorites"] as? List<String>) ?: emptyList(),
           tags = (this["tags"] as? List<String>) ?: emptyList(),
-          rating = this["rating"] as? Double ?: GoMeetUser.NO_RATING)
+          rating = this["rating"] as? Pair<Int, Int> ?: Pair(0, 0))
     }
 
     private fun convertToInvitationsList(data: Any?): List<Invitation> {
