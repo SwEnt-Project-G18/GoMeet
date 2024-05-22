@@ -22,7 +22,7 @@ data class Post(
     val content: String,
     val date: LocalDate,
     val time: LocalTime,
-    val image: String,
+    var image: String,
     val likes: List<String>,
     val comments: List<Pair<String, String>>
 )

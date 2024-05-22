@@ -1,5 +1,6 @@
 package com.github.se.gomeet.ui.mainscreens.events
 
+import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
@@ -178,13 +179,25 @@ fun MyEventInfo(
                   AddPost(
                       callbackCancel = { addPost = false },
                       callbackPost = { post ->
-                        coroutineScope.launch {
-                          eventViewModel.editEvent(
-                              myEvent.value!!.copy(posts = myEvent.value!!.posts.plus(post)))
-                          myEvent.value = eventViewModel.getEvent(eventId)
-                        }
-                        addPost = false
-                      },
+                          if (post.image != "") {
+                              userViewModel.uploadImageAndGetUrl(
+                                  userId = currentUser.value!!.uid,
+                                  imageUri = Uri.parse(post.image),
+                                  onSuccess = { imageUrl ->
+                                      post.image = imageUrl
+                                  },
+                                  onError = { exception ->
+                                      Log.e(
+                                          "ProfileUpdate", "Failed to upload new image: ${exception.message}")
+                                  })
+                          }
+                            coroutineScope.launch {
+                              eventViewModel.editEvent(
+                                  myEvent.value!!.copy(posts = myEvent.value!!.posts.plus(post)))
+                              myEvent.value = eventViewModel.getEvent(eventId)
+                            }
+                            addPost = false
+                          },
                       user = currentUser.value!!)
                 }
                 Spacer(Modifier.height(screenHeight / 80))
@@ -222,12 +235,15 @@ fun MyEventInfo(
                       style = MaterialTheme.typography.bodyLarge)
                   Spacer(Modifier.height(screenHeight / 50))
                 } else {
-                  myEvent.value!!.posts.forEach {
-                    HorizontalDivider(color = MaterialTheme.colorScheme.primaryContainer)
-                    EventPost(post = it, userViewModel = userViewModel)
+                    myEvent.value!!.posts.forEach {
+                        Spacer(Modifier.height(screenHeight / 50))
+                        EventPost(post = it, userViewModel = userViewModel, eventViewModel = eventViewModel, currentUser = currentUser.value!!.uid)
+                        Spacer(Modifier.height(screenHeight / 50))
+                        HorizontalDivider(color = MaterialTheme.colorScheme.primaryContainer)
+                        Spacer(Modifier.height(screenHeight / 50))
                   }
-                  Spacer(Modifier.height(screenHeight / 40))
                 }
+                Spacer(Modifier.height(screenHeight / 10))
               }
         }
       }

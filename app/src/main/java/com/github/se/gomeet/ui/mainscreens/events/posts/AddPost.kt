@@ -68,60 +68,60 @@ import java.time.LocalTime
 @SuppressLint("SuspiciousIndentation")
 @Composable
 fun AddPost(user: GoMeetUser, callbackCancel: () -> Unit, callbackPost: (Post) -> Unit) {
-  val screenHeight = LocalConfiguration.current.screenHeightDp.dp
-  val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
 
-  var titleState by remember { mutableStateOf("") }
-  var contentState by remember { mutableStateOf("") }
-  var url by remember { mutableStateOf("") }
+    var titleState by remember { mutableStateOf("") }
+    var contentState by remember { mutableStateOf("") }
+    var url by remember { mutableStateOf("") }
 
-  val context = LocalContext.current
+    val context = LocalContext.current
 
-  var imageUri by remember { mutableStateOf<Uri?>(null) }
-  var imageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
-  val imagePickerLauncher =
-      rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri?
-        ->
-        imageUri = uri
-        uri?.let { uriNonNull ->
-          val inputStream: InputStream? =
-              try {
-                context.contentResolver.openInputStream(uriNonNull)
-              } catch (e: Exception) {
-                e.printStackTrace()
-                null
-              }
-          inputStream?.let {
-            val bitmap = BitmapFactory.decodeStream(it)
-            imageBitmap = bitmap.asImageBitmap()
-            url = uriNonNull.toString()
-          }
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
+    var imageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
+    val imagePickerLauncher =
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri?
+            ->
+            imageUri = uri
+            uri?.let { uriNonNull ->
+                val inputStream: InputStream? =
+                    try {
+                        context.contentResolver.openInputStream(uriNonNull)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        null
+                    }
+                inputStream?.let {
+                    val bitmap = BitmapFactory.decodeStream(it)
+                    imageBitmap = bitmap.asImageBitmap()
+                    url = uriNonNull.toString()
+                }
+            }
         }
-      }
 
-  val textFieldColors =
-      TextFieldDefaults.colors(
-          focusedTextColor = MaterialTheme.colorScheme.onBackground,
-          unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
-          unfocusedContainerColor = Color.Transparent,
-          focusedContainerColor = Color.Transparent,
-          cursorColor = MaterialTheme.colorScheme.outlineVariant,
-          focusedLabelColor = MaterialTheme.colorScheme.tertiary,
-          unfocusedLabelColor = MaterialTheme.colorScheme.tertiary,
-          focusedIndicatorColor = MaterialTheme.colorScheme.tertiary,
-          unfocusedIndicatorColor = MaterialTheme.colorScheme.tertiary)
+    val textFieldColors =
+        TextFieldDefaults.colors(
+            focusedTextColor = MaterialTheme.colorScheme.onBackground,
+            unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+            unfocusedContainerColor = Color.Transparent,
+            focusedContainerColor = Color.Transparent,
+            cursorColor = MaterialTheme.colorScheme.outlineVariant,
+            focusedLabelColor = MaterialTheme.colorScheme.tertiary,
+            unfocusedLabelColor = MaterialTheme.colorScheme.tertiary,
+            focusedIndicatorColor = MaterialTheme.colorScheme.tertiary,
+            unfocusedIndicatorColor = MaterialTheme.colorScheme.tertiary)
 
-  Box(
-      modifier =
-      Modifier
-          .border(
-              BorderStroke(4.dp, MaterialTheme.colorScheme.primaryContainer),
-              RoundedCornerShape(10.dp)
-          )
-          .background(MaterialTheme.colorScheme.secondaryContainer, RoundedCornerShape(10.dp))) {
-      IconButton(onClick = { callbackCancel() }) {
-          Icon(Icons.Filled.Close, contentDescription = "Cancel")
-      }
+    Box(
+        modifier =
+        Modifier
+            .border(
+                BorderStroke(4.dp, MaterialTheme.colorScheme.primaryContainer),
+                RoundedCornerShape(10.dp)
+            )
+            .background(MaterialTheme.colorScheme.secondaryContainer, RoundedCornerShape(10.dp))) {
+        IconButton(onClick = { callbackCancel() }) {
+            Icon(Icons.Filled.Close, contentDescription = "Cancel")
+        }
         Column(modifier = Modifier.padding(top = 10.dp)) {
             Text(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
@@ -131,110 +131,105 @@ fun AddPost(user: GoMeetUser, callbackCancel: () -> Unit, callbackPost: (Post) -
             Spacer(modifier = Modifier.height(screenHeight / 40))
 
             Row(
-              horizontalArrangement = Arrangement.Start,
-              verticalAlignment = Alignment.CenterVertically,
-              modifier = Modifier
-                  .fillMaxWidth()
-                  .padding(start = 20.dp)
-                  .testTag("UserInfo")) {
-                Box(modifier = Modifier.padding(end = 5.dp)) {
-                  ProfileImage(
-                      userId = user.uid,
-                      modifier = Modifier.testTag("Profile Picture"),
-                      size = 50.dp)
-                }
-                Column(horizontalAlignment = Alignment.Start) {
-                  Text(
-                      (user.firstName + " " + user.lastName),
-                      textAlign = TextAlign.Center,
-                      style = MaterialTheme.typography.bodyLarge)
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("UserInfo")) {
+                ProfileImage(
+                    userId = user.uid,
+                    modifier = Modifier.testTag("Profile Picture"),
+                    size = 50.dp)
 
-                  Text(text = "@" + (user.username), style = MaterialTheme.typography.bodySmall)
+                Column(horizontalAlignment = Alignment.Start, modifier = Modifier.padding(start = 10.dp)) {
+                    Text(
+                        (user.firstName + " " + user.lastName),
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.tertiary
+                    )
+
+                    Text(text = "@" + (user.username),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.secondary)
                 }
-              }
+            }
 
             OutlinedTextField(
                 value = contentState,
                 onValueChange = { newVal -> contentState = newVal },
-                placeholder = { Text("Share the latest updates about this event...") },
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color.Transparent,
-                    unfocusedBorderColor = Color.Transparent,
-                    cursorColor = MaterialTheme.colorScheme.tertiary,
-                    focusedLabelColor = MaterialTheme.colorScheme.tertiary
-                ),
+                placeholder = { Text("What's new ?") },
+                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color.Transparent, unfocusedBorderColor = Color.Transparent),
+                modifier = Modifier
+                    .fillMaxWidth())
+
+            if (url.isNotEmpty()) {
+                Image(
+                    painter =
+                    if (imageBitmap != null) {
+                        BitmapPainter(imageBitmap!!)
+                    } else if (url.isNotEmpty()) {
+                        rememberAsyncImagePainter(url)
+                    } else {
+                        painterResource(id = R.drawable.gomeet_logo)
+                    },
+                    contentDescription = "Post Image",
+                    contentScale = ContentScale.Crop,
+                    modifier =
+                    Modifier
+                        .padding(horizontal = 20.dp)
+                        .aspectRatio(2f)
+                        .clickable { imagePickerLauncher.launch("image/*") }
+                        .clip(RoundedCornerShape(20.dp)))
+            }
+
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
-            )
-
-          if (url.isNotEmpty()) {
-            Image(
-                painter =
-                    if (imageBitmap != null) {
-                      BitmapPainter(imageBitmap!!)
-                    } else if (url.isNotEmpty()) {
-                      rememberAsyncImagePainter(url)
-                    } else {
-                      painterResource(id = R.drawable.gomeet_logo)
-                    },
-                contentDescription = "Post Image",
-                contentScale = ContentScale.Crop,
-                modifier =
-                Modifier
-                    .padding(horizontal = 20.dp)
-                    .aspectRatio(2f)
-                    .clickable { imagePickerLauncher.launch("image/*") }
-                    .clip(RoundedCornerShape(20.dp)))
-          }
-
-          Row(
-              modifier = Modifier
-                  .fillMaxWidth()
-                  .padding(20.dp),
-              verticalAlignment = Alignment.CenterVertically,
-              horizontalArrangement = Arrangement.SpaceBetween) {
-              if (url.isNotEmpty()) {
-                  IconButton(
-                      modifier = Modifier.size(30.dp),
-                      onClick = { url = "" }) {
-                      Icon(
-                          ImageVector.vectorResource(R.drawable.image_delete_icon),
-                          contentDescription = "Add Image",
-                          tint = MaterialTheme.colorScheme.tertiary)
-                  }
-              }else {
-                  IconButton(
-                      modifier = Modifier
-                          .size(30.dp),
-                      onClick = { imagePickerLauncher.launch("image/*") }) {
-                      Icon(
-                          ImageVector.vectorResource(R.drawable.image_add_icon),
-                          contentDescription = "Add Image",
-                          tint = MaterialTheme.colorScheme.tertiary)
-                  }
-              }
+                    .padding(20.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween) {
+                if (url.isNotEmpty()) {
+                    IconButton(
+                        modifier = Modifier.size(30.dp),
+                        onClick = { url = "" }) {
+                        Icon(
+                            ImageVector.vectorResource(R.drawable.image_delete_icon),
+                            contentDescription = "Add Image",
+                            tint = MaterialTheme.colorScheme.tertiary)
+                    }
+                }else {
+                    IconButton(
+                        modifier = Modifier
+                            .size(30.dp),
+                        onClick = { imagePickerLauncher.launch("image/*") }) {
+                        Icon(
+                            ImageVector.vectorResource(R.drawable.image_add_icon),
+                            contentDescription = "Add Image",
+                            tint = MaterialTheme.colorScheme.tertiary)
+                    }
+                }
                 Button(
                     modifier = Modifier.width(screenWidth / 3),
                     shape = RoundedCornerShape(10.dp),
                     onClick = {
-                      callbackPost(
-                          Post(
-                              user.uid,
-                              titleState,
-                              contentState,
-                              LocalDate.now(),
-                              LocalTime.now(),
-                              url,
-                              emptyList(),
-                              emptyList()))
+                        callbackPost(
+                            Post(
+                                user.uid,
+                                titleState,
+                                contentState,
+                                LocalDate.now(),
+                                LocalTime.now(),
+                                url,
+                                emptyList(),
+                                emptyList()))
                     },
                     colors =
-                        ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.outlineVariant)) {
-                      Text(text = "Post", color = White)
-                    }
-              }
+                    ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.outlineVariant)) {
+                    Text(text = "Post", color = White)
+                }
+            }
         }
-      }
+    }
 }
