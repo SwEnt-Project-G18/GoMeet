@@ -185,7 +185,6 @@ internal fun GoogleMapView(
                 isButtonVisible.value = false
                 false
               }
-
               events.value.forEachIndexed { index, event ->
                 val today = LocalDate.now()
                 val oneWeekLater = today.plusWeeks(1)
