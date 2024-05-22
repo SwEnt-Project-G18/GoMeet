@@ -19,7 +19,6 @@ import androidx.compose.material.BackdropValue
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.rememberBackdropScaffoldState
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -67,7 +66,7 @@ import kotlinx.coroutines.tasks.await
  * @param nav The navigation actions.
  * @param eventViewModel The event view model.
  */
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
   val coroutineScope = rememberCoroutineScope()

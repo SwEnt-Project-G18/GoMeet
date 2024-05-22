@@ -12,9 +12,11 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.rule.GrantPermissionRule
 import com.github.se.gomeet.MainActivity
 import com.github.se.gomeet.model.event.location.Location
 import com.github.se.gomeet.screens.EventInfoScreen
+import com.github.se.gomeet.screens.ExploreScreen
 import com.github.se.gomeet.screens.FollowScreen
 import com.github.se.gomeet.screens.LoginScreenScreen
 import com.github.se.gomeet.screens.OtherProfileScreen
@@ -45,6 +47,8 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class EndToEndTest2 : TestCase() {
   @get:Rule val composeTestRule = createAndroidComposeRule<MainActivity>()
+  @get:Rule
+  var permissionRule = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
 
   companion object {
     private const val email1 = "user1@test2.com"
@@ -203,12 +207,16 @@ class EndToEndTest2 : TestCase() {
         composeTestRule.onNodeWithText("Log In").assertIsEnabled().performClick()
         composeTestRule.waitForIdle()
         composeTestRule.waitUntil(timeoutMillis = 10000) {
-          composeTestRule.onNodeWithTag("CreateUI").isDisplayed()
+          composeTestRule.onNodeWithTag("ExploreUI").isDisplayed()
         }
       }
     }
 
-    step("Go to Trends") { composeTestRule.onNodeWithText("Trends").performClick() }
+    ComposeScreen.onComposeScreen<ExploreScreen>(composeTestRule) {
+      step("Go to Trends") {
+        composeTestRule.onNodeWithText("Trends").assertIsDisplayed().performClick()
+      }
+    }
 
     ComposeScreen.onComposeScreen<TrendsScreen>(composeTestRule) {
       step("View the info page of an event by clicking on it") {
