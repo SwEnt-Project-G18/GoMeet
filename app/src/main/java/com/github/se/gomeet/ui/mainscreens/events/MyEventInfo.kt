@@ -183,63 +183,52 @@ private fun MapViewComposable(
     loc: LatLng,
     zoomLevel: Float = 15f // Default zoom level for close-up of location
 ) {
-    val ctx = LocalContext.current
-    val isDarkTheme = isSystemInDarkTheme()
-    val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(loc, zoomLevel)
-    }
-    val markerState = rememberMarkerState(position = loc)
+  val ctx = LocalContext.current
+  val isDarkTheme = isSystemInDarkTheme()
+  val cameraPositionState = rememberCameraPositionState {
+    position = CameraPosition.fromLatLngZoom(loc, zoomLevel)
+  }
+  val markerState = rememberMarkerState(position = loc)
 
-    val uiSettings by remember {
-        mutableStateOf(
-            MapUiSettings(
-                compassEnabled = false, zoomControlsEnabled = false, myLocationButtonEnabled = false
-            )
-        )
-    }
-    val mapProperties by remember {
-        mutableStateOf(
-            MapProperties(
-                mapType = MapType.NORMAL,
-                mapStyleOptions = MapStyleOptions.loadRawResourceStyle(
-                    ctx, if (isDarkTheme) R.raw.map_style_dark else R.raw.map_style_light
-                )
-            )
-        )
-    }
+  val uiSettings by remember {
+    mutableStateOf(
+        MapUiSettings(
+            compassEnabled = false, zoomControlsEnabled = false, myLocationButtonEnabled = false))
+  }
+  val mapProperties by remember {
+    mutableStateOf(
+        MapProperties(
+            mapType = MapType.NORMAL,
+            mapStyleOptions =
+                MapStyleOptions.loadRawResourceStyle(
+                    ctx, if (isDarkTheme) R.raw.map_style_dark else R.raw.map_style_light)))
+  }
 
-    // Load custom pin bitmap
-    val originalBitmap = BitmapFactory.decodeResource(ctx.resources, R.drawable.default_pin)
-    val desiredWidth = 94
-    val desiredHeight = 140
-    val scaledBitmap = Bitmap.createScaledBitmap(originalBitmap, desiredWidth, desiredHeight, true)
-    val customPin = BitmapDescriptorFactory.fromBitmap(scaledBitmap)
+  // Load custom pin bitmap
+  val originalBitmap = BitmapFactory.decodeResource(ctx.resources, R.drawable.default_pin)
+  val desiredWidth = 94
+  val desiredHeight = 140
+  val scaledBitmap = Bitmap.createScaledBitmap(originalBitmap, desiredWidth, desiredHeight, true)
+  val customPin = BitmapDescriptorFactory.fromBitmap(scaledBitmap)
 
-    // Set up the GoogleMap composable
-    GoogleMap(
-        modifier = Modifier
-            .testTag("MapView")
-            .fillMaxWidth()
-            .height(200.dp)
-            .clip(RoundedCornerShape(20.dp)),
-        cameraPositionState = cameraPositionState,
-        properties = mapProperties,
-        uiSettings = uiSettings
-    ) {
-        Marker(
-            state = markerState,
-            icon = customPin
-        )
-    }
+  // Set up the GoogleMap composable
+  GoogleMap(
+      modifier =
+          Modifier.testTag("MapView").fillMaxWidth().height(200.dp).clip(RoundedCornerShape(20.dp)),
+      cameraPositionState = cameraPositionState,
+      properties = mapProperties,
+      uiSettings = uiSettings) {
+        Marker(state = markerState, icon = customPin)
+      }
 
-    // Initialize the map position once and avoid resetting on recomposition
-    DisposableEffect(loc) {
-        cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(loc, zoomLevel))
-        onDispose {}
-    }
+  // Initialize the map position once and avoid resetting on recomposition
+  DisposableEffect(loc) {
+    cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(loc, zoomLevel))
+    onDispose {}
+  }
 
-    DisposableEffect(loc) {
-        markerState.position = loc
-        onDispose {}
-    }
+  DisposableEffect(loc) {
+    markerState.position = loc
+    onDispose {}
+  }
 }
