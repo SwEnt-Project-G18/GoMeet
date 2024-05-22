@@ -96,7 +96,9 @@ fun EventPost(
                   }
                   .testTag("EventPostUserInfo")) {
             ProfileImage(
-                userId = poster!!.uid, modifier = Modifier.testTag("Event Post Profile Picture"), size = 50.dp)
+                userId = poster!!.uid,
+                modifier = Modifier.testTag("Event Post Profile Picture"),
+                size = 50.dp)
 
             Column(
                 horizontalAlignment = Alignment.Start, modifier = Modifier.padding(start = 10.dp)) {
