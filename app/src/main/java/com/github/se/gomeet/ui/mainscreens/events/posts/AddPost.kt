@@ -137,7 +137,8 @@ fun AddPost(user: GoMeetUser, callbackCancel: () -> Unit, callbackPost: (Post) -
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .testTag("UserInfo").padding(start = 15.dp)) {
+                    .testTag("UserInfo")
+                    .padding(start = 15.dp)) {
                 ProfileImage(
                     userId = user.uid,
                     modifier = Modifier.testTag("Profile Picture"),
@@ -153,7 +154,7 @@ fun AddPost(user: GoMeetUser, callbackCancel: () -> Unit, callbackPost: (Post) -
 
                     Text(text = "@" + (user.username),
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.secondary)
+                        color = MaterialTheme.colorScheme.tertiary)
                 }
             }
 
@@ -183,12 +184,13 @@ fun AddPost(user: GoMeetUser, callbackCancel: () -> Unit, callbackPost: (Post) -
                         .aspectRatio(2f)
                         .clickable { imagePickerLauncher.launch("image/*") }
                         .clip(RoundedCornerShape(20.dp)))
+                    Spacer(modifier = Modifier.height(screenHeight / 60))
             }
 
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(20.dp),
+                    .padding(start = 20.dp, end = 20.dp, bottom = 20.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween) {
                 if (uriString.isNotEmpty()) {
@@ -203,7 +205,7 @@ fun AddPost(user: GoMeetUser, callbackCancel: () -> Unit, callbackPost: (Post) -
                 }else {
                     IconButton(
                         modifier = Modifier
-                            .size(30.dp),
+                            .size(26.dp),
                         onClick = { imagePickerLauncher.launch("image/*") }) {
                         Icon(
                             ImageVector.vectorResource(R.drawable.image_add_icon),

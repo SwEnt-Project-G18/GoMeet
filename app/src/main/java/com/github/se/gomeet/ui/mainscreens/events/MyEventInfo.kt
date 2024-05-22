@@ -19,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -41,6 +42,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.user.GoMeetUser
@@ -143,7 +145,7 @@ fun MyEventInfo(
           Column(
               modifier =
                   Modifier.padding(innerPadding)
-                      .padding(start = 15.dp, end = 15.dp, top = 0.dp, bottom = 15.dp)
+                      .padding(horizontal = 10.dp)
                       .fillMaxSize()
                       .verticalScroll(state = rememberScrollState())) {
                 EventHeader(
@@ -195,19 +197,16 @@ fun MyEventInfo(
                 Spacer(Modifier.height(screenHeight / 80))
                 Row(
                     horizontalArrangement = Arrangement.SpaceAround,
-                    verticalAlignment = Alignment.CenterVertically) {
+                    verticalAlignment = Alignment.Top) {
                       Text(
                           text = "Posts",
-                          modifier = Modifier.padding(start = 15.dp),
-                          style = MaterialTheme.typography.headlineSmall)
+                          style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.SemiBold))
 
                       Spacer(modifier = Modifier.weight(1f))
                       if (!addPost && organizer.value!!.uid == currentUser.value!!.uid) {
-                        OutlinedButton(
+                        Button(
                             onClick = { addPost = true },
                             shape = RoundedCornerShape(10.dp),
-                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-                            enabled = true,
                             colors =
                                 ButtonDefaults.buttonColors(
                                     containerColor = MaterialTheme.colorScheme.outlineVariant)) {
@@ -217,19 +216,18 @@ fun MyEventInfo(
                     }
 
                 if (myEvent.value!!.posts.isEmpty()) {
-                  Spacer(Modifier.height(screenHeight / 30))
+                  Spacer(Modifier.height(10.dp))
                   Text(
                       text = "No updates about this event at the moment.",
                       modifier = Modifier.align(Alignment.CenterHorizontally),
                       style = MaterialTheme.typography.bodyLarge)
                   Spacer(Modifier.height(screenHeight / 50))
                 } else {
+                    Spacer(Modifier.height(10.dp))
                     myEvent.value!!.posts.forEach {
-                        Spacer(Modifier.height(screenHeight / 50))
-                        EventPost(post = it, userViewModel = userViewModel, eventViewModel = eventViewModel, currentUser = currentUser.value!!.uid)
-                        Spacer(Modifier.height(screenHeight / 50))
+                        EventPost(event = myEvent.value!!, post = it, userViewModel = userViewModel, eventViewModel = eventViewModel, currentUser = currentUser.value!!.uid)
                         HorizontalDivider(color = MaterialTheme.colorScheme.primaryContainer)
-                        Spacer(Modifier.height(screenHeight / 50))
+                        Spacer(Modifier.height(10.dp))
                   }
                 }
                 Spacer(Modifier.height(screenHeight / 10))

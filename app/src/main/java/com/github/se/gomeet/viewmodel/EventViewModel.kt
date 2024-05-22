@@ -12,6 +12,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.se.gomeet.model.event.Event
+import com.github.se.gomeet.model.event.Post
 import com.github.se.gomeet.model.event.location.Location
 import com.github.se.gomeet.model.repository.EventRepository
 import com.google.android.gms.maps.model.BitmapDescriptor
@@ -289,6 +290,18 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
     lastLoadedEvents = lastLoadedEvents.plus(event)
     EventRepository.updateEvent(event)
   }
+
+
+    fun editPost(event : Event, oldPost : Post, newPost: Post){
+        val updatedPosts = event.posts.map { currentPost ->
+            if (currentPost == oldPost) {
+                newPost
+            } else {
+                currentPost
+            }
+        }
+        editEvent(event.copy(posts = updatedPosts))
+    }
 
   /**
    * Remove an event by its UID.

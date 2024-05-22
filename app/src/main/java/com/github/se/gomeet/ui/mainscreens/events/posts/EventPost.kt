@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -18,6 +19,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material.icons.outlined.ThumbUp
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -25,6 +29,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -53,9 +58,11 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 
-@Composable fun EventPost(post: Post, userViewModel: UserViewModel, eventViewModel: EventViewModel, currentUser: String) {
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable fun EventPost(event: Event, post: Post, userViewModel: UserViewModel, eventViewModel: EventViewModel, currentUser: String) {
     var poster by remember { mutableStateOf<GoMeetUser?>(null) }
     var liked by remember { mutableStateOf(false) }
+    var likes by remember { mutableIntStateOf(0) }
     val coroutineScope = rememberCoroutineScope()
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
 
@@ -63,6 +70,7 @@ import kotlinx.coroutines.launch
         coroutineScope.launch {
             poster = userViewModel.getUser(post.userId)
             liked = post.likes.contains(currentUser)
+            likes =  post.likes.size
         }
     }
 
@@ -101,28 +109,39 @@ import kotlinx.coroutines.launch
             if (post.content.isNotEmpty()){
 
                 Spacer(modifier = Modifier.height(screenHeight / 60))
-                Text(text = post.content,
+                Text(
+                    modifier = Modifier.padding(horizontal = 10.dp),
+                    text = post.content,
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.tertiary)
             }
 
 
-            Spacer(modifier = Modifier.height(screenHeight / 60))
 
             if (post.image.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(screenHeight / 80))
                 Image(
                     painter = rememberAsyncImagePainter(post.image),
                     contentDescription = "Post Image",
                     contentScale = ContentScale.Crop,
                     modifier =
                     Modifier
-                        .padding(horizontal = 20.dp)
+                        .padding(horizontal = 10.dp)
                         .aspectRatio(2f)
                         .clip(RoundedCornerShape(20.dp)))
-                Spacer(modifier = Modifier.height(screenHeight / 60))
             }
             Row (verticalAlignment = Alignment.CenterVertically)  {
                 IconButton(onClick = {
+                    val oldPost = post.copy()
+                    if (liked){
+                        likes --
+                        post.likes = post.likes.minus(currentUser)
+                        eventViewModel.editPost(event, oldPost, post)
+                    } else {
+                        likes ++
+                        post.likes = post.likes.plus(currentUser)
+                        eventViewModel.editPost(event, oldPost, post)
+                    }
                     liked = !liked
                 }) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -131,7 +150,7 @@ import kotlinx.coroutines.launch
                                 contentDescription = "Like",
                                 tint = MaterialTheme.colorScheme.tertiary)
                             Spacer(modifier = Modifier.width(5.dp))
-                            Text(text = post.likes.size.toString(),
+                            Text(text = likes.toString(),
                                 color = MaterialTheme.colorScheme.tertiary,
                                 style = MaterialTheme.typography.bodyMedium)
                         }else{
@@ -139,7 +158,7 @@ import kotlinx.coroutines.launch
                                 contentDescription = "Like",
                                 tint = MaterialTheme.colorScheme.outlineVariant)
                             Spacer(modifier = Modifier.width(5.dp))
-                            Text(text = post.likes.size.toString(),
+                            Text(text = likes.toString(),
                                 color = MaterialTheme.colorScheme.outlineVariant,
                                 style = MaterialTheme.typography.bodyMedium)
 

@@ -23,6 +23,6 @@ data class Post(
     val date: LocalDate,
     val time: LocalTime,
     var image: String,
-    val likes: List<String>,
+    var likes: List<String>,
     val comments: List<Pair<String, String>>
 )
