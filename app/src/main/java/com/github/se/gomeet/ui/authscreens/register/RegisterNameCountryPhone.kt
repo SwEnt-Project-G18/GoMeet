@@ -80,7 +80,7 @@ fun RegisterNameCountryPhone(
         Text(
             text = "Tell Us More About Yourself",
             modifier = Modifier.fillMaxWidth().testTag("Text"),
-            color = MaterialTheme.colorScheme.onPrimary,
+            color = MaterialTheme.colorScheme.onBackground,
             style = MaterialTheme.typography.titleMedium,
             textAlign = TextAlign.Center)
 
