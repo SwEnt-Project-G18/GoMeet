@@ -47,6 +47,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -81,6 +82,7 @@ fun EditEvent(
 ) {
   val context = LocalContext.current
   val coroutineScope = rememberCoroutineScope()
+    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
 
   var event by remember { mutableStateOf<Event?>(null) }
   var profilePictureUrl by remember { mutableStateOf<String?>(null) }
@@ -229,31 +231,33 @@ fun EditEvent(
                               .testTag("Event Picture"),
                       contentScale = ContentScale.Crop)
 
-                  Spacer(modifier = Modifier.size(16.dp))
+                Spacer(modifier = Modifier.height(screenHeight / 80))
 
                   TextField(
                       value = titleState.value,
                       onValueChange = { newValue -> titleState.value = newValue },
                       label = { Text("Title") },
                       singleLine = true,
-                      modifier = Modifier.fillMaxWidth(),
+                      modifier = Modifier.fillMaxWidth().padding(start = 15.dp, end = 15.dp),
                       colors = textFieldColors)
-                  Spacer(modifier = Modifier.size(16.dp))
+
+                Spacer(modifier = Modifier.height(screenHeight / 80))
 
                   TextField(
                       value = descriptionState.value,
                       onValueChange = { newValue -> descriptionState.value = newValue },
                       label = { Text("Description") },
                       singleLine = true,
-                      modifier = Modifier.fillMaxWidth(),
+                      modifier = Modifier.fillMaxWidth().padding(start = 15.dp, end = 15.dp),
                       colors = textFieldColors)
-                  Spacer(modifier = Modifier.size(16.dp))
+
+                Spacer(modifier = Modifier.height(screenHeight / 80))
 
                   LocationField(selectedLocation, locationState, eventViewModel)
-                  Spacer(modifier = Modifier.size(16.dp))
+
+                Spacer(modifier = Modifier.height(screenHeight / 30))
 
                   DateTimePicker(pickedTime = pickedTime, pickedDate = pickedDate)
-                  Spacer(modifier = Modifier.size(16.dp))
 
                   TextField(
                       value = priceText,
@@ -263,21 +267,23 @@ fun EditEvent(
                       },
                       label = { Text("Price") },
                       singleLine = true,
-                      modifier = Modifier.fillMaxWidth(),
+                      modifier = Modifier.fillMaxWidth().padding(start = 15.dp, end = 15.dp),
                       colors = textFieldColors)
-                  Spacer(modifier = Modifier.size(16.dp))
+
+                Spacer(modifier = Modifier.height(screenHeight / 80))
 
                   TextField(
                       value = url.value,
                       onValueChange = { newVal -> url.value = newVal },
                       label = { Text("Link") },
                       singleLine = true,
-                      modifier = Modifier.fillMaxWidth(),
+                      modifier = Modifier.fillMaxWidth().padding(start = 15.dp, end = 15.dp),
                       colors = textFieldColors)
-                  Spacer(modifier = Modifier.size(16.dp))
+
+                Spacer(modifier = Modifier.height(screenHeight / 80))
 
                   Row(
-                      modifier = Modifier.fillMaxWidth().padding(top = 15.dp, bottom = 10.dp),
+                      modifier = Modifier.fillMaxWidth().padding(start = 15.dp, top = 10.dp),
                       verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             text = "Edit Tags",
