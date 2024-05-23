@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -21,7 +22,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
@@ -54,12 +54,12 @@ fun ContentInRow(
     val screenWidth = configuration.screenWidthDp
     LazyRow(
         horizontalArrangement = Arrangement.Start,
-        modifier = Modifier.padding(start = 10.dp, bottom = 10.dp),
+        modifier = Modifier.padding(bottom = 10.dp),
         state = listState) {
           items(events) { event ->
             val columnShape =
                 RoundedCornerShape(
-                    topStart = 24.dp, topEnd = 24.dp, bottomStart = 16.dp, bottomEnd = 16.dp)
+                    topStart = 24.dp, topEnd = 24.dp, bottomStart = 10.dp, bottomEnd = 10.dp)
             Column(
                 modifier =
                     Modifier.padding(start = 10.dp)
@@ -102,9 +102,9 @@ fun ContentInRow(
                             contentDescription = "Event Image",
                             alignment = Alignment.Center,
                             contentScale = ContentScale.Crop,
-                            modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(16.dp)))
+                            modifier = Modifier.fillMaxSize().aspectRatio(3f / 1.75f))
                       }
-                  Column(modifier = Modifier.padding(8.dp)) {
+                  Column(modifier = Modifier.padding(start = 10.dp, end = 10.dp, bottom = 10.dp)) {
                     Text(
                         text = event.title,
                         style = MaterialTheme.typography.bodyLarge,
