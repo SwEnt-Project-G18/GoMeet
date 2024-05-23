@@ -106,7 +106,9 @@ fun ContentInRow(
                       }
                   Column(modifier = Modifier.padding(start = 10.dp, end = 10.dp, bottom = 10.dp)) {
                     Text(
-                        text = event.title,
+                        text =
+                            if (event.title.length > 37) event.title.take(33) + "...."
+                            else event.title,
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.tertiary)
                     Text(

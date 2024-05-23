@@ -76,13 +76,24 @@ fun EventHeader(
     date: String,
     time: String
 ) {
+  val titleBuilder = StringBuilder()
+  var index = 0
+
+  while (index < title.length) {
+    if (index + 20 < title.length) {
+      titleBuilder.append(title.substring(index, index + 20)).append("\n")
+    } else {
+      titleBuilder.append(title.substring(index))
+    }
+    index += 20
+  }
   Row(
       modifier = Modifier.fillMaxWidth().testTag("EventHeader").padding(10.dp),
-      verticalAlignment = Alignment.CenterVertically,
+      verticalAlignment = Alignment.Top,
       horizontalArrangement = Arrangement.SpaceBetween) {
         Column {
           Text(
-              text = title,
+              text = titleBuilder.toString(),
               style =
                   TextStyle(
                       fontSize = 24.sp,

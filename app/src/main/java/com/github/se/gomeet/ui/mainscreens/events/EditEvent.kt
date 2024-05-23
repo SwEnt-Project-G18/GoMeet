@@ -2,6 +2,7 @@ package com.github.se.gomeet.ui.mainscreens.events
 
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.webkit.URLUtil
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -63,6 +64,7 @@ import com.github.se.gomeet.model.event.location.Location
 import com.github.se.gomeet.ui.mainscreens.DateTimePicker
 import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.mainscreens.create.LocationField
+import com.github.se.gomeet.ui.mainscreens.create.isValidPrice
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
@@ -99,6 +101,7 @@ fun EditEvent(
     var price by remember { mutableDoubleStateOf(event!!.price) }
     var priceText by remember { mutableStateOf(event!!.price.toString()) }
     val url = remember { mutableStateOf(event!!.url) }
+    var urlValid by remember { mutableStateOf(true) }
 
     val pickedTime = remember { mutableStateOf(event!!.time) }
     val pickedDate = remember { mutableStateOf(event!!.date) }
@@ -157,11 +160,15 @@ fun EditEvent(
                 style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
                 modifier =
                     Modifier.padding(end = 15.dp).clickable {
-                      if (titleState.value.isNotEmpty() &&
+                      urlValid = URLUtil.isValidUrl(url.value)
+                      if (urlValid &&
+                          titleState.value.isNotEmpty() &&
                           descriptionState.value.isNotEmpty() &&
-                          locationState.value.isNotEmpty() &&
-                          priceText.isNotEmpty() &&
-                          url.value.isNotEmpty()) {
+                          locationState.value.isNotEmpty()) {
+                        titleState.value = titleState.value.trimEnd()
+                        descriptionState.value = descriptionState.value.trimEnd()
+                        url.value = url.value.trimEnd()
+
                         val updatedEvent =
                             event!!.copy(
                                 title = titleState.value,
@@ -237,7 +244,12 @@ fun EditEvent(
 
                   TextField(
                       value = titleState.value,
-                      onValueChange = { newValue -> titleState.value = newValue },
+                      onValueChange = { newValue ->
+                        if ((titleState.value.isNotEmpty() || newValue != " ") &&
+                            titleState.value.length < 58) {
+                          titleState.value = newValue
+                        }
+                      },
                       label = { Text("Title") },
                       singleLine = true,
                       modifier = Modifier.fillMaxWidth().padding(start = 15.dp, end = 15.dp),
@@ -247,7 +259,11 @@ fun EditEvent(
 
                   TextField(
                       value = descriptionState.value,
-                      onValueChange = { newValue -> descriptionState.value = newValue },
+                      onValueChange = { newValue ->
+                        if ((descriptionState.value.isNotEmpty() || newValue != " ")) {
+                          descriptionState.value = newValue
+                        }
+                      },
                       label = { Text("Description") },
                       singleLine = true,
                       modifier = Modifier.fillMaxWidth().padding(start = 15.dp, end = 15.dp),
@@ -266,8 +282,10 @@ fun EditEvent(
                   TextField(
                       value = priceText,
                       onValueChange = { newVal ->
-                        priceText = newVal
-                        newVal.toDoubleOrNull()?.let { price = it }
+                        if (newVal.isEmpty() || isValidPrice(newVal)) {
+                          priceText = newVal
+                          newVal.toDoubleOrNull()?.let { price = it }
+                        }
                       },
                       label = { Text("Price") },
                       singleLine = true,
