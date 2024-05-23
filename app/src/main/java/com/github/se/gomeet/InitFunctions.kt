@@ -70,7 +70,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
-private const val chatClientTag = "ChatClient"
+private const val TAG = "InitFunctions"
 
 /** Initialize the cache. */
 fun initCache() {
@@ -182,7 +182,7 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
                     navAction)
               } else {
                 // Handle connection failure
-                Log.e(chatClientTag, "Failed to connect user: $userId")
+                Log.e(TAG, "ChatClient: Failed to connect user: $userId")
               }
             }
           },
@@ -293,8 +293,8 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
           when (clientInitialisationState) {
             InitializationState.COMPLETE -> {
               Log.d(
-                  chatClientTag,
-                  "Sign in to chat works, $id, and ${Firebase.auth.currentUser!!.uid}")
+                  TAG,
+                  "ChatClient: Sign in to chat works, $id, and ${userViewModel.value.currentUID}")
               client
                   .createChannel(
                       channelType = "messaging",
@@ -303,10 +303,10 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
                       extraData = emptyMap())
                   .enqueue { res ->
                     res.onError { error ->
-                      Log.e(chatClientTag, "Create channel failed, Error: $error")
+                      Log.e(TAG, "ChatClient: create channel failed, Error: $error")
                     }
                     res.onSuccess { result ->
-                      Log.d(chatClientTag, "Create channel success")
+                      Log.d(TAG, "ChatClient: Create channel success")
                       success.value = true
                       channelId.value =
                           "messaging:${result.id}" // Correct format "channelType:channelId"
@@ -327,12 +327,12 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
               }
             }
             InitializationState.INITIALIZING -> {
-              Log.d(chatClientTag, "Sign in to Chat is initializing")
-              Text(text = "Initializing...")
+              Log.d(TAG, "ChatClient: Sign in to Chat is initialising")
+              Text(text = "Initialising...")
             }
             InitializationState.NOT_INITIALIZED -> {
-              Log.e(chatClientTag, "Sign in to Chat doesn't work, not initialized")
-              Text(text = "Not initialized...")
+              Log.e(TAG, "ChatClient: Sign in to Chat doesn't work, not initialised")
+              Text(text = "Not initialised...")
             }
           }
         }
@@ -383,7 +383,7 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
         arguments = listOf(navArgument("id") { type = NavType.StringType })) {
           val id = it.arguments?.getString("id") ?: ""
           ChatTheme {
-            Log.d(chatClientTag, "ID is: $id")
+            Log.d(TAG, "ChatClient: ID is $id")
             MessagesScreen(
                 viewModelFactory =
                     MessagesViewModelFactory(
@@ -463,18 +463,18 @@ private fun logOut(
   userViewModel.value = UserViewModel()
   authViewModel.signOut()
   chatDisconnected.value = false
-  Log.d(chatClientTag, "Starting full disconnect")
+  Log.d(TAG, "ChatClient: Starting full disconnect")
   scope.launch {
     try {
       client
           .disconnect(false)
           .doOnResult(scope) {
-            Log.d(chatClientTag, "Full disconnect complete")
+            Log.d(TAG, "ChatClient: Full disconnect complete")
             chatDisconnected.value = true
           }
           .await()
     } catch (e: Exception) {
-      Log.e(chatClientTag, "Error during disconnect: ${e.message}")
+      Log.e(TAG, "ChatClient: Error during disconnect", e)
     }
   }
 }

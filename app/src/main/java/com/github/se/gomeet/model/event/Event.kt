@@ -23,8 +23,7 @@ import java.time.LocalTime
  * @param tags Tags of the event
  * @param eventRatings Ratings of the event by each user (i.e. userID -> rating)
  * @param images Images of the event
- * @param posts Posts of the event
->>>>>>> a0979603ee96764731490b732fddd35bdc089325
+ * @param posts Posts of the event >>>>>>> a0979603ee96764731490b732fddd35bdc089325
  */
 data class Event(
     val eventID: String,

@@ -42,6 +42,8 @@ import com.google.firebase.ktx.Firebase
 import io.getstream.chat.android.client.ChatClient
 import io.getstream.chat.android.models.User
 
+private const val TAG = "RegisterScreen"
+
 /**
  * This composable function represents the Register Screen, where users can sign up for a new
  * account. It navigates through multiple registration steps, each handling different parts of the
@@ -183,9 +185,7 @@ fun RegisterScreen(
                       userViewModel.createUserIfNew(
                           uid, username, firstName, lastName, email, phoneNumber, country, imageUrl)
                     },
-                    onError = { exception ->
-                      Log.e("ProfileUpdate", "Failed to upload new image: ${exception.message}")
-                    })
+                    onError = { exception -> Log.e(TAG, "Failed to upload new image", exception) })
               } else {
                 userViewModel.createUserIfNew(
                     uid, username, firstName, lastName, email, phoneNumber, country, "")

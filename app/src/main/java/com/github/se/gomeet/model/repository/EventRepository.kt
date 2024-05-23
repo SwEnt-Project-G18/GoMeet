@@ -253,7 +253,7 @@ class EventRepository private constructor() {
           e ->
         if (e != null) {
           // Handle error
-          Log.w("EventRepository", "Listen failed.", e)
+          Log.w(TAG, "Listen failed.", e)
           return@addSnapshotListener
         }
 

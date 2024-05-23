@@ -1,6 +1,5 @@
 package com.github.se.gomeet.viewmodel
 
-import android.content.ContentValues.TAG
 import android.content.Context
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
@@ -40,6 +39,8 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONArray
 
+private const val TAG = "EventViewModel"
+
 /**
  * ViewModel for the event. The viewModel is responsible for handling the logic that comes from the
  * UI and the repository.
@@ -76,7 +77,7 @@ class EventViewModel(val currentUID: String? = null) : ViewModel() {
                         loadBitmapFromUri(context, uri) // Load the bitmap as a BitmapDescriptor
                     _bitmapDescriptors[event.eventID] = bitmapDescriptor
                   } catch (e: Exception) {
-                    Log.e("ViewModel", "Error loading bitmap descriptor: ${e.message}")
+                    Log.e(TAG, "Error loading bitmap descriptor", e)
                     _bitmapDescriptors[event.eventID] =
                         BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)
                   }
@@ -87,7 +88,7 @@ class EventViewModel(val currentUID: String? = null) : ViewModel() {
             loadJobs.awaitAll() // Await all loading jobs
           } finally {
             lastLoadedEvents = events.toList() // Update the last loaded events
-            Log.d("ViewModel", "Finished loading custom pins")
+            Log.d(TAG, "Finished loading custom pins")
             _loading.value = false
           }
         }
@@ -116,14 +117,14 @@ class EventViewModel(val currentUID: String? = null) : ViewModel() {
                       continuation.resume(BitmapDescriptorFactory.fromBitmap(bitmap))
                     }
                         ?: run {
-                          Log.e("ViewModel", "Drawable is null after loading image.")
+                          Log.w(TAG, "Drawable is null after loading image.")
                           continuation.resumeWithException(
                               RuntimeException("Drawable is null after loading image"))
                         }
                   }
 
                   override fun onError(e: Exception?) {
-                    Log.e("ViewModel", "Error loading image from Picasso: ${e?.message}")
+                    Log.e(TAG, "Error loading image from Picasso", e)
                     continuation.resumeWithException(
                         e ?: RuntimeException("Unknown error in Picasso"))
                   }
@@ -179,7 +180,7 @@ class EventViewModel(val currentUID: String? = null) : ViewModel() {
           .addOnFailureListener { event.completeExceptionally(it) }
       event.await()
     } catch (e: Exception) {
-      Log.e("Firebase", "Error fetching event image: ${e.localizedMessage}")
+      Log.e(TAG, "Error fetching event image for event $eventId", e)
       null
     }
   }
@@ -244,7 +245,7 @@ class EventViewModel(val currentUID: String? = null) : ViewModel() {
       userViewModel: UserViewModel,
       eventId: String
   ) {
-    Log.d("CreatorID", "Creator ID is $currentUID")
+    Log.d(TAG, "User $currentUID is creating event $eventId")
     CoroutineScope(Dispatchers.IO).launch {
       try {
         val participantsWithCreator =
@@ -275,7 +276,7 @@ class EventViewModel(val currentUID: String? = null) : ViewModel() {
         userViewModel.joinEvent(event.eventID, currentUID)
         userViewModel.userCreatesEvent(event.eventID, currentUID)
       } catch (e: Exception) {
-        Log.w(TAG, "Error uploading image or adding event", e)
+        Log.e(TAG, "Error uploading image or adding event", e)
       }
     }
   }
@@ -404,7 +405,7 @@ class EventViewModel(val currentUID: String? = null) : ViewModel() {
    */
   fun cancelInvitation(event: Event, userId: String) {
     if (!event.pendingParticipants.contains(userId)) {
-      Log.w(TAG, "Event doesn't have $userId as a pendingParticipant")
+      Log.w(TAG, "Event ${event.eventID} doesn't have $userId as a pendingParticipant")
       return
     }
 
@@ -490,9 +491,9 @@ class EventViewModel(val currentUID: String? = null) : ViewModel() {
         }
         eventsList.sortByDescending { eventScoreList[it.eventID] }
 
-        Log.d("EventViewModel", "Sort success.")
+        Log.d(TAG, "Sort success")
       } else {
-        Log.d("EventViewModel", "User has no tags, no sorting done.")
+        Log.d(TAG, "User has no tags, no sorting done")
       }
     }
   }

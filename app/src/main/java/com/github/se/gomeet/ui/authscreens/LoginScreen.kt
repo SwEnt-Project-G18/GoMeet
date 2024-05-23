@@ -47,6 +47,8 @@ import com.google.firebase.ktx.Firebase
 import io.getstream.chat.android.client.ChatClient
 import io.getstream.chat.android.models.User
 
+private const val TAG = "LoginScreen"
+
 /**
  * Composable function for the Login Screen.
  *
@@ -180,7 +182,7 @@ fun LoginScreen(
                 onNavToExplore()
               } else {
                 // Handle connection failure
-                Log.e("ChatClient", "Failed to connect user: ${user.id}")
+                Log.e(TAG, "ChatClient failed to connect user: ${user.id}")
               }
             }
           }

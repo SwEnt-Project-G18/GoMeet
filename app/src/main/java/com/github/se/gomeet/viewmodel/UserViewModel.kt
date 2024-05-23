@@ -18,6 +18,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
+private const val TAG = "UserViewModel"
+
 /**
  * ViewModel for the user. The viewModel is responsible for handling the logic that comes from the
  * UI and the repository.
@@ -71,14 +73,14 @@ class UserViewModel(val currentUID: String? = null) : ViewModel() {
           _currentUser.value = user
           UserRepository.addUser(user!!)
         } catch (e: Exception) {
-          Log.w(ContentValues.TAG, "Error adding user", e)
+          Log.w(TAG, "${ContentValues.TAG}: Error adding user", e)
         }
       }
     }
     return user
   }
 
-  suspend fun getFollowers(uid: String): List<GoMeetUser> {
+  fun getFollowers(uid: String): List<GoMeetUser> {
     val followers = mutableListOf<GoMeetUser>()
     UserRepository.getAllUsers { users ->
       for (user in users) {
@@ -114,11 +116,12 @@ class UserViewModel(val currentUID: String? = null) : ViewModel() {
    */
   suspend fun getUser(uid: String): GoMeetUser? {
     return try {
-      Log.d("UID IS", "User id is $uid")
+      Log.d(TAG, "User id is $uid")
       val event = CompletableDeferred<GoMeetUser?>()
       UserRepository.getUser(uid) { t -> event.complete(t) }
       event.await()
     } catch (e: Exception) {
+      Log.e(TAG, "Error getting user $uid", e)
       null
     }
   }
@@ -175,7 +178,7 @@ class UserViewModel(val currentUID: String? = null) : ViewModel() {
       }
       editUser(goMeetUser.copy(joinedEvents = goMeetUser.joinedEvents.plus(eventId)))
     } catch (e: Exception) {
-      Log.w(ContentValues.TAG, "Couldn't join the event", e)
+      Log.w(TAG, "Couldn't join the event", e)
     }
   }
 
@@ -191,7 +194,7 @@ class UserViewModel(val currentUID: String? = null) : ViewModel() {
       val goMeetUser = getUser(userId)!!
       editUser(goMeetUser.copy(myEvents = goMeetUser.myEvents.plus(eventId)))
     } catch (e: Exception) {
-      Log.w(ContentValues.TAG, "Couldn't create the event", e)
+      Log.w(TAG, "Couldn't create the event", e)
     }
   }
 
@@ -212,9 +215,7 @@ class UserViewModel(val currentUID: String? = null) : ViewModel() {
       val goMeetUser = getUser(userId)!!
       if (goMeetUser.joinedEvents.contains(eventId) ||
           goMeetUser.pendingRequests.contains(possibleInvitation)) {
-        Log.w(
-            (ContentValues.TAG),
-            "User already joined this event or has a pending request for this event")
+        Log.w(TAG, "User already joined this event or has a pending request for this event")
         return
       }
       val possiblePreviousInvitationRefused =
@@ -242,7 +243,7 @@ class UserViewModel(val currentUID: String? = null) : ViewModel() {
               pendingRequests =
                   goMeetUser.pendingRequests.plus(Invitation(eventId, InviteStatus.PENDING))))
     } catch (e: Exception) {
-      Log.w(ContentValues.TAG, "Couldn't get the invitation", e)
+      Log.w(TAG, "User $userId couldn't get the invitation for event $eventId", e)
     }
   }
 
@@ -259,7 +260,7 @@ class UserViewModel(val currentUID: String? = null) : ViewModel() {
       val goMeetUser = getUser(userId)!!
       editUser(goMeetUser.copy(joinedEvents = goMeetUser.joinedEvents.minus(eventId)))
     } catch (e: Exception) {
-      Log.w(ContentValues.TAG, "Couldn't get kicked from the event", e)
+      Log.w(TAG, "User $userId couldn't be kicked from event $eventId", e)
     }
   }
 
@@ -283,7 +284,7 @@ class UserViewModel(val currentUID: String? = null) : ViewModel() {
             goMeetUser.copy(pendingRequests = goMeetUser.pendingRequests.minus(possibleInvitation)))
       }
     } catch (e: Exception) {
-      Log.w(ContentValues.TAG, "Couldn't cancel the invitation", e)
+      Log.w(TAG, "Couldn't cancel the invitation to event $eventId for user $userId", e)
     }
   }
 
@@ -309,7 +310,7 @@ class UserViewModel(val currentUID: String? = null) : ViewModel() {
                 pendingRequests = goMeetUser.pendingRequests.minus(possibleInvitation),
                 joinedEvents = goMeetUser.joinedEvents.plus(eventId)))
       } else {
-        Log.w(ContentValues.TAG, "Couldn't accept the invitation")
+        Log.w(TAG, "User $userId couldn't accept the invitation to event $eventId")
       }
     }
   }
@@ -343,7 +344,9 @@ class UserViewModel(val currentUID: String? = null) : ViewModel() {
 
         editUser(goMeetUser.copy(pendingRequests = updatedPendingRequests))
       } else {
-        Log.w(ContentValues.TAG, "Couldn't refuse the invitation: Invitation not found")
+        Log.w(
+            TAG,
+            "User $userId couldn't refuse the invitation to event $eventId: Invitation not found")
       }
     }
   }
@@ -354,8 +357,7 @@ class UserViewModel(val currentUID: String? = null) : ViewModel() {
    * @param uid The uid of the user to follow.
    */
   fun follow(uid: String) {
-    val currentUser = Firebase.auth.currentUser!!
-    Log.d(ContentValues.TAG, "Follow: ${currentUser.uid} following $uid")
+    Log.d(TAG, "User $currentUID started following $uid")
     CoroutineScope(Dispatchers.IO).launch {
       val senderUid = Firebase.auth.currentUser!!.uid
       val sender = getUser(senderUid)
@@ -364,7 +366,7 @@ class UserViewModel(val currentUID: String? = null) : ViewModel() {
         editUser(sender.copy(following = sender.following.plus(uid)))
         editUser(receiver.copy(followers = receiver.followers.plus(senderUid)))
       } else {
-        Log.w(ContentValues.TAG, "Couldn't follow the user: Already following")
+        Log.w(TAG, "User $currentUID couldn't follow user $uid: Already following")
       }
     }
   }
@@ -375,10 +377,9 @@ class UserViewModel(val currentUID: String? = null) : ViewModel() {
    * @param uid The uid of the user to unfollow.
    */
   fun unfollow(uid: String) {
-    val currentUser = Firebase.auth.currentUser!!
-    Log.d(ContentValues.TAG, "Unfollow: ${currentUser.uid} unfollowing $uid")
+    Log.d(TAG, "User $currentUID unfollowed $uid")
     CoroutineScope(Dispatchers.IO).launch {
-      val senderUid = currentUser.uid
+      val senderUid = currentUID!!
       val sender = getUser(senderUid)
       val receiver = getUser(uid)
       editUser(sender!!.copy(following = sender.following.minus(uid)))
@@ -397,7 +398,7 @@ class UserViewModel(val currentUID: String? = null) : ViewModel() {
       val user = getUser(uid)
       user?.username
     } catch (e: Exception) {
-      Log.e("GetUserError", "Error retrieving user: ${e.message}")
+      Log.e(TAG, "Error retrieving username of user $uid", e)
       null
     }
   }

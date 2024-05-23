@@ -30,8 +30,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -68,6 +68,8 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 import kotlinx.coroutines.launch
+
+private const val TAG = "EventInfo"
 
 /**
  * Composable function to display the details of an event.
@@ -114,7 +116,7 @@ fun MyEventInfo(
     }
   }
 
-  Log.d("EventInfo", "Organiser is $organizerId")
+  Log.d(TAG, "Organiser is $organizerId")
   Scaffold(
       topBar = {
         TopAppBar(

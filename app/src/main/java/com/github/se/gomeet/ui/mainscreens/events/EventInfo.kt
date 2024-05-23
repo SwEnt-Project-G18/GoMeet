@@ -115,21 +115,23 @@ fun EventHeader(
                       letterSpacing = 0.5.sp))
           // Add other details like rating here
           Row {
-                for (i in 1..5) {
-                  val star = if (i <= rating.value) Icons.Filled.Star else Icons.TwoTone.Star
-                  Icon(
-                      imageVector = star,
-                      contentDescription = "Rating Star",
-                      tint = MaterialTheme.colorScheme.outlineVariant,
-                      modifier = Modifier.clickable {
-                          if(rating.value == i) {
-                            rating.value = 0
-                          } else {
-                            rating.value = i
+            for (i in 1..5) {
+              val star = if (i <= rating.value) Icons.Filled.Star else Icons.TwoTone.Star
+              Icon(
+                  imageVector = star,
+                  contentDescription = "Rating Star",
+                  tint = MaterialTheme.colorScheme.outlineVariant,
+                  modifier =
+                      Modifier.clickable {
+                            if (rating.value == i) {
+                              rating.value = 0
+                            } else {
+                              rating.value = i
+                            }
                           }
-                      }.padding(4.dp))
-                }
-              }
+                          .padding(4.dp))
+            }
+          }
         }
         // Icon for settings or more options, assuming using Material Icons
         EventDateTime(day = date, time = time)

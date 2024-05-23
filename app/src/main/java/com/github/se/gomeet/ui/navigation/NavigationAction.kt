@@ -24,6 +24,8 @@ import androidx.navigation.NavHostController
 import com.github.se.gomeet.R
 import com.google.android.gms.maps.model.LatLng
 
+private const val TAG = "NavigationAction"
+
 /**
  * Data class representing a top level destination in the app.
  *
@@ -152,7 +154,7 @@ class NavigationActions(val navController: NavHostController) {
    * @param clearBackStack Whether to clear the back stack.
    */
   fun navigateTo(destination: TopLevelDestination, clearBackStack: Boolean = false) {
-    Log.d("Navigation", "Navigating to ${destination.route}, clear back stack: $clearBackStack")
+    Log.d(TAG, "Navigating to ${destination.route}, clear back stack: $clearBackStack")
     navController.navigate(destination.route) {
       if (clearBackStack) {
         popUpTo(navController.graph.findStartDestination().id) { inclusive = true }

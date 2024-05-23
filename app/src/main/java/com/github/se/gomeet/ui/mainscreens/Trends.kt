@@ -68,6 +68,8 @@ import java.util.Locale
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+private const val TAG = "Trends"
+
 /**
  * Trends screen composable. This is where the popular trends are displayed.
  *
@@ -96,9 +98,9 @@ fun Trends(
       val currentUser = userViewModel.getUser(currentUserId)
       if (currentUser != null) {
         userTags.addAll(Tag.entries.filter { currentUser.tags.contains(it.tagName) })
-        Log.d("Trends", "Current user: ${currentUser.username} with ${userTags.size} tags")
+        Log.d(TAG, "Current user: ${currentUser.username} with ${userTags.size} tags")
       } else {
-        Log.e("Trends", "Current user is null")
+        Log.e(TAG, "Current user is null")
       }
       val allEvents = eventViewModel.getAllEvents()!!.filter { !it.isPastEvent() }
       if (allEvents.isNotEmpty()) {
