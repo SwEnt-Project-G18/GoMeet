@@ -206,7 +206,7 @@ fun SearchModuleSnippet(
                         description = item.event.description,
                         organizer = item.event.creator,
                         loc = LatLng(item.event.location.latitude, item.event.location.longitude),
-                        rating = item.event.eventRatings[currentUID] ?: 0)
+                        rating = item.event.ratings[currentUID] ?: 0)
                   }) {
             Image(
                 painter = painter,

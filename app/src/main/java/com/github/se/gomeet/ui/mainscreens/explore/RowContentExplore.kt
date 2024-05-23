@@ -72,7 +72,7 @@ fun ContentInRow(
                           description = event.description,
                           organizer = event.creator,
                           loc = LatLng(event.location.latitude, event.location.longitude),
-                          rating = event.eventRatings[currentUID] ?: 0,
+                          rating = event.ratings[currentUID] ?: 0,
                           // TODO: add image
                       )
                     }) {

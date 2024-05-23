@@ -79,7 +79,7 @@ private const val TAG = "EventInfo"
  * @param eventId ID of the event
  * @param date Date of the event
  * @param time Time of the event
- * @param organizerId ID of the organizer of the event
+ * @param organiserId ID of the organizer of the event
  * @param rating Rating of the event by the current user (0 if unrated, 1-5 otherwise)
  * @param description Description of the event
  * @param loc Location of the event
@@ -93,7 +93,7 @@ fun MyEventInfo(
     eventId: String = "",
     date: String = "",
     time: String = "",
-    organizerId: String,
+    organiserId: String,
     rating: Int,
     description: String = "",
     loc: LatLng = LatLng(0.0, 0.0),
@@ -110,13 +110,13 @@ fun MyEventInfo(
 
   LaunchedEffect(Unit) {
     coroutineScope.launch {
-      organizer.value = userViewModel.getUser(organizerId)
+      organizer.value = userViewModel.getUser(organiserId)
       currentUser.value = userViewModel.getUser(Firebase.auth.currentUser!!.uid)
       myEvent.value = eventViewModel.getEvent(eventId)
     }
   }
 
-  Log.d(TAG, "Organiser is $organizerId")
+  Log.d(TAG, "Organiser is $organiserId")
   Scaffold(
       topBar = {
         TopAppBar(
@@ -158,8 +158,9 @@ fun MyEventInfo(
                       .verticalScroll(state = rememberScrollState())) {
                 EventHeader(
                     title = title,
-                    currentUser = currentUser.value!!,
-                    organizer = organizer.value!!,
+                    eventID = eventId,
+                    eventViewModel = eventViewModel,
+                    organiser = organizer.value!!,
                     rating = ratingState,
                     nav = nav,
                     date = date,

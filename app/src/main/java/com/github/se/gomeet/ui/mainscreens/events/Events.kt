@@ -95,7 +95,6 @@ fun Events(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel:
     coroutineScope.launch {
       user.value = userViewModel.getUser(currentUID)
       Log.d(TAG, "User is ${user.value!!.username} with ${user.value!!.myEvents.size} events")
-      val events = eventViewModel.getAllEvents()
       val allEvents =
           (eventViewModel.getAllEvents() ?: emptyList()).filter { e ->
             (user.value!!.myEvents.contains(e.eventID) ||

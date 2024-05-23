@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material.icons.twotone.Star
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -65,7 +64,9 @@ private const val TAG = "EventInfo"
  * EventHeader is a composable that displays the header of an event.
  *
  * @param title Title of the event
- * @param organizer Organizer of the event
+ * @param eventID ID of the event
+ * @param eventViewModel EventViewModel object to handle event operations
+ * @param organiser Organizer of the event
  * @param rating Rating of the event by the current user (0 if unrated, 1-5 otherwise)
  * @param nav NavigationActions object to handle navigation
  * @param date Date of the event
@@ -74,8 +75,9 @@ private const val TAG = "EventInfo"
 @Composable
 fun EventHeader(
     title: String,
-    currentUser: GoMeetUser,
-    organizer: GoMeetUser,
+    eventID: String,
+    eventViewModel: EventViewModel,
+    organiser: GoMeetUser,
     rating: MutableState<Int>,
     nav: NavigationActions,
     date: String,
@@ -98,14 +100,14 @@ fun EventHeader(
           Text(
               modifier =
                   Modifier.clickable {
-                        if (organizer.uid == currentUser.uid) {
+                        if (organiser.uid == eventViewModel.currentUID) {
                           nav.navigateToScreen(Route.PROFILE)
                         } else {
-                          nav.navigateToScreen(Route.OTHERS_PROFILE.replace("{uid}", organizer.uid))
+                          nav.navigateToScreen(Route.OTHERS_PROFILE.replace("{uid}", organiser.uid))
                         }
                       }
                       .testTag("Username"),
-              text = organizer.username,
+              text = organiser.username,
               style =
                   TextStyle(
                       fontSize = 16.sp,
@@ -128,6 +130,7 @@ fun EventHeader(
                             } else {
                               rating.value = i
                             }
+                            eventViewModel.updateRating(eventID, rating.value)
                           }
                           .padding(4.dp))
             }

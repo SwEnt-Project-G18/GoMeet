@@ -190,7 +190,7 @@ class NavigationActions(val navController: NavHostController) {
       date: String,
       time: String,
       organizer: String,
-      rating: Int,
+      rating: Long,
       description: String,
       loc: LatLng
   ) {
@@ -204,7 +204,6 @@ class NavigationActions(val navController: NavHostController) {
             .replace("{description}", Uri.encode(description))
             .replace("{latitude}", loc.latitude.toString())
             .replace("{longitude}", loc.longitude.toString())
-
     navController.navigate(route) { popUpTo(Route.EVENTS) { inclusive = false } }
   }
 

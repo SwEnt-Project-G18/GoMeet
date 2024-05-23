@@ -248,7 +248,7 @@ fun EventCarousel(events: List<Event>, nav: NavigationActions, currentUserId: St
                         date = dayString,
                         time = timeString,
                         organizer = event.creator,
-                        rating = event.eventRatings[currentUserId] ?: 0,
+                        rating = event.ratings[currentUserId] ?: 0,
                         description = event.description,
                         loc = LatLng(event.location.latitude, event.location.longitude))
                   }

@@ -25,7 +25,6 @@ class TrendsTest {
 
     composeTestRule.setContent {
       Trends(
-          currentUserId = uid,
           nav = NavigationActions(rememberNavController()),
           userViewModel = UserViewModel(),
           eventViewModel = EventViewModel(uid))

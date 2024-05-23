@@ -4,6 +4,27 @@ import com.github.se.gomeet.model.event.location.Location
 import java.time.LocalDate
 import java.time.LocalTime
 
+// Constants for the keys in the Firestore database
+const val EVENT_ID = "uid"
+const val CREATOR = "creator"
+const val TITLE = "title"
+const val DESCRIPTION = "description"
+const val LOCATION = "location"
+const val DATE = "date"
+const val TIME = "time"
+const val PRICE = "price"
+const val URL = "url"
+const val PENDING_PARTICIPANTS = "pendingParticipants"
+const val PARTICIPANTS = "participants"
+const val VISIBLE_TO_IF_PRIVATE = "visibleToIfPrivate"
+const val MAX_PARTICIPANTS = "maxParticipants"
+const val PUBLIC = "public"
+const val TAGS = "tags"
+const val IMAGES = "images"
+const val RATINGS = "ratings"
+const val POSTS = "posts"
+
+
 /**
  * This data class represents an event. An event is the main entity of the application.
  *
@@ -21,7 +42,7 @@ import java.time.LocalTime
  * @param maxParticipants Maximum number of Participants of the event
  * @param public True if the event is public, false if it's private
  * @param tags Tags of the event
- * @param eventRatings Ratings of the event by each user (i.e. userID -> rating)
+ * @param ratings Ratings of the event by each user (i.e. userID -> rating)
  * @param images Images of the event
  * @param posts Posts of the event >>>>>>> a0979603ee96764731490b732fddd35bdc089325
  */
@@ -42,7 +63,7 @@ data class Event(
     val public: Boolean,
     val tags: List<String> = emptyList(),
     val images: List<String> = emptyList(),
-    val eventRatings: Map<String, Int> = emptyMap(),
+    val ratings: Map<String, Long> = emptyMap(),
     val posts: List<Post> = emptyList()
 ) {
 

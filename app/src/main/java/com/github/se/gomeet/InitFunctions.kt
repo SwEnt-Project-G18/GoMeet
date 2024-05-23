@@ -16,6 +16,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.github.se.gomeet.model.event.*
 import com.github.se.gomeet.ui.authscreens.LoginScreen
 import com.github.se.gomeet.ui.authscreens.WelcomeScreen
 import com.github.se.gomeet.ui.authscreens.register.RegisterScreen
@@ -411,7 +412,7 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
                 date = updatedEvent.getDateString(),
                 time = updatedEvent.getTimeString(),
                 organizer = updatedEvent.creator,
-                rating = updatedEvent.eventRatings[eventViewModel.value.currentUID ?: ""] ?: 0,
+                rating = updatedEvent.ratings[eventViewModel.value.currentUID ?: ""] ?: 0,
                 description = updatedEvent.description,
                 loc = LatLng(updatedEvent.location.latitude, updatedEvent.location.longitude))
           }
@@ -535,6 +536,10 @@ private fun connectChatClient(
  */
 fun debug() {
   val androidLocalhost = "10.0.2.2"
+  Firebase.auth.signOut()
+  Firebase.firestore.clearPersistence()
+  // It's best to sign out and clear cache at each run if you're testing. Avoids
+  // unexpected Firebase issues.
   Firebase.firestore.useEmulator(androidLocalhost, 8080)
   Firebase.auth.useEmulator(androidLocalhost, 9099)
   Firebase.storage.useEmulator(androidLocalhost, 9199)

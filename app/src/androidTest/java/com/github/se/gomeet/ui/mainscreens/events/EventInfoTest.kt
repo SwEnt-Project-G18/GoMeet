@@ -111,7 +111,7 @@ class EventInfoTest {
           eventId = eventId,
           date = eventDate,
           time = eventTime,
-          organizerId = organiserId,
+          organiserId = organiserId,
           rating = eventRating,
           description = eventDescription,
           loc = eventLocation,

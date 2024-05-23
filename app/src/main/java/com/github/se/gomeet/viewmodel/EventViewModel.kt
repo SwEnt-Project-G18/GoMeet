@@ -311,6 +311,10 @@ class EventViewModel(val currentUID: String? = null) : ViewModel() {
     editEvent(event.copy(posts = updatedPosts))
   }
 
+    fun updateRating(eventID: String, rating: Int) {
+        viewModelScope.launch { EventRepository.updateRating(eventID, rating, currentUID!!) }
+    }
+
   /**
    * Remove an event by its UID.
    *

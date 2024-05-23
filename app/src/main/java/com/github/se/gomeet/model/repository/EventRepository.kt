@@ -1,14 +1,13 @@
 package com.github.se.gomeet.model.repository
 
 import android.util.Log
-import com.github.se.gomeet.model.event.Event
-import com.github.se.gomeet.model.event.Post
-import com.github.se.gomeet.model.event.location.Location
-import com.github.se.gomeet.model.repository.EventRepository.Companion.toEvent
+import com.github.se.gomeet.model.event.*
+import com.github.se.gomeet.model.event.location.*
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.MetadataChanges
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.tasks.await
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -58,12 +57,12 @@ class EventRepository private constructor() {
               val event = document.data!!.toEvent(uid)
               callback(event)
             } else {
-              Log.d(TAG, "No such document")
+              Log.w(TAG, "No such document")
               callback(null)
             }
           }
           .addOnFailureListener { exception ->
-            Log.d(TAG, "get failed with ", exception)
+            Log.e(TAG, "getEvent() failed", exception)
             callback(null)
           }
     }
@@ -121,6 +120,17 @@ class EventRepository private constructor() {
           .addOnFailureListener { e -> Log.w(TAG, "Error updating document", e) }
     }
 
+      suspend fun updateRating(eventID: String, rating: Int, currentUID: String) {
+          val ratings = Firebase.firestore.collection(EVENT_COLLECTION).document(eventID).get().await().get(RATINGS) as MutableMap<String, Long>
+          Log.d(TAG, "Updating rating for event $eventID with rating $rating and currentUID $currentUID, current ratings are $ratings")
+          ratings[currentUID] = rating.toLong()
+            val documentRef = Firebase.firestore.collection(EVENT_COLLECTION).document(eventID)
+            documentRef
+                .update(RATINGS, ratings)
+                .addOnSuccessListener { Log.d(TAG, "Rating of event $eventID was successfully updated!") }
+                .addOnFailureListener { e -> Log.w(TAG, "Error updating rating of event $eventID", e) }
+      }
+
     /**
      * This function removes an event from the database
      *
@@ -143,24 +153,24 @@ class EventRepository private constructor() {
      */
     private fun Event.toMap(): Map<String, Any?> {
       return mapOf(
-          "uid" to eventID,
-          "creator" to creator,
-          "title" to title,
-          "description" to description,
-          "location" to location.toMap(),
-          "date" to date.toString(),
-          "time" to time.toString(),
-          "price" to price,
-          "url" to url,
-          "pendingParticipants" to pendingParticipants,
-          "participants" to participants,
-          "visibleToIfPrivate" to visibleToIfPrivate,
-          "maxParticipants" to maxParticipants,
-          "public" to public,
-          "tags" to tags,
-          "images" to images,
-          "eventRatings" to eventRatings,
-          "posts" to posts.map { it.toMap() })
+          EVENT_ID to eventID,
+          CREATOR to creator,
+          TITLE to title,
+          DESCRIPTION to description,
+          LOCATION to location.toMap(),
+          DATE to date.toString(),
+          TIME to time.toString(),
+          PRICE to price,
+          URL to url,
+          PENDING_PARTICIPANTS to pendingParticipants,
+          PARTICIPANTS to participants,
+          VISIBLE_TO_IF_PRIVATE to visibleToIfPrivate,
+          MAX_PARTICIPANTS to maxParticipants,
+          PUBLIC to public,
+          TAGS to tags,
+          IMAGES to images,
+          RATINGS to ratings,
+          POSTS to posts.map { it.toMap() })
     }
 
     /**
@@ -169,7 +179,7 @@ class EventRepository private constructor() {
      * @return the map of the location
      */
     private fun Location.toMap(): Map<String, Any> {
-      return mapOf("latitude" to latitude, "longitude" to longitude, "name" to name)
+      return mapOf(LATITUDE to latitude, LONGITUDE to longitude, NAME to name)
     }
 
     /**
@@ -196,24 +206,24 @@ class EventRepository private constructor() {
      */
     private fun Map<String, Any>.toEvent(id: String? = null): Event {
       return Event(
-          eventID = id ?: this["uid"] as? String ?: "",
-          creator = this["creator"] as? String ?: "",
-          title = this["title"] as? String ?: "",
-          description = this["description"] as? String ?: "",
-          location = (this["location"] as? Map<String, Any>)?.toLocation() ?: Location(.0, .0, ""),
-          date = LocalDate.parse(this["date"] as? String ?: ""),
-          time = LocalTime.parse(this["time"] as? String ?: "00:00"),
-          price = this["price"] as? Double ?: 0.0,
-          url = this["url"] as? String ?: "",
-          pendingParticipants = this["pendingParticipants"] as? List<String> ?: emptyList(),
-          participants = this["participants"] as? List<String> ?: emptyList(),
-          visibleToIfPrivate = this["visibleToIfPrivate"] as? List<String> ?: emptyList(),
-          maxParticipants = (this["maxParticipants"] as? String)?.toIntOrNull() ?: 0,
-          public = this["public"] as? Boolean ?: false,
-          tags = this["tags"] as? List<String> ?: emptyList(),
-          images = this["images"] as? List<String> ?: emptyList(),
-          eventRatings = this["eventRatings"] as? Map<String, Int> ?: emptyMap(),
-          posts = (this["posts"] as? List<Map<String, Any>> ?: emptyList()).map { it.toPost() })
+          eventID = id ?: this[EVENT_ID] as? String ?: "",
+          creator = this[CREATOR] as? String ?: "",
+          title = this[TITLE] as? String ?: "",
+          description = this[DESCRIPTION] as? String ?: "",
+          location = (this[LOCATION] as? Map<String, Any>)?.toLocation() ?: Location(.0, .0, ""),
+          date = LocalDate.parse(this[DATE] as? String ?: ""),
+          time = LocalTime.parse(this[TIME] as? String ?: "00:00"),
+          price = this[PRICE] as? Double ?: 0.0,
+          url = this[URL] as? String ?: "",
+          pendingParticipants = this[PENDING_PARTICIPANTS] as? List<String> ?: emptyList(),
+          participants = this[PARTICIPANTS] as? List<String> ?: emptyList(),
+          visibleToIfPrivate = this[VISIBLE_TO_IF_PRIVATE] as? List<String> ?: emptyList(),
+          maxParticipants = (this[MAX_PARTICIPANTS] as? String)?.toIntOrNull() ?: 0,
+          public = this[PUBLIC] as? Boolean ?: false,
+          tags = this[TAGS] as? List<String> ?: emptyList(),
+          images = this[IMAGES] as? List<String> ?: emptyList(),
+          ratings = this[RATINGS] as? Map<String, Long> ?: emptyMap(),
+          posts = (this[POSTS] as? List<Map<String, Any>> ?: emptyList()).map { it.toPost() })
     }
 
     /**
@@ -223,9 +233,9 @@ class EventRepository private constructor() {
      */
     private fun Map<String, Any>.toLocation(): Location {
       return Location(
-          latitude = this["latitude"] as Double,
-          longitude = this["longitude"] as Double,
-          name = this["name"] as String)
+          latitude = this[LATITUDE] as Double,
+          longitude = this[LONGITUDE] as Double,
+          name = this[NAME] as String)
     }
 
     private fun Map<String, Any>.toPost(): Post {
@@ -248,7 +258,7 @@ class EventRepository private constructor() {
      * in the database accordingly to what this function listens to
      */
     private fun startListeningForEvents() {
-      Firebase.firestore.collection("events").addSnapshotListener(MetadataChanges.INCLUDE) {
+      Firebase.firestore.collection(EVENT_COLLECTION).addSnapshotListener(MetadataChanges.INCLUDE) {
           snapshot,
           e ->
         if (e != null) {

@@ -1,3 +1,4 @@
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -42,6 +43,8 @@ import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.android.gms.maps.model.LatLng
+
+private const val TAG = "EventWidget"
 
 /**
  * A composable function that displays detailed information about an event in a card layout. This
@@ -94,7 +97,7 @@ fun EventWidget(event: Event, verified: Boolean, nav: NavigationActions, userVM:
                     description = event.description,
                     organizer = event.creator,
                     loc = LatLng(event.location.latitude, event.location.longitude),
-                    rating = event.eventRatings[userVM.currentUID!!] ?: 0,
+                    rating = event.ratings[userVM.currentUID!!] ?: 0,
                 )
               },
       colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),

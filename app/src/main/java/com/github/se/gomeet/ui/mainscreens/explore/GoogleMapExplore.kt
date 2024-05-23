@@ -206,7 +206,7 @@ internal fun GoogleMapView(
                           description = event.description,
                           organizer = event.creator,
                           loc = LatLng(event.location.latitude, event.location.longitude),
-                          rating = event.eventRatings[eventViewModel.currentUID!!] ?: 0,
+                          rating = event.ratings[eventViewModel.currentUID!!] ?: 0,
                           // TODO: add image
                       )
                     },
