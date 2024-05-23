@@ -228,6 +228,7 @@ fun MyEventInfo(
                   Spacer(Modifier.height(10.dp))
                   Text(
                       text = "No updates about this event at the moment.",
+                      color = MaterialTheme.colorScheme.tertiary,
                       modifier = Modifier.align(Alignment.CenterHorizontally),
                       style = MaterialTheme.typography.bodyLarge)
                   Spacer(Modifier.height(screenHeight / 50))

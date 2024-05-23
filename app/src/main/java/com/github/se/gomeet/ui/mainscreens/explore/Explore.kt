@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -59,7 +57,6 @@ import kotlinx.coroutines.tasks.await
  * @param nav The navigation actions.
  * @param eventViewModel The event view model.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
   val coroutineScope = rememberCoroutineScope()
@@ -95,7 +92,6 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
   val query = remember { mutableStateOf("") }
   val currentPosition = remember { mutableStateOf(defaultPosition) }
   var isMapLoaded by remember { mutableStateOf(false) }
-  val selectedEvent = remember { mutableStateOf<Event?>(null) }
   LaunchedEffect(Unit) {
     if (locationPermissionsAlreadyGranted) {
       locationPermitted.value = true
@@ -156,7 +152,6 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
           moveToCurrentLocation.value = CameraAction.MOVE
           Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
             GoogleMapView(
-                selectedEvent = selectedEvent,
                 currentPosition = currentPosition,
                 allEvents = nonFilteredEvents,
                 events = eventList,
@@ -166,11 +161,7 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
                 eventViewModel = eventViewModel,
                 nav = nav)
             Column(modifier = Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Bottom) {
-              ContentInRow(
-                  selectedEvent = selectedEvent,
-                  listState = rememberLazyListState(),
-                  eventList = eventList,
-                  nav = nav)
+              ContentInRow(listState = rememberLazyListState(), eventList = eventList, nav = nav)
             }
           }
         } else {
@@ -179,17 +170,9 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
           }
         }
 
-        val isDarkTheme = isSystemInDarkTheme()
-        val backgroundColor =
-            if (isDarkTheme) {
-              MaterialTheme.colorScheme.primaryContainer
-            } else {
-              MaterialTheme.colorScheme.background
-            }
-
         SearchModule(
             nav = nav,
-            backgroundColor = backgroundColor,
+            backgroundColor = MaterialTheme.colorScheme.background,
             contentColor = MaterialTheme.colorScheme.tertiary)
       }
 }

@@ -71,7 +71,6 @@ internal val isButtonVisible = mutableStateOf(true)
 /**
  * The GoogleMapView composable displays a Google Map with custom pins for events.
  *
- * @param selectedEvent Event that have been clicked on
  * @param modifier The modifier of the map
  * @param currentPosition The current position of the user
  * @param content The content of the map
@@ -84,7 +83,6 @@ internal val isButtonVisible = mutableStateOf(true)
  */
 @Composable
 internal fun GoogleMapView(
-    selectedEvent: MutableState<Event?>,
     modifier: Modifier = Modifier,
     currentPosition: MutableState<LatLng>,
     content: @Composable () -> Unit = {},
@@ -98,9 +96,9 @@ internal fun GoogleMapView(
 
   val ctx = LocalContext.current
   val coroutineScope = rememberCoroutineScope()
-  var selected by remember { mutableStateOf(false) }
 
-  val eventLocations = events.value.map { event -> LatLng(event.location.latitude, event.location.longitude) }
+  val eventLocations =
+      events.value.map { event -> LatLng(event.location.latitude, event.location.longitude) }
   val eventStates = eventLocations.map { location -> rememberMarkerState(position = location) }
 
   val uiSettings by remember {
@@ -108,7 +106,9 @@ internal fun GoogleMapView(
         MapUiSettings(
             compassEnabled = false, zoomControlsEnabled = false, myLocationButtonEnabled = false))
   }
+
   val isDarkTheme = isSystemInDarkTheme()
+
   val mapProperties by remember {
     mutableStateOf(
         MapProperties(
@@ -118,7 +118,9 @@ internal fun GoogleMapView(
                 MapStyleOptions.loadRawResourceStyle(
                     ctx, if (isDarkTheme) R.raw.map_style_dark else R.raw.map_style_light)))
   }
+
   val mapVisible by remember { mutableStateOf(true) }
+
   val cameraPositionState = rememberCameraPositionState()
 
   LaunchedEffect(moveToCurrentLocation.value, Unit) {
@@ -161,12 +163,9 @@ internal fun GoogleMapView(
     if (visibleRegion != null) {
       val bounds = LatLngBounds(visibleRegion.nearLeft, visibleRegion.farRight)
       events.value =
-          allEvents.value.filter { e ->
-            bounds.contains(LatLng(e.location.latitude, e.location.longitude))
+          allEvents.value.filter { event ->
+            bounds.contains(LatLng(event.location.latitude, event.location.longitude))
           }
-      if (!events.value.contains(selectedEvent.value)){
-          selectedEvent.value = null
-      }
     }
   }
 
@@ -190,14 +189,10 @@ internal fun GoogleMapView(
                     }
               }
             },
-            onMapClick = {
-              isButtonVisible.value = true
-              selectedEvent.value = null
-            },
+            onMapClick = { isButtonVisible.value = true },
             onPOIClick = {}) {
-              val markerClick: (Event) -> Boolean = { e ->
+              val markerClick: () -> Boolean = {
                 isButtonVisible.value = false
-                selectedEvent.value = e
                 false
               }
               events.value.forEachIndexed { index, event ->
@@ -230,7 +225,7 @@ internal fun GoogleMapView(
                         customPinBitmapDescriptor
                             ?: BitmapDescriptorFactory.defaultMarker(
                                 BitmapDescriptorFactory.HUE_RED),
-                    onClick = { markerClick(event) },
+                    onClick = { markerClick() },
                     onInfoWindowClick = {
                       nav.navigateToEventInfo(
                           eventId = event.eventID,
