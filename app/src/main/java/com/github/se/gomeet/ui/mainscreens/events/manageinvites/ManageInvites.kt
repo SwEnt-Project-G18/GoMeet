@@ -96,7 +96,9 @@ fun ManageInvites(
       if (following.isNotEmpty()) {
         following.forEach {
           val followingUser = userViewModel.getUser(it)
-          followersFollowingList.add(followingUser!!)
+          if (!followers.contains(followingUser!!.uid)) {
+            followersFollowingList.add(followingUser)
+          }
         }
       }
       isLoaded = true
@@ -331,12 +333,12 @@ private fun inviteAction(
  */
 @OptIn(ExperimentalFoundationApi::class)
 private fun pagerWeight(pagerState: PagerState, button: String): FontWeight {
-  if ((pagerState.currentPage == TO_INVITE.ordinal && button == TO_INVITE.formattedName) ||
+  return if ((pagerState.currentPage == TO_INVITE.ordinal && button == TO_INVITE.formattedName) ||
       (pagerState.currentPage == PENDING.ordinal && button == PENDING.formattedName) ||
       (pagerState.currentPage == ACCEPTED.ordinal && button == ACCEPTED.formattedName) ||
       (pagerState.currentPage == REFUSED.ordinal && button == REFUSED.formattedName))
-      return FontWeight.Bold
-  else return FontWeight.Normal
+      FontWeight.Bold
+  else FontWeight.Normal
 }
 
 /**
@@ -357,8 +359,8 @@ fun pendingRequests(
     val possiblePreviousInvitationRefused =
         user.pendingRequests.find { it.eventId == event.eventID && it.status == REFUSED }
 
-    if (user.pendingRequests.contains(possiblePreviousInvitationRefused)) {
-      return user.pendingRequests
+    return if (user.pendingRequests.contains(possiblePreviousInvitationRefused)) {
+      user.pendingRequests
           .map {
             if (it == possiblePreviousInvitationRefused) {
               it.copy(status = PENDING)
@@ -368,7 +370,7 @@ fun pendingRequests(
           }
           .toSet()
     } else {
-      return user.pendingRequests.plus(Invitation(event.eventID, status ?: PENDING))
+      user.pendingRequests.plus(Invitation(event.eventID, status ?: PENDING))
     }
   } else {
     return user.pendingRequests.minus(Invitation(event.eventID, status ?: PENDING))

@@ -4,17 +4,15 @@ import android.net.Uri
 import android.util.Log
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.AccountCircle
-import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.AddCircle
 import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -98,7 +96,7 @@ val TOP_LEVEL_DESTINATIONS =
         TopLevelDestination(route = Route.TRENDS, icon = Icons.Default.Home, textId = Route.TRENDS),
         TopLevelDestination(
             route = Route.EXPLORE, icon = Icons.Default.Home, textId = Route.EXPLORE),
-        TopLevelDestination(route = Route.CREATE, icon = Icons.Default.Add, textId = Route.CREATE),
+        TopLevelDestination(Route.NOTIFICATIONS, Icons.Default.Notifications, Route.NOTIFICATIONS),
         TopLevelDestination(
             route = Route.PROFILE, icon = Icons.Default.Person, textId = Route.PROFILE))
 
@@ -222,7 +220,7 @@ fun getIconForRoute(route: String): ImageVector {
     Route.EVENTS -> Icons.Outlined.DateRange
     Route.TRENDS -> ImageVector.vectorResource(R.drawable.arrow_trending)
     Route.EXPLORE -> Icons.Outlined.Home
-    Route.CREATE -> Icons.Outlined.AddCircle
+    Route.NOTIFICATIONS -> Icons.Outlined.Notifications
     Route.PROFILE -> Icons.Outlined.Person
     else -> Icons.Outlined.AccountCircle
   }
@@ -239,7 +237,7 @@ fun getIconForSelectedRoute(route: String): ImageVector {
     Route.EVENTS -> Icons.Filled.DateRange
     Route.TRENDS -> ImageVector.vectorResource(R.drawable.arrow_trending)
     Route.EXPLORE -> Icons.Filled.Home
-    Route.CREATE -> Icons.Filled.AddCircle
+    Route.NOTIFICATIONS -> Icons.Filled.Notifications
     Route.PROFILE -> Icons.Filled.Person
     else -> Icons.Filled.AccountCircle
   }

@@ -118,9 +118,15 @@ class EndToEndTest : TestCase() {
     }
 
     ComposeScreen.onComposeScreen<ExploreScreen>(composeTestRule) {
-      step("Go to Create") {
-        composeTestRule.onNodeWithText("Create").assertIsDisplayed().performClick()
+      step("Go to Events") {
+        composeTestRule.onNodeWithText("Events").assertIsDisplayed().performClick()
       }
+    }
+
+    composeTestRule.waitForIdle()
+
+    ComposeScreen.onComposeScreen<EventsScreen>(composeTestRule) {
+      composeTestRule.onNodeWithTag("CreateEventButton").assertIsDisplayed().performClick()
     }
 
     composeTestRule.waitForIdle()
