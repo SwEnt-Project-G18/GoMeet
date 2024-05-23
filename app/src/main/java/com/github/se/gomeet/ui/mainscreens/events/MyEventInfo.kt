@@ -167,7 +167,7 @@ fun MyEventInfo(
                       onDismissRequest = { expanded = false }
                   ) {
                       DropdownMenuItem(
-                          text = { Text("Share Event") },
+                          text = { Text("Share Event", modifier = Modifier.padding(10.dp)) },
                           onClick = {
                               expanded = false
                               showShareEventDialog = true
