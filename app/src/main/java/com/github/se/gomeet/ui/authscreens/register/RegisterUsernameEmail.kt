@@ -76,6 +76,7 @@ fun RegisterUsernameEmail(
         Text(
             text = "Welcome to GoMeet !\nPlease enter a username and an email.",
             modifier = Modifier.fillMaxWidth().testTag("Text"),
+            color = MaterialTheme.colorScheme.onBackground,
             style = MaterialTheme.typography.titleMedium,
             textAlign = TextAlign.Center)
 

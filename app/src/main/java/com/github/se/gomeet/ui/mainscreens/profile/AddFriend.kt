@@ -93,6 +93,7 @@ fun AddFriend(nav: NavigationActions, userViewModel: UserViewModel) {
               modifier = Modifier.padding(start = 18.dp)) {
                 Text(
                     text = "Find User",
+                    color = MaterialTheme.colorScheme.onBackground,
                     style =
                         MaterialTheme.typography.headlineSmall.copy(
                             fontWeight = FontWeight.SemiBold))

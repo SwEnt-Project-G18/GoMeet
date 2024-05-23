@@ -49,6 +49,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
@@ -125,6 +126,7 @@ fun Profile(
                     .testTag("TopBar")) {
               Text(
                   text = "My Profile",
+                  color = MaterialTheme.colorScheme.onBackground,
                   style =
                       MaterialTheme.typography.headlineMedium.copy(
                           fontWeight = FontWeight.SemiBold))
@@ -167,15 +169,20 @@ fun Profile(
                         Modifier.fillMaxWidth()
                             .padding(start = screenWidth / 20)
                             .testTag("UserInfo")) {
-                      ProfileImage(userId = userId, modifier = Modifier.testTag("Profile Picture"))
+                      ProfileImage(
+                          userId = userId,
+                          modifier = Modifier.testTag("Profile Picture"),
+                          size = 101.dp)
                       Column(modifier = Modifier.padding(start = screenWidth / 20)) {
                         Text(
                             (currentUser?.firstName + " " + currentUser?.lastName),
                             textAlign = TextAlign.Center,
+                            color = MaterialTheme.colorScheme.onBackground,
                             style = MaterialTheme.typography.titleLarge)
 
                         Text(
                             text = ("@" + currentUser?.username),
+                            color = MaterialTheme.colorScheme.onBackground,
                             style = MaterialTheme.typography.bodyLarge)
                       }
                     }
@@ -232,10 +239,12 @@ fun Profile(
                               }) {
                             Text(
                                 text = currentUser?.myEvents?.size.toString(),
+                                color = MaterialTheme.colorScheme.onBackground,
                                 style = MaterialTheme.typography.titleLarge,
                                 modifier = Modifier.align(Alignment.CenterHorizontally))
                             Text(
                                 text = "Events",
+                                color = MaterialTheme.colorScheme.onBackground,
                                 style = MaterialTheme.typography.bodyMedium,
                                 modifier = Modifier.align(Alignment.CenterHorizontally))
                           }
@@ -246,10 +255,12 @@ fun Profile(
                               }) {
                             Text(
                                 text = currentUser?.followers?.size.toString(),
+                                color = MaterialTheme.colorScheme.onBackground,
                                 style = MaterialTheme.typography.titleLarge,
                                 modifier = Modifier.align(Alignment.CenterHorizontally))
                             Text(
                                 text = "Followers",
+                                color = MaterialTheme.colorScheme.onBackground,
                                 style = MaterialTheme.typography.bodyMedium,
                                 modifier = Modifier.align(Alignment.CenterHorizontally))
                           }
@@ -260,10 +271,12 @@ fun Profile(
                               }) {
                             Text(
                                 text = currentUser?.following?.size.toString(),
+                                color = MaterialTheme.colorScheme.onBackground,
                                 style = MaterialTheme.typography.titleLarge,
                                 modifier = Modifier.align(Alignment.CenterHorizontally))
                             Text(
                                 text = "Following",
+                                color = MaterialTheme.colorScheme.onBackground,
                                 style = MaterialTheme.typography.bodyMedium,
                                 modifier = Modifier.align(Alignment.CenterHorizontally))
                           }
@@ -282,6 +295,7 @@ fun Profile(
                             content = {
                               Text(
                                   text = currentUser!!.tags[index],
+                                  color = MaterialTheme.colorScheme.onBackground,
                                   style = MaterialTheme.typography.labelLarge)
                             },
                             colors =
@@ -309,7 +323,8 @@ fun Profile(
 fun ProfileImage(
     userId: String,
     modifier: Modifier = Modifier,
-    defaultImageResId: Int = R.drawable.gomeet_logo
+    defaultImageResId: Int = R.drawable.gomeet_logo,
+    size: Dp
 ) {
   var profilePictureUrl by remember { mutableStateOf<String?>(null) }
 
@@ -334,7 +349,7 @@ fun ProfileImage(
       contentDescription = "Profile picture",
       modifier =
           modifier
-              .size(101.dp)
+              .size(size)
               .clip(CircleShape)
               .background(color = MaterialTheme.colorScheme.background),
       contentScale = ContentScale.Crop)

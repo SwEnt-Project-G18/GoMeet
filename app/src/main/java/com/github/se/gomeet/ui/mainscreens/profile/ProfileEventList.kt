@@ -24,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -56,11 +57,11 @@ fun ProfileEventsList(
     Row(Modifier.testTag("EventsListHeader"), verticalAlignment = Alignment.CenterVertically) {
       Text(
           text = title,
+          color = MaterialTheme.colorScheme.onBackground,
           style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.W400))
       Spacer(modifier = Modifier.width(10.dp))
       ClickableText(
-          style =
-              MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.primary),
+          style = MaterialTheme.typography.bodyMedium.copy(color = Gray),
           onClick = { // TODO: Go to List of Events
           },
           text = AnnotatedString(text = "View All >"))
@@ -117,9 +118,13 @@ fun ProfileEventsList(
                               .clip(RoundedCornerShape(size = 10.dp)))
                   Spacer(modifier = Modifier.height(2.dp))
 
-                  Text(text = event.title, style = MaterialTheme.typography.bodyLarge)
+                  Text(
+                      text = event.title,
+                      color = MaterialTheme.colorScheme.onBackground,
+                      style = MaterialTheme.typography.bodyLarge)
                   Text(
                       text = event.date.toString(),
+                      color = MaterialTheme.colorScheme.onBackground,
                       style =
                           MaterialTheme.typography.bodyLarge.copy(
                               color = MaterialTheme.colorScheme.primary))
