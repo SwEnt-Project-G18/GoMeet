@@ -14,7 +14,6 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -41,77 +40,85 @@ import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.google.android.gms.maps.model.LatLng
 
 @SuppressLint("SuspiciousIndentation")
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ContentInRow(
+    selectedEvent: MutableState<Event?>,
     listState: LazyListState,
     eventList: MutableState<List<Event>>,
     nav: NavigationActions
 ) {
 
-    val events = eventList.value
-        Column (horizontalAlignment = Alignment.CenterHorizontally) {
-            val configuration = LocalConfiguration.current
-            val screenHeight = configuration.screenHeightDp.dp
-            val screenWidth = configuration.screenWidthDp
-            LazyRow(horizontalArrangement = Arrangement.Start, modifier = Modifier.padding(start = 10.dp, bottom = 10.dp), state = listState) {
-                items(events) { event ->
-                    Column(modifier = Modifier
-                        .padding(end = 10.dp)
-                        .shadow(elevation = 10.dp, shape = RoundedCornerShape(10.dp))
-                        .background(MaterialTheme.colorScheme.background, RoundedCornerShape(10.dp))
-                        .fillMaxWidth()) {
-                        Card(
-                            shape = RoundedCornerShape(10.dp),
-                            modifier =
-                            Modifier
-                                .size(width = (screenWidth/1.35).dp, height = screenHeight / 6)
+  val events = eventList.value
+  Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp.dp
+    val screenWidth = configuration.screenWidthDp
+    LazyRow(
+        horizontalArrangement = Arrangement.Start,
+        modifier = Modifier.padding(start = 10.dp, bottom = 10.dp),
+        state = listState) {
+          items(events) { event ->
+            if (selectedEvent.value == null || selectedEvent.value == event) {
+              Column(
+                  modifier =
+                      Modifier.padding(end = 10.dp)
+                          .shadow(elevation = 10.dp, shape = RoundedCornerShape(10.dp))
+                          .background(
+                              MaterialTheme.colorScheme.background, RoundedCornerShape(10.dp))
+                          .fillMaxWidth()) {
+                    Card(
+                        shape = RoundedCornerShape(10.dp),
+                        modifier =
+                            Modifier.size(
+                                    width = (screenWidth / 1.35).dp, height = screenHeight / 6)
                                 .padding(10.dp)
                                 .clickable {
-                                nav.navigateToEventInfo(
-                                    eventId = event.eventID,
-                                    title = event.title,
-                                    date = getEventDateString(event.date),
-                                    time = getEventTimeString(event.time),
-                                    description = event.description,
-                                    organizer = event.creator,
-                                    loc = LatLng(event.location.latitude, event.location.longitude),
-                                    rating = 0.0 // TODO: replace with actual rating
-                                    // TODO: add image
-                                )
-                            }) {
-                            val painter: Painter =
-                                if (event.images.isNotEmpty()) {
-                                    rememberAsyncImagePainter(
-                                        ImageRequest.Builder(LocalContext.current)
-                                            .data(data = event.images[0])
-                                            .apply {
-                                                crossfade(true)
-                                                placeholder(R.drawable.gomeet_logo)
-                                            }
-                                            .build())
-                                } else {
-                                    painterResource(id = R.drawable.gomeet_logo)
-                                }
-                            Image(
-                                painter = painter,
-                                contentDescription = "Event Image",
-                                alignment = Alignment.Center,
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(16.dp)))
+                                  nav.navigateToEventInfo(
+                                      eventId = event.eventID,
+                                      title = event.title,
+                                      date = getEventDateString(event.date),
+                                      time = getEventTimeString(event.time),
+                                      description = event.description,
+                                      organizer = event.creator,
+                                      loc =
+                                          LatLng(event.location.latitude, event.location.longitude),
+                                      rating = 0.0 // TODO: replace with actual rating
+                                      // TODO: add image
+                                      )
+                                }) {
+                          val painter: Painter =
+                              if (event.images.isNotEmpty()) {
+                                rememberAsyncImagePainter(
+                                    ImageRequest.Builder(LocalContext.current)
+                                        .data(data = event.images[0])
+                                        .apply {
+                                          crossfade(true)
+                                          placeholder(R.drawable.gomeet_logo)
+                                        }
+                                        .build())
+                              } else {
+                                painterResource(id = R.drawable.gomeet_logo)
+                              }
+                          Image(
+                              painter = painter,
+                              contentDescription = "Event Image",
+                              alignment = Alignment.Center,
+                              contentScale = ContentScale.Crop,
+                              modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(16.dp)))
                         }
-                        Column(modifier = Modifier.padding(8.dp)) {
-                            Text(
-                                text = event.title,
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.tertiary)
-                            Text(
-                                text = eventMomentToString(event.date, event.time),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.tertiary)
-                        }
+                    Column(modifier = Modifier.padding(8.dp)) {
+                      Text(
+                          text = event.title,
+                          style = MaterialTheme.typography.bodyLarge,
+                          color = MaterialTheme.colorScheme.tertiary)
+                      Text(
+                          text = eventMomentToString(event.date, event.time),
+                          style = MaterialTheme.typography.bodyMedium,
+                          color = MaterialTheme.colorScheme.tertiary)
                     }
-                }
+                  }
             }
+          }
         }
+  }
 }
