@@ -21,25 +21,27 @@ import java.time.LocalTime
  * @param maxParticipants Maximum number of Participants of the event
  * @param public True if the event is public, false if it's private
  * @param tags Tags of the event
- * @param images Is it the right type?
+ * @param images Images of the event
+ * @param posts Posts of the event
  */
 data class Event(
-    val eventID: String, // Event's uid
-    val creator: String, // Creator of the event
-    val title: String, // title of the event
-    val description: String, // Description of the event
-    val location: Location, // Location of the event
-    val date: LocalDate, // Date of the event
-    val time: LocalTime, // Time of the event
-    val price: Double, // price of the Event
-    val url: String, // Website of the event (can be ticketLink)
-    val pendingParticipants: List<String>, // Pending users invitations to the event
-    var participants: List<String>, // People participating to the event
-    val visibleToIfPrivate: List<String>, // People that can enter the event if it's private
-    val maxParticipants: Int, // Maximum number of Participants of the event
-    val public: Boolean, // True if the event is public, false if it's private
-    val tags: List<String>, // Tags of the event
-    val images: List<String> // Is it the right type?
+    val eventID: String,
+    val creator: String,
+    val title: String,
+    val description: String,
+    val location: Location,
+    val date: LocalDate,
+    val time: LocalTime,
+    val price: Double,
+    val url: String,
+    val pendingParticipants: List<String>,
+    var participants: List<String>,
+    val visibleToIfPrivate: List<String>,
+    val maxParticipants: Int,
+    val public: Boolean,
+    val tags: List<String>,
+    val images: List<String>,
+    val posts: List<Post> = emptyList()
 ) {
   fun doesMatchSearchQuery(query: String): Boolean {
     val matchingCombinations =

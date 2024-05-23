@@ -106,7 +106,6 @@ fun CreateEvent(
   var price by remember { mutableDoubleStateOf(0.0) }
   var priceText by remember { mutableStateOf("") }
   val url = remember { mutableStateOf("") }
-  val isPrivateEvent = remember { mutableStateOf(false) }
 
   val pickedTime = remember { mutableStateOf(LocalTime.now()) }
   val pickedDate = remember { mutableStateOf(LocalDate.now()) }
@@ -155,7 +154,7 @@ fun CreateEvent(
 
   Scaffold(
       topBar = {
-        Column {
+        Column(modifier = Modifier.padding(bottom = screenHeight / 90)) {
           TopAppBar(
               modifier = Modifier.testTag("TopBar"),
               backgroundColor = MaterialTheme.colorScheme.background,
@@ -177,6 +176,7 @@ fun CreateEvent(
               modifier = Modifier.padding(start = 18.dp)) {
                 Text(
                     text = "Create",
+                    color = MaterialTheme.colorScheme.onBackground,
                     style =
                         MaterialTheme.typography.headlineSmall.copy(
                             fontWeight = FontWeight.SemiBold))
@@ -255,6 +255,7 @@ fun CreateEvent(
                     Icon(
                         Icons.AutoMirrored.Filled.KeyboardArrowRight,
                         null,
+                        tint = MaterialTheme.colorScheme.onBackground,
                         modifier =
                             Modifier.clickable { showPopup.value = true }.testTag("TagsButton"))
                   }
@@ -276,6 +277,7 @@ fun CreateEvent(
                       Icon(
                           Icons.AutoMirrored.Filled.KeyboardArrowRight,
                           null,
+                          tint = MaterialTheme.colorScheme.onBackground,
                           modifier =
                               Modifier.clickable {
                                 nav.navigateToScreen(
@@ -299,6 +301,7 @@ fun CreateEvent(
                     Icon(
                         Icons.AutoMirrored.Filled.KeyboardArrowRight,
                         null,
+                        tint = MaterialTheme.colorScheme.onBackground,
                         modifier =
                             Modifier.clickable {
                                   if (imageUri != null) {
@@ -362,7 +365,7 @@ fun CreateEvent(
                                     listOf(),
                                     listOf(),
                                     0,
-                                    !isPrivateEvent.value,
+                                    !isPrivate,
                                     listOf(),
                                     listOf(),
                                     imageUri,
@@ -385,7 +388,7 @@ fun CreateEvent(
                               listOf(),
                               listOf(),
                               0,
-                              !isPrivateEvent.value,
+                              !isPrivate,
                               tags.value,
                               listOf(),
                               imageUri,

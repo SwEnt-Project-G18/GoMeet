@@ -166,11 +166,15 @@ fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel = UserViewM
       topBar = {
         Row(verticalAlignment = Alignment.CenterVertically) {
           IconButton(onClick = { nav.goBack() }) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Go back")
+            Icon(
+                Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = "Go back",
+                tint = MaterialTheme.colorScheme.onBackground)
           }
           Spacer(modifier = Modifier.weight(1f))
           Text(
               text = "Done",
+              color = MaterialTheme.colorScheme.onBackground,
               style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
               modifier =
                   Modifier.padding(end = 15.dp).clickable {
@@ -350,6 +354,7 @@ fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel = UserViewM
                             Icon(
                                 Icons.AutoMirrored.Filled.KeyboardArrowRight,
                                 null,
+                                tint = MaterialTheme.colorScheme.onBackground,
                                 modifier =
                                     Modifier.clickable { showPopup.value = true }
                                         .testTag("EditTagsButton"))
