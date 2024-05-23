@@ -265,7 +265,6 @@ fun EditEvent(
                         }
                       },
                       label = { Text("Description") },
-                      singleLine = true,
                       modifier = Modifier.fillMaxWidth().padding(start = 15.dp, end = 15.dp),
                       colors = textFieldColors)
 

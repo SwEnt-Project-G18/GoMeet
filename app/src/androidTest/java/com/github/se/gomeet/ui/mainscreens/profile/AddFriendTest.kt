@@ -7,6 +7,7 @@ import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.navigation.compose.rememberNavController
@@ -99,6 +100,6 @@ class AddFriendTest {
     composeTestRule.onAllNodesWithContentDescription("Profile picture")[0].assertIsDisplayed()
     composeTestRule.onNodeWithText(firstName2, substring = true).assertIsDisplayed()
     composeTestRule.onNodeWithText(username2).assertIsDisplayed()
-    composeTestRule.onNodeWithText("Follow").assertIsDisplayed().performClick()
+    composeTestRule.onAllNodesWithText("Follow")[0].assertIsDisplayed().performClick()
   }
 }
