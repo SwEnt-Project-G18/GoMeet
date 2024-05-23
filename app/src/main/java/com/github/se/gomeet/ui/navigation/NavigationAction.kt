@@ -65,6 +65,7 @@ object Route {
   const val CHANNEL = "Channel/{id}"
   const val ADD_FRIEND = "AddFriend"
   const val EDIT_EVENT = "EditEvent/{eventId}"
+  const val SCAN = "Scan"
 }
 
 val CREATE_ITEMS =
