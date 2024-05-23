@@ -2,6 +2,7 @@ package com.github.se.gomeet
 
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -76,7 +77,7 @@ private const val TAG = "InitFunctions"
 fun initCache() {
   val cacheSize = 1024L * 1024L * 100L
 
-  // Initialize Firestore settings
+  // Initialise Firestore settings
   val firestoreSettings =
       FirebaseFirestoreSettings.Builder()
           .setLocalCacheSettings(memoryCacheSettings {})
@@ -143,8 +144,17 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
     val uid = Firebase.auth.currentUser!!.uid
     eventViewModel.value = EventViewModel(uid)
     userViewModel.value = UserViewModel(uid)
-    // If the user is logged in already, the app should start at the post-login screen
+    // If the user is logged in already, the app should start at the post-login screen and we need
+    // to initialise the chat client
     startDestination.value = postLoginScreen
+    connectChatClient(
+        client,
+        false,
+        navAction,
+        postLoginScreen,
+        eventViewModel,
+        userViewModel,
+        applicationContext)
   }
 
   return NavHost(navController = nav, startDestination = startDestination.value) {
@@ -152,39 +162,29 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
       WelcomeScreen(
           onNavToLogin = { navAction.navigateTo(LOGIN_ITEMS[1]) },
           onNavToRegister = { navAction.navigateTo(LOGIN_ITEMS[2]) },
-          onSignInSuccess = { userId: String, _: String, _: String, _: String, _: String, _: String
-            ->
+          onSignInSuccess = {
+              userId: String,
+              email: String,
+              firstName: String,
+              lastName: String,
+              phone: String,
+              username: String ->
             val currentUser = Firebase.auth.currentUser
             if (currentUser != null) {
-              val uid = currentUser.uid
-              val email = currentUser.email ?: ""
-              val firstName = authViewModel.signInState.value.firstNameRegister
-              val lastName = authViewModel.signInState.value.lastNameRegister
-              val phoneNumber = authViewModel.signInState.value.phoneNumberRegister
               val country = authViewModel.signInState.value.countryRegister
-              val username = authViewModel.signInState.value.usernameRegister
               userViewModel.value.createUserIfNew(
-                  uid, username, firstName, lastName, email, phoneNumber, country)
+                  userId, username, firstName, lastName, email, phone, country)
               // userViewModel.value.currentUID is null here, but this doesn't matter since
               // createUserIfNew doesn't use it (this code will be cleaned up later)
             }
-            val user =
-                User(
-                    id = Firebase.auth.currentUser!!.uid,
-                    name = Firebase.auth.currentUser!!.email!!)
-
-            client.connectUser(user = user, token = client.devToken(userId)).enqueue { result ->
-              if (result.isSuccess) {
-                onNavToPostLogin(
-                    eventViewModel,
-                    userViewModel,
-                    TOP_LEVEL_DESTINATIONS.first { it.route == postLoginScreen },
-                    navAction)
-              } else {
-                // Handle connection failure
-                Log.e(TAG, "ChatClient: Failed to connect user: $userId")
-              }
-            }
+            connectChatClient(
+                client,
+                true,
+                navAction,
+                postLoginScreen,
+                eventViewModel,
+                userViewModel,
+                applicationContext)
           },
           chatClientDisconnected = chatDisconnected)
     }
@@ -198,12 +198,15 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
       }
     }
     composable(Route.REGISTER) {
-      RegisterScreen(client, navAction, authViewModel, userViewModel.value) {
-        onNavToPostLogin(
+      RegisterScreen(navAction, authViewModel, userViewModel.value) {
+        connectChatClient(
+            client,
+            true,
+            navAction,
+            postLoginScreen,
             eventViewModel,
             userViewModel,
-            TOP_LEVEL_DESTINATIONS.first { it.route == postLoginScreen },
-            navAction)
+            applicationContext)
       }
     }
     composable(Route.EXPLORE) { Explore(navAction, eventViewModel.value) }
@@ -475,6 +478,53 @@ private fun logOut(
           .await()
     } catch (e: Exception) {
       Log.e(TAG, "ChatClient: Error during disconnect", e)
+    }
+  }
+}
+
+/**
+ * Connect the chat client to the user.
+ *
+ * @param client The chat client.
+ * @param navToPostLogin Whether to navigate to the post-login screen.
+ * @param navAction The navigation actions.
+ * @param postLoginScreen The post-login screen.
+ * @param eventViewModel The event view model state.
+ * @param userViewModel The user view model state.
+ * @param applicationContext The application context.
+ */
+private fun connectChatClient(
+    client: ChatClient,
+    navToPostLogin: Boolean,
+    navAction: NavigationActions,
+    postLoginScreen: String,
+    eventViewModel: MutableState<EventViewModel>,
+    userViewModel: MutableState<UserViewModel>,
+    applicationContext: Context
+) {
+
+  val uid = Firebase.auth.currentUser!!.uid
+  val user = User(id = uid, name = Firebase.auth.currentUser!!.email!!)
+  // TODO: currently username = email
+
+  client.connectUser(user = user, token = client.devToken(uid)).enqueue { result ->
+    // TODO: Generate Token, see https://getstream.io/tutorials/android-chat/
+    if (navToPostLogin) {
+      if (result.isSuccess) {
+        onNavToPostLogin(
+            eventViewModel,
+            userViewModel,
+            TOP_LEVEL_DESTINATIONS.first { it.route == postLoginScreen },
+            navAction)
+        Log.d(TAG, "ChatClient: Successfully connected user ${userViewModel.value.currentUID}")
+      } else {
+        Toast.makeText(
+                applicationContext,
+                "User account created, but failed to connect to chat",
+                Toast.LENGTH_SHORT)
+            .show()
+        Log.e(TAG, "ChatClient: Failed to connect user ${userViewModel.value.currentUID}")
+      }
     }
   }
 }

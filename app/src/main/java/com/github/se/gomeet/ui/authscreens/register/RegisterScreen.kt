@@ -39,8 +39,6 @@ import com.github.se.gomeet.viewmodel.AuthViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import io.getstream.chat.android.client.ChatClient
-import io.getstream.chat.android.models.User
 
 private const val TAG = "RegisterScreen"
 
@@ -50,7 +48,6 @@ private const val TAG = "RegisterScreen"
  * registration process, including entering username, email, password, personal details, and
  * uploading a profile picture.
  *
- * @param client ChatClient instance used for handling user connection.
  * @param nav Navigation actions for handling back navigation and successful registration
  *   completion.
  * @param authViewModel ViewModel to manage and observe authentication related data.
@@ -60,7 +57,6 @@ private const val TAG = "RegisterScreen"
  */
 @Composable
 fun RegisterScreen(
-    client: ChatClient,
     nav: NavigationActions,
     authViewModel: AuthViewModel,
     userViewModel: UserViewModel,
@@ -191,17 +187,6 @@ fun RegisterScreen(
                     uid, username, firstName, lastName, email, phoneNumber, country, "")
               }
             }
-
-            val user =
-                User(
-                    id = Firebase.auth.currentUser!!.uid,
-                    name = Firebase.auth.currentUser!!.email!!) // TODO: currently username = email
-            client
-                .connectUser(
-                    user = user,
-                    // TODO: Generate Token, see https://getstream.io/tutorials/android-chat/
-                    token = client.devToken(user.id))
-                .enqueue()
             onNavToExplore()
           }
         }
