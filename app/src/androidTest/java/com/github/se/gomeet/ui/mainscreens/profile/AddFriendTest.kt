@@ -5,8 +5,8 @@ import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onNodeWithContentDescription
-import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onAllNodesWithContentDescription
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.navigation.compose.rememberNavController
@@ -90,13 +90,13 @@ class AddFriendTest {
     composeTestRule.waitForIdle()
 
     composeTestRule.waitUntil(timeoutMillis = 10000) {
-      composeTestRule.onNodeWithTag("UserItem").isDisplayed()
+      composeTestRule.onAllNodesWithTag("UserItem")[0].isDisplayed()
     }
 
     composeTestRule.onNodeWithText("Find User").assertIsDisplayed()
     composeTestRule.onNodeWithText("Search").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("UserItem").assertIsDisplayed().assertHasClickAction()
-    composeTestRule.onNodeWithContentDescription("Profile picture").assertIsDisplayed()
+    composeTestRule.onAllNodesWithTag("UserItem")[0].assertIsDisplayed().assertHasClickAction()
+    composeTestRule.onAllNodesWithContentDescription("Profile picture")[0].assertIsDisplayed()
     composeTestRule.onNodeWithText(firstName2, substring = true).assertIsDisplayed()
     composeTestRule.onNodeWithText(username2).assertIsDisplayed()
     composeTestRule.onNodeWithText("Follow").assertIsDisplayed().performClick()

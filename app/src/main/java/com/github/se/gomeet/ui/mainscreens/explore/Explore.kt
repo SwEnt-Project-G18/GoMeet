@@ -134,7 +134,7 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
 
   Scaffold(
       bottomBar = { BottomNavigationFun(nav) },
-      modifier = Modifier.fillMaxSize(),
+      modifier = Modifier.fillMaxSize().testTag("ExploreUI"),
       floatingActionButton = {
         if (locationPermitted.value == true && isButtonVisible.value) {
           FloatingActionButton(
@@ -160,9 +160,12 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
                 locationPermitted = locationPermitted.value!!,
                 eventViewModel = eventViewModel,
                 nav = nav)
-            Column(modifier = Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Bottom) {
-              ContentInRow(listState = rememberLazyListState(), eventList = eventList, nav = nav)
-            }
+            Column(
+                modifier = Modifier.fillMaxHeight().testTag("MapSlider"),
+                verticalArrangement = Arrangement.Bottom) {
+                  ContentInRow(
+                      listState = rememberLazyListState(), eventList = eventList, nav = nav)
+                }
           }
         } else {
           Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
