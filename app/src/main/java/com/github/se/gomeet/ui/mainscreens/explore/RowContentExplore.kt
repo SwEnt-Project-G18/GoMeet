@@ -44,7 +44,8 @@ fun ContentInRow(
     halfHeightPx: Float,
     listState: LazyListState,
     eventList: MutableState<List<Event>>,
-    nav: NavigationActions
+    nav: NavigationActions,
+    currentUID: String
 ) {
 
   val offset by backdropState.offset
@@ -71,9 +72,9 @@ fun ContentInRow(
                           description = event.description,
                           organizer = event.creator,
                           loc = LatLng(event.location.latitude, event.location.longitude),
-                          rating = 0.0 // TODO: replace with actual rating
+                          rating = event.eventRatings[currentUID] ?: 0,
                           // TODO: add image
-                          )
+                      )
                     }) {
                   val painter: Painter =
                       if (event.images.isNotEmpty()) {

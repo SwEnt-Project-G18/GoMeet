@@ -28,17 +28,11 @@ import kotlinx.coroutines.launch
  * Composable function for the AddParticipants screen.
  *
  * @param nav The navigation actions.
- * @param userId The user id.
  * @param userViewModel The user view model.
  * @param eventId The event id.
  */
 @Composable
-fun AddParticipants(
-    nav: NavigationActions,
-    userId: String,
-    userViewModel: UserViewModel,
-    eventId: String
-) {
+fun AddParticipants(nav: NavigationActions, userViewModel: UserViewModel, eventId: String) {
 
   /* TODO: Code the UI of the AddParticipants screen when the logic of
   the invites will be done and the UI of this screen discussed with the team */
@@ -49,7 +43,7 @@ fun AddParticipants(
 
   LaunchedEffect(Unit) {
     coroutineScope.launch {
-      currentUser.value = userViewModel.getUser(userId)
+      currentUser.value = userViewModel.getUser(userViewModel.currentUID!!)
       while (currentUser.value == null) {}
       val fwers = currentUser.value!!.followers
 

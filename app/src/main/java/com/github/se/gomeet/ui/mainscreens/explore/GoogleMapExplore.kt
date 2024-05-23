@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -29,6 +28,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
+import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -154,7 +154,7 @@ internal fun GoogleMapView(
   if (mapVisible) {
     Box(Modifier.fillMaxSize()) {
       if (isLoading) {
-        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+        LoadingText()
       } else {
         GoogleMap(
             modifier = modifier,
@@ -195,10 +195,7 @@ internal fun GoogleMapView(
                 MarkerInfoWindowContent(
                     state = eventStates[index],
                     title = event.title,
-                    icon =
-                        customPinBitmapDescriptor
-                            ?: BitmapDescriptorFactory.defaultMarker(
-                                BitmapDescriptorFactory.HUE_RED),
+                    icon = customPinBitmapDescriptor,
                     onClick = markerClick,
                     onInfoWindowClick = {
                       nav.navigateToEventInfo(
@@ -209,9 +206,9 @@ internal fun GoogleMapView(
                           description = event.description,
                           organizer = event.creator,
                           loc = LatLng(event.location.latitude, event.location.longitude),
-                          rating = 0.0 // TODO: replace with actual rating
+                          rating = event.eventRatings[eventViewModel.currentUID!!] ?: 0,
                           // TODO: add image
-                          )
+                      )
                     },
                     visible = event.title.contains(query.value, ignoreCase = true)) {
                       Row(verticalAlignment = Alignment.CenterVertically) {

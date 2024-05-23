@@ -71,7 +71,6 @@ import kotlinx.coroutines.launch
 /**
  * Trends screen composable. This is where the popular trends are displayed.
  *
- * @param currentUserId The current user ID.
  * @param nav Navigation actions.
  * @param userViewModel The user view model.
  * @param eventViewModel The event view model.
@@ -79,7 +78,6 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Trends(
-    currentUserId: String,
     nav: NavigationActions,
     userViewModel: UserViewModel,
     eventViewModel: EventViewModel,
@@ -91,13 +89,17 @@ fun Trends(
   val screenWidth = LocalConfiguration.current.screenWidthDp.dp
   val screenHeight = LocalConfiguration.current.screenHeightDp.dp
   val userTags = remember { mutableStateListOf<Tag>() }
+  val currentUserId = userViewModel.currentUID!!
 
   LaunchedEffect(Unit) {
     coroutineScope.launch {
       val currentUser = userViewModel.getUser(currentUserId)
-      if (currentUser != null)
-          userTags.addAll(Tag.entries.filter { currentUser.tags.contains(it.tagName) })
-      Log.d("Trends", "Current user: $currentUser with ${userTags.size} tags")
+      if (currentUser != null) {
+        userTags.addAll(Tag.entries.filter { currentUser.tags.contains(it.tagName) })
+        Log.d("Trends", "Current user: ${currentUser.username} with ${userTags.size} tags")
+      } else {
+        Log.e("Trends", "Current user is null")
+      }
       val allEvents = eventViewModel.getAllEvents()!!.filter { !it.isPastEvent() }
       if (allEvents.isNotEmpty()) {
         eventList.addAll(allEvents)
@@ -146,7 +148,7 @@ fun Trends(
               } else {
                 Spacer(modifier = Modifier.height(5.dp))
                 // TODO: Use the top 5 events instead
-                EventCarousel(eventList.take(5), nav)
+                EventCarousel(eventList.take(5), nav, currentUserId)
 
                 Column(modifier = Modifier.fillMaxSize()) {
                   // TODO: Remove the top 5 events from the list
@@ -171,10 +173,11 @@ fun Trends(
  *
  * @param events The list of events to display.
  * @param nav Navigation actions.
+ * @param currentUserId The current user ID.
  */
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-fun EventCarousel(events: List<Event>, nav: NavigationActions) {
+fun EventCarousel(events: List<Event>, nav: NavigationActions, currentUserId: String) {
   val pagerState = rememberPagerState()
 
   LaunchedEffect(pagerState) {
@@ -242,7 +245,7 @@ fun EventCarousel(events: List<Event>, nav: NavigationActions) {
                         date = dayString,
                         time = timeString,
                         organizer = event.creator,
-                        rating = 0.0,
+                        rating = event.eventRatings[currentUserId] ?: 0,
                         description = event.description,
                         loc = LatLng(event.location.latitude, event.location.longitude))
                   }

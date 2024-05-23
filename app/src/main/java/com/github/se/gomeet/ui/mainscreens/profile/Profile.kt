@@ -72,14 +72,10 @@ import kotlinx.coroutines.tasks.await
  *
  * @param nav NavigationActions
  * @param userViewModel UserViewModel
+ * @param eventViewModel EventViewModel
  */
 @Composable
-fun Profile(
-    nav: NavigationActions,
-    userId: String,
-    userViewModel: UserViewModel,
-    eventViewModel: EventViewModel
-) {
+fun Profile(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel: EventViewModel) {
   val screenWidth = LocalConfiguration.current.screenWidthDp.dp
 
   val screenHeight = LocalConfiguration.current.screenHeightDp.dp
@@ -88,6 +84,7 @@ fun Profile(
   var currentUser by remember { mutableStateOf<GoMeetUser?>(null) }
   val joinedEventsList = remember { mutableListOf<Event>() }
   val myHistoryList = remember { mutableListOf<Event>() }
+  val userId = userViewModel.currentUID!!
 
   LaunchedEffect(Unit) {
     coroutineScope.launch {
@@ -294,9 +291,10 @@ fun Profile(
 
                 Spacer(modifier = Modifier.height(screenHeight / 40))
 
-                ProfileEventsList("Joined Events", rememberLazyListState(), joinedEventsList, nav)
+                ProfileEventsList(
+                    "Joined Events", rememberLazyListState(), joinedEventsList, nav, userId)
                 Spacer(modifier = Modifier.height(screenHeight / 30))
-                ProfileEventsList("My History", rememberLazyListState(), myHistoryList, nav)
+                ProfileEventsList("My History", rememberLazyListState(), myHistoryList, nav, userId)
               }
         } else {
           LoadingText()
@@ -343,8 +341,5 @@ fun ProfileImage(
 @Composable
 fun ProfilePreview() {
   Profile(
-      nav = NavigationActions(rememberNavController()),
-      "John",
-      UserViewModel(),
-      EventViewModel("John"))
+      nav = NavigationActions(rememberNavController()), UserViewModel(""), EventViewModel("John"))
 }

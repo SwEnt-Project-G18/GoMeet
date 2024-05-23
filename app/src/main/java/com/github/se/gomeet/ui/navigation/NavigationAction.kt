@@ -178,7 +178,7 @@ class NavigationActions(val navController: NavHostController) {
    * @param date The date of the event.
    * @param time The time of the event.
    * @param organizer The organizer of the event.
-   * @param rating The rating of the event.
+   * @param rating The rating of the event by the current user (0 if unrated, 1-5 otherwise).
    * @param description The description of the event.
    * @param loc The location of the event.
    */
@@ -188,7 +188,7 @@ class NavigationActions(val navController: NavHostController) {
       date: String,
       time: String,
       organizer: String,
-      rating: Double,
+      rating: Int,
       description: String,
       loc: LatLng
   ) {

@@ -28,7 +28,7 @@ class EditProfileTest {
   @get:Rule val composeTestRule = createComposeRule()
 
   companion object {
-    private val userVM = UserViewModel()
+    private var userVM = UserViewModel(null)
     private lateinit var uid: String
 
     private val usr = "editprofile@test.com"
@@ -54,6 +54,7 @@ class EditProfileTest {
         while (userVM.getUser(uid) == null) {
           TimeUnit.SECONDS.sleep(1)
         }
+        userVM = UserViewModel(uid)
       }
     }
 
@@ -70,7 +71,7 @@ class EditProfileTest {
 
   @Test
   fun testEditProfile() {
-    composeTestRule.setContent { EditProfile(NavigationActions(rememberNavController())) }
+    composeTestRule.setContent { EditProfile(NavigationActions(rememberNavController()), userVM) }
 
     // Wait for the page to load
     composeTestRule.waitUntil(timeoutMillis = 10000) {

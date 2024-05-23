@@ -1,7 +1,6 @@
 package com.github.se.gomeet.ui.mainscreens.events
 
 import android.net.Uri
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -16,6 +15,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Star
+import androidx.compose.material.icons.twotone.Star
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -56,12 +59,14 @@ import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import kotlinx.coroutines.launch
 
+private const val TAG = "EventInfo"
+
 /**
  * EventHeader is a composable that displays the header of an event.
  *
  * @param title Title of the event
  * @param organizer Organizer of the event
- * @param rating Rating of the event
+ * @param rating Rating of the event by the current user (0 if unrated, 1-5 otherwise)
  * @param nav NavigationActions object to handle navigation
  * @param date Date of the event
  * @param time Time of the event
@@ -71,7 +76,7 @@ fun EventHeader(
     title: String,
     currentUser: GoMeetUser,
     organizer: GoMeetUser,
-    rating: Double, // TODO: Implement rating system
+    rating: MutableState<Int>,
     nav: NavigationActions,
     date: String,
     time: String
@@ -109,6 +114,22 @@ fun EventHeader(
                       fontFamily = FontFamily(Font(R.font.roboto)),
                       letterSpacing = 0.5.sp))
           // Add other details like rating here
+          Row {
+                for (i in 1..5) {
+                  val star = if (i <= rating.value) Icons.Filled.Star else Icons.TwoTone.Star
+                  Icon(
+                      imageVector = star,
+                      contentDescription = "Rating Star",
+                      tint = MaterialTheme.colorScheme.outlineVariant,
+                      modifier = Modifier.clickable {
+                          if(rating.value == i) {
+                            rating.value = 0
+                          } else {
+                            rating.value = i
+                          }
+                      }.padding(4.dp))
+                }
+              }
         }
         // Icon for settings or more options, assuming using Material Icons
         EventDateTime(day = date, time = time)
@@ -123,7 +144,6 @@ fun EventHeader(
  */
 @Composable
 fun EventDateTime(day: String, time: String) {
-  Log.d(day, "This is the day")
   Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(end = 15.dp)) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,

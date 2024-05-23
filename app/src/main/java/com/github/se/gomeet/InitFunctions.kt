@@ -129,20 +129,20 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
   val navAction = NavigationActions(nav)
   val clientInitialisationState by client.clientState.initializationState.collectAsState()
   val authViewModel = AuthViewModel()
-  val userViewModel = UserViewModel()
   val startScreen = Route.WELCOME // The screen that gets navigated to when the app starts
   val postLoginScreen =
       Route.EXPLORE // The screen that gets navigated to after logging in/signing up
   val applicationScope = CoroutineScope(Job() + Dispatchers.Default)
 
-  val userIdState = remember { mutableStateOf("") }
   val eventViewModel = remember { mutableStateOf(EventViewModel(null)) }
+  val userViewModel = remember { mutableStateOf(UserViewModel(null)) }
   val startDestination = remember { mutableStateOf(startScreen) }
   val chatDisconnected = remember { mutableStateOf(true) }
 
   if (Firebase.auth.currentUser != null) {
-    userIdState.value = Firebase.auth.currentUser!!.uid
-    eventViewModel.value = EventViewModel(userIdState.value)
+    val uid = Firebase.auth.currentUser!!.uid
+    eventViewModel.value = EventViewModel(uid)
+    userViewModel.value = UserViewModel(uid)
     // If the user is logged in already, the app should start at the post-login screen
     startDestination.value = postLoginScreen
   }
@@ -163,8 +163,10 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
               val phoneNumber = authViewModel.signInState.value.phoneNumberRegister
               val country = authViewModel.signInState.value.countryRegister
               val username = authViewModel.signInState.value.usernameRegister
-              userViewModel.createUserIfNew(
+              userViewModel.value.createUserIfNew(
                   uid, username, firstName, lastName, email, phoneNumber, country)
+              // userViewModel.value.currentUID is null here, but this doesn't matter since
+              // createUserIfNew doesn't use it (this code will be cleaned up later)
             }
             val user =
                 User(
@@ -175,7 +177,7 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
               if (result.isSuccess) {
                 onNavToPostLogin(
                     eventViewModel,
-                    userIdState,
+                    userViewModel,
                     TOP_LEVEL_DESTINATIONS.first { it.route == postLoginScreen },
                     navAction)
               } else {
@@ -190,60 +192,48 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
       LoginScreen(authViewModel = authViewModel, nav = navAction) {
         onNavToPostLogin(
             eventViewModel,
-            userIdState,
+            userViewModel,
             TOP_LEVEL_DESTINATIONS.first { it.route == postLoginScreen },
             navAction)
       }
     }
     composable(Route.REGISTER) {
-      RegisterScreen(client, navAction, authViewModel, userViewModel) {
+      RegisterScreen(client, navAction, authViewModel, userViewModel.value) {
         onNavToPostLogin(
             eventViewModel,
-            userIdState,
+            userViewModel,
             TOP_LEVEL_DESTINATIONS.first { it.route == postLoginScreen },
             navAction)
       }
     }
     composable(Route.EXPLORE) { Explore(navAction, eventViewModel.value) }
-    composable(Route.EVENTS) {
-      Events(userIdState.value, navAction, userViewModel, eventViewModel.value)
-    }
-    composable(Route.TRENDS) {
-      Trends(userIdState.value, navAction, userViewModel, eventViewModel.value)
-    }
-    composable(Route.CREATE) {
-      userIdState.value = Firebase.auth.currentUser!!.uid
-      Create(navAction)
-    }
-    composable(Route.NOTIFICATIONS) {
-      Notifications(navAction, currentUserID = userIdState.value, userViewModel)
-    }
+    composable(Route.EVENTS) { Events(navAction, userViewModel.value, eventViewModel.value) }
+    composable(Route.TRENDS) { Trends(navAction, userViewModel.value, eventViewModel.value) }
+    composable(Route.CREATE) { Create(navAction) }
+    composable(Route.NOTIFICATIONS) { Notifications(navAction, userViewModel.value) }
 
-    composable(Route.PROFILE) {
-      Profile(navAction, userId = userIdState.value, userViewModel, eventViewModel.value)
-    }
+    composable(Route.PROFILE) { Profile(navAction, userViewModel.value, eventViewModel.value) }
     composable(
         route = Route.OTHERS_PROFILE,
         arguments = listOf(navArgument("uid") { type = NavType.StringType })) {
           OthersProfile(
-              navAction, it.arguments?.getString("uid") ?: "", userViewModel, eventViewModel.value)
+              navAction,
+              it.arguments?.getString("uid") ?: "",
+              userViewModel.value,
+              eventViewModel.value)
         }
     composable(Route.PRIVATE_CREATE) {
-      CreateEvent(navAction, eventViewModel.value, true, userViewModel)
+      CreateEvent(navAction, eventViewModel.value, true, userViewModel.value)
     }
     composable(Route.PUBLIC_CREATE) {
-      CreateEvent(navAction, eventViewModel.value, false, userViewModel)
+      CreateEvent(navAction, eventViewModel.value, false, userViewModel.value)
     }
 
     composable(
         route = Route.ADD_PARTICIPANTS,
         arguments = listOf(navArgument("eventId") { type = NavType.StringType })) { entry ->
           val eventId = entry.arguments?.getString("eventId") ?: ""
-          AddParticipants(
-              nav = navAction,
-              userId = userIdState.value,
-              userViewModel = userViewModel,
-              eventId = eventId)
+          AddParticipants(nav = navAction, userViewModel = userViewModel.value, eventId = eventId)
         }
 
     composable(
@@ -251,7 +241,7 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
         arguments = listOf(navArgument("eventId") { type = NavType.StringType })) { entry ->
           val eventId = entry.arguments?.getString("eventId") ?: ""
 
-          ManageInvites(userIdState.value, eventId, navAction, userViewModel, eventViewModel.value)
+          ManageInvites(eventId, navAction, userViewModel.value, eventViewModel.value)
         }
 
     composable(
@@ -263,7 +253,7 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
                 navArgument("date") { type = NavType.StringType },
                 navArgument("time") { type = NavType.StringType },
                 navArgument("organizer") { type = NavType.StringType },
-                navArgument("rating") { type = NavType.FloatType },
+                navArgument("rating") { type = NavType.IntType },
                 navArgument("description") { type = NavType.StringType },
                 navArgument("latitude") { type = NavType.FloatType }, // Change to DoubleType
                 navArgument("longitude") { type = NavType.FloatType } // Change to DoubleType
@@ -273,7 +263,7 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
           val date = entry.arguments?.getString("date") ?: ""
           val time = entry.arguments?.getString("time") ?: ""
           val organizer = entry.arguments?.getString("organizer") ?: ""
-          val rating = entry.arguments?.getFloat("rating") ?: 0.0
+          val rating: Int = entry.arguments?.getInt("rating") ?: 0
           val description = entry.arguments?.getString("description") ?: ""
           val latitude = entry.arguments?.getFloat("latitude") ?: 0.0
           val longitude = entry.arguments?.getFloat("longitude") ?: 0.0
@@ -286,10 +276,10 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
               date,
               time,
               organizer,
-              rating.toDouble(),
+              rating,
               description,
               loc,
-              userViewModel,
+              userViewModel.value,
               eventViewModel.value)
         }
 
@@ -353,7 +343,7 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
             navAction,
             LOGIN_ITEMS.first { it.route == startScreen },
             eventViewModel,
-            userIdState,
+            userViewModel,
             authViewModel,
             client,
             chatDisconnected,
@@ -363,26 +353,18 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
     composable(Route.ABOUT) { SettingsAbout(navAction) }
     composable(Route.HELP) { SettingsHelp(navAction) }
     composable(Route.PERMISSIONS) { SettingsPermissions(navAction) }
-    composable(Route.EDIT_PROFILE) { EditProfile(nav = navAction) }
+    composable(Route.EDIT_PROFILE) { EditProfile(nav = navAction, userViewModel.value) }
     composable(
         route = Route.FOLLOWERS,
         arguments = listOf(navArgument("uid") { type = NavType.StringType })) {
           FollowingFollowers(
-              navAction,
-              it.arguments?.getString("uid") ?: "",
-              userIdState.value,
-              userViewModel,
-              false)
+              navAction, it.arguments?.getString("uid") ?: "", userViewModel.value, false)
         }
     composable(
         route = Route.FOLLOWING,
         arguments = listOf(navArgument("uid") { type = NavType.StringType })) {
           FollowingFollowers(
-              navAction,
-              it.arguments?.getString("uid") ?: "",
-              userIdState.value,
-              userViewModel,
-              true)
+              navAction, it.arguments?.getString("uid") ?: "", userViewModel.value, true)
         }
     composable(Route.MESSAGE_CHANNELS) {
       ChatTheme {
@@ -390,7 +372,8 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
             onBackPressed = { navAction.goBack() },
             onHeaderAvatarClick = { navAction.navigateToScreen(Route.PROFILE) },
             onHeaderActionClick = {
-              navAction.navigateToScreen(Route.FOLLOWING.replace("{uid}", userIdState.value))
+              navAction.navigateToScreen(
+                  Route.FOLLOWING.replace("{uid}", userViewModel.value.currentUID ?: ""))
             },
             onItemClick = { c -> navAction.navigateToScreen(Route.CHANNEL.replace("{id}", c.id)) })
       }
@@ -410,7 +393,7 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
                 onBackPressed = { navAction.goBack() })
           }
         }
-    composable(route = Route.ADD_FRIEND) { AddFriend(navAction, userViewModel) }
+    composable(route = Route.ADD_FRIEND) { AddFriend(navAction, userViewModel.value) }
     composable(
         route = Route.EDIT_EVENT,
         arguments = listOf(navArgument("eventId") { type = NavType.StringType })) { entry ->
@@ -425,7 +408,7 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
                 date = updatedEvent.getDateString(),
                 time = updatedEvent.getTimeString(),
                 organizer = updatedEvent.creator,
-                rating = 0.0,
+                rating = updatedEvent.eventRatings[eventViewModel.value.currentUID ?: ""] ?: 0,
                 description = updatedEvent.description,
                 loc = LatLng(updatedEvent.location.latitude, updatedEvent.location.longitude))
           }
@@ -437,18 +420,19 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
  * Function to be called upon a successful sign in/register
  *
  * @param eventViewModel The event view model state.
- * @param userIdState The user ID state.
+ * @param userViewModel The user view model state.
  * @param postLogin The screen that will be navigated to upon logging in/signing up.
  * @param navigationActions The navigation actions.
  */
 private fun onNavToPostLogin(
     eventViewModel: MutableState<EventViewModel>,
-    userIdState: MutableState<String>,
+    userViewModel: MutableState<UserViewModel>,
     postLogin: TopLevelDestination,
     navigationActions: NavigationActions
 ) {
-  userIdState.value = Firebase.auth.currentUser!!.uid
-  eventViewModel.value = EventViewModel(userIdState.value)
+  val uid = Firebase.auth.currentUser!!.uid
+  eventViewModel.value = EventViewModel(uid)
+  userViewModel.value = UserViewModel(uid)
   navigationActions.navigateTo(postLogin)
 }
 
@@ -458,7 +442,7 @@ private fun onNavToPostLogin(
  * @param navigationActions The navigation actions.
  * @param startScreen The screen that will be navigated to after logging out.
  * @param eventViewModel The event view model state.
- * @param userIdState The user ID state.
+ * @param userViewModel The user view model state.
  * @param authViewModel The authentication view model.
  * @param client The chat client.
  * @param chatDisconnected Whether the chat is disconnected fully or not.
@@ -468,15 +452,15 @@ private fun logOut(
     navigationActions: NavigationActions,
     startScreen: TopLevelDestination,
     eventViewModel: MutableState<EventViewModel>,
-    userIdState: MutableState<String>,
+    userViewModel: MutableState<UserViewModel>,
     authViewModel: AuthViewModel,
     client: ChatClient,
     chatDisconnected: MutableState<Boolean>,
     scope: CoroutineScope
 ) {
   navigationActions.navigateTo(startScreen)
-  userIdState.value = ""
   eventViewModel.value = EventViewModel()
+  userViewModel.value = UserViewModel()
   authViewModel.signOut()
   chatDisconnected.value = false
   Log.d(chatClientTag, "Starting full disconnect")

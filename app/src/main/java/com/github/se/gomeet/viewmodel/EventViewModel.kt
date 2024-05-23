@@ -43,9 +43,9 @@ import org.json.JSONArray
  * ViewModel for the event. The viewModel is responsible for handling the logic that comes from the
  * UI and the repository.
  *
- * @param creatorId the id of the creator of the event
+ * @param currentUID the id of the current user (and therefore the creator of any events)
  */
-class EventViewModel(private val creatorId: String? = null) : ViewModel() {
+class EventViewModel(val currentUID: String? = null) : ViewModel() {
   private val _bitmapDescriptors = mutableStateMapOf<String, BitmapDescriptor>()
   val bitmapDescriptors: MutableMap<String, BitmapDescriptor> = _bitmapDescriptors
 
@@ -243,17 +243,17 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
       userViewModel: UserViewModel,
       eventId: String
   ) {
-    Log.d("CreatorID", "Creator ID is $creatorId")
+    Log.d("CreatorID", "Creator ID is $currentUID")
     CoroutineScope(Dispatchers.IO).launch {
       try {
         val participantsWithCreator =
-            if (participants.contains(creatorId)) participants else participants.plus(creatorId!!)
+            if (participants.contains(currentUID)) participants else participants.plus(currentUID!!)
         val imageUrl = imageUri?.let { uploadImageAndGetUrl(it) }
         val updatedImages = images.toMutableList().apply { imageUrl?.let { add(it) } }
         val event =
             Event(
                 eventId,
-                creatorId!!,
+                currentUID!!,
                 title,
                 description,
                 location,
@@ -271,8 +271,8 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
 
         EventRepository.addEvent(event)
         lastLoadedEvents = lastLoadedEvents.plus(event)
-        userViewModel.joinEvent(event.eventID, creatorId)
-        userViewModel.userCreatesEvent(event.eventID, creatorId)
+        userViewModel.joinEvent(event.eventID, currentUID)
+        userViewModel.userCreatesEvent(event.eventID, currentUID)
       } catch (e: Exception) {
         Log.w(TAG, "Error uploading image or adding event", e)
       }

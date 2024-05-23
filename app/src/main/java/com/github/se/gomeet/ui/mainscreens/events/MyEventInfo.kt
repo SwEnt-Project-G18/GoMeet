@@ -22,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -57,7 +58,7 @@ import kotlinx.coroutines.launch
  * @param date Date of the event
  * @param time Time of the event
  * @param organizerId ID of the organizer of the event
- * @param rating Rating of the event
+ * @param rating Rating of the event by the current user (0 if unrated, 1-5 otherwise)
  * @param description Description of the event
  * @param loc Location of the event
  * @param userViewModel UserViewModel object to interact with user data
@@ -71,7 +72,7 @@ fun MyEventInfo(
     date: String = "",
     time: String = "",
     organizerId: String,
-    rating: Double = 0.0, // TODO: Implement rating system
+    rating: Int,
     description: String = "",
     loc: LatLng = LatLng(0.0, 0.0),
     userViewModel: UserViewModel,
@@ -81,6 +82,7 @@ fun MyEventInfo(
   val organizer = remember { mutableStateOf<GoMeetUser?>(null) }
   val currentUser = remember { mutableStateOf<GoMeetUser?>(null) }
   val myEvent = remember { mutableStateOf<Event?>(null) }
+  val ratingState = remember { mutableIntStateOf(rating) }
 
   val coroutineScope = rememberCoroutineScope()
 
@@ -92,7 +94,7 @@ fun MyEventInfo(
     }
   }
 
-  Log.d("EventInfo", "Organizer is $organizerId")
+  Log.d("EventInfo", "Organiser is $organizerId")
   Scaffold(
       topBar = {
         TopAppBar(
@@ -136,7 +138,7 @@ fun MyEventInfo(
                     title = title,
                     currentUser = currentUser.value!!,
                     organizer = organizer.value!!,
-                    rating = rating,
+                    rating = ratingState,
                     nav = nav,
                     date = date,
                     time = time)

@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -174,14 +173,16 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
                         halfHeightPx = halfHeightPx,
                         listState = listState,
                         eventList = eventList,
-                        nav = nav)
+                        nav = nav,
+                        eventViewModel.currentUID!!)
 
                     ContentInColumn(
                         backdropState = backdropState,
                         halfHeightPx = halfHeightPx,
                         listState = listState,
                         eventList = eventList,
-                        nav = nav)
+                        nav = nav,
+                        eventViewModel.currentUID)
                   }
                 }
               },
@@ -235,7 +236,8 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
                       SearchModule(
                           nav = nav,
                           backgroundColor = backgroundColor,
-                          contentColor = MaterialTheme.colorScheme.tertiary)
+                          contentColor = MaterialTheme.colorScheme.tertiary,
+                          currentUID = eventViewModel.currentUID!!)
                     }
               }) {}
         }

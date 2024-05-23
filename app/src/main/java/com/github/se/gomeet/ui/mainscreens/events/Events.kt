@@ -1,6 +1,7 @@
 package com.github.se.gomeet.ui.mainscreens.events
 
 import EventWidget
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -65,6 +66,8 @@ import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import kotlinx.coroutines.launch
 
+private const val TAG = "Events"
+
 /**
  * Composable function to display the Events screen.
  *
@@ -75,12 +78,7 @@ import kotlinx.coroutines.launch
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Events(
-    currentUser: String,
-    nav: NavigationActions,
-    userViewModel: UserViewModel,
-    eventViewModel: EventViewModel
-) {
+fun Events(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel: EventViewModel) {
   val screenWidth = LocalConfiguration.current.screenWidthDp.dp
   val screenHeight = LocalConfiguration.current.screenHeightDp.dp
   // State management for event filters and list
@@ -90,11 +88,14 @@ fun Events(
   val query = remember { mutableStateOf("") }
   val user = remember { mutableStateOf<GoMeetUser?>(null) }
   val eventsLoaded = remember { mutableStateOf(false) }
+  val currentUID = userViewModel.currentUID!!
 
   // Initial data loading using LaunchedEffect
   LaunchedEffect(Unit) {
     coroutineScope.launch {
-      user.value = userViewModel.getUser(currentUser)
+      user.value = userViewModel.getUser(currentUID)
+      Log.d(TAG, "User is ${user.value!!.username} with ${user.value!!.myEvents.size} events")
+      val events = eventViewModel.getAllEvents()
       val allEvents =
           (eventViewModel.getAllEvents() ?: emptyList()).filter { e ->
             (user.value!!.myEvents.contains(e.eventID) ||
@@ -104,6 +105,7 @@ fun Events(
       if (allEvents.isNotEmpty()) {
         eventList.addAll(allEvents)
       }
+      Log.d(TAG, "Displaying ${eventList.size} events")
       eventsLoaded.value = true
     }
   }

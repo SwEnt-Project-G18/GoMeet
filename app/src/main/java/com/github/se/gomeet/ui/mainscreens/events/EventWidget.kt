@@ -94,8 +94,8 @@ fun EventWidget(event: Event, verified: Boolean, nav: NavigationActions, userVM:
                     description = event.description,
                     organizer = event.creator,
                     loc = LatLng(event.location.latitude, event.location.longitude),
-                    rating = 0.0 // TODO: replace with actual rating
-                    )
+                    rating = event.eventRatings[userVM.currentUID!!] ?: 0,
+                )
               },
       colors =
           CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),

@@ -3,7 +3,6 @@ package com.github.se.gomeet.viewmodel
 import android.content.ContentValues
 import android.net.Uri
 import android.util.Log
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.se.gomeet.model.event.Invitation
@@ -15,14 +14,17 @@ import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 /**
  * ViewModel for the user. The viewModel is responsible for handling the logic that comes from the
  * UI and the repository.
  */
-class UserViewModel : ViewModel() {
-  private val currentUser = mutableStateOf<GoMeetUser?>(null)
+class UserViewModel(val currentUID: String? = null) : ViewModel() {
+  private val _currentUser = MutableStateFlow<GoMeetUser?>(null)
+  val currentUser: StateFlow<GoMeetUser?> = _currentUser
 
   /**
    * Create a new user if the user is new.
@@ -66,7 +68,7 @@ class UserViewModel : ViewModel() {
                   myFavorites = emptyList(),
                   profilePicture = pfp,
                   tags = emptyList())
-          currentUser.value = user
+          _currentUser.value = user
           UserRepository.addUser(user!!)
         } catch (e: Exception) {
           Log.w(ContentValues.TAG, "Error adding user", e)

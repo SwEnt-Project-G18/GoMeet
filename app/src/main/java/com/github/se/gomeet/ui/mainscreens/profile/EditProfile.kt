@@ -74,7 +74,7 @@ import java.io.InputStream
 import kotlinx.coroutines.tasks.await
 
 @Composable
-fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel = UserViewModel()) {
+fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel) {
 
   val countries = getCountries()
   val currentUser = remember { mutableStateOf<GoMeetUser?>(null) }

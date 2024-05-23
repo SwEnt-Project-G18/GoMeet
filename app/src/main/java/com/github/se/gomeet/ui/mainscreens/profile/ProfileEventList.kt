@@ -42,13 +42,18 @@ import com.google.android.gms.maps.model.LatLng
  * Composable function for the ProfileEventsList screen.
  *
  * @param title The title of the event.
+ * @param listState The state of the list.
+ * @param eventList The list of events.
+ * @param nav The navigation actions.
+ * @param currentUID The current user's UID.
  */
 @Composable
 fun ProfileEventsList(
     title: String,
     listState: LazyListState,
     eventList: MutableList<Event>,
-    nav: NavigationActions
+    nav: NavigationActions,
+    currentUID: String
 ) {
   Column(Modifier.fillMaxWidth().padding(start = 15.dp)) {
     Row(Modifier.testTag("EventsListHeader"), verticalAlignment = Alignment.CenterVertically) {
@@ -84,9 +89,9 @@ fun ProfileEventsList(
                           description = event.description,
                           organizer = event.creator,
                           loc = LatLng(event.location.latitude, event.location.longitude),
-                          rating = 0.0 // TODO: replace with actual rating
+                          rating = event.eventRatings[currentUID] ?: 0,
                           // TODO: add image
-                          )
+                      )
                     }) {
                   Image(
                       painter =
