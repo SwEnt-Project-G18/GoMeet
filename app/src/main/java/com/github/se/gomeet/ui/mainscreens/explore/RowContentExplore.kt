@@ -57,14 +57,17 @@ fun ContentInRow(
         modifier = Modifier.padding(start = 10.dp, bottom = 10.dp),
         state = listState) {
           items(events) { event ->
+            val columnShape =
+                RoundedCornerShape(
+                    topStart = 24.dp, topEnd = 24.dp, bottomStart = 16.dp, bottomEnd = 16.dp)
             Column(
                 modifier =
-                    Modifier.padding(end = 10.dp)
-                        .shadow(elevation = 10.dp, shape = RoundedCornerShape(10.dp))
-                        .background(MaterialTheme.colorScheme.background, RoundedCornerShape(10.dp))
+                    Modifier.padding(start = 10.dp)
+                        .shadow(elevation = 10.dp, shape = columnShape)
+                        .background(MaterialTheme.colorScheme.background, columnShape)
                         .fillMaxWidth()) {
                   Card(
-                      shape = RoundedCornerShape(10.dp),
+                      shape = RoundedCornerShape(16.dp),
                       modifier =
                           Modifier.size(width = (screenWidth / 1.35).dp, height = screenHeight / 6)
                               .padding(10.dp)
