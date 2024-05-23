@@ -1,5 +1,6 @@
 package com.github.se.gomeet.ui.mainscreens.explore
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -12,20 +13,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.painter.Painter
@@ -44,6 +40,7 @@ import com.github.se.gomeet.model.event.getEventTimeString
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.google.android.gms.maps.model.LatLng
 
+@SuppressLint("SuspiciousIndentation")
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ContentInRow(
@@ -57,11 +54,11 @@ fun ContentInRow(
             val configuration = LocalConfiguration.current
             val screenHeight = configuration.screenHeightDp.dp
             val screenWidth = configuration.screenWidthDp
-            LazyRow(horizontalArrangement = Arrangement.Start, modifier = Modifier.fillMaxWidth().padding(10.dp), state = listState) {
+            LazyRow(horizontalArrangement = Arrangement.Start, modifier = Modifier.padding(start = 10.dp, bottom = 10.dp), state = listState) {
                 items(events) { event ->
                     Column(modifier = Modifier
                         .padding(end = 10.dp)
-                        .shadow(elevation = 30.dp, shape = RoundedCornerShape(10.dp))
+                        .shadow(elevation = 10.dp, shape = RoundedCornerShape(10.dp))
                         .background(MaterialTheme.colorScheme.background, RoundedCornerShape(10.dp))
                         .fillMaxWidth()) {
                         Card(
