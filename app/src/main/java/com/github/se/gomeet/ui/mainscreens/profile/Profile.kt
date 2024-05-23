@@ -1,10 +1,17 @@
 package com.github.se.gomeet.ui.mainscreens.profile
 
+import android.content.Context
+import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
+import android.net.Uri
+import android.provider.MediaStore
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -23,8 +30,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -32,26 +41,33 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.core.content.FileProvider
 import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
@@ -68,6 +84,8 @@ import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import java.io.File
+import java.io.FileOutputStream
 
 /**
  * Profile screen composable
@@ -90,8 +108,10 @@ fun Profile(
   var currentUser by remember { mutableStateOf<GoMeetUser?>(null) }
   val joinedEventsList = remember { mutableListOf<Event>() }
   val myHistoryList = remember { mutableListOf<Event>() }
+    var showShareProfileDialog by remember { mutableStateOf(false) }
 
-  LaunchedEffect(Unit) {
+
+    LaunchedEffect(Unit) {
     coroutineScope.launch {
       currentUser = userViewModel.getUser(userId)
       val allEvents =
@@ -109,6 +129,20 @@ fun Profile(
     }
   }
   Scaffold(
+
+      floatingActionButton = {
+          Box(modifier = Modifier.padding(8.dp)) {
+              IconButton(
+                  modifier =
+                  Modifier.background(
+                      color = MaterialTheme.colorScheme.outlineVariant,
+                      shape = RoundedCornerShape(10.dp)),
+                  onClick = { nav.navigateToScreen(Route.SCAN) }) {
+                  Icon(  imageVector = ImageVector.vectorResource(R.drawable.scan_icon), contentDescription = "Create Event", tint = Color.White)
+              }
+          }
+      },
+
       modifier = Modifier.testTag("Profile"),
       bottomBar = {
         BottomNavigationMenu(
@@ -203,7 +237,7 @@ fun Profile(
                           }
 
                       Button(
-                          onClick = { /*TODO*/},
+                          onClick = { showShareProfileDialog = true },
                           modifier = Modifier.height(37.dp).width(screenWidth * 4 / 11),
                           shape = RoundedCornerShape(10.dp),
                           colors =
@@ -317,6 +351,14 @@ fun Profile(
           LoadingText()
         }
       }
+
+    // Show the QR code dialog if the state is true
+    if (showShareProfileDialog) {
+        ShareProfileDialog(
+            uid = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/QR_code_for_mobile_English_Wikipedia.svg/1200px-QR_code_for_mobile_English_Wikipedia.svg.png", // Replace with actual QR code URL
+            onDismiss = { showShareProfileDialog = false }
+        )
+    }
 }
 
 @Composable
@@ -353,6 +395,78 @@ fun ProfileImage(
               .clip(CircleShape)
               .background(color = MaterialTheme.colorScheme.background),
       contentScale = ContentScale.Crop)
+
+
+}
+
+
+@Composable
+fun ShareProfileDialog(uid: String, onDismiss: () -> Unit) {
+    val painter = rememberAsyncImagePainter(uid)
+    val context = LocalContext.current
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(text = "Share Profile")
+        },
+        text = {
+            Column {
+                    Image(
+                        painter = painter,
+                        contentDescription = "QR Code",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                            .background(Color.White),
+                        contentScale = ContentScale.Fit
+                    )
+            }
+        },
+        confirmButton = {
+            Column {
+                Button(onClick = onDismiss,colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer) ) {
+                    Text("Close",color = MaterialTheme.colorScheme.tertiary)
+                }
+                Button(colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer), onClick = { shareImage(context, painter) }) {
+                    Text("Share", color = MaterialTheme.colorScheme.tertiary)
+                }
+            }
+        }
+    )
+}
+
+fun shareImage(context: Context, painter: AsyncImagePainter) {
+    if (painter.state is AsyncImagePainter.State.Success) {
+        val bitmap = ((painter.state as AsyncImagePainter.State.Success).result.drawable as BitmapDrawable).bitmap
+
+        // Save bitmap to file
+        val cachePath = File(context.cacheDir, "images")
+        cachePath.mkdirs() // Create the directory if it doesn't exist
+        val file = File(cachePath, "qr_code.png")
+        val fileOutputStream = FileOutputStream(file)
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream)
+        fileOutputStream.close()
+
+        // Get the URI of the file using FileProvider
+        val fileUri: Uri = FileProvider.getUriForFile(
+            context,
+            "${context.packageName}.fileprovider",
+            file
+        )
+
+        // Create and launch the share intent
+        val shareIntent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_STREAM, fileUri)
+            type = "image/png"
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        context.startActivity(Intent.createChooser(shareIntent, "Share QR Code"))
+    }
 }
 
 @Preview

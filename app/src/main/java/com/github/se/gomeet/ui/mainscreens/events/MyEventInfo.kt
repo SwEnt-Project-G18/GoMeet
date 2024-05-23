@@ -1,6 +1,13 @@
 package com.github.se.gomeet.ui.mainscreens.events
 
+import android.content.Context
+import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
+import android.net.Uri
 import android.util.Log
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,8 +25,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -39,17 +49,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.content.FileProvider
+import coil.compose.AsyncImagePainter
+import coil.compose.rememberAsyncImagePainter
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.mainscreens.events.posts.AddPost
 import com.github.se.gomeet.ui.mainscreens.events.posts.EventPost
+import com.github.se.gomeet.ui.mainscreens.profile.ShareProfileDialog
+import com.github.se.gomeet.ui.mainscreens.profile.shareImage
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.theme.White
 import com.github.se.gomeet.viewmodel.EventViewModel
@@ -67,6 +84,8 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 import kotlinx.coroutines.launch
+import java.io.File
+import java.io.FileOutputStream
 
 /**
  * Composable function to display the details of an event.
@@ -103,6 +122,9 @@ fun MyEventInfo(
   val myEvent = remember { mutableStateOf<Event?>(null) }
   val coroutineScope = rememberCoroutineScope()
   val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+    var expanded by remember { mutableStateOf(false) }
+    var showShareEventDialog by remember { mutableStateOf(false) }
+
 
   LaunchedEffect(Unit) {
     coroutineScope.launch {
@@ -115,30 +137,45 @@ fun MyEventInfo(
   Log.d("EventInfo", "Organizer is $organizerId")
   Scaffold(
       topBar = {
-        TopAppBar(
-            modifier = Modifier.testTag("TopBar"),
-            backgroundColor = MaterialTheme.colorScheme.background,
-            elevation = 0.dp,
-            title = {
-              // Empty title since we're placing our own components
-            },
-            navigationIcon = {
-              IconButton(onClick = { nav.goBack() }) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
-                    tint = MaterialTheme.colorScheme.onBackground)
+          TopAppBar(
+              modifier = Modifier.testTag("TopBar"),
+              backgroundColor = MaterialTheme.colorScheme.background,
+              elevation = 0.dp,
+              title = {
+                  // Empty title since we're placing our own components
+              },
+              navigationIcon = {
+                  IconButton(onClick = { nav.goBack() }) {
+                      Icon(
+                          imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                          contentDescription = "Back",
+                          tint = MaterialTheme.colorScheme.onBackground
+                      )
+                  }
+              },
+              actions = {
+                  IconButton(onClick = { expanded = true }) {
+                      Icon(
+                          imageVector = Icons.Filled.MoreVert,
+                          contentDescription = "More",
+                          modifier = Modifier.rotate(90f),
+                          tint = MaterialTheme.colorScheme.onBackground
+                      )
+                  }
+                  DropdownMenu(
+                      expanded = expanded,
+                      onDismissRequest = { expanded = false }
+                  ) {
+                      DropdownMenuItem(
+                          text = { Text("Share Event") },
+                          onClick = {
+                              expanded = false
+                              showShareEventDialog = true
+                          }
+                      )
+                  }
               }
-            },
-            actions = {
-              IconButton(onClick = { /* Handle more action */}) {
-                Icon(
-                    imageVector = Icons.Filled.MoreVert,
-                    contentDescription = "More",
-                    modifier = Modifier.rotate(90f),
-                    tint = MaterialTheme.colorScheme.onBackground)
-              }
-            })
+          )
       },
       bottomBar = {
         // Your bottom bar content
@@ -250,6 +287,52 @@ fun MyEventInfo(
               }
         }
       }
+
+    if (showShareEventDialog) {
+        ShareEventDialog(
+            uid = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/QR_code_for_mobile_English_Wikipedia.svg/1200px-QR_code_for_mobile_English_Wikipedia.svg.png", // Replace with actual QR code URL
+            onDismiss = { showShareEventDialog = false }
+        )
+    }
+}
+
+@Composable
+fun ShareEventDialog(uid: String, onDismiss: () -> Unit) {
+    val painter = rememberAsyncImagePainter(uid)
+    val context = LocalContext.current
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(text = "Share Profile")
+        },
+        text = {
+            Column {
+                Image(
+                    painter = painter,
+                    contentDescription = "QR Code",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .background(Color.White),
+                    contentScale = ContentScale.Fit
+                )
+            }
+        },
+        confirmButton = {
+            Column {
+                Button(onClick = onDismiss,colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer) ) {
+                    Text("Close",color = MaterialTheme.colorScheme.tertiary)
+                }
+                Button(colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer), onClick = { shareImage(context, painter) }) {
+                    Text("Share", color = MaterialTheme.colorScheme.tertiary)
+                }
+            }
+        }
+    )
 }
 
 /**
@@ -303,3 +386,4 @@ private fun MapViewComposable(
     onDispose {}
   }
 }
+
