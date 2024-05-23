@@ -49,6 +49,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
@@ -168,7 +169,10 @@ fun Profile(
                         Modifier.fillMaxWidth()
                             .padding(start = screenWidth / 20)
                             .testTag("UserInfo")) {
-                      ProfileImage(userId = userId, modifier = Modifier.testTag("Profile Picture"))
+                      ProfileImage(
+                          userId = userId,
+                          modifier = Modifier.testTag("Profile Picture"),
+                          size = 101.dp)
                       Column(modifier = Modifier.padding(start = screenWidth / 20)) {
                         Text(
                             (currentUser?.firstName + " " + currentUser?.lastName),
@@ -319,7 +323,8 @@ fun Profile(
 fun ProfileImage(
     userId: String,
     modifier: Modifier = Modifier,
-    defaultImageResId: Int = R.drawable.gomeet_logo
+    defaultImageResId: Int = R.drawable.gomeet_logo,
+    size: Dp
 ) {
   var profilePictureUrl by remember { mutableStateOf<String?>(null) }
 
@@ -344,7 +349,7 @@ fun ProfileImage(
       contentDescription = "Profile picture",
       modifier =
           modifier
-              .size(101.dp)
+              .size(size)
               .clip(CircleShape)
               .background(color = MaterialTheme.colorScheme.background),
       contentScale = ContentScale.Crop)

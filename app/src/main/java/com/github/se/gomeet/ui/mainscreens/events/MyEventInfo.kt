@@ -2,7 +2,9 @@ package com.github.se.gomeet.ui.mainscreens.events
 
 import android.util.Log
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,30 +16,42 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.LoadingText
+import com.github.se.gomeet.ui.mainscreens.events.posts.AddPost
+import com.github.se.gomeet.ui.mainscreens.events.posts.EventPost
 import com.github.se.gomeet.ui.navigation.NavigationActions
+import com.github.se.gomeet.ui.theme.White
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -83,12 +97,12 @@ fun MyEventInfo(
     userViewModel: UserViewModel,
     eventViewModel: EventViewModel
 ) {
-
+  var addPost by remember { mutableStateOf(false) }
   val organizer = remember { mutableStateOf<GoMeetUser?>(null) }
   val currentUser = remember { mutableStateOf<GoMeetUser?>(null) }
   val myEvent = remember { mutableStateOf<Event?>(null) }
-
   val coroutineScope = rememberCoroutineScope()
+  val screenHeight = LocalConfiguration.current.screenHeightDp.dp
 
   LaunchedEffect(Unit) {
     coroutineScope.launch {
@@ -129,13 +143,13 @@ fun MyEventInfo(
       bottomBar = {
         // Your bottom bar content
       }) { innerPadding ->
-        if (organizer.value == null || currentUser.value == null) {
+        if (organizer.value == null || currentUser.value == null || myEvent.value == null) {
           LoadingText()
         } else {
           Column(
               modifier =
                   Modifier.padding(innerPadding)
-                      .padding(start = 15.dp, end = 15.dp, top = 0.dp, bottom = 15.dp)
+                      .padding(horizontal = 10.dp)
                       .fillMaxSize()
                       .verticalScroll(state = rememberScrollState())) {
                 EventHeader(
@@ -146,6 +160,7 @@ fun MyEventInfo(
                     nav = nav,
                     date = date,
                     time = time)
+
                 Spacer(modifier = Modifier.height(20.dp))
                 EventButtons(
                     currentUser.value!!,
@@ -154,15 +169,84 @@ fun MyEventInfo(
                     userViewModel,
                     eventViewModel,
                     nav)
-                Spacer(modifier = Modifier.height(20.dp))
 
                 var imageUrl by remember { mutableStateOf<String?>(null) }
                 LaunchedEffect(eventId) { imageUrl = eventViewModel.getEventImageUrl(eventId) }
                 EventImage(imageUrl = imageUrl)
                 Spacer(modifier = Modifier.height(20.dp))
+
                 EventDescription(text = description)
                 Spacer(modifier = Modifier.height(20.dp))
                 MapViewComposable(loc = loc)
+                if (addPost) {
+                  Spacer(modifier = Modifier.height(screenHeight / 80))
+                  HorizontalDivider(
+                      thickness = 5.dp, color = MaterialTheme.colorScheme.primaryContainer)
+                  Spacer(modifier = Modifier.height(screenHeight / 80))
+                  AddPost(
+                      callbackCancel = { addPost = false },
+                      callbackPost = { post ->
+                        addPost = false
+                        coroutineScope.launch {
+                          eventViewModel.editEvent(
+                              myEvent.value!!.copy(
+                                  posts = myEvent.value!!.posts.reversed().plus(post).reversed()))
+                          myEvent.value = eventViewModel.getEvent(eventId)
+                        }
+                      },
+                      user = currentUser.value!!,
+                      userViewModel = userViewModel)
+                }
+                Spacer(Modifier.height(screenHeight / 80))
+                HorizontalDivider(
+                    thickness = 5.dp, color = MaterialTheme.colorScheme.primaryContainer)
+                Spacer(Modifier.height(screenHeight / 80))
+                Row(
+                    horizontalArrangement = Arrangement.SpaceAround,
+                    verticalAlignment = Alignment.Top) {
+                      Text(
+                          text = "Posts",
+                          style =
+                              MaterialTheme.typography.headlineSmall.copy(
+                                  fontWeight = FontWeight.SemiBold))
+
+                      Spacer(modifier = Modifier.weight(1f))
+                      if (!addPost && organizer.value!!.uid == currentUser.value!!.uid) {
+                        Button(
+                            onClick = { addPost = true },
+                            shape = RoundedCornerShape(10.dp),
+                            colors =
+                                ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.outlineVariant)) {
+                              Icon(Icons.Filled.Add, contentDescription = "Add Post", tint = White)
+                            }
+                      }
+                    }
+
+                if (myEvent.value!!.posts.isEmpty()) {
+                  Spacer(Modifier.height(10.dp))
+                  Text(
+                      text = "No updates about this event at the moment.",
+                      modifier = Modifier.align(Alignment.CenterHorizontally),
+                      style = MaterialTheme.typography.bodyLarge)
+                  Spacer(Modifier.height(screenHeight / 50))
+                } else {
+                  Spacer(Modifier.height(10.dp))
+                  myEvent.value!!.posts.forEach { post ->
+                    key(post.date.toString() + post.time.toString()) {
+                      EventPost(
+                          nav = nav,
+                          event = myEvent.value!!,
+                          post = post,
+                          userViewModel = userViewModel,
+                          eventViewModel = eventViewModel,
+                          currentUser = currentUser.value!!.uid)
+                      HorizontalDivider(color = MaterialTheme.colorScheme.primaryContainer)
+                      Spacer(Modifier.height(10.dp))
+                    }
+                  }
+                }
+                Spacer(Modifier.height(screenHeight / 10))
               }
         }
       }

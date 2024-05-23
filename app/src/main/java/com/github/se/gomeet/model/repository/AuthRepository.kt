@@ -105,7 +105,7 @@ class AuthRepository private constructor() {
 
     /** This function signs out the user */
     fun signOut() {
-      firebaseAuth.signOut()
+      if (firebaseAuth.currentUser != null) firebaseAuth.signOut()
     }
   }
 }

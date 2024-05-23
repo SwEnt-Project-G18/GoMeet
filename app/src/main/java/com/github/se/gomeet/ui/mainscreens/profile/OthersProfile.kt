@@ -143,7 +143,10 @@ fun OthersProfile(
                         Modifier.fillMaxWidth()
                             .padding(start = screenWidth / 20)
                             .testTag("UserInfo")) {
-                      ProfileImage(userId = uid, modifier = Modifier.testTag("Profile Picture"))
+                      ProfileImage(
+                          userId = uid,
+                          modifier = Modifier.testTag("Profile Picture"),
+                          size = 101.dp)
                       Column(modifier = Modifier.padding(start = screenWidth / 20)) {
                         Text(
                             (user?.firstName ?: "First") + " " + (user?.lastName ?: " Last"),

@@ -20,6 +20,7 @@ import com.github.se.gomeet.screens.EventsScreen
 import com.github.se.gomeet.screens.ExploreScreen
 import com.github.se.gomeet.screens.LoginScreenScreen
 import com.github.se.gomeet.screens.WelcomeScreenScreen
+import com.github.se.gomeet.viewmodel.AuthViewModel
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
@@ -53,6 +54,7 @@ class EndToEndTest : TestCase() {
 
     private val userVM = UserViewModel()
     private lateinit var eventVM: EventViewModel
+    private val authViewModel = AuthViewModel()
 
     @JvmStatic
     @BeforeClass
@@ -71,13 +73,13 @@ class EndToEndTest : TestCase() {
         while (userVM.getUser(uid) == null) {
           TimeUnit.SECONDS.sleep(1)
         }
-
         // Sign in
         result = Firebase.auth.signInWithEmailAndPassword(email, pwd)
         while (!result.isComplete) {
           TimeUnit.SECONDS.sleep(1)
         }
         eventVM = EventViewModel(uid)
+        authViewModel.signOut()
       }
     }
 
