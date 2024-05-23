@@ -303,7 +303,7 @@ fun ShareEventDialog(uid: String, onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
-            Text(text = "Share Profile")
+            Text(text = "Share Event")
         },
         text = {
             Column {
