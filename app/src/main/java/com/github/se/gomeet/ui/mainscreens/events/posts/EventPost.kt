@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -38,8 +37,6 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.Post
-import com.github.se.gomeet.model.event.getEventDateString
-import com.github.se.gomeet.model.event.getEventTimeString
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.profile.ProfileImage
 import com.github.se.gomeet.ui.navigation.NavigationActions
@@ -177,12 +174,7 @@ fun EventPost(
 
         Spacer(modifier = Modifier.weight(1f))
         Text(
-            text = getEventDateString(post.date),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.primary)
-
-        Text(
-            text = ", " + getEventTimeString(post.time),
+            text = "${event.getDateString()}, ${event.getTimeString()}",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.primary)
       }

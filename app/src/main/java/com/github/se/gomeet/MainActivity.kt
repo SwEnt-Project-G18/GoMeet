@@ -11,13 +11,15 @@ import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.ui.theme.GoMeetTheme
 import com.github.se.gomeet.ui.theme.SetStatusBarColor
 import com.google.android.gms.maps.MapsInitializer
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 /** The main activity of the application. */
 class MainActivity : ComponentActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    debug()
+    debug() // TODO: remove this (@reviewer if you see this remind me to remove it)
 
     MapsInitializer.initialize(this)
     initCache()
