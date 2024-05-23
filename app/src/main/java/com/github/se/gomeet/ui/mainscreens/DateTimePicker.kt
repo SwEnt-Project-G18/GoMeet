@@ -107,7 +107,10 @@ fun DateTimePicker(pickedTime: MutableState<LocalTime>, pickedDate: MutableState
                 onClick = { dateDialogState.show() }, colors = buttonColors, shape = buttonShape) {
                   Text(text = "Pick date", style = MaterialTheme.typography.titleMedium)
                 }
-            Text(text = formattedDate, style = MaterialTheme.typography.bodyLarge)
+            Text(
+                text = formattedDate,
+                color = MaterialTheme.colorScheme.onBackground,
+                style = MaterialTheme.typography.bodyLarge)
           }
       Spacer(modifier = Modifier.width(screenWidth / 7))
       Column(
@@ -118,7 +121,10 @@ fun DateTimePicker(pickedTime: MutableState<LocalTime>, pickedDate: MutableState
                 onClick = { timeDialogState.show() }, colors = buttonColors, shape = buttonShape) {
                   Text(text = "Pick time", style = MaterialTheme.typography.titleMedium)
                 }
-            Text(text = formattedTime, style = MaterialTheme.typography.bodyLarge)
+            Text(
+                text = formattedTime,
+                color = MaterialTheme.colorScheme.onBackground,
+                style = MaterialTheme.typography.bodyLarge)
           }
 
       MaterialDialog(

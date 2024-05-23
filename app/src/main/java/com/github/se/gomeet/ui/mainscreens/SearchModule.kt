@@ -20,7 +20,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -101,13 +100,14 @@ fun SearchModule(nav: NavigationActions, backgroundColor: Color, contentColor: C
             TextFieldDefaults.colors(
                 focusedTextColor = contentColor,
                 unfocusedTextColor = contentColor,
-                cursorColor = MaterialTheme.colorScheme.primary,
+                cursorColor = MaterialTheme.colorScheme.outlineVariant,
                 focusedContainerColor = Color.Transparent,
                 unfocusedContainerColor = Color.Transparent,
                 disabledContainerColor = Color.Transparent,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
-                disabledIndicatorColor = Color.Transparent))
+                disabledIndicatorColor = Color.Transparent),
+        singleLine = true)
 
     Spacer(modifier = Modifier.height(16.dp))
     if (isSearching) {
@@ -225,6 +225,7 @@ fun SearchModuleSnippet(
                   Text(
                       text =
                           "${item.event.date.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))} - ${item.event.time.format(DateTimeFormatter.ofPattern("HH:mm"))}",
+                      color = MaterialTheme.colorScheme.onBackground,
                       modifier = Modifier.fillMaxWidth())
                   val croppedDescription =
                       if (item.event.description.length > 150) {
@@ -239,7 +240,6 @@ fun SearchModuleSnippet(
   }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
 fun PreviewSearchModule() {

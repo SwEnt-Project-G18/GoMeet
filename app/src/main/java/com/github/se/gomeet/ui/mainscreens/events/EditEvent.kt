@@ -145,11 +145,15 @@ fun EditEvent(
         topBar = {
           Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = { nav.goBack() }) {
-              Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Go back")
+              Icon(
+                  Icons.AutoMirrored.Filled.ArrowBack,
+                  contentDescription = "Go back",
+                  tint = MaterialTheme.colorScheme.onBackground)
             }
             Spacer(modifier = Modifier.weight(1f))
             Text(
                 text = "Done",
+                color = MaterialTheme.colorScheme.onBackground,
                 style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
                 modifier =
                     Modifier.padding(end = 15.dp).clickable {
@@ -257,6 +261,8 @@ fun EditEvent(
 
                   DateTimePicker(pickedTime = pickedTime, pickedDate = pickedDate)
 
+                  Spacer(modifier = Modifier.height(screenHeight / 80))
+
                   TextField(
                       value = priceText,
                       onValueChange = { newVal ->
@@ -294,6 +300,7 @@ fun EditEvent(
                         Icon(
                             Icons.AutoMirrored.Filled.KeyboardArrowRight,
                             null,
+                            tint = MaterialTheme.colorScheme.onBackground,
                             modifier =
                                 Modifier.clickable { showPopup.value = true }
                                     .testTag("EditTagsButton"))

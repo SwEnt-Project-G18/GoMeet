@@ -53,7 +53,7 @@ fun SettingsScreen(nav: NavigationActions, /*userViewModel: UserViewModel*/ logO
   Scaffold(
       modifier = Modifier.testTag("SettingsScreen"),
       topBar = {
-        Column {
+        Column(modifier = Modifier.padding(bottom = screenHeight / 90)) {
           TopAppBar(
               modifier = Modifier.testTag("TopBar"),
               backgroundColor = MaterialTheme.colorScheme.background,
@@ -75,6 +75,7 @@ fun SettingsScreen(nav: NavigationActions, /*userViewModel: UserViewModel*/ logO
               modifier = Modifier.padding(start = 18.dp)) {
                 Text(
                     text = "Settings",
+                    color = MaterialTheme.colorScheme.onBackground,
                     style =
                         MaterialTheme.typography.headlineSmall.copy(
                             fontWeight = FontWeight.SemiBold))

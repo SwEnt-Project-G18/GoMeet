@@ -222,7 +222,10 @@ fun TopAppBar(
             }
             nav.goBack()
           }) {
-            Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = "Go back")
+            Icon(
+                Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                contentDescription = "Go back",
+                tint = MaterialTheme.colorScheme.onBackground)
           }
     }
     Row(
@@ -231,6 +234,7 @@ fun TopAppBar(
         horizontalArrangement = Arrangement.Center) {
           Text(
               text = "Notifications",
+              color = MaterialTheme.colorScheme.onBackground,
               style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold))
         }
   }
@@ -258,6 +262,7 @@ fun TabRow(pagerState: PagerState, coroutineScope: CoroutineScope, screenHeight:
                 }) {
               Text(
                   text = "Invitations",
+                  color = MaterialTheme.colorScheme.onBackground,
                   style =
                       MaterialTheme.typography.bodyMedium.copy(
                           fontWeight =
@@ -273,6 +278,7 @@ fun TabRow(pagerState: PagerState, coroutineScope: CoroutineScope, screenHeight:
                 }) {
               Text(
                   text = "Messages",
+                  color = MaterialTheme.colorScheme.onBackground,
                   style =
                       MaterialTheme.typography.bodyMedium.copy(
                           fontWeight =
@@ -441,6 +447,7 @@ fun InvitationsNotificationsWidget(
                           username?.let {
                             Text(
                                 it,
+                                color = MaterialTheme.colorScheme.onBackground,
                                 style =
                                     TextStyle(
                                         fontSize = smallTextSize.sp,
@@ -456,6 +463,7 @@ fun InvitationsNotificationsWidget(
 
                     Text(
                         "$dayString - $timeString",
+                        color = MaterialTheme.colorScheme.onBackground,
                         style =
                             TextStyle(
                                 fontSize = smallTextSize.sp,

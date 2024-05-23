@@ -15,7 +15,7 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 private val DarkColorScheme =
     darkColorScheme(
-        primary = Grey,
+        primary = Color.Black,
         secondary = DarkGrey,
         tertiary = White,
         background = Color.Black,
@@ -24,11 +24,12 @@ private val DarkColorScheme =
         secondaryContainer = DarkerBlue,
         tertiaryContainer = Color(0xFFEEEEEE),
         outlineVariant = DodgerBlue,
-        onBackground = Color.White)
+        onBackground = Color.White,
+    )
 
 private val LightColorScheme =
     lightColorScheme(
-        primary = Grey,
+        primary = Color.White,
         secondary = DarkGrey,
         tertiary = DarkGrey,
         background = White,

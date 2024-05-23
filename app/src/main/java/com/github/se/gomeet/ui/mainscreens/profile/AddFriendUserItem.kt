@@ -75,7 +75,7 @@ fun ProfileImageUser(
           },
       contentDescription = "Profile picture",
       modifier = modifier.size(55.dp).clip(CircleShape).background(color = Color.Gray),
-      contentScale = ContentScale.Crop)
+      contentScale = ContentScale.FillBounds)
 }
 
 /**
@@ -110,6 +110,7 @@ fun UserItem(
           Column {
             Text(
                 text = "${user.firstName} ${user.lastName}",
+                color = MaterialTheme.colorScheme.onBackground,
                 style = MaterialTheme.typography.bodyLarge)
             Text(
                 text = user.username,

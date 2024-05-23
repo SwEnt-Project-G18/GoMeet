@@ -61,6 +61,7 @@ fun RegisterPassword(callback: (String) -> Unit, textFieldColors: TextFieldColor
         Text(
             text = "Please enter your password.",
             modifier = Modifier.fillMaxWidth().testTag("Text"),
+            color = MaterialTheme.colorScheme.onBackground,
             style = MaterialTheme.typography.titleMedium,
             textAlign = TextAlign.Center)
 
