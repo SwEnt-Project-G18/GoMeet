@@ -27,6 +27,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.AlertDialog
@@ -74,6 +75,7 @@ import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.SECOND_LEVEL_DESTINATION
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
+import com.github.se.gomeet.ui.theme.White
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.firestore.FirebaseFirestore
@@ -397,34 +399,37 @@ fun ShareProfileDialog(uid: String, onDismiss: () -> Unit) {
   val painter = rememberAsyncImagePainter(uid)
   val context = LocalContext.current
   AlertDialog(
+      containerColor = MaterialTheme.colorScheme.background,
       onDismissRequest = onDismiss,
-      title = { Text(text = "Share Profile") },
-      text = {
+      icon = {
         Column {
+          Row {
+            Spacer(modifier = Modifier.weight(1f))
+            IconButton(onClick = { onDismiss() }) {
+              Icon(
+                  Icons.Filled.Close,
+                  contentDescription = "Close",
+                  tint = MaterialTheme.colorScheme.tertiary,
+                  modifier = Modifier.size(30.dp))
+            }
+          }
           Image(
               painter = painter,
               contentDescription = "QR Code",
-              modifier = Modifier.fillMaxWidth().padding(16.dp).background(Color.White),
+              modifier = Modifier.fillMaxWidth().background(Color.White),
               contentScale = ContentScale.Fit)
         }
       },
       confirmButton = {
-        Column {
-          Button(
-              onClick = onDismiss,
-              colors =
-                  ButtonDefaults.buttonColors(
-                      containerColor = MaterialTheme.colorScheme.primaryContainer)) {
-                Text("Close", color = MaterialTheme.colorScheme.tertiary)
-              }
-          Button(
-              colors =
-                  ButtonDefaults.buttonColors(
-                      containerColor = MaterialTheme.colorScheme.primaryContainer),
-              onClick = { shareImage(context, painter) }) {
-                Text("Share", color = MaterialTheme.colorScheme.tertiary)
-              }
-        }
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(10.dp),
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.outlineVariant),
+            onClick = { shareImage(context, painter) }) {
+              Text("Share", color = White)
+            }
       })
 }
 

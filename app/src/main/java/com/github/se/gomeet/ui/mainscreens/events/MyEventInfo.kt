@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -19,6 +20,7 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -283,34 +285,37 @@ fun ShareEventDialog(uid: String, onDismiss: () -> Unit) {
   val painter = rememberAsyncImagePainter(uid)
   val context = LocalContext.current
   AlertDialog(
+      containerColor = MaterialTheme.colorScheme.background,
       onDismissRequest = onDismiss,
-      title = { Text(text = "Share Event") },
-      text = {
+      icon = {
         Column {
+          Row {
+            Spacer(modifier = Modifier.weight(1f))
+            IconButton(onClick = { onDismiss() }) {
+              Icon(
+                  Icons.Filled.Close,
+                  contentDescription = "Close",
+                  tint = MaterialTheme.colorScheme.tertiary,
+                  modifier = Modifier.size(30.dp))
+            }
+          }
           Image(
               painter = painter,
               contentDescription = "QR Code",
-              modifier = Modifier.fillMaxWidth().padding(16.dp).background(Color.White),
+              modifier = Modifier.fillMaxWidth().background(Color.White),
               contentScale = ContentScale.Fit)
         }
       },
       confirmButton = {
-        Column {
-          Button(
-              onClick = onDismiss,
-              colors =
-                  ButtonDefaults.buttonColors(
-                      containerColor = MaterialTheme.colorScheme.primaryContainer)) {
-                Text("Close", color = MaterialTheme.colorScheme.tertiary)
-              }
-          Button(
-              colors =
-                  ButtonDefaults.buttonColors(
-                      containerColor = MaterialTheme.colorScheme.primaryContainer),
-              onClick = { shareImage(context, painter) }) {
-                Text("Share", color = MaterialTheme.colorScheme.tertiary)
-              }
-        }
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(10.dp),
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.outlineVariant),
+            onClick = { shareImage(context, painter) }) {
+              Text("Share", color = White)
+            }
       })
 }
 
