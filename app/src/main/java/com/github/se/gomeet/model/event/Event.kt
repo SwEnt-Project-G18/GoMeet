@@ -21,8 +21,10 @@ import java.time.LocalTime
  * @param maxParticipants Maximum number of Participants of the event
  * @param public True if the event is public, false if it's private
  * @param tags Tags of the event
- * @param images List of urls of images of the event
  * @param eventRatings Ratings of the event by each user (i.e. userID -> rating)
+ * @param images Images of the event
+ * @param posts Posts of the event
+>>>>>>> a0979603ee96764731490b732fddd35bdc089325
  */
 data class Event(
     val eventID: String,
@@ -41,7 +43,8 @@ data class Event(
     val public: Boolean,
     val tags: List<String> = emptyList(),
     val images: List<String> = emptyList(),
-    val eventRatings: Map<String, Int> = emptyMap()
+    val eventRatings: Map<String, Int> = emptyMap(),
+    val posts: List<Post> = emptyList()
 ) {
 
   /**

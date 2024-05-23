@@ -2,7 +2,9 @@ package com.github.se.gomeet.model.repository
 
 import android.util.Log
 import com.github.se.gomeet.model.event.Event
+import com.github.se.gomeet.model.event.Post
 import com.github.se.gomeet.model.event.location.Location
+import com.github.se.gomeet.model.repository.EventRepository.Companion.toEvent
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.MetadataChanges
 import com.google.firebase.firestore.ktx.firestore
@@ -157,7 +159,8 @@ class EventRepository private constructor() {
           "public" to public,
           "tags" to tags,
           "images" to images,
-          "eventRatings" to eventRatings)
+          "eventRatings" to eventRatings,
+          "posts" to posts.map { it.toMap() })
     }
 
     /**
@@ -167,6 +170,23 @@ class EventRepository private constructor() {
      */
     private fun Location.toMap(): Map<String, Any> {
       return mapOf("latitude" to latitude, "longitude" to longitude, "name" to name)
+    }
+
+    /**
+     * This function maps the location of an event to the fields stored in the database
+     *
+     * @return the map of the location
+     */
+    private fun Post.toMap(): Map<String, Any> {
+      return mapOf(
+          "userId" to userId,
+          "title" to title,
+          "content" to content,
+          "date" to date.toString(), // Convert LocalDate to String
+          "time" to time.toString(), // Convert LocalTime to String
+          "image" to image,
+          "likes" to likes,
+          "comments" to comments.associate { it.first to it.second })
     }
 
     /**
@@ -192,7 +212,8 @@ class EventRepository private constructor() {
           public = this["public"] as? Boolean ?: false,
           tags = this["tags"] as? List<String> ?: emptyList(),
           images = this["images"] as? List<String> ?: emptyList(),
-          eventRatings = this["eventRatings"] as? Map<String, Int> ?: emptyMap())
+          eventRatings = this["eventRatings"] as? Map<String, Int> ?: emptyMap(),
+          posts = (this["posts"] as? List<Map<String, Any>> ?: emptyList()).map { it.toPost() })
     }
 
     /**
@@ -205,6 +226,21 @@ class EventRepository private constructor() {
           latitude = this["latitude"] as Double,
           longitude = this["longitude"] as Double,
           name = this["name"] as String)
+    }
+
+    private fun Map<String, Any>.toPost(): Post {
+      val commentsMap = this["comments"] as? Map<String, String> ?: emptyMap()
+      val commentsList = commentsMap.map { Pair(it.key, it.value) }
+
+      return Post(
+          userId = this["userId"] as? String ?: "",
+          title = this["title"] as? String ?: "",
+          content = this["content"] as? String ?: "",
+          date = LocalDate.parse(this["date"] as? String ?: ""),
+          time = LocalTime.parse(this["time"] as? String ?: "00:00"),
+          image = this["image"] as? String ?: "",
+          likes = this["likes"] as? List<String> ?: emptyList(),
+          comments = commentsList)
     }
 
     /**

@@ -97,8 +97,7 @@ fun EventWidget(event: Event, verified: Boolean, nav: NavigationActions, userVM:
                     rating = event.eventRatings[userVM.currentUID!!] ?: 0,
                 )
               },
-      colors =
-          CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
+      colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
   ) {
     Row(
         modifier = Modifier.fillMaxWidth(),

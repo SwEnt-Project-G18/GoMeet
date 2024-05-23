@@ -118,7 +118,10 @@ fun OthersProfile(
       topBar = {
         Row(modifier = Modifier.testTag("TopBar"), verticalAlignment = Alignment.CenterVertically) {
           IconButton(onClick = { nav.goBack() }) {
-            Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Go back")
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = "Go back",
+                tint = MaterialTheme.colorScheme.onBackground)
           }
           Spacer(modifier = Modifier.weight(1F))
           MoreActionsButton()
@@ -138,17 +141,19 @@ fun OthersProfile(
                             .padding(start = screenWidth / 20)
                             .testTag("UserInfo")) {
                       ProfileImage(
-                          userId = viewedUID, modifier = Modifier.testTag("Profile Picture"))
+                          userId = viewedUID,
+                          modifier = Modifier.testTag("Profile Picture"),
+                          size = 101.dp)
                       Column(modifier = Modifier.padding(start = screenWidth / 20)) {
                         Text(
-                            (viewedUser?.firstName ?: "First") +
-                                " " +
-                                (viewedUser?.lastName ?: " Last"),
+                            "${(viewedUser?.firstName ?: "First")} ${(viewedUser?.lastName ?: "Last")}",
                             textAlign = TextAlign.Center,
+                            color = MaterialTheme.colorScheme.onBackground,
                             style = MaterialTheme.typography.titleLarge)
 
                         Text(
-                            text = "@" + (viewedUser?.username ?: "username"),
+                            text = "@${(viewedUser?.username ?: "username")}",
+                            color = MaterialTheme.colorScheme.onBackground,
                             style = MaterialTheme.typography.bodyLarge)
                       }
                     }
@@ -214,10 +219,12 @@ fun OthersProfile(
                               }) {
                             Text(
                                 text = viewedUser?.myEvents?.size.toString(),
+                                color = MaterialTheme.colorScheme.onBackground,
                                 style = MaterialTheme.typography.titleLarge,
                                 modifier = Modifier.align(Alignment.CenterHorizontally))
                             Text(
                                 text = "Events",
+                                color = MaterialTheme.colorScheme.onBackground,
                                 style = MaterialTheme.typography.bodyMedium,
                                 modifier = Modifier.align(Alignment.CenterHorizontally))
                           }
@@ -229,10 +236,12 @@ fun OthersProfile(
                               }) {
                             Text(
                                 text = viewedUser?.followers?.size.toString(),
+                                color = MaterialTheme.colorScheme.onBackground,
                                 style = MaterialTheme.typography.titleLarge,
                                 modifier = Modifier.align(Alignment.CenterHorizontally))
                             Text(
                                 text = "Followers",
+                                color = MaterialTheme.colorScheme.onBackground,
                                 style = MaterialTheme.typography.bodyMedium,
                                 modifier = Modifier.align(Alignment.CenterHorizontally))
                           }
@@ -244,10 +253,12 @@ fun OthersProfile(
                               }) {
                             Text(
                                 text = viewedUser?.following?.size.toString(),
+                                color = MaterialTheme.colorScheme.onBackground,
                                 style = MaterialTheme.typography.titleLarge,
                                 modifier = Modifier.align(Alignment.CenterHorizontally))
                             Text(
                                 text = "Following",
+                                color = MaterialTheme.colorScheme.onBackground,
                                 style = MaterialTheme.typography.bodyMedium,
                                 modifier = Modifier.align(Alignment.CenterHorizontally))
                           }
@@ -266,6 +277,7 @@ fun OthersProfile(
                             content = {
                               Text(
                                   text = viewedUser!!.tags[index],
+                                  color = MaterialTheme.colorScheme.onBackground,
                                   style = MaterialTheme.typography.labelLarge)
                             },
                             colors =

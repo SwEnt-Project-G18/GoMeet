@@ -36,7 +36,10 @@ internal fun TopTitle(forColumn: Boolean, alpha: Float) {
                     .background(color = Color.LightGray)
                     .align(alignment = Alignment.CenterHorizontally))
         Spacer(modifier = Modifier.height(LocalConfiguration.current.screenHeightDp.dp / 80))
-        Text(text = "Trending Around You", style = MaterialTheme.typography.titleMedium)
+        Text(
+            text = "Trending Around You",
+            color = MaterialTheme.colorScheme.onBackground,
+            style = MaterialTheme.typography.titleMedium)
         Spacer(modifier = Modifier.height(LocalConfiguration.current.screenHeightDp.dp / 80))
       }
 }

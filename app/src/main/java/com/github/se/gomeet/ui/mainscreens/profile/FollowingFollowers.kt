@@ -20,7 +20,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Icon
@@ -122,7 +122,10 @@ fun FollowingFollowers(
                 verticalAlignment = Alignment.CenterVertically) {
                   IconButton(
                       modifier = Modifier.testTag("GoBackFollower"), onClick = { nav.goBack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Go back")
+                        Icon(
+                            Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                            contentDescription = "Go back",
+                            tint = MaterialTheme.colorScheme.onBackground)
                       }
                 }
             Row(
@@ -131,6 +134,7 @@ fun FollowingFollowers(
                 horizontalArrangement = Arrangement.Center) {
                   Text(
                       text = username,
+                      color = MaterialTheme.colorScheme.onBackground,
                       style =
                           MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold))
                 }
@@ -150,6 +154,7 @@ fun FollowingFollowers(
                         }) {
                       Text(
                           text = FOLLOWERS.str,
+                          color = MaterialTheme.colorScheme.onBackground,
                           style =
                               MaterialTheme.typography.bodyMedium.copy(
                                   fontWeight =
@@ -168,6 +173,7 @@ fun FollowingFollowers(
                         }) {
                       Text(
                           text = FOLLOWING.str,
+                          color = MaterialTheme.colorScheme.onBackground,
                           style =
                               MaterialTheme.typography.bodyMedium.copy(
                                   fontWeight =
@@ -264,10 +270,15 @@ fun PageUsers(
                         .background(color = MaterialTheme.colorScheme.background),
                 painter = painter,
                 contentDescription = "Profile picture",
-                contentScale = ContentScale.None)
+                contentScale = ContentScale.FillBounds)
             Column(modifier = Modifier.padding(start = 15.dp).weight(1f)) {
-              Text(text = "${user.firstName} ${user.lastName}")
-              Text("@${user.username}")
+              Text(
+                  text = "${user.firstName} ${user.lastName}",
+                  color = MaterialTheme.colorScheme.onBackground)
+              Text(
+                  "@${user.username}",
+                  color = MaterialTheme.colorScheme.onBackground,
+              )
             }
             if (uidOfFollowList == userViewModel.currentUID!!) {
               if (isFollowing) {
