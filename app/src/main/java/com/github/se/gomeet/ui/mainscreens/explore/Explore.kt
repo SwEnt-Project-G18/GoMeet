@@ -147,19 +147,8 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
         }
     }
 
-    BottomSheetScaffold(
-        sheetContent = {
-            Scaffold (bottomBar = { BottomNavigationFun(nav) }) { innerPadding ->
-                ContentInColumn(
-                    innerPadding = innerPadding,
-                    listState = rememberLazyListState(),
-                    eventList = eventList,
-                    nav = nav
-                )
-            }
-        }) {
     Scaffold(
-        bottomBar = {},
+        bottomBar = { BottomNavigationFun(nav) },
         modifier = Modifier.fillMaxSize(),
         floatingActionButton = {
             if (locationPermitted.value == true && isButtonVisible.value) {
@@ -196,7 +185,8 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
                 )
                 Column (modifier = Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Bottom){
                     ContentInRow(
-                        event = selectedEvent,
+                        listState = rememberLazyListState(),
+                        eventList = eventList,
                         nav = nav
                     )
                 }
@@ -223,7 +213,6 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
             backgroundColor = backgroundColor,
             contentColor = MaterialTheme.colorScheme.tertiary
         )
-    }
     }
 }
 
