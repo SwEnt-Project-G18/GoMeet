@@ -4,6 +4,7 @@ import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -26,6 +27,9 @@ class SettingsPermissionsTest {
     composeTestRule.onNodeWithText("Open permissions").assertIsDisplayed().assertHasClickAction()
     composeTestRule.onNodeWithText("Location").assertIsDisplayed().assertHasClickAction()
     composeTestRule.onNodeWithText("Internet").assertIsDisplayed().assertHasClickAction()
-    composeTestRule.onNodeWithText("Notifications").assertIsDisplayed().assertHasClickAction()
+    composeTestRule
+        .onAllNodesWithText("Notifications")[0]
+        .assertIsDisplayed()
+        .assertHasClickAction()
   }
 }
