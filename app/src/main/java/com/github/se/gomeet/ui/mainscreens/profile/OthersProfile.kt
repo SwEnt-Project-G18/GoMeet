@@ -41,7 +41,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
@@ -178,8 +177,9 @@ fun OthersProfile(
                             modifier = Modifier.height(40.dp).width(180.dp),
                             shape = RoundedCornerShape(10.dp),
                             colors =
-                                ButtonDefaults.buttonColors(containerColor = Color(0xFFECEFF1))) {
-                              Text(text = "Unfollow", color = Color.Black)
+                                ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.primaryContainer)) {
+                              Text(text = "Unfollow", color = MaterialTheme.colorScheme.tertiary)
                             }
                       } else {
                         Button(
@@ -191,8 +191,9 @@ fun OthersProfile(
                             modifier = Modifier.height(40.dp).width(180.dp),
                             shape = RoundedCornerShape(10.dp),
                             colors =
-                                ButtonDefaults.buttonColors(containerColor = Color(0xFFECEFF1))) {
-                              Text(text = "Follow", color = Color.Black)
+                                ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.primaryContainer)) {
+                              Text(text = "Follow", color = MaterialTheme.colorScheme.tertiary)
                             }
                       }
 
@@ -206,8 +207,9 @@ fun OthersProfile(
                           modifier = Modifier.height(40.dp).width(180.dp),
                           shape = RoundedCornerShape(10.dp),
                           colors =
-                              ButtonDefaults.buttonColors(containerColor = Color(0xFFECEFF1))) {
-                            Text(text = "Message", color = Color.Black)
+                              ButtonDefaults.buttonColors(
+                                  containerColor = MaterialTheme.colorScheme.primaryContainer)) {
+                            Text(text = "Message", color = MaterialTheme.colorScheme.tertiary)
                           }
                     }
 
@@ -282,7 +284,6 @@ fun OthersProfile(
                             content = {
                               Text(
                                   text = viewedUser.value!!.tags[index],
-                                  color = MaterialTheme.colorScheme.onBackground,
                                   style = MaterialTheme.typography.labelLarge)
                             },
                             colors =

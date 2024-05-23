@@ -291,7 +291,6 @@ fun Profile(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel
                             content = {
                               Text(
                                   text = currentUser!!.tags[index],
-                                  color = MaterialTheme.colorScheme.onBackground,
                                   style = MaterialTheme.typography.labelLarge)
                             },
                             colors =

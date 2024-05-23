@@ -41,6 +41,7 @@ import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.profile.ProfileImage
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
+import com.github.se.gomeet.ui.theme.Grey
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import kotlinx.coroutines.launch
@@ -176,7 +177,7 @@ fun EventPost(
         Text(
             text = "${event.getDateString()}, ${event.getTimeString()}",
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.primary)
+            color = Grey)
       }
     }
   }

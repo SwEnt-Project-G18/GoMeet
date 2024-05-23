@@ -182,15 +182,16 @@ fun FollowingFollowers(
                                       else FontWeight.Normal))
                     }
               }
-
+          val canvasColor = MaterialTheme.colorScheme.tertiary
           Canvas(
               modifier =
                   Modifier.fillMaxWidth() // Ensures the Canvas takes up full screen width
                       .height(1.dp) // Sets the height of the Canvas to 1 dp
               ) {
                 val canvasWidth = size.width
+
                 drawLine(
-                    color = Color.Black,
+                    color = canvasColor,
                     start =
                         if (pagerState.currentPage == FOLLOWERS.ordinal) Offset(x = 0f, y = 0f)
                         else Offset(x = canvasWidth / 2, y = 0f),

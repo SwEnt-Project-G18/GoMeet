@@ -155,7 +155,7 @@ fun EventDateTime(day: String, time: String) {
           style =
               TextStyle(
                   fontSize = 24.sp,
-                  color = MaterialTheme.colorScheme.onBackground,
+                  color = MaterialTheme.colorScheme.tertiary,
                   fontWeight = FontWeight.SemiBold,
                   textAlign = TextAlign.Center))
       Text(
@@ -163,7 +163,7 @@ fun EventDateTime(day: String, time: String) {
           style =
               TextStyle(
                   fontSize = 16.sp,
-                  color = MaterialTheme.colorScheme.onBackground,
+                  color = MaterialTheme.colorScheme.tertiary,
                   textAlign = TextAlign.Center))
     }
   }
@@ -206,6 +206,7 @@ fun EventImage(imageUrl: String?) {
 fun EventDescription(text: String) {
   Text(
       text = text,
+      color = MaterialTheme.colorScheme.tertiary,
       style = MaterialTheme.typography.bodyLarge,
       modifier = Modifier.testTag("EventDescription").padding(horizontal = 10.dp))
 }

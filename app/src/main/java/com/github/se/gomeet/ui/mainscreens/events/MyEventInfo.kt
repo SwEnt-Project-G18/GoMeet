@@ -210,6 +210,7 @@ fun MyEventInfo(
                     verticalAlignment = Alignment.Top) {
                       Text(
                           text = "Posts",
+                          color = MaterialTheme.colorScheme.tertiary,
                           style =
                               MaterialTheme.typography.headlineSmall.copy(
                                   fontWeight = FontWeight.SemiBold))
