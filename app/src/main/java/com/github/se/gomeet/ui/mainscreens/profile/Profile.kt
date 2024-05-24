@@ -1,9 +1,12 @@
 package com.github.se.gomeet.ui.mainscreens.profile
 
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
+import android.provider.MediaStore
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -74,7 +77,6 @@ import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.SECOND_LEVEL_DESTINATION
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
-import com.github.se.gomeet.ui.theme.White
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.firestore.FirebaseFirestore
@@ -84,6 +86,7 @@ import com.google.zxing.common.BitMatrix
 import com.journeyapps.barcodescanner.BarcodeEncoder
 import java.io.File
 import java.io.FileOutputStream
+import java.io.OutputStream
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
@@ -353,9 +356,7 @@ fun Profile(
 
   // Show the QR code dialog if the state is true
   if (showShareProfileDialog) {
-    ShareProfileDialog(
-        uid = currentUser?.uid ?: "", // Ensure UID is not null
-        onDismiss = { showShareProfileDialog = false })
+    ShareDialog(currentUser?.uid ?: "", onDismiss = { showShareProfileDialog = false })
   }
 }
 
@@ -404,7 +405,7 @@ fun generateQRCode(type: String, id: String): Bitmap {
 }
 
 @Composable
-fun ShareProfileDialog(uid: String, onDismiss: () -> Unit) {
+fun ShareDialog(uid: String, onDismiss: () -> Unit) {
   val context = LocalContext.current
   val qrCodeBitmap by remember { mutableStateOf(generateQRCode("Profile", uid)) }
 
@@ -414,13 +415,20 @@ fun ShareProfileDialog(uid: String, onDismiss: () -> Unit) {
       icon = {
         Column {
           Row {
+            IconButton(onClick = { saveImageToGallery(context, qrCodeBitmap) }) {
+              Icon(
+                  imageVector = ImageVector.vectorResource(R.drawable.download_icon),
+                  contentDescription = "Save",
+                  tint = MaterialTheme.colorScheme.tertiary,
+                  modifier = Modifier.size(30.dp))
+            }
             Spacer(modifier = Modifier.weight(1f))
             IconButton(onClick = { onDismiss() }) {
               Icon(
                   Icons.Filled.Close,
                   contentDescription = "Close",
                   tint = MaterialTheme.colorScheme.tertiary,
-                  modifier = Modifier.size(30.dp))
+                  modifier = Modifier.size(36.dp))
             }
           }
           Image(
@@ -438,9 +446,32 @@ fun ShareProfileDialog(uid: String, onDismiss: () -> Unit) {
                 ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.outlineVariant),
             onClick = { shareImage(context, qrCodeBitmap) }) {
-              Text("Share", color = White)
+              Text("Share", color = Color.White)
             }
       })
+}
+
+fun saveImageToGallery(context: Context, bitmap: Bitmap) {
+  val values =
+      ContentValues().apply {
+        put(MediaStore.Images.Media.TITLE, "QR Code")
+        put(MediaStore.Images.Media.DISPLAY_NAME, "QR Code")
+        put(MediaStore.Images.Media.MIME_TYPE, "image/png")
+        put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/QR Codes")
+      }
+
+  val uri = context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+
+  uri?.let {
+    val outputStream: OutputStream? = context.contentResolver.openOutputStream(it)
+    outputStream?.use { stream ->
+      if (bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)) {
+        Toast.makeText(context, "QR code saved to gallery", Toast.LENGTH_SHORT).show()
+      } else {
+        Toast.makeText(context, "Failed to save QR code", Toast.LENGTH_SHORT).show()
+      }
+    }
+  }
 }
 
 fun shareImage(context: Context, bitmap: Bitmap) {
