@@ -356,7 +356,7 @@ fun Profile(
 
   // Show the QR code dialog if the state is true
   if (showShareProfileDialog) {
-    ShareDialog(currentUser?.uid ?: "", onDismiss = { showShareProfileDialog = false })
+    ShareDialog("Profile", currentUser?.uid ?: "", onDismiss = { showShareProfileDialog = false })
   }
 }
 
@@ -405,9 +405,9 @@ fun generateQRCode(type: String, id: String): Bitmap {
 }
 
 @Composable
-fun ShareDialog(uid: String, onDismiss: () -> Unit) {
+fun ShareDialog(type: String, uid: String, onDismiss: () -> Unit) {
   val context = LocalContext.current
-  val qrCodeBitmap by remember { mutableStateOf(generateQRCode("Profile", uid)) }
+  val qrCodeBitmap by remember { mutableStateOf(generateQRCode(type, uid)) }
 
   AlertDialog(
       containerColor = MaterialTheme.colorScheme.background,

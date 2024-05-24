@@ -2,6 +2,7 @@ package com.github.se.gomeet.ui.mainscreens.profile
 
 import android.net.Uri
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,15 +21,15 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -89,18 +90,20 @@ fun OthersProfile(
   LaunchedEffect(Unit) {
     coroutineScope.launch {
       user = userViewModel.getUser(uid)
-      isFollowing = user?.followers?.contains(currentUser) ?: false
-      followerCount = user?.followers?.size ?: 0
+      if (user != null) {
+        isFollowing = user!!.followers.contains(currentUser)
+        followerCount = user!!.followers.size
 
-      val allEvents =
-          (eventViewModel.getAllEvents() ?: emptyList()).filter { e ->
-            user!!.joinedEvents.contains(e.eventID) && e.public
+        val allEvents =
+            (eventViewModel.getAllEvents() ?: emptyList()).filter { e ->
+              user!!.joinedEvents.contains(e.eventID) && e.public
+            }
+        allEvents.forEach {
+          if (!isPastEvent(it)) {
+            joinedEventsList.add(it)
+          } else {
+            myHistoryList.add(it)
           }
-      allEvents.forEach {
-        if (!isPastEvent(it)) {
-          joinedEventsList.add(it)
-        } else {
-          myHistoryList.add(it)
         }
       }
       isProfileLoaded = true
@@ -126,7 +129,7 @@ fun OthersProfile(
                 tint = MaterialTheme.colorScheme.onBackground)
           }
           Spacer(modifier = Modifier.weight(1F))
-          MoreActionsButton()
+          MoreActionsButton(uid, true)
         }
       }) { innerPadding ->
         if (isProfileLoaded) {
@@ -307,31 +310,68 @@ fun OthersProfile(
 
 /** Composable function for the MoreActionsButton. */
 @Composable
-fun MoreActionsButton() {
-  var showMenu by remember { mutableStateOf(false) }
+fun MoreActionsButton(uid: String, isProfile: Boolean) {
+  var showOptionsDialog by remember { mutableStateOf(false) }
+  var showShareDialog by remember { mutableStateOf(false) }
 
-  IconButton(onClick = { showMenu = true }) {
+  IconButton(onClick = { showOptionsDialog = true }) {
     Icon(
         imageVector = Icons.Default.MoreVert,
         contentDescription = "More",
-        modifier = Modifier.rotate(90f), // Rotates the icon by 90 degrees
-        tint = MaterialTheme.colorScheme.tertiary)
+        modifier = Modifier.rotate(90f),
+        tint = MaterialTheme.colorScheme.onBackground)
   }
 
-  DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
-    DropdownMenuItem(
-        text = { Text("Share Profile") },
-        onClick = {
-          // Handle Share Profile logic here
-          showMenu = false
-        })
-    DropdownMenuItem(
-        text = { Text("Block") },
-        onClick = {
-          // Handle Block logic here
-          showMenu = false
+  if (showOptionsDialog) {
+    AlertDialog(
+        containerColor = MaterialTheme.colorScheme.background,
+        onDismissRequest = { showOptionsDialog = false },
+        title = { Text(text = "Options") },
+        text = {
+          Column {
+            StyledTextButton(
+                text = "Share Profile",
+                onClick = {
+                  showOptionsDialog = false
+                  showShareDialog = true
+                })
+            StyledTextButton(
+                text = "Block",
+                onClick = {
+                  // Handle Block logic here
+                  showOptionsDialog = false
+                })
+          }
+        },
+        confirmButton = {
+          StyledTextButton(text = "Cancel", onClick = { showOptionsDialog = false })
         })
   }
+
+  if (showShareDialog) {
+    ShareDialog(
+        type = if (isProfile) "Profile" else "Event",
+        uid = uid,
+        onDismiss = { showShareDialog = false })
+  }
+}
+
+@Composable
+fun StyledTextButton(text: String, onClick: () -> Unit) {
+  TextButton(
+      onClick = onClick,
+      modifier =
+          Modifier.padding(top = 10.dp)
+              .background(
+                  color = MaterialTheme.colorScheme.primaryContainer,
+                  shape = RoundedCornerShape(10.dp))
+              .height(50.dp)
+              .fillMaxWidth()) {
+        Text(
+            text = text,
+            color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
+      }
 }
 
 @Preview

@@ -263,7 +263,7 @@ fun MyEventInfo(
       }
 
   if (showShareEventDialog) {
-    ShareDialog(eventId, onDismiss = { showShareEventDialog = false })
+    ShareDialog("Event", eventId, onDismiss = { showShareEventDialog = false })
   }
 }
 
