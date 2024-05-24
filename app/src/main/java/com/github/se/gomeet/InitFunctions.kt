@@ -279,7 +279,7 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
           val latitude = entry.arguments?.getFloat("latitude") ?: 0.0
           val longitude = entry.arguments?.getFloat("longitude") ?: 0.0
           val loc = LatLng(latitude.toDouble(), longitude.toDouble())
-
+          
           MyEventInfo(
               navAction,
               title,

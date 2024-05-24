@@ -31,7 +31,6 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -102,7 +101,7 @@ fun MyEventInfo(
     eventViewModel: EventViewModel
 ) {
   var addPost by remember { mutableStateOf(false) }
-  val organizer = remember { mutableStateOf<GoMeetUser?>(null) }
+  val organiser = remember { mutableStateOf<GoMeetUser?>(null) }
   val currentUser = remember { mutableStateOf<GoMeetUser?>(null) }
   val myEvent = remember { mutableStateOf<Event?>(null) }
   val ratingState = remember { mutableLongStateOf(rating) }
@@ -111,7 +110,7 @@ fun MyEventInfo(
 
   LaunchedEffect(Unit) {
     coroutineScope.launch {
-      organizer.value = userViewModel.getUser(organiserId)
+      organiser.value = userViewModel.getUser(organiserId)
       currentUser.value = userViewModel.getUser(Firebase.auth.currentUser!!.uid)
       myEvent.value = eventViewModel.getEvent(eventId)
     }
@@ -148,7 +147,7 @@ fun MyEventInfo(
       bottomBar = {
         // Your bottom bar content
       }) { innerPadding ->
-        if (organizer.value == null || currentUser.value == null || myEvent.value == null) {
+        if (organiser.value == null || currentUser.value == null || myEvent.value == null) {
           LoadingText()
         } else {
           Column(
@@ -158,19 +157,15 @@ fun MyEventInfo(
                       .fillMaxSize()
                       .verticalScroll(state = rememberScrollState())) {
                 EventHeader(
-                    title = title,
-                    eventID = eventId,
                     eventViewModel = eventViewModel,
-                    organiser = organizer.value!!,
+                    event = myEvent.value!!,
                     rating = ratingState,
                     nav = nav,
-                    date = date,
-                    time = time)
-
+                    organiser = organiser.value!!)
                 Spacer(modifier = Modifier.height(20.dp))
                 EventButtons(
                     currentUser.value!!,
-                    organizer.value!!,
+                    organiser.value!!,
                     eventId,
                     userViewModel,
                     eventViewModel,
@@ -218,7 +213,7 @@ fun MyEventInfo(
                                   fontWeight = FontWeight.SemiBold))
 
                       Spacer(modifier = Modifier.weight(1f))
-                      if (!addPost && organizer.value!!.uid == currentUser.value!!.uid) {
+                      if (!addPost && organiser.value!!.uid == currentUser.value!!.uid) {
                         Button(
                             onClick = { addPost = true },
                             shape = RoundedCornerShape(10.dp),
