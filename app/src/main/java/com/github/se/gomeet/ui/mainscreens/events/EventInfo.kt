@@ -131,7 +131,7 @@ fun EventHeader(
                             } else {
                               rating.value = i.toLong()
                             }
-                            eventViewModel.updateRating(eventID, rating.value, oldRating, organiser)
+                            eventViewModel.updateRating(eventID, rating.value, oldRating, organiser.uid)
                           }
                           .padding(4.dp))
             }

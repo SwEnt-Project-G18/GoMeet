@@ -182,10 +182,6 @@ fun Profile(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel
                             text = ("@" + currentUser?.username),
                             color = MaterialTheme.colorScheme.onBackground,
                             style = MaterialTheme.typography.bodyLarge)
-                        Text(
-                            text = "Rating: ${currentUser?.rating?.first.toString()} / ${currentUser?.rating?.second}",
-                            color = MaterialTheme.colorScheme.onBackground,
-                            style = MaterialTheme.typography.bodyMedium)
                       }
                     }
                 Spacer(modifier = Modifier.height(screenHeight / 40))

@@ -128,13 +128,13 @@ class EventRepository private constructor() {
        * @param newRating The new rating
        * @param currentUID The rater's user ID
        * @param oldRating The old rating
-       * @param organiser The organiser of the event
+       * @param organiserID The id of the organiser of the event
        */
       suspend fun updateRating(eventID: String, newRating: Long, currentUID: String,
-                               oldRating: Long, organiser: GoMeetUser) {
+                               oldRating: Long, organiserID: String) {
           val ratings = Firebase.firestore.collection(EVENT_COLLECTION).document(eventID).get().await().get(RATINGS) as MutableMap<String, Long>
           ratings[currentUID] = newRating
-          UserRepository.updateUserRating(organiser, newRating, oldRating)
+          UserRepository.updateUserRating(organiserID, newRating, oldRating)
             val documentRef = Firebase.firestore.collection(EVENT_COLLECTION).document(eventID)
             documentRef
                 .update(RATINGS, ratings)

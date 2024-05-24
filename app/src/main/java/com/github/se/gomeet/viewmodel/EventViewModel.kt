@@ -318,10 +318,10 @@ class EventViewModel(val currentUID: String? = null) : ViewModel() {
      * @param eventID the ID of the event to update
      * @param newRating the new rating of the event
      * @param oldRating the old rating of the event
-     * @param organiser the organiser of the event
+     * @param organiserID the id of the organiser of the event
      */
-    fun updateRating(eventID: String, newRating: Long, oldRating: Long, organiser: GoMeetUser) {
-        viewModelScope.launch { EventRepository.updateRating(eventID, newRating, currentUID!!, oldRating, organiser) }
+    fun updateRating(eventID: String, newRating: Long, oldRating: Long, organiserID: String) {
+        viewModelScope.launch { EventRepository.updateRating(eventID, newRating, currentUID!!, oldRating, organiserID) }
     }
 
   /**

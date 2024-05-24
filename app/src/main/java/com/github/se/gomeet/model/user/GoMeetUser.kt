@@ -2,6 +2,27 @@ package com.github.se.gomeet.model.user
 
 import com.github.se.gomeet.model.event.Invitation
 
+const val UID = "uid"
+const val USERNAME = "username"
+const val FIRST_NAME = "firstName"
+const val LAST_NAME = "lastName"
+const val EMAIL = "email"
+const val PHONE_NUMBER = "phoneNumber"
+const val COUNTRY = "country"
+const val FOLLOWING = "following"
+const val FOLLOWERS = "followers"
+const val PENDING_REQUESTS = "pendingRequests"
+const val JOINED_EVENTS = "joinedEvents"
+const val MY_EVENTS = "myEvents"
+const val MY_FAVORITES = "myFavorites"
+const val PROFILE_PICTURE = "profilePicture"
+const val TAGS = "tags"
+const val RATING = "rating"
+
+
+
+
+
 /**
  * This data class represents the user of the application. It contains the user's information.
  *
