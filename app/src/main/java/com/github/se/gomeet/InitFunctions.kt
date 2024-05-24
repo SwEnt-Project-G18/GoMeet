@@ -32,7 +32,7 @@ import com.github.se.gomeet.ui.mainscreens.explore.Explore
 import com.github.se.gomeet.ui.mainscreens.profile.AddFriend
 import com.github.se.gomeet.ui.mainscreens.profile.EditProfile
 import com.github.se.gomeet.ui.mainscreens.profile.FollowingFollowers
-import com.github.se.gomeet.ui.mainscreens.profile.Notifications
+import com.github.se.gomeet.ui.mainscreens.notifications.Notifications
 import com.github.se.gomeet.ui.mainscreens.profile.OthersProfile
 import com.github.se.gomeet.ui.mainscreens.profile.Profile
 import com.github.se.gomeet.ui.mainscreens.profile.QRCodeScannerScreen
@@ -68,7 +68,6 @@ import io.getstream.chat.android.offline.plugin.factory.StreamOfflinePluginFacto
 import io.getstream.chat.android.state.plugin.config.StatePluginConfig
 import io.getstream.chat.android.state.plugin.factory.StreamStatePluginFactory
 import io.getstream.result.call.doOnResult
-import io.getstream.result.call.launch
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
