@@ -415,7 +415,7 @@ fun InvitationsNotificationsWidget(
               .padding(start = 10.dp, top = 5.dp, end = 10.dp, bottom = 5.dp)
               .testTag("EventCard"),
       colors =
-          CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)) {
+          CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,

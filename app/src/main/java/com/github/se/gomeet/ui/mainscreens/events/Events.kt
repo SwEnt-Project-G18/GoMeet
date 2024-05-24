@@ -122,8 +122,9 @@ fun Events(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel:
           IconButton(
               modifier =
                   Modifier.background(
-                      color = MaterialTheme.colorScheme.outlineVariant,
-                      shape = RoundedCornerShape(10.dp)),
+                          color = MaterialTheme.colorScheme.outlineVariant,
+                          shape = RoundedCornerShape(10.dp))
+                      .testTag("CreateEventButton"),
               onClick = { nav.navigateToScreen(Route.CREATE) }) {
                 Icon(Icons.Filled.Add, contentDescription = "Create Event", tint = Color.White)
               }

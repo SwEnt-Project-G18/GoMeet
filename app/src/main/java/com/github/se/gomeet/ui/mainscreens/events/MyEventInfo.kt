@@ -1,6 +1,10 @@
 package com.github.se.gomeet.ui.mainscreens.events
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.util.Log
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -17,9 +22,13 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -40,22 +49,27 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import coil.compose.rememberAsyncImagePainter
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.mainscreens.events.posts.AddPost
 import com.github.se.gomeet.ui.mainscreens.events.posts.EventPost
+import com.github.se.gomeet.ui.mainscreens.profile.shareImage
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.theme.White
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
@@ -64,6 +78,7 @@ import com.google.firebase.ktx.Firebase
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapType
+import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
@@ -107,6 +122,8 @@ fun MyEventInfo(
   val ratingState = remember { mutableLongStateOf(rating) }
   val coroutineScope = rememberCoroutineScope()
   val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+  var expanded by remember { mutableStateOf(false) }
+  var showShareEventDialog by remember { mutableStateOf(false) }
 
   LaunchedEffect(Unit) {
     coroutineScope.launch {
@@ -135,12 +152,20 @@ fun MyEventInfo(
               }
             },
             actions = {
-              IconButton(onClick = { /* Handle more action */}) {
+              IconButton(onClick = { expanded = true }) {
                 Icon(
                     imageVector = Icons.Filled.MoreVert,
                     contentDescription = "More",
                     modifier = Modifier.rotate(90f),
                     tint = MaterialTheme.colorScheme.onBackground)
+              }
+              DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                DropdownMenuItem(
+                    text = { Text("Share Event", modifier = Modifier.padding(10.dp)) },
+                    onClick = {
+                      expanded = false
+                      showShareEventDialog = true
+                    })
               }
             })
       },
@@ -229,6 +254,7 @@ fun MyEventInfo(
                   Spacer(Modifier.height(10.dp))
                   Text(
                       text = "No updates about this event at the moment.",
+                      color = MaterialTheme.colorScheme.tertiary,
                       modifier = Modifier.align(Alignment.CenterHorizontally),
                       style = MaterialTheme.typography.bodyLarge)
                   Spacer(Modifier.height(screenHeight / 50))
@@ -252,6 +278,52 @@ fun MyEventInfo(
               }
         }
       }
+
+  if (showShareEventDialog) {
+    ShareEventDialog(
+        uid =
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/QR_code_for_mobile_English_Wikipedia.svg/1200px-QR_code_for_mobile_English_Wikipedia.svg.png", // Replace with actual QR code URL
+        onDismiss = { showShareEventDialog = false })
+  }
+}
+
+@Composable
+fun ShareEventDialog(uid: String, onDismiss: () -> Unit) {
+  val painter = rememberAsyncImagePainter(uid)
+  val context = LocalContext.current
+  AlertDialog(
+      containerColor = MaterialTheme.colorScheme.background,
+      onDismissRequest = onDismiss,
+      icon = {
+        Column {
+          Row {
+            Spacer(modifier = Modifier.weight(1f))
+            IconButton(onClick = { onDismiss() }) {
+              Icon(
+                  Icons.Filled.Close,
+                  contentDescription = "Close",
+                  tint = MaterialTheme.colorScheme.tertiary,
+                  modifier = Modifier.size(30.dp))
+            }
+          }
+          Image(
+              painter = painter,
+              contentDescription = "QR Code",
+              modifier = Modifier.fillMaxWidth().background(Color.White),
+              contentScale = ContentScale.Fit)
+        }
+      },
+      confirmButton = {
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(10.dp),
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.outlineVariant),
+            onClick = { shareImage(context, painter) }) {
+              Text("Share", color = White)
+            }
+      })
 }
 
 /**
@@ -267,9 +339,15 @@ private fun MapViewComposable(
 ) {
   val ctx = LocalContext.current
   val isDarkTheme = isSystemInDarkTheme()
-
   val cameraPositionState = rememberCameraPositionState {
     position = CameraPosition.fromLatLngZoom(loc, zoomLevel)
+  }
+  val markerState = rememberMarkerState(position = loc)
+
+  val uiSettings by remember {
+    mutableStateOf(
+        MapUiSettings(
+            compassEnabled = false, zoomControlsEnabled = false, myLocationButtonEnabled = false))
   }
   val mapProperties by remember {
     mutableStateOf(
@@ -280,18 +358,21 @@ private fun MapViewComposable(
                     ctx, if (isDarkTheme) R.raw.map_style_dark else R.raw.map_style_light)))
   }
 
-  val markerState = rememberMarkerState(position = loc)
+  // Load custom pin bitmap
+  val originalBitmap = BitmapFactory.decodeResource(ctx.resources, R.drawable.default_pin)
+  val desiredWidth = 94
+  val desiredHeight = 140
+  val scaledBitmap = Bitmap.createScaledBitmap(originalBitmap, desiredWidth, desiredHeight, true)
+  val customPin = BitmapDescriptorFactory.fromBitmap(scaledBitmap)
 
   // Set up the GoogleMap composable
   GoogleMap(
       modifier =
           Modifier.testTag("MapView").fillMaxWidth().height(200.dp).clip(RoundedCornerShape(20.dp)),
       cameraPositionState = cameraPositionState,
-      properties = mapProperties) {
-        Marker(
-            state = markerState,
-            title = "Marker in Location",
-            snippet = "This is the selected location")
+      properties = mapProperties,
+      uiSettings = uiSettings) {
+        Marker(state = markerState, icon = customPin)
       }
 
   // Initialize the map position once and avoid resetting on recomposition

@@ -34,6 +34,7 @@ import com.github.se.gomeet.ui.mainscreens.profile.FollowingFollowers
 import com.github.se.gomeet.ui.mainscreens.profile.Notifications
 import com.github.se.gomeet.ui.mainscreens.profile.OthersProfile
 import com.github.se.gomeet.ui.mainscreens.profile.Profile
+import com.github.se.gomeet.ui.mainscreens.profile.QRCodeScannerScreen
 import com.github.se.gomeet.ui.mainscreens.profile.settings.SettingsAbout
 import com.github.se.gomeet.ui.mainscreens.profile.settings.SettingsHelp
 import com.github.se.gomeet.ui.mainscreens.profile.settings.SettingsPermissions
@@ -405,6 +406,14 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
           }
         }
     composable(route = Route.ADD_FRIEND) { AddFriend(navAction, userViewModel.value) }
+    composable(route = Route.SCAN) { backStackEntry ->
+      QRCodeScannerScreen(
+          onQRCodeScanned = { uid ->
+            navAction.navigateToScreen(Route.OTHERS_PROFILE.replace("{uid}", uid))
+          },
+          nav = navAction)
+    }
+
     composable(
         route = Route.EDIT_EVENT,
         arguments = listOf(navArgument("eventId") { type = NavType.StringType })) { entry ->

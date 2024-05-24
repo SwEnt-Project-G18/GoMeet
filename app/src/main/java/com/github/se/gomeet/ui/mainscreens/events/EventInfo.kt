@@ -73,16 +73,24 @@ fun EventHeader(
     rating: MutableState<Long>,
     organiser: GoMeetUser
 ) {
+  val titleBuilder = StringBuilder()
+  var index = 0
+
+  while (index < event.title.length) {
+    if (index + 20 < event.title.length) {
+      titleBuilder.append(event.title.substring(index, index + 20)).append("\n")
+    } else {
+      titleBuilder.append(event.title.substring(index))
+    }
+    index += 20
+  }
   Row(
-      modifier = Modifier
-          .fillMaxWidth()
-          .testTag("EventHeader")
-          .padding(10.dp),
-      verticalAlignment = Alignment.CenterVertically,
+      modifier = Modifier.fillMaxWidth().testTag("EventHeader").padding(10.dp),
+      verticalAlignment = Alignment.Top,
       horizontalArrangement = Arrangement.SpaceBetween) {
         Column {
           Text(
-              text = event.title,
+              text = titleBuilder.toString(),
               style =
                   TextStyle(
                       fontSize = 24.sp,

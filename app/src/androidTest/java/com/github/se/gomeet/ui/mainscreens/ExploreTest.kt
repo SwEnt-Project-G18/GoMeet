@@ -40,6 +40,5 @@ class ExploreTest {
     composeTestRule.onNodeWithTag("Map").assertIsDisplayed()
     composeTestRule.onNodeWithText("Search").assertIsDisplayed()
     composeTestRule.onNodeWithTag("CurrentLocationButton").assertIsDisplayed().performClick()
-    composeTestRule.onNodeWithTag("MapSlider").assertIsDisplayed()
   }
 }

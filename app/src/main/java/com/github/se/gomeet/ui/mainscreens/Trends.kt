@@ -53,7 +53,9 @@ import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.viewmodel.EventViewModel
-import com.github.se.gomeet.viewmodel.EventViewModel.SortOption.*
+import com.github.se.gomeet.viewmodel.EventViewModel.SortOption.ALPHABETICAL
+import com.github.se.gomeet.viewmodel.EventViewModel.SortOption.DATE
+import com.github.se.gomeet.viewmodel.EventViewModel.SortOption.DEFAULT
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
