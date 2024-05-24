@@ -245,7 +245,6 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
           val eventId = entry.arguments?.getString("eventId") ?: ""
           AddParticipants(
               nav = navAction,
-              userId = userIdState.value,
               userViewModel = userViewModel,
               eventId = eventId)
         }
