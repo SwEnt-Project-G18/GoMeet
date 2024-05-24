@@ -543,7 +543,7 @@ private fun connectChatClient(
  */
 fun debug() {
   val androidLocalhost = "10.0.2.2"
-  Firebase.auth.signOut()
+//  Firebase.auth.signOut() // Uncomment this if the app crashes when you're already signed in
   Firebase.firestore.clearPersistence()
   // It's best to sign out and clear cache at each run if you're testing. Avoids
   // unexpected Firebase issues.

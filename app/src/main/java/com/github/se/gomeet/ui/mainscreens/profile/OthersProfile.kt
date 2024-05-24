@@ -159,6 +159,9 @@ fun OthersProfile(
                             text = "@${(viewedUser.value?.username ?: "username")}",
                             color = MaterialTheme.colorScheme.onBackground,
                             style = MaterialTheme.typography.bodyLarge)
+
+                          Spacer(modifier = Modifier.height(screenHeight / 180))
+                          RatingStarWithText(rating = viewedUser.value!!.rating)
                       }
                     }
 

@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -42,6 +43,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
@@ -53,6 +55,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.github.se.gomeet.R
@@ -69,6 +72,7 @@ import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import java.util.Locale
 
 /**
  * Profile screen composable
@@ -120,8 +124,9 @@ fun Profile(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier =
-                Modifier.padding(start = screenWidth / 15, top = screenHeight / 30)
-                    .testTag("TopBar")) {
+            Modifier
+                .padding(start = screenWidth / 15, top = screenHeight / 30)
+                .testTag("TopBar")) {
               Text(
                   text = "My Profile",
                   color = MaterialTheme.colorScheme.onBackground,
@@ -136,12 +141,16 @@ fun Profile(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel
                         Icons.Outlined.Notifications,
                         contentDescription = "Notifications",
                         modifier =
-                            Modifier.size(screenHeight / 28).align(Alignment.CenterVertically),
+                        Modifier
+                            .size(screenHeight / 28)
+                            .align(Alignment.CenterVertically),
                         tint = MaterialTheme.colorScheme.onBackground)
                   }
 
               IconButton(
-                  modifier = Modifier.align(Alignment.CenterVertically).padding(end = 15.dp),
+                  modifier = Modifier
+                      .align(Alignment.CenterVertically)
+                      .padding(end = 15.dp),
                   onClick = {
                     nav.navigateTo(SECOND_LEVEL_DESTINATION.first { it.route == Route.SETTINGS })
                   }) {
@@ -149,7 +158,9 @@ fun Profile(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel
                         Icons.Outlined.Settings,
                         contentDescription = "Settings",
                         modifier =
-                            Modifier.size(screenHeight / 28).align(Alignment.CenterVertically),
+                        Modifier
+                            .size(screenHeight / 28)
+                            .align(Alignment.CenterVertically),
                         tint = MaterialTheme.colorScheme.onBackground)
                   }
             }
@@ -158,20 +169,24 @@ fun Profile(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel
           Column(
               verticalArrangement = Arrangement.SpaceEvenly,
               horizontalAlignment = Alignment.CenterHorizontally,
-              modifier = Modifier.padding(innerPadding).verticalScroll(rememberScrollState(0))) {
+              modifier = Modifier
+                  .padding(innerPadding)
+                  .verticalScroll(rememberScrollState(0))) {
                 Spacer(modifier = Modifier.height(screenHeight / 60))
                 Row(
                     horizontalArrangement = Arrangement.Start,
                     verticalAlignment = Alignment.CenterVertically,
                     modifier =
-                        Modifier.fillMaxWidth()
-                            .padding(start = screenWidth / 20)
-                            .testTag("UserInfo")) {
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(start = screenWidth / 20)
+                        .testTag("UserInfo")) {
                       ProfileImage(
                           userId = userId,
                           modifier = Modifier.testTag("Profile Picture"),
                           size = 101.dp)
                       Column(modifier = Modifier.padding(start = screenWidth / 20)) {
+
                         Text(
                             (currentUser?.firstName + " " + currentUser?.lastName),
                             textAlign = TextAlign.Center,
@@ -182,6 +197,10 @@ fun Profile(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel
                             text = ("@" + currentUser?.username),
                             color = MaterialTheme.colorScheme.onBackground,
                             style = MaterialTheme.typography.bodyLarge)
+
+                          Spacer(modifier = Modifier.height(screenHeight / 180))
+                        RatingStarWithText(rating = currentUser!!.rating)
+
                       }
                     }
                 Spacer(modifier = Modifier.height(screenHeight / 40))
@@ -192,7 +211,9 @@ fun Profile(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel
                       // Edit Profile button
                       Button(
                           onClick = { nav.navigateToScreen(Route.EDIT_PROFILE) },
-                          modifier = Modifier.height(37.dp).width(screenWidth * 4 / 11),
+                          modifier = Modifier
+                              .height(37.dp)
+                              .width(screenWidth * 4 / 11),
                           shape = RoundedCornerShape(10.dp),
                           colors =
                               ButtonDefaults.buttonColors(
@@ -202,7 +223,9 @@ fun Profile(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel
 
                       Button(
                           onClick = { /*TODO*/},
-                          modifier = Modifier.height(37.dp).width(screenWidth * 4 / 11),
+                          modifier = Modifier
+                              .height(37.dp)
+                              .width(screenWidth * 4 / 11),
                           shape = RoundedCornerShape(10.dp),
                           colors =
                               ButtonDefaults.buttonColors(
@@ -280,7 +303,9 @@ fun Profile(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel
                           }
                     }
 
-                Spacer(modifier = Modifier.fillMaxWidth().height(screenHeight / 50))
+                Spacer(modifier = Modifier
+                    .fillMaxWidth()
+                    .height(screenHeight / 50))
 
                 LazyRow(
                     modifier = Modifier.fillMaxWidth(),
@@ -346,11 +371,30 @@ fun ProfileImage(
           },
       contentDescription = "Profile picture",
       modifier =
-          modifier
-              .size(size)
-              .clip(CircleShape)
-              .background(color = MaterialTheme.colorScheme.background),
+      modifier
+          .size(size)
+          .clip(CircleShape)
+          .background(color = MaterialTheme.colorScheme.background),
       contentScale = ContentScale.Crop)
+}
+
+@Composable
+fun RatingStarWithText(rating: Pair<Long, Long>) {
+    val doubleRating = if(rating.second > 0) rating.first.toDouble() / rating.second.toDouble() else 0.0
+    Row {
+        Icon(
+            imageVector = Icons.Filled.Star,
+            contentDescription = "Rating",
+            tint = MaterialTheme.colorScheme.outlineVariant,
+            modifier = Modifier.size(20.dp)  // Set the size of the icon
+        )
+        Text(
+            text = String.format(Locale.UK, "%.1f (%d)", doubleRating, rating.second),
+            fontSize = 16.sp,  // Set the font size
+            color = MaterialTheme.colorScheme.tertiary,
+            textAlign = TextAlign.Center,
+        )
+    }
 }
 
 @Preview

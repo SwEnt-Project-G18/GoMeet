@@ -111,8 +111,6 @@ fun EventHeader(
                       letterSpacing = 0.5.sp))
 
             RateEvent(rating, eventViewModel, event)
-
-
         }
         // Icon for settings or more options, assuming using Material Icons
         EventDateTime(day = event.getDateString(), time = event.getTimeString())
