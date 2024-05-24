@@ -56,7 +56,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberAsyncImagePainter
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.user.GoMeetUser
@@ -280,60 +279,51 @@ fun MyEventInfo(
         }
       }
 
-    if (showShareEventDialog) {
-        ShareEventDialog(
-            eventId = eventId, // Ensure eventId is not null
-            onDismiss = { showShareEventDialog = false }
-        )
-    }
+  if (showShareEventDialog) {
+    ShareEventDialog(
+        eventId = eventId, // Ensure eventId is not null
+        onDismiss = { showShareEventDialog = false })
+  }
 }
 
 @Composable
 fun ShareEventDialog(eventId: String, onDismiss: () -> Unit) {
-    val context = LocalContext.current
-    val qrCodeBitmap by remember {
-        mutableStateOf(generateQRCode("Event", eventId))
-    }
+  val context = LocalContext.current
+  val qrCodeBitmap by remember { mutableStateOf(generateQRCode("Event", eventId)) }
 
-    AlertDialog(
-        containerColor = MaterialTheme.colorScheme.background,
-        onDismissRequest = onDismiss,
-        icon = {
-            Column {
-                Row {
-                    Spacer(modifier = Modifier.weight(1f))
-                    IconButton(onClick = { onDismiss() }) {
-                        Icon(
-                            Icons.Filled.Close,
-                            contentDescription = "Close",
-                            tint = MaterialTheme.colorScheme.tertiary,
-                            modifier = Modifier.size(30.dp)
-                        )
-                    }
-                }
-                Image(
-                    bitmap = qrCodeBitmap.asImageBitmap(),
-                    contentDescription = "QR Code",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color.White),
-                    contentScale = ContentScale.Fit
-                )
+  AlertDialog(
+      containerColor = MaterialTheme.colorScheme.background,
+      onDismissRequest = onDismiss,
+      icon = {
+        Column {
+          Row {
+            Spacer(modifier = Modifier.weight(1f))
+            IconButton(onClick = { onDismiss() }) {
+              Icon(
+                  Icons.Filled.Close,
+                  contentDescription = "Close",
+                  tint = MaterialTheme.colorScheme.tertiary,
+                  modifier = Modifier.size(30.dp))
             }
-        },
-        confirmButton = {
-            Button(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(10.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.outlineVariant
-                ),
-                onClick = { shareImage(context, qrCodeBitmap) }
-            ) {
-                Text("Share", color = White)
-            }
+          }
+          Image(
+              bitmap = qrCodeBitmap.asImageBitmap(),
+              contentDescription = "QR Code",
+              modifier = Modifier.fillMaxWidth().background(Color.White),
+              contentScale = ContentScale.Fit)
         }
-    )
+      },
+      confirmButton = {
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(10.dp),
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.outlineVariant),
+            onClick = { shareImage(context, qrCodeBitmap) }) {
+              Text("Share", color = White)
+            }
+      })
 }
 
 /**
