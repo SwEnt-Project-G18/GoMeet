@@ -49,6 +49,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -62,6 +63,7 @@ import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.mainscreens.events.posts.AddPost
 import com.github.se.gomeet.ui.mainscreens.events.posts.EventPost
+import com.github.se.gomeet.ui.mainscreens.profile.generateQRCode
 import com.github.se.gomeet.ui.mainscreens.profile.shareImage
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.theme.White
@@ -278,51 +280,60 @@ fun MyEventInfo(
         }
       }
 
-  if (showShareEventDialog) {
-    ShareEventDialog(
-        uid =
-            "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/QR_code_for_mobile_English_Wikipedia.svg/1200px-QR_code_for_mobile_English_Wikipedia.svg.png", // Replace with actual QR code URL
-        onDismiss = { showShareEventDialog = false })
-  }
+    if (showShareEventDialog) {
+        ShareEventDialog(
+            eventId = eventId, // Ensure eventId is not null
+            onDismiss = { showShareEventDialog = false }
+        )
+    }
 }
 
 @Composable
-fun ShareEventDialog(uid: String, onDismiss: () -> Unit) {
-  val painter = rememberAsyncImagePainter(uid)
-  val context = LocalContext.current
-  AlertDialog(
-      containerColor = MaterialTheme.colorScheme.background,
-      onDismissRequest = onDismiss,
-      icon = {
-        Column {
-          Row {
-            Spacer(modifier = Modifier.weight(1f))
-            IconButton(onClick = { onDismiss() }) {
-              Icon(
-                  Icons.Filled.Close,
-                  contentDescription = "Close",
-                  tint = MaterialTheme.colorScheme.tertiary,
-                  modifier = Modifier.size(30.dp))
+fun ShareEventDialog(eventId: String, onDismiss: () -> Unit) {
+    val context = LocalContext.current
+    val qrCodeBitmap by remember {
+        mutableStateOf(generateQRCode("Event", eventId))
+    }
+
+    AlertDialog(
+        containerColor = MaterialTheme.colorScheme.background,
+        onDismissRequest = onDismiss,
+        icon = {
+            Column {
+                Row {
+                    Spacer(modifier = Modifier.weight(1f))
+                    IconButton(onClick = { onDismiss() }) {
+                        Icon(
+                            Icons.Filled.Close,
+                            contentDescription = "Close",
+                            tint = MaterialTheme.colorScheme.tertiary,
+                            modifier = Modifier.size(30.dp)
+                        )
+                    }
+                }
+                Image(
+                    bitmap = qrCodeBitmap.asImageBitmap(),
+                    contentDescription = "QR Code",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.White),
+                    contentScale = ContentScale.Fit
+                )
             }
-          }
-          Image(
-              painter = painter,
-              contentDescription = "QR Code",
-              modifier = Modifier.fillMaxWidth().background(Color.White),
-              contentScale = ContentScale.Fit)
+        },
+        confirmButton = {
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(10.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.outlineVariant
+                ),
+                onClick = { shareImage(context, qrCodeBitmap) }
+            ) {
+                Text("Share", color = White)
+            }
         }
-      },
-      confirmButton = {
-        Button(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(10.dp),
-            colors =
-                ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.outlineVariant),
-            onClick = { shareImage(context, painter) }) {
-              Text("Share", color = White)
-            }
-      })
+    )
 }
 
 /**

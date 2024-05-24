@@ -49,6 +49,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
@@ -79,6 +80,10 @@ import com.github.se.gomeet.ui.theme.White
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.zxing.BarcodeFormat
+import com.google.zxing.MultiFormatWriter
+import com.google.zxing.common.BitMatrix
+import com.journeyapps.barcodescanner.BarcodeEncoder
 import java.io.File
 import java.io.FileOutputStream
 import kotlinx.coroutines.launch
@@ -349,12 +354,12 @@ fun Profile(
       }
 
   // Show the QR code dialog if the state is true
-  if (showShareProfileDialog) {
-    ShareProfileDialog(
-        uid =
-            "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/QR_code_for_mobile_English_Wikipedia.svg/1200px-QR_code_for_mobile_English_Wikipedia.svg.png", // Replace with actual QR code URL
-        onDismiss = { showShareProfileDialog = false })
-  }
+    if (showShareProfileDialog) {
+        ShareProfileDialog(
+            uid = currentUser?.uid ?: "", // Ensure UID is not null
+            onDismiss = { showShareProfileDialog = false }
+        )
+    }
 }
 
 @Composable
@@ -393,52 +398,66 @@ fun ProfileImage(
       contentScale = ContentScale.Crop)
 }
 
-@Composable
-fun ShareProfileDialog(uid: String, onDismiss: () -> Unit) {
-  val painter = rememberAsyncImagePainter(uid)
-  val context = LocalContext.current
-  AlertDialog(
-      containerColor = MaterialTheme.colorScheme.background,
-      onDismissRequest = onDismiss,
-      icon = {
-        Column {
-          Row {
-            Spacer(modifier = Modifier.weight(1f))
-            IconButton(onClick = { onDismiss() }) {
-              Icon(
-                  Icons.Filled.Close,
-                  contentDescription = "Close",
-                  tint = MaterialTheme.colorScheme.tertiary,
-                  modifier = Modifier.size(30.dp))
-            }
-          }
-          Image(
-              painter = painter,
-              contentDescription = "QR Code",
-              modifier = Modifier.fillMaxWidth().background(Color.White),
-              contentScale = ContentScale.Fit)
-        }
-      },
-      confirmButton = {
-        Button(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(10.dp),
-            colors =
-                ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.outlineVariant),
-            onClick = { shareImage(context, painter) }) {
-              Text("Share", color = White)
-            }
-      })
+
+
+fun generateQRCode(type: String, id: String): Bitmap {
+    val content = "$type/$id"
+    val writer = MultiFormatWriter()
+    val bitMatrix: BitMatrix = writer.encode(content, BarcodeFormat.QR_CODE, 1024, 1024)
+    val encoder = BarcodeEncoder()
+    return encoder.createBitmap(bitMatrix)
 }
 
-fun shareImage(context: Context, painter: AsyncImagePainter) {
-  if (painter.state is AsyncImagePainter.State.Success) {
-    val bitmap =
-        ((painter.state as AsyncImagePainter.State.Success).result.drawable as BitmapDrawable)
-            .bitmap
 
-    // Save bitmap to file
+@Composable
+fun ShareProfileDialog(uid: String, onDismiss: () -> Unit) {
+    val context = LocalContext.current
+    val qrCodeBitmap by remember {
+        mutableStateOf(generateQRCode("Profile", uid))
+    }
+
+    AlertDialog(
+        containerColor = MaterialTheme.colorScheme.background,
+        onDismissRequest = onDismiss,
+        icon = {
+            Column {
+                Row {
+                    Spacer(modifier = Modifier.weight(1f))
+                    IconButton(onClick = { onDismiss() }) {
+                        Icon(
+                            Icons.Filled.Close,
+                            contentDescription = "Close",
+                            tint = MaterialTheme.colorScheme.tertiary,
+                            modifier = Modifier.size(30.dp)
+                        )
+                    }
+                }
+                Image(
+                    bitmap = qrCodeBitmap.asImageBitmap(),
+                    contentDescription = "QR Code",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.White),
+                    contentScale = ContentScale.Fit
+                )
+            }
+        },
+        confirmButton = {
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(10.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.outlineVariant
+                ),
+                onClick = { shareImage(context, qrCodeBitmap) }
+            ) {
+                Text("Share", color = White)
+            }
+        }
+    )
+}
+
+fun shareImage(context: Context, bitmap: Bitmap) {
     val cachePath = File(context.cacheDir, "images")
     cachePath.mkdirs() // Create the directory if it doesn't exist
     val file = File(cachePath, "qr_code.png")
@@ -446,20 +465,19 @@ fun shareImage(context: Context, painter: AsyncImagePainter) {
     bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream)
     fileOutputStream.close()
 
-    // Get the URI of the file using FileProvider
-    val fileUri: Uri =
-        FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+    val fileUri: Uri = FileProvider.getUriForFile(
+        context,
+        "${context.packageName}.fileprovider",
+        file
+    )
 
-    // Create and launch the share intent
-    val shareIntent =
-        Intent().apply {
-          action = Intent.ACTION_SEND
-          putExtra(Intent.EXTRA_STREAM, fileUri)
-          type = "image/png"
-          addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        }
+    val shareIntent = Intent().apply {
+        action = Intent.ACTION_SEND
+        putExtra(Intent.EXTRA_STREAM, fileUri)
+        type = "image/png"
+        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    }
     context.startActivity(Intent.createChooser(shareIntent, "Share QR Code"))
-  }
 }
 
 @Preview
