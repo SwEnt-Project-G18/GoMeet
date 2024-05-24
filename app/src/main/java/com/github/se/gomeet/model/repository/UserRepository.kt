@@ -9,6 +9,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
+import kotlin.time.Duration.Companion.seconds
 
 /** Class that connects to the Firebase Firestore database to get, add, update and remove users. */
 class UserRepository private constructor() {
@@ -129,6 +130,18 @@ class UserRepository private constructor() {
           .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }
     }
 
+      fun updateUserRating(user: GoMeetUser, oldRating: Long, newRating: Long) {
+
+          if(oldRating == newRating || newRating < 0 || newRating > 5 || oldRating < 0 || oldRating > 5) return
+
+          val oldUserRating = user.rating
+          val newUserRating = Pair(oldUserRating.first + newRating - oldRating, oldUserRating.second)
+          if(oldRating == 0L) newUserRating.second.plus(1L)
+          Firebase.firestore.collection(USERS_COLLECTION).document(user.uid).update("rating", newUserRating)
+              .addOnSuccessListener { Log.d(TAG, "Successfully updated rating of user ${user.uid}") }
+              .addOnFailureListener { e -> Log.w(TAG, "Error updating rating of user ${user.uid}", e) }
+      }
+
     /**
      * Convert a GoMeetUser to a map.
      *
@@ -177,7 +190,7 @@ class UserRepository private constructor() {
           myEvents = (this["myEvents"] as? List<String>) ?: emptyList(),
           myFavorites = (this["myFavorites"] as? List<String>) ?: emptyList(),
           tags = (this["tags"] as? List<String>) ?: emptyList(),
-          rating = this["rating"] as? Pair<Int, Int> ?: Pair(0, 0))
+          rating = this["rating"] as? Pair<Long, Long> ?: Pair(0, 0))
     }
 
     private fun convertToInvitationsList(data: Any?): List<Invitation> {

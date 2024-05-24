@@ -21,8 +21,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.twotone.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -180,6 +182,10 @@ fun Profile(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel
                             text = ("@" + currentUser?.username),
                             color = MaterialTheme.colorScheme.onBackground,
                             style = MaterialTheme.typography.bodyLarge)
+                        Text(
+                            text = "Rating: ${currentUser?.rating?.first.toString()} / ${currentUser?.rating?.second}",
+                            color = MaterialTheme.colorScheme.onBackground,
+                            style = MaterialTheme.typography.bodyMedium)
                       }
                     }
                 Spacer(modifier = Modifier.height(screenHeight / 40))

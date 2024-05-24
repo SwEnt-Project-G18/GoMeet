@@ -16,7 +16,6 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.github.se.gomeet.model.event.*
 import com.github.se.gomeet.ui.authscreens.LoginScreen
 import com.github.se.gomeet.ui.authscreens.WelcomeScreen
 import com.github.se.gomeet.ui.authscreens.register.RegisterScreen
@@ -191,11 +190,19 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
     }
     composable(Route.LOGIN) {
       LoginScreen(authViewModel = authViewModel, nav = navAction) {
-        onNavToPostLogin(
-            eventViewModel,
-            userViewModel,
-            TOP_LEVEL_DESTINATIONS.first { it.route == postLoginScreen },
-            navAction)
+          connectChatClient(
+              client,
+              true,
+              navAction,
+              postLoginScreen,
+              eventViewModel,
+              userViewModel,
+              applicationContext)
+//        onNavToPostLogin(
+//            eventViewModel,
+//            userViewModel,
+//            TOP_LEVEL_DESTINATIONS.first { it.route == postLoginScreen },
+//            navAction)
       }
     }
     composable(Route.REGISTER) {
@@ -257,7 +264,7 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
                 navArgument("date") { type = NavType.StringType },
                 navArgument("time") { type = NavType.StringType },
                 navArgument("organizer") { type = NavType.StringType },
-                navArgument("rating") { type = NavType.IntType },
+                navArgument("rating") { type = NavType.LongType },
                 navArgument("description") { type = NavType.StringType },
                 navArgument("latitude") { type = NavType.FloatType }, // Change to DoubleType
                 navArgument("longitude") { type = NavType.FloatType } // Change to DoubleType
@@ -267,7 +274,7 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
           val date = entry.arguments?.getString("date") ?: ""
           val time = entry.arguments?.getString("time") ?: ""
           val organizer = entry.arguments?.getString("organizer") ?: ""
-          val rating: Int = entry.arguments?.getInt("rating") ?: 0
+          val rating: Long = entry.arguments?.getLong("rating") ?: 0
           val description = entry.arguments?.getString("description") ?: ""
           val latitude = entry.arguments?.getFloat("latitude") ?: 0.0
           val longitude = entry.arguments?.getFloat("longitude") ?: 0.0
@@ -512,20 +519,20 @@ private fun connectChatClient(
     // TODO: Generate Token, see https://getstream.io/tutorials/android-chat/
     if (navToPostLogin) {
       if (result.isSuccess) {
+        Log.d(TAG, "ChatClient: Successfully connected user ${userViewModel.value.currentUID}")
+      } else {
+        Toast.makeText(
+                applicationContext,
+                "Failed to connect to chat client",
+                Toast.LENGTH_SHORT)
+            .show()
+        Log.e(TAG, "ChatClient: Failed to connect user ${userViewModel.value.currentUID}")
+      }
         onNavToPostLogin(
             eventViewModel,
             userViewModel,
             TOP_LEVEL_DESTINATIONS.first { it.route == postLoginScreen },
             navAction)
-        Log.d(TAG, "ChatClient: Successfully connected user ${userViewModel.value.currentUID}")
-      } else {
-        Toast.makeText(
-                applicationContext,
-                "User account created, but failed to connect to chat",
-                Toast.LENGTH_SHORT)
-            .show()
-        Log.e(TAG, "ChatClient: Failed to connect user ${userViewModel.value.currentUID}")
-      }
     }
   }
 }

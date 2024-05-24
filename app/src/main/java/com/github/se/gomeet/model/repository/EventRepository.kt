@@ -3,6 +3,7 @@ package com.github.se.gomeet.model.repository
 import android.util.Log
 import com.github.se.gomeet.model.event.*
 import com.github.se.gomeet.model.event.location.*
+import com.github.se.gomeet.model.user.GoMeetUser
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.MetadataChanges
 import com.google.firebase.firestore.ktx.firestore
@@ -120,10 +121,20 @@ class EventRepository private constructor() {
           .addOnFailureListener { e -> Log.w(TAG, "Error updating document", e) }
     }
 
-      suspend fun updateRating(eventID: String, rating: Int, currentUID: String) {
+      /**
+       * This function updates the rating of an event by a particular user
+       *
+       * @param eventID The event ID
+       * @param newRating The new rating
+       * @param currentUID The rater's user ID
+       * @param oldRating The old rating
+       * @param organiser The organiser of the event
+       */
+      suspend fun updateRating(eventID: String, newRating: Long, currentUID: String,
+                               oldRating: Long, organiser: GoMeetUser) {
           val ratings = Firebase.firestore.collection(EVENT_COLLECTION).document(eventID).get().await().get(RATINGS) as MutableMap<String, Long>
-          Log.d(TAG, "Updating rating for event $eventID with rating $rating and currentUID $currentUID, current ratings are $ratings")
-          ratings[currentUID] = rating.toLong()
+          ratings[currentUID] = newRating
+          UserRepository.updateUserRating(organiser, newRating, oldRating)
             val documentRef = Firebase.firestore.collection(EVENT_COLLECTION).document(eventID)
             documentRef
                 .update(RATINGS, ratings)

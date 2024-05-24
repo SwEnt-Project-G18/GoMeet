@@ -38,7 +38,7 @@ data class GoMeetUser(
     var myFavorites: List<String>,
     var profilePicture: String = "",
     var tags: List<String>,
-    var rating: Pair<Int, Int> = Pair(0, 0),
+    var rating: Pair<Long, Long> = Pair(0, 0),
 ) {
 
   /**

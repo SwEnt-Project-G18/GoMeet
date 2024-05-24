@@ -78,7 +78,7 @@ fun EventHeader(
     eventID: String,
     eventViewModel: EventViewModel,
     organiser: GoMeetUser,
-    rating: MutableState<Int>,
+    rating: MutableState<Long>,
     nav: NavigationActions,
     date: String,
     time: String
@@ -121,16 +121,17 @@ fun EventHeader(
               val star = if (i <= rating.value) Icons.Filled.Star else Icons.TwoTone.Star
               Icon(
                   imageVector = star,
-                  contentDescription = "Rating Star",
+                  contentDescription = "Rating stars",
                   tint = MaterialTheme.colorScheme.outlineVariant,
                   modifier =
                       Modifier.clickable {
-                            if (rating.value == i) {
+                          val oldRating = rating.value
+                          if (rating.value == i.toLong()) {
                               rating.value = 0
                             } else {
-                              rating.value = i
+                              rating.value = i.toLong()
                             }
-                            eventViewModel.updateRating(eventID, rating.value)
+                            eventViewModel.updateRating(eventID, rating.value, oldRating, organiser)
                           }
                           .padding(4.dp))
             }

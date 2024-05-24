@@ -32,6 +32,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -94,7 +95,7 @@ fun MyEventInfo(
     date: String = "",
     time: String = "",
     organiserId: String,
-    rating: Int,
+    rating: Long,
     description: String = "",
     loc: LatLng = LatLng(0.0, 0.0),
     userViewModel: UserViewModel,
@@ -104,7 +105,7 @@ fun MyEventInfo(
   val organizer = remember { mutableStateOf<GoMeetUser?>(null) }
   val currentUser = remember { mutableStateOf<GoMeetUser?>(null) }
   val myEvent = remember { mutableStateOf<Event?>(null) }
-  val ratingState = remember { mutableIntStateOf(rating) }
+  val ratingState = remember { mutableLongStateOf(rating) }
   val coroutineScope = rememberCoroutineScope()
   val screenHeight = LocalConfiguration.current.screenHeightDp.dp
 
