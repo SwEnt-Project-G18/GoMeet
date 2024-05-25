@@ -254,28 +254,11 @@ fun PageUsers(
                   .testTag("FollowingUser"),
           horizontalArrangement = Arrangement.SpaceBetween,
           verticalAlignment = Alignment.CenterVertically) {
-            val painter: Painter =
-                if (user.profilePicture.isNotEmpty()) {
-                  rememberAsyncImagePainter(
-                      ImageRequest.Builder(LocalContext.current)
-                          .data(data = user.profilePicture)
-                          .apply {
-                            crossfade(true)
-                            placeholder(R.drawable.gomeet_logo)
-                          }
-                          .build())
-                } else {
-                  painterResource(id = R.drawable.gomeet_logo)
-                }
-            Image(
-                modifier =
-                    Modifier.width(60.dp)
-                        .height(60.dp)
-                        .clip(CircleShape)
-                        .background(color = MaterialTheme.colorScheme.background),
-                painter = painter,
-                contentDescription = "Profile picture",
-                contentScale = ContentScale.FillBounds)
+
+          ProfileImage(
+              userId = user.uid,
+              modifier = Modifier.testTag("Event Post Profile Picture"),
+              size = 50.dp)
             Column(modifier = Modifier.padding(start = 15.dp).weight(1f)) {
               Text(
                   text = "${user.firstName} ${user.lastName}",
