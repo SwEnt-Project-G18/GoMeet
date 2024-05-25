@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
@@ -108,7 +109,7 @@ fun RegisterScreen(
           Image(
               painter = painterResource(id = R.drawable.gomeet_text),
               contentDescription = "GoMeet",
-              modifier = Modifier.padding(top = 0.dp),
+              modifier = Modifier.padding(top = 0.dp).width(200.dp),
               alignment = Alignment.Center,
               colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.tertiary))
 

@@ -406,13 +406,7 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
           }
         }
     composable(route = Route.ADD_FRIEND) { AddFriend(navAction, userViewModel.value) }
-    composable(route = Route.SCAN) { backStackEntry ->
-      QRCodeScannerScreen(
-          onQRCodeScanned = { uid ->
-            navAction.navigateToScreen(Route.OTHERS_PROFILE.replace("{uid}", uid))
-          },
-          nav = navAction)
-    }
+    composable(route = Route.SCAN) { backStackEntry -> QRCodeScannerScreen(nav = navAction) }
 
     composable(
         route = Route.EDIT_EVENT,

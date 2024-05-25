@@ -3,7 +3,6 @@ package com.github.se.gomeet.ui.mainscreens.events
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -22,13 +21,8 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -48,22 +42,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberAsyncImagePainter
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.mainscreens.events.posts.AddPost
 import com.github.se.gomeet.ui.mainscreens.events.posts.EventPost
-import com.github.se.gomeet.ui.mainscreens.profile.shareImage
+import com.github.se.gomeet.ui.mainscreens.profile.ShareDialog
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.theme.White
 import com.github.se.gomeet.viewmodel.EventViewModel
@@ -152,20 +144,12 @@ fun MyEventInfo(
               }
             },
             actions = {
-              IconButton(onClick = { expanded = true }) {
+              IconButton(onClick = { showShareEventDialog = true }) {
                 Icon(
-                    imageVector = Icons.Filled.MoreVert,
-                    contentDescription = "More",
-                    modifier = Modifier.rotate(90f),
-                    tint = MaterialTheme.colorScheme.onBackground)
-              }
-              DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                DropdownMenuItem(
-                    text = { Text("Share Event", modifier = Modifier.padding(10.dp)) },
-                    onClick = {
-                      expanded = false
-                      showShareEventDialog = true
-                    })
+                    imageVector = ImageVector.vectorResource(R.drawable.upload_icon),
+                    contentDescription = "Share",
+                    tint = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.size(24.dp))
               }
             })
       },
@@ -280,50 +264,8 @@ fun MyEventInfo(
       }
 
   if (showShareEventDialog) {
-    ShareEventDialog(
-        uid =
-            "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/QR_code_for_mobile_English_Wikipedia.svg/1200px-QR_code_for_mobile_English_Wikipedia.svg.png", // Replace with actual QR code URL
-        onDismiss = { showShareEventDialog = false })
+    ShareDialog("Event", eventId, onDismiss = { showShareEventDialog = false })
   }
-}
-
-@Composable
-fun ShareEventDialog(uid: String, onDismiss: () -> Unit) {
-  val painter = rememberAsyncImagePainter(uid)
-  val context = LocalContext.current
-  AlertDialog(
-      containerColor = MaterialTheme.colorScheme.background,
-      onDismissRequest = onDismiss,
-      icon = {
-        Column {
-          Row {
-            Spacer(modifier = Modifier.weight(1f))
-            IconButton(onClick = { onDismiss() }) {
-              Icon(
-                  Icons.Filled.Close,
-                  contentDescription = "Close",
-                  tint = MaterialTheme.colorScheme.tertiary,
-                  modifier = Modifier.size(30.dp))
-            }
-          }
-          Image(
-              painter = painter,
-              contentDescription = "QR Code",
-              modifier = Modifier.fillMaxWidth().background(Color.White),
-              contentScale = ContentScale.Fit)
-        }
-      },
-      confirmButton = {
-        Button(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(10.dp),
-            colors =
-                ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.outlineVariant),
-            onClick = { shareImage(context, painter) }) {
-              Text("Share", color = White)
-            }
-      })
 }
 
 /**
