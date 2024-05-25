@@ -60,7 +60,7 @@ import kotlinx.coroutines.launch
  *
  * @param nav The navigation actions.
  * @param userViewModel The user view model.
- * @param eventId The ID of the event.
+ * @param eventCreationViewModel The event creation view model.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -198,6 +198,14 @@ fun AddParticipants(
       }
 }
 
+/**
+ * Composable function for the InviteUserWidget.
+ *
+ * @param nav The navigation actions.
+ * @param user The user to invite.
+ * @param pendingParticipants The list of pending participants.
+ * @param onInviteButtonClick The callback for the invite button click.
+ */
 @Composable
 fun InviteUserWidget(
     nav: NavigationActions,

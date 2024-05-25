@@ -507,6 +507,10 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
   }
 }
 
+/**
+ * ViewModel for the creation of an event. This viewModel is useful to store the participants that
+ * are invited to an event that is in creation (i.e. not created yet).
+ */
 class EventCreationViewModel : ViewModel() {
   val invitedParticipants = mutableStateListOf<GoMeetUser>()
 }

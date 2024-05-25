@@ -60,6 +60,12 @@ import kotlinx.coroutines.launch
 /**
  * This composable function represents the screen where the user can manage the invitations for one
  * of his event.
+ *
+ * @param currentUser The current user.
+ * @param currentEvent The current event.
+ * @param nav The navigation actions.
+ * @param userViewModel The user view model.
+ * @param eventViewModel The event view model.
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

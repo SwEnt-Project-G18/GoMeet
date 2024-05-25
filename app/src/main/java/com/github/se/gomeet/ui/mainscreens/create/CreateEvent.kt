@@ -96,6 +96,7 @@ private const val NUMBER_OF_SUGGESTIONS = 3
  * @param eventViewModel The event view model.
  * @param isPrivate The boolean value to determine if the event is private or not.
  * @param userViewModel The user view model.
+ * @param eventCreationViewModel The event creation view model.
  */
 @Composable
 fun CreateEvent(
