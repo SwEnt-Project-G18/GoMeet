@@ -49,6 +49,7 @@ class OthersProfileTest {
 
       // Create two new users
       Firebase.auth.createUserWithEmailAndPassword(email1, pwd1).await()
+      uid1 = Firebase.auth.currentUser!!.uid
       userVM = UserViewModel(uid1)
       eventVM = EventViewModel(uid1)
 
