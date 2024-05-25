@@ -197,23 +197,17 @@ internal fun GoogleMapView(
               events.value.forEachIndexed { index, event ->
                 val today = LocalDate.now()
                 val oneWeekLater = today.plusWeeks(1)
-
                 val isEventThisWeek =
                     event.date.isAfter(today.minusDays(1)) &&
                         event.date.isBefore(oneWeekLater.plusDays(1))
-
                 val stablePins = remember { eventViewModel.bitmapDescriptors }
                 val originalBitmap =
                     BitmapFactory.decodeResource(context.resources, R.drawable.default_pin)
-
                 val desiredWidth = 94
                 val desiredHeight = 140
-
                 val scaledBitmap =
                     Bitmap.createScaledBitmap(originalBitmap, desiredWidth, desiredHeight, true)
-
                 val scaledPin = BitmapDescriptorFactory.fromBitmap(scaledBitmap)
-
                 val customPinBitmapDescriptor =
                     if (isEventThisWeek) stablePins[event.eventID] else scaledPin
 
