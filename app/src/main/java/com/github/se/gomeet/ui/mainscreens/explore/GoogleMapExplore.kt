@@ -3,15 +3,29 @@ package com.github.se.gomeet.ui.mainscreens.explore
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -27,13 +41,26 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.modifier.modifierLocalConsumer
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
+import coil.request.ImageRequest
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
+import com.github.se.gomeet.model.event.eventMomentToString
 import com.github.se.gomeet.model.event.getEventDateString
 import com.github.se.gomeet.model.event.getEventTimeString
 import com.github.se.gomeet.ui.navigation.NavigationActions
+import com.github.se.gomeet.ui.theme.VeryLightBlue
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
@@ -45,7 +72,9 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapType
 import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.MarkerInfoWindow
 import com.google.maps.android.compose.MarkerInfoWindowContent
+import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 import java.time.LocalDate
@@ -95,10 +124,10 @@ internal fun GoogleMapView(
     nav: NavigationActions
 ) {
 
-  val ctx = LocalContext.current
+    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+  val screenWidth = LocalConfiguration.current.screenWidthDp
+  val context = LocalContext.current
   val coroutineScope = rememberCoroutineScope()
-
-  val eventStates = events.value.map { event -> rememberMarkerState(key = event.eventID, position =  LatLng(event.location.latitude, event.location.longitude)) }
 
   val uiSettings by remember {
     mutableStateOf(
@@ -115,7 +144,7 @@ internal fun GoogleMapView(
             isMyLocationEnabled = locationPermitted,
             mapStyleOptions =
                 MapStyleOptions.loadRawResourceStyle(
-                    ctx, if (isDarkTheme) R.raw.map_style_dark else R.raw.map_style_light)))
+                    context, if (isDarkTheme) R.raw.map_style_dark else R.raw.map_style_light)))
   }
 
   val mapVisible by remember { mutableStateOf(true) }
@@ -143,8 +172,6 @@ internal fun GoogleMapView(
     }
   }
 
-  val context = LocalContext.current
-
   LaunchedEffect(events.value) {
     Log.d("ViewModel", "Loading custom pins for ${events.value.size} events.")
     eventViewModel.loadCustomPins(context, events.value)
@@ -168,7 +195,25 @@ internal fun GoogleMapView(
     }
   }
 
+
   if (mapVisible) {
+      val eventStates = allEvents.value.associate { event ->
+          event.eventID to rememberMarkerState(position = LatLng(event.location.latitude, event.location.longitude))
+      }
+      val eventPainters= allEvents.value.associate { event ->
+          event.eventID to if (event.images.isNotEmpty())
+              rememberAsyncImagePainter(
+                  model = ImageRequest.Builder(context)
+                      .data(event.images[0])
+                      .crossfade(true)
+                      .allowHardware(false) // Ensure software rendering
+                      .build())
+              else
+                  painterResource(id = R.drawable.gomeet_logo)
+      }
+
+
+
     Box(Modifier.fillMaxSize()) {
       if (isLoading) {
         CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
@@ -183,18 +228,16 @@ internal fun GoogleMapView(
               if (visibleRegion != null) {
                 val bounds = LatLngBounds(visibleRegion.nearLeft, visibleRegion.farRight)
                 events.value =
-                    allEvents.value.filter { e ->
+                    events.value.filter { e ->
                       bounds.contains(LatLng(e.location.latitude, e.location.longitude))
                     }
               }
             },
             onMapClick = { isButtonVisible.value = true },
             onPOIClick = {}) {
-              val markerClick: () -> Boolean = {
-                isButtonVisible.value = false
-                false
-              }
-              events.value.forEachIndexed { index, event ->
+
+              events.value.forEach { event ->
+
                 val today = LocalDate.now()
                 val oneWeekLater = today.plusWeeks(1)
                 val isEventThisWeek =
@@ -205,52 +248,90 @@ internal fun GoogleMapView(
                     BitmapFactory.decodeResource(context.resources, R.drawable.default_pin)
                 val desiredWidth = 94
                 val desiredHeight = 140
-                val scaledBitmap =
-                    Bitmap.createScaledBitmap(originalBitmap, desiredWidth, desiredHeight, true)
+                  val scaledBitmap =
+                      Bitmap.createScaledBitmap(originalBitmap, desiredWidth, desiredHeight, true)
                 val scaledPin = BitmapDescriptorFactory.fromBitmap(scaledBitmap)
                 val customPinBitmapDescriptor =
                     if (isEventThisWeek) stablePins[event.eventID] else scaledPin
+                  val columnShape =
+                      RoundedCornerShape(
+                          topStart = 24.dp, topEnd = 24.dp, bottomStart = 10.dp, bottomEnd = 10.dp)
+                  MarkerInfoWindow(
+                      state = eventStates[event.eventID]!!,
+                      icon = customPinBitmapDescriptor ?: BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED),
+                  ) {
 
-                MarkerInfoWindowContent(
-                    state = eventStates[index],
-                    title = event.title,
-                    icon =
-                        customPinBitmapDescriptor
-                            ?: BitmapDescriptorFactory.defaultMarker(
-                                BitmapDescriptorFactory.HUE_RED),
-                    onClick = { markerClick() },
-                    onInfoWindowClick = {
-                      nav.navigateToEventInfo(
-                          eventId = event.eventID,
-                          title = event.title,
-                          date = getEventDateString(event.date),
-                          time = getEventTimeString(event.time),
-                          description = event.description,
-                          organizer = event.creator,
-                          loc = LatLng(event.location.latitude, event.location.longitude),
-                          rating = 0.0 // TODO: replace with actual rating
-                          // TODO: add image
+                  Box(
+                      modifier =
+                      Modifier
+                          .width((screenWidth * 0.5).dp)
+                          .padding(10.dp)
+                          .border(
+                              3.dp,
+                              MaterialTheme.colorScheme.outlineVariant,
+                              RoundedCornerShape(10.dp)
                           )
-                    },
-                    visible = true) {
-                      Row(modifier = Modifier.background(MaterialTheme.colorScheme.primaryContainer), verticalAlignment = Alignment.CenterVertically) {
-                        Column(Modifier.padding(20.dp)) {
-                          Text(
-                              event.title,
-                              color = MaterialTheme.colorScheme.secondary,
-                              style = MaterialTheme.typography.titleMedium)
-                          Text(
-                              getEventDateString(event.date),
-                              color = MaterialTheme.colorScheme.secondary,
-                              style = MaterialTheme.typography.bodyMedium)
-                        }
-                        Icon(
-                            imageVector = Icons.Filled.Info,
-                            tint = MaterialTheme.colorScheme.secondary,
-                            contentDescription = "See More",
-                            modifier = Modifier.padding(end = 20.dp))
+                          .background(
+                              MaterialTheme.colorScheme
+                                  .primaryContainer,
+                              columnShape
+                          )) {
+                      /*Card(
+                          shape = RoundedCornerShape(16.dp),
+                          modifier =
+                          Modifier
+                              .size(width = (screenWidth / 1.35).dp, height = screenHeight / 6)
+                              .padding(10.dp)
+                              .clickable {
+                                  nav.navigateToEventInfo(
+                                      eventId = event.eventID,
+                                      title = event.title,
+                                      date = getEventDateString(event.date),
+                                      time = getEventTimeString(event.time),
+                                      description = event.description,
+                                      organizer = event.creator,
+                                      loc = LatLng(
+                                          event.location.latitude,
+                                          event.location.longitude
+                                      ),
+                                      rating = 0.0 // TODO: replace with actual rating
+                                      // TODO: add image
+                                  )
+                              }) {
+
+                          Image(
+                              painter = eventPainters[event.eventID]!!,
+                              contentDescription = "Event Image",
+                              alignment = Alignment.Center,
+                              contentScale = ContentScale.Crop,
+                              modifier = Modifier
+                                  .fillMaxSize()
+                                  .aspectRatio(3f / 1.75f))
+                      }*/
+                      Row (modifier = Modifier.fillMaxWidth().padding(15.dp), verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.SpaceBetween){
+                          Column(horizontalAlignment = Alignment.Start) {
+                              Text(
+                                  text =
+                                  if (event.title.length > 37) event.title.take(33) + "...."
+                                  else event.title,
+                                  style = MaterialTheme.typography.titleMedium,
+                                  color = MaterialTheme.colorScheme.onBackground
+                              )
+                              Text(
+                                  text = eventMomentToString(event.date, event.time),
+                                  style = MaterialTheme.typography.bodyMedium, // Smaller text style
+                                  color = MaterialTheme.colorScheme.onBackground)
+                          }
+                          Icon(Icons.Outlined.Info,
+                              contentDescription = "",
+                              tint = MaterialTheme.colorScheme.outlineVariant,
+                              modifier = Modifier.size(25.dp))
+
                       }
-                    }
+
+
+                  }
+                  }
               }
             }
         content()

@@ -3,6 +3,7 @@ package com.github.se.gomeet.ui.mainscreens.explore
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -63,8 +64,7 @@ fun ContentInRow(
             Column(
                 modifier =
                     Modifier.padding(start = 10.dp)
-                        .shadow(elevation = 10.dp, shape = columnShape)
-                        .background(MaterialTheme.colorScheme.background, columnShape)
+                        .background(MaterialTheme.colorScheme.secondaryContainer, columnShape)
                         .fillMaxWidth()) {
                   Card(
                       shape = RoundedCornerShape(16.dp),
@@ -104,17 +104,18 @@ fun ContentInRow(
                             contentScale = ContentScale.Crop,
                             modifier = Modifier.fillMaxSize().aspectRatio(3f / 1.75f))
                       }
-                  Column(modifier = Modifier.padding(start = 10.dp, end = 10.dp, bottom = 10.dp)) {
+                  Column(modifier = Modifier.padding(start = 20.dp, end = 5.dp, bottom = 10.dp)) {
                     Text(
                         text =
                             if (event.title.length > 37) event.title.take(33) + "...."
                             else event.title,
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.tertiary)
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
                     Text(
                         text = eventMomentToString(event.date, event.time),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.tertiary)
+                        style = MaterialTheme.typography.bodyMedium, // Smaller text style
+                        color = MaterialTheme.colorScheme.onBackground)
                   }
                 }
           }
