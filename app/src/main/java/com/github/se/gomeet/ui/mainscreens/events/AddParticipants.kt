@@ -1,24 +1,28 @@
 package com.github.se.gomeet.ui.mainscreens.events
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -26,24 +30,33 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberImagePainter
+import com.github.se.gomeet.model.event.Invitation
+import com.github.se.gomeet.model.event.InviteStatus
 import com.github.se.gomeet.model.user.GoMeetUser
+import com.github.se.gomeet.ui.mainscreens.LoadingText
+import com.github.se.gomeet.ui.mainscreens.profile.ProfileImageUser
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.viewmodel.UserViewModel
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.launch
 
 /**
  * Composable function for the AddParticipants screen.
@@ -52,6 +65,7 @@ import com.github.se.gomeet.viewmodel.UserViewModel
  * @param userViewModel The user view model.
  * @param eventId The ID of the event.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddParticipants(
     nav: NavigationActions,
@@ -59,41 +73,90 @@ fun AddParticipants(
     eventId: String
 ) {
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+    val query = remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(true) }
     val coroutineScope = rememberCoroutineScope()
-    val participants = remember { mutableStateListOf<GoMeetUser>() }
-    val invitedUsers = remember { mutableStateListOf<String>() }
+    val user = remember { mutableStateOf<GoMeetUser?>(null) }
+    val potentialParticipants = remember { mutableStateListOf<GoMeetUser>() }
 
     LaunchedEffect(Unit) {
-        // Fetch users that can be invited
-        userViewModel.getAllUsers()?.let { participants.addAll(it) } // This should be implemented in your ViewModel
+        coroutineScope.launch {
+            val currentUser = Firebase.auth.currentUser!!.uid
+
+            user.value = userViewModel.getUser(currentUser)
+
+            val followers = user.value!!.followers
+            if (followers.isNotEmpty()) {
+                followers.forEach {
+                    val followerUser = userViewModel.getUser(it)
+                    potentialParticipants.add(followerUser!!)
+                }
+            }
+            val following = user.value!!.following
+            if (following.isNotEmpty()) {
+                following.forEach {
+                    val followingUser = userViewModel.getUser(it)
+                    if (!followers.contains(followingUser!!.uid)) {
+                        potentialParticipants.add(followingUser)
+                    }
+                }
+            }
+
+            isLoading = false
+        }
+    }
+
+    // Filtered users based on search query
+    val filteredUsers by
+    remember(query.value, potentialParticipants) {
+        derivedStateOf {
+            if (query.value.isEmpty()) {
+                potentialParticipants
+            } else {
+                potentialParticipants.filter { it.username.contains(query.value, ignoreCase = true) }
+            }
+        }
     }
 
     Scaffold(
         topBar = {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 15.dp, end = 15.dp)
-            ) {
-                IconButton(onClick = { nav.goBack() }) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back",
-                        tint = MaterialTheme.colorScheme.onBackground
-                    )
+            Column {
+                TopAppBar(
+                    modifier = Modifier.testTag("TopBar"),
+                    backgroundColor = MaterialTheme.colorScheme.background,
+                    elevation = 0.dp,
+                    title = {
+                        // Empty title since we're placing our own components
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = { nav.goBack() }) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Back",
+                                tint = MaterialTheme.colorScheme.onBackground)
+                        }
+                    })
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(start = 18.dp)) {
+                    Text(
+                        text = "Add Participants",
+                        color = MaterialTheme.colorScheme.onBackground,
+                        style =
+                        MaterialTheme.typography.headlineSmall.copy(
+                            fontWeight = FontWeight.SemiBold))
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    Text(
+                        text = "Done",
+                        color = MaterialTheme.colorScheme.onBackground,
+                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
+                        modifier = Modifier.padding(end = 15.dp).clickable {
+                            // TODO: Handle the logic to add participants to the event
+                        })
                 }
-                Spacer(modifier = Modifier.weight(1f))
-                Text(
-                    text = "Done",
-                    color = MaterialTheme.colorScheme.onBackground,
-                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
-                    modifier = Modifier.clickable {
-                        // Handle the logic to update the event with the invited users
-                        // eventViewModel.addParticipants(eventId, invitedUsers) // This should be implemented in your ViewModel
-                        nav.goBack()
-                    }
-                )
             }
         },
         bottomBar = {
@@ -106,59 +169,102 @@ fun AddParticipants(
             )
         }
     ) { innerPadding ->
-        Column(
-            Modifier
-                .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            participants.forEach { user ->
-                val isInvited = invitedUsers.contains(user.uid)
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(15.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Image(
-                        painter = rememberAsyncImagePainter(user.profilePicture),
-                        contentDescription = "Profile picture of ${user.username}",
-                        modifier = Modifier
-                            .size(48.dp)
-                            .padding(end = 8.dp)
-                    )
-                    Text(
-                        text = user.username,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Spacer(modifier = Modifier.weight(1f))
-                    Button(
-                        onClick = {
-                            if (isInvited) {
-                                invitedUsers.remove(user.uid)
-                            } else {
-                                invitedUsers.add(user.uid)
-                            }
-                        },
-                        colors = if (isInvited) {
-                            ButtonDefaults.buttonColors(
-                                containerColor = Color.Red,
-                                contentColor = Color.White
-                            )
-                        } else {
-                            ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.primary,
-                                contentColor = Color.White
+        Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
+            if (isLoading) {
+                LoadingText()
+            } else {
+                Column {
+                    GoMeetSearchBar(
+                        nav,
+                        query,
+                        MaterialTheme.colorScheme.primaryContainer,
+                        MaterialTheme.colorScheme.tertiary)
+
+                    Spacer(modifier = Modifier.height(screenHeight / 40))
+
+                    LazyColumn(
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        items(filteredUsers) { user ->
+                            InviteUserWidget(
+                                nav = nav,
+                                user = user,
+                                eventId = eventId,
+                                potentialParticipants = potentialParticipants.toSet(),
+                                onInviteButtonClick = { userId, isInvited ->
+                                    // Handle the logic to invite or cancel the invitation
+                                    // eventViewModel.inviteUser(eventId, userId, isInvited)
+                                }
                             )
                         }
-                    ) {
-                        Text(text = if (isInvited) "Cancel" else "Invite")
+
                     }
                 }
             }
-            Spacer(modifier = Modifier.height(16.dp))
+        }
+    }
+}
+
+@Composable
+fun InviteUserWidget(
+    nav: NavigationActions,
+    user: GoMeetUser,
+    eventId: String,
+    potentialParticipants: Set<GoMeetUser>,
+    onInviteButtonClick: (String, Boolean) -> Unit
+) {
+    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+
+    val isInvited = user.pendingRequests.contains(Invitation(eventId, InviteStatus.PENDING))
+
+    Row(modifier =
+    Modifier.fillMaxWidth()
+        .padding(vertical = 3.dp)
+        .clickable { nav.navigateToScreen(Route.OTHERS_PROFILE.replace("{uid}", user.uid)) }
+        .testTag("InviteUserWidget"),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            ProfileImageUser(userId = user.uid)
+
+            Spacer(modifier = Modifier.width(screenWidth / 20))
+
+            Column {
+                Text(
+                    text = "${user.firstName} ${user.lastName}",
+                    color = MaterialTheme.colorScheme.onBackground,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                Text(
+                    text = user.username,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6F)
+                )
+            }
+        }
+
+        Button(
+            shape = RoundedCornerShape(10.dp),
+            onClick = { onInviteButtonClick(user.uid, isInvited) },
+            modifier =
+            Modifier.padding(start = 15.dp)
+                .width(110.dp)
+                .testTag(if (isInvited) "CancelButton" else "InviteButton"),
+            colors =
+            ButtonDefaults.buttonColors(
+                containerColor =
+                if (isInvited) MaterialTheme.colorScheme.primaryContainer
+                else MaterialTheme.colorScheme.outlineVariant,
+                contentColor = if (isInvited) Color.Black else Color.White,
+                disabledContentColor = Color.Transparent,
+                disabledContainerColor = Color.Transparent
+            )
+        ) {
+            Text(
+                text = if (isInvited) "Cancel" else "Invite",
+                style = MaterialTheme.typography.labelLarge,
+                color = if (isInvited) MaterialTheme.colorScheme.onBackground else Color.White
+            )
         }
     }
 }
