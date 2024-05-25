@@ -53,7 +53,7 @@ fun ContentInRow(
     val screenWidth = configuration.screenWidthDp
     LazyRow(
         horizontalArrangement = Arrangement.Start,
-        modifier = Modifier.padding(bottom = 10.dp),
+        modifier = Modifier.padding(bottom = 10.dp, end = (screenWidth/5).dp),
         state = listState) {
           items(events) { event ->
             val columnShape =
