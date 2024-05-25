@@ -53,7 +53,7 @@ fun ProfileEventsList(
     eventList: MutableList<Event>,
     nav: NavigationActions
 ) {
-  Column(Modifier.fillMaxWidth().padding(start = 15.dp)) {
+  Column(Modifier.fillMaxWidth()) {
     Row(Modifier.testTag("EventsListHeader"), verticalAlignment = Alignment.CenterVertically) {
       Text(
           text = title,
@@ -73,12 +73,12 @@ fun ProfileEventsList(
         state = listState,
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
-        contentPadding = PaddingValues(end = 15.dp),
+        contentPadding = PaddingValues(end = 10.dp),
         modifier = Modifier.heightIn(min = 56.dp).testTag("EventsListItems")) {
           itemsIndexed(eventList) { _, event ->
             Column(
                 modifier =
-                    Modifier.width(170.dp).clickable {
+                    Modifier.width(170.dp).padding(start = 10.dp).clickable {
                       val dayString = getEventDateString(event.date)
                       val timeString = getEventTimeString(event.time)
 
@@ -120,6 +120,7 @@ fun ProfileEventsList(
 
                   Text(
                       text = event.title,
+                      maxLines = 1,
                       color = MaterialTheme.colorScheme.onBackground,
                       style = MaterialTheme.typography.bodyLarge)
                   Text(
