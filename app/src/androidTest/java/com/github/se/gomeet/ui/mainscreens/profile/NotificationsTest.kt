@@ -74,9 +74,13 @@ class NotificationsTest {
 
       TimeUnit.SECONDS.sleep(1L)
 
+      val event = eventVM.getEvent(eventId)!!
+
+      TimeUnit.SECONDS.sleep(1L)
+
       // Invite the user to the event
       userVM.gotInvitation(eventId, uid)
-      eventVM.sendInvitation(eventId, uid)
+      eventVM.sendInvitation(event, uid)
       TimeUnit.SECONDS.sleep(1L)
     }
 

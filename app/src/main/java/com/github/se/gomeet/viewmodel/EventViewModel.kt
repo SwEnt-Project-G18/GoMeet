@@ -355,11 +355,17 @@ class EventViewModel(val currentUID: String? = null) : ViewModel() {
    * Update the event pendingParticipants field by adding the given user to the list. Note that this
    * function should be called at the same time as the equivalent function in the UserViewModel.
    *
-   * @param eventID the ID of the event to update
+   * @param event the event to update
    * @param userId the ID of the user to add to the event
    */
-  fun sendInvitation(eventID: String, userId: String) {
-    viewModelScope.launch { EventRepository.sendInvitation(eventID, userId) }
+  fun sendInvitation(event: Event, userId: String) {
+    if (event.pendingParticipants.contains(userId)) {
+      Log.w(TAG, "User $userId is already invited to event ${event.eventID}")
+      return
+    }
+
+    EventRepository.updateEvent(
+        event.copy(pendingParticipants = event.pendingParticipants.plus(userId)))
   }
 
   /**
@@ -370,11 +376,12 @@ class EventViewModel(val currentUID: String? = null) : ViewModel() {
    * @param event the event to update
    * @param userId the ID of the user to add to the event
    */
-  fun acceptInvitation(event: Event, userId: String) {
-    assert(event.pendingParticipants.contains(userId))
+  fun acceptInvitation(event: Event, userId: String): Boolean {
+    if (!event.pendingParticipants.contains(userId)) return false
     EventRepository.updateEvent(
         event.copy(pendingParticipants = event.pendingParticipants.minus(userId)))
     joinEvent(event, userId)
+    return true
   }
 
   /**

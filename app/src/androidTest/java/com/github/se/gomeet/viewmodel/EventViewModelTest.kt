@@ -186,6 +186,8 @@ class EventViewModelTest {
     assert(events[1].eventID == eventId)
     assert(events[2].eventID == eid1)
     assert(events[3].eventID == eid2)
+
+    userViewModel.deleteUser(userID)
   }
 
   @Test
@@ -223,7 +225,7 @@ class EventViewModelTest {
     val userId = "uid1"
 
     // Send an invitation to the event
-    runBlocking { eventVM.sendInvitation(eventId, userId) }
+    runBlocking { eventVM.sendInvitation(eventVM.getEvent(eventId)!!, userId) }
 
     // Verify that the invited user was added to ehe event's pendingParticipants list
     runBlocking { assert(eventVM.getEvent(eventId)!!.pendingParticipants.contains(userId)) }
@@ -234,10 +236,10 @@ class EventViewModelTest {
     val userId = "uid2"
 
     // Invite a user to the event
-    runBlocking { eventVM.sendInvitation(eventId, userId) }
+    runBlocking { eventVM.sendInvitation(eventVM.getEvent(eventId)!!, userId) }
 
     // Make the user accept the invitation
-    runBlocking { eventVM.acceptInvitation(eventVM.getEvent(eventId)!!, userId) }
+    runBlocking { assert(eventVM.acceptInvitation(eventVM.getEvent(eventId)!!, userId)) }
 
     // Verify that the event's participants list was updated correctly
     runBlocking { assert(eventVM.getEvent(eventId)!!.participants.contains(userId)) }
@@ -248,7 +250,7 @@ class EventViewModelTest {
     val userId = "uid3"
 
     // Invite a user to the event
-    runBlocking { eventVM.sendInvitation(eventId, userId) }
+    runBlocking { eventVM.sendInvitation(eventVM.getEvent(eventId)!!, userId) }
 
     // Make the user decline the invitation
     runBlocking { eventVM.declineInvitation(eventVM.getEvent(eventId)!!, userId) }
@@ -279,7 +281,7 @@ class EventViewModelTest {
     val userId = "uid5"
 
     // Invite a user to the event
-    runBlocking { eventVM.sendInvitation(eventId, userId) }
+    runBlocking { eventVM.sendInvitation(eventVM.getEvent(eventId)!!, userId) }
 
     // Cancel the invitation
     runBlocking { eventVM.cancelInvitation(eventVM.getEvent(eventId)!!, uid) }

@@ -322,7 +322,7 @@ private fun inviteAction(
     if (user.pendingRequests.any { invitation ->
       invitation.eventId == event.value!!.eventID && invitation.status == PENDING
     }) {
-      eventViewModel.sendInvitation(event.value!!.eventID, user.uid)
+      eventViewModel.sendInvitation(event.value!!, user.uid)
     } else {
       eventViewModel.cancelInvitation(event.value!!, user.uid)
     }
