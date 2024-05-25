@@ -124,7 +124,6 @@ internal fun GoogleMapView(
     nav: NavigationActions
 ) {
 
-    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
   val screenWidth = LocalConfiguration.current.screenWidthDp
   val context = LocalContext.current
   val coroutineScope = rememberCoroutineScope()
@@ -199,17 +198,6 @@ internal fun GoogleMapView(
   if (mapVisible) {
       val eventStates = allEvents.value.associate { event ->
           event.eventID to rememberMarkerState(position = LatLng(event.location.latitude, event.location.longitude))
-      }
-      val eventPainters= allEvents.value.associate { event ->
-          event.eventID to if (event.images.isNotEmpty())
-              rememberAsyncImagePainter(
-                  model = ImageRequest.Builder(context)
-                      .data(event.images[0])
-                      .crossfade(true)
-                      .allowHardware(false) // Ensure software rendering
-                      .build())
-              else
-                  painterResource(id = R.drawable.gomeet_logo)
       }
 
 
@@ -288,38 +276,6 @@ internal fun GoogleMapView(
                                   .primaryContainer,
                               columnShape
                           )) {
-                      /*Card(
-                          shape = RoundedCornerShape(16.dp),
-                          modifier =
-                          Modifier
-                              .size(width = (screenWidth / 1.35).dp, height = screenHeight / 6)
-                              .padding(10.dp)
-                              .clickable {
-                                  nav.navigateToEventInfo(
-                                      eventId = event.eventID,
-                                      title = event.title,
-                                      date = getEventDateString(event.date),
-                                      time = getEventTimeString(event.time),
-                                      description = event.description,
-                                      organizer = event.creator,
-                                      loc = LatLng(
-                                          event.location.latitude,
-                                          event.location.longitude
-                                      ),
-                                      rating = 0.0 // TODO: replace with actual rating
-                                      // TODO: add image
-                                  )
-                              }) {
-
-                          Image(
-                              painter = eventPainters[event.eventID]!!,
-                              contentDescription = "Event Image",
-                              alignment = Alignment.Center,
-                              contentScale = ContentScale.Crop,
-                              modifier = Modifier
-                                  .fillMaxSize()
-                                  .aspectRatio(3f / 1.75f))
-                      }*/
                       Row (modifier = Modifier.fillMaxWidth().padding(15.dp), verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.SpaceBetween){
                           Column(horizontalAlignment = Alignment.Start) {
                               Text(

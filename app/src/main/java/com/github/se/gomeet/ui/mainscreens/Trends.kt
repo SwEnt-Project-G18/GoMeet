@@ -329,7 +329,7 @@ fun SortButton(eventList: MutableList<Event>, userTags: List<Tag>) {
                   text = { Text("Name") },
                   onClick = {
                     selectedOption = ALPHABETICAL
-                    eventList.sortBy { it.title }
+                    eventList.sortBy { it.title.lowercase() }
                     expanded = false
                   },
                   modifier =
