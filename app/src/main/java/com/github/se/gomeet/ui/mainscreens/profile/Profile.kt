@@ -263,7 +263,7 @@ fun Profile(
                                 // TODO
                               }) {
                             Text(
-                                text = currentUser?.myEvents?.size.toString(),
+                                text = joinedEventsList.size.toString(),
                                 color = MaterialTheme.colorScheme.onBackground,
                                 style = MaterialTheme.typography.titleLarge,
                                 modifier = Modifier.align(Alignment.CenterHorizontally))
