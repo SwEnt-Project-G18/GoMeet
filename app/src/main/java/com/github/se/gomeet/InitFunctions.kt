@@ -68,7 +68,6 @@ import io.getstream.chat.android.offline.plugin.factory.StreamOfflinePluginFacto
 import io.getstream.chat.android.state.plugin.config.StatePluginConfig
 import io.getstream.chat.android.state.plugin.factory.StreamStatePluginFactory
 import io.getstream.result.call.doOnResult
-import io.getstream.result.call.launch
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -415,13 +414,7 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
           }
         }
     composable(route = Route.ADD_FRIEND) { AddFriend(navAction, userViewModel) }
-    composable(route = Route.SCAN) { backStackEntry ->
-      QRCodeScannerScreen(
-          onQRCodeScanned = { uid ->
-            navAction.navigateToScreen(Route.OTHERS_PROFILE.replace("{uid}", uid))
-          },
-          nav = navAction)
-    }
+    composable(route = Route.SCAN) { backStackEntry -> QRCodeScannerScreen(nav = navAction) }
 
     composable(
         route = Route.EDIT_EVENT,
