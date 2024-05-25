@@ -3,6 +3,7 @@ package com.github.se.gomeet.ui.mainscreens.explore
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -97,9 +98,7 @@ internal fun GoogleMapView(
   val ctx = LocalContext.current
   val coroutineScope = rememberCoroutineScope()
 
-  val eventLocations =
-      events.value.map { event -> LatLng(event.location.latitude, event.location.longitude) }
-  val eventStates = eventLocations.map { location -> rememberMarkerState(position = location) }
+  val eventStates = events.value.map { event -> rememberMarkerState(key = event.eventID, position =  LatLng(event.location.latitude, event.location.longitude)) }
 
   val uiSettings by remember {
     mutableStateOf(
@@ -240,7 +239,7 @@ internal fun GoogleMapView(
                           )
                     },
                     visible = event.title.contains(query.value, ignoreCase = true)) {
-                      Row(verticalAlignment = Alignment.CenterVertically) {
+                      Row(modifier = Modifier.background(MaterialTheme.colorScheme.primaryContainer), verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.padding(20.dp)) {
                           Text(
                               event.title,
