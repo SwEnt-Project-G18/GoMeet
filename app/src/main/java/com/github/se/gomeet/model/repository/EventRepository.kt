@@ -3,14 +3,13 @@ package com.github.se.gomeet.model.repository
 import android.util.Log
 import com.github.se.gomeet.model.event.*
 import com.github.se.gomeet.model.event.location.*
-import com.github.se.gomeet.model.user.GoMeetUser
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.MetadataChanges
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.tasks.await
 import java.time.LocalDate
 import java.time.LocalTime
+import kotlinx.coroutines.tasks.await
 
 /**
  * This class represents the repository for the events. A repository is a class that communicates
@@ -121,27 +120,38 @@ class EventRepository private constructor() {
           .addOnFailureListener { e -> Log.w(TAG, "Error updating document", e) }
     }
 
-      /**
-       * This function updates the rating of an event by a particular user
-       *
-       * @param eventID The event ID
-       * @param newRating The new rating
-       * @param currentUID The rater's user ID
-       * @param oldRating The old rating
-       * @param organiserID The id of the organiser of the event
-       */
-      suspend fun updateRating(eventID: String, newRating: Long, currentUID: String,
-                               oldRating: Long, organiserID: String) {
-          if(currentUID == organiserID) return
-          val ratings = Firebase.firestore.collection(EVENT_COLLECTION).document(eventID).get().await().get(RATINGS) as MutableMap<String, Long>
-          ratings[currentUID] = newRating
-          UserRepository.updateUserRating(organiserID, newRating, oldRating)
-            val documentRef = Firebase.firestore.collection(EVENT_COLLECTION).document(eventID)
-            documentRef
-                .update(RATINGS, ratings)
-                .addOnSuccessListener { Log.d(TAG, "Rating of event $eventID was successfully updated!") }
-                .addOnFailureListener { e -> Log.w(TAG, "Error updating rating of event $eventID", e) }
-      }
+    /**
+     * This function updates the rating of an event by a particular user
+     *
+     * @param eventID The event ID
+     * @param newRating The new rating
+     * @param currentUID The rater's user ID
+     * @param oldRating The old rating
+     * @param organiserID The id of the organiser of the event
+     */
+    suspend fun updateRating(
+        eventID: String,
+        newRating: Long,
+        currentUID: String,
+        oldRating: Long,
+        organiserID: String
+    ) {
+      if (currentUID == organiserID) return
+      val ratings =
+          Firebase.firestore
+              .collection(EVENT_COLLECTION)
+              .document(eventID)
+              .get()
+              .await()
+              .get(RATINGS) as MutableMap<String, Long>
+      ratings[currentUID] = newRating
+      UserRepository.updateUserRating(organiserID, newRating, oldRating)
+      val documentRef = Firebase.firestore.collection(EVENT_COLLECTION).document(eventID)
+      documentRef
+          .update(RATINGS, ratings)
+          .addOnSuccessListener { Log.d(TAG, "Rating of event $eventID was successfully updated!") }
+          .addOnFailureListener { e -> Log.w(TAG, "Error updating rating of event $eventID", e) }
+    }
 
     /**
      * This function removes an event from the database
@@ -270,42 +280,41 @@ class EventRepository private constructor() {
      * in the database accordingly to what this function listens to
      */
     private fun startListeningForEvents() {
-      Firebase.firestore.collection(EVENT_COLLECTION).addSnapshotListener(MetadataChanges.INCLUDE) {
-          snapshot,
-          e ->
-        if (e != null) {
-          // Handle error
-          Log.w(TAG, "Listen failed.", e)
-          return@addSnapshotListener
-        }
-
-        for (docChange in snapshot?.documentChanges!!) {
-
-          val event = docChange.document.data.toEvent()
-          when (docChange.type) {
-            DocumentChange.Type.ADDED -> {
-              localEventsList.add(event)
+      Firebase.firestore.collection(EVENT_COLLECTION).addSnapshotListener(
+          MetadataChanges.INCLUDE) { snapshot, e ->
+            if (e != null) {
+              // Handle error
+              Log.w(TAG, "Listen failed.", e)
+              return@addSnapshotListener
             }
-            DocumentChange.Type.MODIFIED -> {
-              localEventsList
-                  .find { it == event }
-                  ?.let { localEventsList[localEventsList.indexOf(it)] = event }
-            }
-            DocumentChange.Type.REMOVED -> {
-              localEventsList.removeIf { it == event }
-            }
-          }
 
-          val source =
-              if (snapshot.metadata.isFromCache) {
-                "local cache"
-              } else {
-                "server"
+            for (docChange in snapshot?.documentChanges!!) {
+
+              val event = docChange.document.data.toEvent()
+              when (docChange.type) {
+                DocumentChange.Type.ADDED -> {
+                  localEventsList.add(event)
+                }
+                DocumentChange.Type.MODIFIED -> {
+                  localEventsList
+                      .find { it == event }
+                      ?.let { localEventsList[localEventsList.indexOf(it)] = event }
+                }
+                DocumentChange.Type.REMOVED -> {
+                  localEventsList.removeIf { it == event }
+                }
               }
 
-          Log.d(TAG, "Data fetched from $source")
-        }
-      }
+              val source =
+                  if (snapshot.metadata.isFromCache) {
+                    "local cache"
+                  } else {
+                    "server"
+                  }
+
+              Log.d(TAG, "Data fetched from $source")
+            }
+          }
     }
   }
 }

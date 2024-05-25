@@ -39,7 +39,8 @@ class OthersProfileTest {
     private lateinit var uid2: String
     private const val username2 = "othersrofiletest2"
 
-    private val userVM = UserViewModel()
+    private lateinit var userVM: UserViewModel
+    private lateinit var eventVM: EventViewModel
 
     @BeforeClass
     @JvmStatic
@@ -51,6 +52,9 @@ class OthersProfileTest {
           TimeUnit.SECONDS.sleep(1)
         }
         uid1 = result.result.user!!.uid
+        userVM = UserViewModel(uid1)
+        eventVM = EventViewModel(uid1)
+
         result = Firebase.auth.createUserWithEmailAndPassword(email2, pwd2)
         while (!result.isComplete) {
           TimeUnit.SECONDS.sleep(1)
@@ -111,8 +115,7 @@ class OthersProfileTest {
   fun testOthersProfile() {
     // Viewing the profile of user2
     composeTestRule.setContent {
-      OthersProfile(
-          NavigationActions(rememberNavController()), uid2, UserViewModel(), EventViewModel())
+      OthersProfile(NavigationActions(rememberNavController()), uid2, userVM, eventVM)
     }
     // Wait for the page to load
     composeTestRule.waitUntil { composeTestRule.onNodeWithTag("Profile Picture").isDisplayed() }

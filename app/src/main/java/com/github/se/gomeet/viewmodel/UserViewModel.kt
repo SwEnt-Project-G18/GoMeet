@@ -165,7 +165,7 @@ class UserViewModel(val currentUID: String? = null) : ViewModel() {
    * @param eventId The id of the event to join.
    * @param userId The id of the user joining the event.
    */
-  suspend fun joinEvent(eventId: String, userId: String) {
+  suspend fun joinEvent(eventId: String, userId: String = currentUID!!) {
     val possibleInvitation =
         getUser(userId)!!.pendingRequests.find {
           it.eventId == eventId && it.status == InviteStatus.PENDING
@@ -189,7 +189,7 @@ class UserViewModel(val currentUID: String? = null) : ViewModel() {
    * @param eventId The id of the event to create.
    * @param userId The id of the user creating the event.
    */
-  suspend fun userCreatesEvent(eventId: String, userId: String) {
+  suspend fun userCreatesEvent(eventId: String, userId: String = currentUID!!) {
     try {
       val goMeetUser = getUser(userId)!!
       editUser(goMeetUser.copy(myEvents = goMeetUser.myEvents.plus(eventId)))

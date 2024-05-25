@@ -160,8 +160,8 @@ fun OthersProfile(
                             color = MaterialTheme.colorScheme.onBackground,
                             style = MaterialTheme.typography.bodyLarge)
 
-                          Spacer(modifier = Modifier.height(screenHeight / 180))
-                          RatingStarWithText(rating = viewedUser.value!!.rating)
+                        Spacer(modifier = Modifier.height(screenHeight / 180))
+                        RatingStarWithText(rating = viewedUser.value!!.rating)
                       }
                     }
 

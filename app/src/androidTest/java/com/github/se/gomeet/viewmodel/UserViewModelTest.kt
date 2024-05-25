@@ -21,7 +21,7 @@ class UserViewModelTest {
     private const val phonenumber = "testphonenumber"
     private const val country = "testcountry"
 
-    private val userVM = UserViewModel()
+    private val userVM = UserViewModel(uid)
 
     @BeforeClass
     @JvmStatic

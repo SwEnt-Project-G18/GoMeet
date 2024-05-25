@@ -27,13 +27,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.twotone.Star
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.outlined.Notifications
-import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -52,7 +50,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -63,12 +60,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
-import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import com.github.se.gomeet.R
@@ -86,9 +81,9 @@ import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.firestore.FirebaseFirestore
 import java.io.File
 import java.io.FileOutputStream
+import java.util.Locale
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import java.util.Locale
 
 /**
  * Profile screen composable
@@ -156,9 +151,8 @@ fun Profile(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier =
-            Modifier
-                .padding(start = screenWidth / 15, top = screenHeight / 30)
-                .testTag("TopBar")) {
+                Modifier.padding(start = screenWidth / 15, top = screenHeight / 30)
+                    .testTag("TopBar")) {
               Text(
                   text = "My Profile",
                   color = MaterialTheme.colorScheme.onBackground,
@@ -173,16 +167,12 @@ fun Profile(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel
                         Icons.Outlined.Notifications,
                         contentDescription = "Notifications",
                         modifier =
-                        Modifier
-                            .size(screenHeight / 28)
-                            .align(Alignment.CenterVertically),
+                            Modifier.size(screenHeight / 28).align(Alignment.CenterVertically),
                         tint = MaterialTheme.colorScheme.onBackground)
                   }
 
               IconButton(
-                  modifier = Modifier
-                      .align(Alignment.CenterVertically)
-                      .padding(end = 15.dp),
+                  modifier = Modifier.align(Alignment.CenterVertically).padding(end = 15.dp),
                   onClick = {
                     nav.navigateTo(SECOND_LEVEL_DESTINATION.first { it.route == Route.SETTINGS })
                   }) {
@@ -190,9 +180,7 @@ fun Profile(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel
                         Icons.Outlined.Settings,
                         contentDescription = "Settings",
                         modifier =
-                        Modifier
-                            .size(screenHeight / 28)
-                            .align(Alignment.CenterVertically),
+                            Modifier.size(screenHeight / 28).align(Alignment.CenterVertically),
                         tint = MaterialTheme.colorScheme.onBackground)
                   }
             }
@@ -201,24 +189,20 @@ fun Profile(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel
           Column(
               verticalArrangement = Arrangement.SpaceEvenly,
               horizontalAlignment = Alignment.CenterHorizontally,
-              modifier = Modifier
-                  .padding(innerPadding)
-                  .verticalScroll(rememberScrollState(0))) {
+              modifier = Modifier.padding(innerPadding).verticalScroll(rememberScrollState(0))) {
                 Spacer(modifier = Modifier.height(screenHeight / 60))
                 Row(
                     horizontalArrangement = Arrangement.Start,
                     verticalAlignment = Alignment.CenterVertically,
                     modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(start = screenWidth / 20)
-                        .testTag("UserInfo")) {
+                        Modifier.fillMaxWidth()
+                            .padding(start = screenWidth / 20)
+                            .testTag("UserInfo")) {
                       ProfileImage(
                           userId = userId,
                           modifier = Modifier.testTag("Profile Picture"),
                           size = 101.dp)
                       Column(modifier = Modifier.padding(start = screenWidth / 20)) {
-
                         Text(
                             (currentUser?.firstName + " " + currentUser?.lastName),
                             textAlign = TextAlign.Center,
@@ -230,9 +214,8 @@ fun Profile(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel
                             color = MaterialTheme.colorScheme.onBackground,
                             style = MaterialTheme.typography.bodyLarge)
 
-                          Spacer(modifier = Modifier.height(screenHeight / 180))
+                        Spacer(modifier = Modifier.height(screenHeight / 180))
                         RatingStarWithText(rating = currentUser!!.rating)
-
                       }
                     }
                 Spacer(modifier = Modifier.height(screenHeight / 40))
@@ -243,9 +226,7 @@ fun Profile(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel
                       // Edit Profile button
                       Button(
                           onClick = { nav.navigateToScreen(Route.EDIT_PROFILE) },
-                          modifier = Modifier
-                              .height(37.dp)
-                              .width(screenWidth * 4 / 11),
+                          modifier = Modifier.height(37.dp).width(screenWidth * 4 / 11),
                           shape = RoundedCornerShape(10.dp),
                           colors =
                               ButtonDefaults.buttonColors(
@@ -333,9 +314,7 @@ fun Profile(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel
                           }
                     }
 
-                Spacer(modifier = Modifier
-                    .fillMaxWidth()
-                    .height(screenHeight / 50))
+                Spacer(modifier = Modifier.fillMaxWidth().height(screenHeight / 50))
 
                 LazyRow(
                     modifier = Modifier.fillMaxWidth(),
@@ -409,101 +388,98 @@ fun ProfileImage(
           },
       contentDescription = "Profile picture",
       modifier =
-      modifier
-          .size(size)
-          .clip(CircleShape)
-          .background(color = MaterialTheme.colorScheme.background),
+          modifier
+              .size(size)
+              .clip(CircleShape)
+              .background(color = MaterialTheme.colorScheme.background),
       contentScale = ContentScale.Crop)
 }
 
 @Composable
 fun RatingStarWithText(rating: Pair<Long, Long>) {
-    val doubleRating =
-        if (rating.second > 0) rating.first.toDouble() / rating.second.toDouble() else 0.0
-    Row {
-        Icon(
-            imageVector = Icons.Filled.Star,
-            contentDescription = "Rating",
-            tint = MaterialTheme.colorScheme.outlineVariant,
-            modifier = Modifier.size(20.dp)  // Set the size of the icon
+  val doubleRating =
+      if (rating.second > 0) rating.first.toDouble() / rating.second.toDouble() else 0.0
+  Row {
+    Icon(
+        imageVector = Icons.Filled.Star,
+        contentDescription = "Rating",
+        tint = MaterialTheme.colorScheme.outlineVariant,
+        modifier = Modifier.size(20.dp) // Set the size of the icon
         )
-        Text(
-            text = String.format(Locale.UK, "%.1f (%d)", doubleRating, rating.second),
-            fontSize = 16.sp,  // Set the font size
-            color = MaterialTheme.colorScheme.tertiary,
-            textAlign = TextAlign.Center,
-        )
-    }
+    Text(
+        text = String.format(Locale.UK, "%.1f (%d)", doubleRating, rating.second),
+        fontSize = 16.sp, // Set the font size
+        color = MaterialTheme.colorScheme.tertiary,
+        textAlign = TextAlign.Center,
+    )
+  }
 }
 
 @Composable
 fun ShareProfileDialog(uid: String, onDismiss: () -> Unit) {
-    val painter = rememberAsyncImagePainter(uid)
-    val context = LocalContext.current
-    AlertDialog(
-        containerColor = MaterialTheme.colorScheme.background,
-        onDismissRequest = onDismiss,
-        icon = {
-            Column {
-                Row {
-                    Spacer(modifier = Modifier.weight(1f))
-                    IconButton(onClick = { onDismiss() }) {
-                        Icon(
-                            Icons.Filled.Close,
-                            contentDescription = "Close",
-                            tint = MaterialTheme.colorScheme.tertiary,
-                            modifier = Modifier.size(30.dp)
-                        )
-                    }
-                }
-                Image(
-                    painter = painter,
-                    contentDescription = "QR Code",
-                    modifier = Modifier.fillMaxWidth().background(Color.White),
-                    contentScale = ContentScale.Fit
-                )
+  val painter = rememberAsyncImagePainter(uid)
+  val context = LocalContext.current
+  AlertDialog(
+      containerColor = MaterialTheme.colorScheme.background,
+      onDismissRequest = onDismiss,
+      icon = {
+        Column {
+          Row {
+            Spacer(modifier = Modifier.weight(1f))
+            IconButton(onClick = { onDismiss() }) {
+              Icon(
+                  Icons.Filled.Close,
+                  contentDescription = "Close",
+                  tint = MaterialTheme.colorScheme.tertiary,
+                  modifier = Modifier.size(30.dp))
             }
-        },
-        confirmButton = {
-            Button(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(10.dp),
-                colors =
+          }
+          Image(
+              painter = painter,
+              contentDescription = "QR Code",
+              modifier = Modifier.fillMaxWidth().background(Color.White),
+              contentScale = ContentScale.Fit)
+        }
+      },
+      confirmButton = {
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(10.dp),
+            colors =
                 ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.outlineVariant
-                ),
-                onClick = { shareImage(context, painter) }) {
-                Text("Share", color = White)
+                    containerColor = MaterialTheme.colorScheme.outlineVariant),
+            onClick = { shareImage(context, painter) }) {
+              Text("Share", color = White)
             }
-        })
+      })
 }
 
 fun shareImage(context: Context, painter: AsyncImagePainter) {
-    if (painter.state is AsyncImagePainter.State.Success) {
-        val bitmap =
-            ((painter.state as AsyncImagePainter.State.Success).result.drawable as BitmapDrawable)
-                .bitmap
+  if (painter.state is AsyncImagePainter.State.Success) {
+    val bitmap =
+        ((painter.state as AsyncImagePainter.State.Success).result.drawable as BitmapDrawable)
+            .bitmap
 
-        // Save bitmap to file
-        val cachePath = File(context.cacheDir, "images")
-        cachePath.mkdirs() // Create the directory if it doesn't exist
-        val file = File(cachePath, "qr_code.png")
-        val fileOutputStream = FileOutputStream(file)
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream)
-        fileOutputStream.close()
+    // Save bitmap to file
+    val cachePath = File(context.cacheDir, "images")
+    cachePath.mkdirs() // Create the directory if it doesn't exist
+    val file = File(cachePath, "qr_code.png")
+    val fileOutputStream = FileOutputStream(file)
+    bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream)
+    fileOutputStream.close()
 
-        // Get the URI of the file using FileProvider
-        val fileUri: Uri =
-            FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+    // Get the URI of the file using FileProvider
+    val fileUri: Uri =
+        FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
 
-        // Create and launch the share intent
-        val shareIntent =
-            Intent().apply {
-                action = Intent.ACTION_SEND
-                putExtra(Intent.EXTRA_STREAM, fileUri)
-                type = "image/png"
-                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            }
-        context.startActivity(Intent.createChooser(shareIntent, "Share QR Code"))
-    }
+    // Create and launch the share intent
+    val shareIntent =
+        Intent().apply {
+          action = Intent.ACTION_SEND
+          putExtra(Intent.EXTRA_STREAM, fileUri)
+          type = "image/png"
+          addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+    context.startActivity(Intent.createChooser(shareIntent, "Share QR Code"))
+  }
 }

@@ -130,19 +130,36 @@ class UserRepository private constructor() {
           .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }
     }
 
-  suspend fun updateUserRating(userID: String, newRating: Long, oldRating: Long) {
+    suspend fun updateUserRating(userID: String, newRating: Long, oldRating: Long) {
 
-      if(oldRating == newRating || newRating < 0 || newRating > 5 || oldRating < 0 || oldRating > 5) return
+      if (oldRating == newRating ||
+          newRating < 0 ||
+          newRating > 5 ||
+          oldRating < 0 ||
+          oldRating > 5)
+          return
 
-      val oldUserRatingMap = Firebase.firestore.collection(USERS_COLLECTION).document(userID).get().await().get(RATING) as Map<String, Long>
+      val oldUserRatingMap =
+          Firebase.firestore.collection(USERS_COLLECTION).document(userID).get().await().get(RATING)
+              as Map<String, Long>
       val oldUserRating = Pair(oldUserRatingMap["first"], oldUserRatingMap["second"])
-      val addOrRemoveCount = if(oldRating == 0L) 1L else if(newRating == 0L && oldUserRating.second!! > 0) -1L else 0L
-      val newUserRating = Pair(oldUserRating.first!! + newRating - oldRating, oldUserRating.second!! + addOrRemoveCount)
-      Firebase.firestore.collection(USERS_COLLECTION).document(userID).update(RATING, newUserRating)
+      val addOrRemoveCount =
+          if (oldRating == 0L) 1L
+          else if (newRating == 0L && oldUserRating.second!! > 0) -1L else 0L
+      val newUserRating =
+          Pair(
+              oldUserRating.first!! + newRating - oldRating,
+              oldUserRating.second!! + addOrRemoveCount)
+      Firebase.firestore
+          .collection(USERS_COLLECTION)
+          .document(userID)
+          .update(RATING, newUserRating)
           .addOnSuccessListener { Log.d(TAG, "Successfully updated rating of user ${userID}") }
           .addOnFailureListener { e -> Log.w(TAG, "Error updating rating of user ${userID}", e) }
-      Log.d(TAG, "Updating rating of user($oldRating to $newRating) ${userID} from ${oldUserRating} to ${newUserRating}")
-  }
+      Log.d(
+          TAG,
+          "Updating rating of user($oldRating to $newRating) ${userID} from ${oldUserRating} to ${newUserRating}")
+    }
 
     /**
      * Convert a GoMeetUser to a map.
@@ -176,9 +193,9 @@ class UserRepository private constructor() {
      * @return the GoMeetUser
      */
     private fun Map<String, Any>.toUser(id: String): GoMeetUser {
-        val ratingMap = this[RATING] as? Map<String, Long>
-        val ratingFst = ratingMap?.get("first") ?: 0L
-        val ratingSnd = ratingMap?.get("second") ?: 0L
+      val ratingMap = this[RATING] as? Map<String, Long>
+      val ratingFst = ratingMap?.get("first") ?: 0L
+      val ratingSnd = ratingMap?.get("second") ?: 0L
       return GoMeetUser(
           uid = id,
           username = this[USERNAME] as String,

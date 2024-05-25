@@ -28,7 +28,7 @@ class ProfileTest {
   @get:Rule val composeTestRule = createComposeRule()
 
   companion object {
-    private val userVM = UserViewModel()
+    private lateinit var userVM: UserViewModel
     private lateinit var uid: String
 
     private val usr = "profile@test.com"
@@ -44,6 +44,8 @@ class ProfileTest {
           TimeUnit.SECONDS.sleep(1)
         }
         uid = result.result.user!!.uid
+
+        userVM = UserViewModel(uid)
 
         // Add the user to the view model
         userVM.createUserIfNew(uid, "a", "b", "c", usr, "4567", "Angola", "")
@@ -67,11 +69,7 @@ class ProfileTest {
   @Test
   fun testProfile() {
     composeTestRule.setContent {
-      Profile(
-          NavigationActions(rememberNavController()),
-          userId = uid,
-          UserViewModel(),
-          EventViewModel(uid))
+      Profile(NavigationActions(rememberNavController()), userVM, EventViewModel(uid))
     }
 
     // Wait for the page to load

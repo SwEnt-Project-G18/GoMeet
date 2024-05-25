@@ -34,29 +34,23 @@ class NavigationTest {
       val nav = rememberNavController()
       NavHost(navController = nav, startDestination = Route.EVENTS) {
         composable(TOP_LEVEL_DESTINATIONS[0].route) {
-          Explore(nav = NavigationActions(nav), EventViewModel(null))
+          Explore(nav = NavigationActions(nav), eventVM)
         }
         composable(TOP_LEVEL_DESTINATIONS[1].route) {
           Events(
-              currentUser = currentUserId,
               nav = NavigationActions(rememberNavController()),
-              userViewModel = UserViewModel(),
-              eventViewModel = EventViewModel("NEEGn5cbkJZDXaezeGdfd2D4u6b2"))
+              userViewModel = userVM,
+              eventViewModel = eventVM)
         }
         composable(TOP_LEVEL_DESTINATIONS[2].route) {
           Trends(
-              currentUserId = currentUserId,
               nav = NavigationActions(rememberNavController()),
-              userViewModel = UserViewModel(),
-              eventViewModel = EventViewModel("NEEGn5cbkJZDXaezeGdfd2D4u6b2"))
+              userViewModel = userVM,
+              eventViewModel = eventVM)
         }
         composable(TOP_LEVEL_DESTINATIONS[3].route) { Create(NavigationActions(nav)) }
         composable(TOP_LEVEL_DESTINATIONS[4].route) {
-          Profile(
-              NavigationActions(nav),
-              userId = currentUserId,
-              UserViewModel(),
-              EventViewModel(currentUserId))
+          Profile(NavigationActions(nav), userVM, eventVM)
         }
         // Add more destinations as needed
       }
@@ -76,29 +70,23 @@ class NavigationTest {
       val nav = rememberNavController()
       NavHost(navController = nav, startDestination = TOP_LEVEL_DESTINATIONS[0].route) {
         composable(TOP_LEVEL_DESTINATIONS[0].route) {
-          Explore(nav = NavigationActions(nav), EventViewModel(null))
+          Explore(nav = NavigationActions(nav), eventVM)
         }
         composable(TOP_LEVEL_DESTINATIONS[1].route) {
           Events(
-              currentUser = currentUserId,
               nav = NavigationActions(rememberNavController()),
-              userViewModel = UserViewModel(),
-              eventViewModel = EventViewModel("NEEGn5cbkJZDXaezeGdfd2D4u6b2"))
+              userViewModel = userVM,
+              eventViewModel = eventVM)
         }
         composable(TOP_LEVEL_DESTINATIONS[2].route) {
           Trends(
-              currentUserId = currentUserId,
               nav = NavigationActions(rememberNavController()),
-              userViewModel = UserViewModel(),
-              eventViewModel = EventViewModel("NEEGn5cbkJZDXaezeGdfd2D4u6b2"))
+              userViewModel = userVM,
+              eventViewModel = eventVM)
         }
         composable(TOP_LEVEL_DESTINATIONS[3].route) { Create(NavigationActions(nav)) }
         composable(TOP_LEVEL_DESTINATIONS[4].route) {
-          Profile(
-              NavigationActions(nav),
-              userId = currentUserId,
-              UserViewModel(),
-              EventViewModel(currentUserId))
+          Profile(NavigationActions(nav), userVM, eventVM)
         }
       }
 
@@ -115,8 +103,9 @@ class NavigationTest {
   }
 
   companion object {
-    private val userVM = UserViewModel()
+    private lateinit var userVM: UserViewModel
     private lateinit var currentUserId: String
+    private lateinit var eventVM: EventViewModel
 
     private val usr = "u@navtest.com"
     private val pwd = "123456"
@@ -140,6 +129,8 @@ class NavigationTest {
       // Order is important here, since createUserIfNew sets current user to created user (so we
       // need to create the current user last)
       currentUserId = Firebase.auth.currentUser!!.uid
+      userVM = UserViewModel(currentUserId)
+      eventVM = EventViewModel(currentUserId)
       userVM.createUserIfNew(currentUserId, "a", "b", "c", usr, "4567", "Angola", "")
       TimeUnit.SECONDS.sleep(3)
     }

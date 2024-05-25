@@ -5,8 +5,6 @@ const val LATITUDE = "latitude"
 const val LONGITUDE = "longitude"
 const val NAME = "name"
 
-
-
 /**
  * This data class represents the location of an event.
  *

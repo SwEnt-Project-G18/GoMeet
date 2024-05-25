@@ -36,9 +36,9 @@ class EventInfoTest {
     private val eventTime = "00:00"
     private val eventDescription = "Event Description"
     private val eventLocation = LatLng(0.0, 0.0)
-    private val userVM = UserViewModel()
+    private val userVM = UserViewModel(organiserId)
     private val eventVM = EventViewModel(organiserId)
-    private val eventRating = 4.5
+    private val eventRating = 4L
     private lateinit var uid: String
 
     private val usr = "eventinfo@test.com"

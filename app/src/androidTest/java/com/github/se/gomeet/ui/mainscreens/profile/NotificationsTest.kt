@@ -30,7 +30,7 @@ class NotificationsTest {
 
   companion object {
     private const val uid = "NotificationsTestUser"
-    private val userVM = UserViewModel()
+    private val userVM = UserViewModel(uid)
 
     private const val eventId = "NotificationsTestEvent"
     private val eventVM = EventViewModel("AnotherUser")
@@ -99,9 +99,7 @@ class NotificationsTest {
 
   @Test
   fun testNotifications() {
-    composeTestRule.setContent {
-      Notifications(NavigationActions(rememberNavController()), uid, userVM)
-    }
+    composeTestRule.setContent { Notifications(NavigationActions(rememberNavController()), userVM) }
 
     composeTestRule.waitForIdle()
 
@@ -125,9 +123,7 @@ class NotificationsTest {
 
   @Test
   fun testAcceptButton() {
-    composeTestRule.setContent {
-      Notifications(NavigationActions(rememberNavController()), uid, userVM)
-    }
+    composeTestRule.setContent { Notifications(NavigationActions(rememberNavController()), userVM) }
     composeTestRule.waitUntil(timeoutMillis = 10000) {
       composeTestRule.onNodeWithText("Accept").isDisplayed()
     }

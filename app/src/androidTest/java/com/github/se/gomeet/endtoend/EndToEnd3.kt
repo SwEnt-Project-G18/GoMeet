@@ -59,7 +59,7 @@ class EndToEndTest3 : TestCase() {
     private var uid2 = ""
     private const val username2 = "test3_user2"
 
-    private val userVM = UserViewModel()
+    private lateinit var userVM: UserViewModel
     private lateinit var eventVM: EventViewModel
     private val authViewModel = AuthViewModel()
 
@@ -79,6 +79,8 @@ class EndToEndTest3 : TestCase() {
           TimeUnit.SECONDS.sleep(1)
         }
         uid1 = result.result.user!!.uid
+
+        userVM = UserViewModel(uid1)
 
         // Add the users to the view model
         userVM.createUserIfNew(

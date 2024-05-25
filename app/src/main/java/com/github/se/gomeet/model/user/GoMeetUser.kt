@@ -19,10 +19,6 @@ const val PROFILE_PICTURE = "profilePicture"
 const val TAGS = "tags"
 const val RATING = "rating"
 
-
-
-
-
 /**
  * This data class represents the user of the application. It contains the user's information.
  *

@@ -32,7 +32,7 @@ class EventsTest {
 
     private const val eventId = "EventsTestEvent"
 
-    private val userVM = UserViewModel()
+    private lateinit var userVM: UserViewModel
     private lateinit var eventVM: EventViewModel
 
     @JvmStatic
@@ -45,6 +45,8 @@ class EventsTest {
           TimeUnit.SECONDS.sleep(1)
         }
         uid = result.result.user!!.uid
+
+        userVM = UserViewModel(uid)
 
         // Add the user to the view model
         userVM.createUserIfNew(
@@ -105,7 +107,7 @@ class EventsTest {
   @Test
   fun testEvents() {
     composeTestRule.setContent {
-      Events(uid, NavigationActions(rememberNavController()), UserViewModel(), eventVM)
+      Events(NavigationActions(rememberNavController()), userVM, eventVM)
     }
 
     composeTestRule.waitForIdle()

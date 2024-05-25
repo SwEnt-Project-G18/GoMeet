@@ -40,7 +40,7 @@ class ProfileEventListTest {
     private const val eventId = "ProfileEventListEvent"
     private lateinit var event: Event
 
-    private val userVM = UserViewModel()
+    private lateinit var userVM: UserViewModel
     private lateinit var eventVM: EventViewModel
 
     @JvmStatic
@@ -53,6 +53,8 @@ class ProfileEventListTest {
           TimeUnit.SECONDS.sleep(1)
         }
         uid = result.result.user!!.uid
+
+        userVM = UserViewModel(uid)
 
         // Add the user to view model
         userVM.createUserIfNew(
@@ -117,7 +119,8 @@ class ProfileEventListTest {
           "title",
           rememberLazyListState(),
           mutableListOf(event),
-          NavigationActions(rememberNavController()))
+          NavigationActions(rememberNavController()),
+          userVM.currentUID!!)
     }
 
     // Wait for the page to load

@@ -17,7 +17,6 @@ class MainActivity : ComponentActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    debug() // TODO: remove this (@reviewer if you see this remind me to remove it)
 
     MapsInitializer.initialize(this)
     initCache()

@@ -28,7 +28,7 @@ class EditProfileTest {
   @get:Rule val composeTestRule = createComposeRule()
 
   companion object {
-    private var userVM = UserViewModel(null)
+    private lateinit var userVM: UserViewModel
     private lateinit var uid: String
 
     private val usr = "editprofile@test.com"
@@ -50,11 +50,11 @@ class EditProfileTest {
 
         // Add the user to the view model
         uid = Firebase.auth.currentUser!!.uid
+        userVM = UserViewModel(uid)
         userVM.createUserIfNew(uid, "a", "b", "c", usr, "4567", "Angola")
         while (userVM.getUser(uid) == null) {
           TimeUnit.SECONDS.sleep(1)
         }
-        userVM = UserViewModel(uid)
       }
     }
 

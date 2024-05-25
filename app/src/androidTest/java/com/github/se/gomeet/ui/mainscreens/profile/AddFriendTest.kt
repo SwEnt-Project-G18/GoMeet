@@ -39,7 +39,7 @@ class AddFriendTest {
     private const val lastName2 = "w"
     private const val username2 = "qwe"
 
-    private val userVM = UserViewModel()
+    private lateinit var userVM: UserViewModel
 
     @BeforeClass
     @JvmStatic
@@ -51,6 +51,8 @@ class AddFriendTest {
           TimeUnit.SECONDS.sleep(1)
         }
         uid1 = result.result.user!!.uid
+
+        userVM = UserViewModel(uid1)
 
         // Add the users to the view model
         userVM.createUserIfNew(

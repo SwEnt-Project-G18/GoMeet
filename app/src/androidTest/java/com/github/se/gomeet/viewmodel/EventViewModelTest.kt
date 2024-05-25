@@ -32,7 +32,6 @@ class EventViewModelTest {
     private val tags = MutableList<String>(0) { "" }
     private val images = emptyList<String>()
     private val imageUrl = null
-    private val userVM = UserViewModel()
     private const val eventId = "EventViewModelTestEvent"
 
     // 6 tags
@@ -40,6 +39,7 @@ class EventViewModelTest {
 
     private const val uid = "EventViewModelTestUser"
     private val eventVM = EventViewModel(uid)
+    private val userVM = UserViewModel(uid)
 
     @BeforeClass
     @JvmStatic
@@ -110,6 +110,7 @@ class EventViewModelTest {
     userVM.createUserIfNew(userID, username, firstName, lastName, email, phoneNumber, country)
 
     val eventViewModel = EventViewModel(userID)
+    val userViewModel = UserViewModel(userID)
 
     val eid1 = "01"
     val eid2 = "02"
@@ -136,7 +137,7 @@ class EventViewModelTest {
         tags1,
         emptyList(),
         null,
-        userVM,
+        userViewModel,
         eid1)
 
     eventViewModel.createEvent(
@@ -155,7 +156,7 @@ class EventViewModelTest {
         tags2,
         emptyList(),
         null,
-        UserViewModel(),
+        userViewModel,
         eid2)
 
     eventViewModel.createEvent(
@@ -174,7 +175,7 @@ class EventViewModelTest {
         tags3,
         emptyList(),
         null,
-        UserViewModel(),
+        userViewModel,
         eid3)
 
     TimeUnit.SECONDS.sleep(1)

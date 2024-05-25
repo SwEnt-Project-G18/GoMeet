@@ -24,7 +24,6 @@ const val IMAGES = "images"
 const val RATINGS = "ratings"
 const val POSTS = "posts"
 
-
 /**
  * This data class represents an event. An event is the main entity of the application.
  *

@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -26,7 +24,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -135,16 +132,12 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
   }
   Scaffold(
       bottomBar = { BottomNavigationFun(nav) },
-      modifier = Modifier
-          .fillMaxSize()
-          .testTag("ExploreUI"),
+      modifier = Modifier.fillMaxSize().testTag("ExploreUI"),
       floatingActionButton = {
         if (locationPermitted.value == true && isButtonVisible.value) {
           FloatingActionButton(
               onClick = { moveToCurrentLocation.value = CameraAction.ANIMATE },
-              modifier = Modifier
-                  .size(45.dp)
-                  .testTag("CurrentLocationButton"),
+              modifier = Modifier.size(45.dp).testTag("CurrentLocationButton"),
               containerColor = MaterialTheme.colorScheme.outlineVariant) {
                 Icon(
                     imageVector = ImageVector.vectorResource(R.drawable.location_icon),
@@ -155,9 +148,7 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
       }) { innerPadding ->
         if (isMapLoaded) {
           moveToCurrentLocation.value = CameraAction.MOVE
-          Box(modifier = Modifier
-              .padding(innerPadding)
-              .fillMaxSize()) {
+          Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
             GoogleMapView(
                 currentPosition = currentPosition,
                 allEvents = nonFilteredEvents,
@@ -168,17 +159,18 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
                 eventViewModel = eventViewModel,
                 nav = nav)
             Column(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .testTag("MapSlider"),
+                modifier = Modifier.fillMaxHeight().testTag("MapSlider"),
                 verticalArrangement = Arrangement.Bottom) {
                   ContentInRow(
-                      listState = rememberLazyListState(), eventList = eventList, nav = nav,
-                      currentUID = eventViewModel.currentUID!!,)
+                      listState = rememberLazyListState(),
+                      eventList = eventList,
+                      nav = nav,
+                      currentUID = eventViewModel.currentUID!!,
+                  )
                 }
           }
         } else {
-            LoadingText()
+          LoadingText()
         }
 
         SearchModule(
@@ -186,7 +178,7 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
             backgroundColor = MaterialTheme.colorScheme.background,
             contentColor = MaterialTheme.colorScheme.tertiary,
             currentUID = eventViewModel.currentUID!!,
-            )
+        )
       }
 }
 

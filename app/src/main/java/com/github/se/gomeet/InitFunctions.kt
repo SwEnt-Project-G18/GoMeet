@@ -191,19 +191,19 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
     }
     composable(Route.LOGIN) {
       LoginScreen(authViewModel = authViewModel, nav = navAction) {
-          connectChatClient(
-              client,
-              true,
-              navAction,
-              postLoginScreen,
-              eventViewModel,
-              userViewModel,
-              applicationContext)
-//        onNavToPostLogin(
-//            eventViewModel,
-//            userViewModel,
-//            TOP_LEVEL_DESTINATIONS.first { it.route == postLoginScreen },
-//            navAction)
+        connectChatClient(
+            client,
+            true,
+            navAction,
+            postLoginScreen,
+            eventViewModel,
+            userViewModel,
+            applicationContext)
+        //        onNavToPostLogin(
+        //            eventViewModel,
+        //            userViewModel,
+        //            TOP_LEVEL_DESTINATIONS.first { it.route == postLoginScreen },
+        //            navAction)
       }
     }
     composable(Route.REGISTER) {
@@ -280,7 +280,7 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
           val latitude = entry.arguments?.getFloat("latitude") ?: 0.0
           val longitude = entry.arguments?.getFloat("longitude") ?: 0.0
           val loc = LatLng(latitude.toDouble(), longitude.toDouble())
-          
+
           MyEventInfo(
               navAction,
               title,
@@ -530,18 +530,15 @@ private fun connectChatClient(
       if (result.isSuccess) {
         Log.d(TAG, "ChatClient: Successfully connected user ${userViewModel.value.currentUID}")
       } else {
-        Toast.makeText(
-                applicationContext,
-                "Failed to connect to chat client",
-                Toast.LENGTH_SHORT)
+        Toast.makeText(applicationContext, "Failed to connect to chat client", Toast.LENGTH_SHORT)
             .show()
         Log.e(TAG, "ChatClient: Failed to connect user ${userViewModel.value.currentUID}")
       }
-        onNavToPostLogin(
-            eventViewModel,
-            userViewModel,
-            TOP_LEVEL_DESTINATIONS.first { it.route == postLoginScreen },
-            navAction)
+      onNavToPostLogin(
+          eventViewModel,
+          userViewModel,
+          TOP_LEVEL_DESTINATIONS.first { it.route == postLoginScreen },
+          navAction)
     }
   }
 }
@@ -552,7 +549,7 @@ private fun connectChatClient(
  */
 fun debug() {
   val androidLocalhost = "10.0.2.2"
-//  Firebase.auth.signOut() // Uncomment this if the app crashes when you're already signed in
+  //  Firebase.auth.signOut() // Uncomment this if the app crashes when you're already signed in
   Firebase.firestore.clearPersistence()
   // It's best to sign out and clear cache at each run if you're testing. Avoids
   // unexpected Firebase issues.
