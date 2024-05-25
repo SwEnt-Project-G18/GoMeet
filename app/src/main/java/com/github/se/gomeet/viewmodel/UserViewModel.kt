@@ -9,8 +9,6 @@ import com.github.se.gomeet.model.event.Invitation
 import com.github.se.gomeet.model.event.InviteStatus
 import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.model.user.GoMeetUser
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -359,12 +357,11 @@ class UserViewModel(val currentUID: String? = null) : ViewModel() {
   fun follow(uid: String) {
     Log.d(TAG, "User $currentUID started following $uid")
     CoroutineScope(Dispatchers.IO).launch {
-      val senderUid = Firebase.auth.currentUser!!.uid
-      val sender = getUser(senderUid)
+      val sender = getUser(currentUID!!)
       val receiver = getUser(uid)
-      if (!sender!!.following.contains(uid) && !receiver!!.followers.contains(senderUid)) {
+      if (!sender!!.following.contains(uid) && !receiver!!.followers.contains(currentUID)) {
         editUser(sender.copy(following = sender.following.plus(uid)))
-        editUser(receiver.copy(followers = receiver.followers.plus(senderUid)))
+        editUser(receiver.copy(followers = receiver.followers.plus(currentUID)))
       } else {
         Log.w(TAG, "User $currentUID couldn't follow user $uid: Already following")
       }

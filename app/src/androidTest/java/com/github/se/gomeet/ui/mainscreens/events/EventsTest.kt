@@ -14,6 +14,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.tasks.await
 import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.junit.Rule
@@ -37,70 +38,55 @@ class EventsTest {
 
     @JvmStatic
     @BeforeClass
-    fun setup() {
-      runBlocking {
-        // Create a new user
-        var result = Firebase.auth.createUserWithEmailAndPassword(email, pwd)
-        while (!result.isComplete) {
-          TimeUnit.SECONDS.sleep(1)
-        }
-        uid = result.result.user!!.uid
+    fun setup() = runBlocking {
+      // Create a new user
+      Firebase.auth.createUserWithEmailAndPassword(email, pwd).await()
+      uid = Firebase.auth.currentUser!!.uid
 
-        userVM = UserViewModel(uid)
+      userVM = UserViewModel(uid)
 
-        // Add the user to the view model
-        userVM.createUserIfNew(
-            uid, username, "testfirstname", "testlastname", email, "testphonenumber", "testcountry")
-        while (userVM.getUser(uid) == null) {
-          TimeUnit.SECONDS.sleep(1)
-        }
+      // Add the user to the view model
+      userVM.createUserIfNew(
+          uid, username, "testfirstname", "testlastname", email, "testphonenumber", "testcountry")
 
-        // Sign in
-        result = Firebase.auth.signInWithEmailAndPassword(email, pwd)
-        while (!result.isComplete) {
-          TimeUnit.SECONDS.sleep(1)
-        }
+      // Sign in
+      Firebase.auth.signInWithEmailAndPassword(email, pwd).await()
 
-        // Create an event
-        eventVM = EventViewModel(uid)
-        eventVM.createEvent(
-            "title",
-            "description",
-            Location(0.0, 0.0, "location"),
-            LocalDate.of(2026, 1, 1),
-            LocalTime.of(9, 17),
-            0.0,
-            "url",
-            emptyList(),
-            emptyList(),
-            emptyList(),
-            1,
-            true,
-            emptyList(),
-            emptyList(),
-            null,
-            userVM,
-            eventId)
+      // Create an event
+      eventVM = EventViewModel(uid)
+      eventVM.createEvent(
+          "title",
+          "description",
+          Location(0.0, 0.0, "location"),
+          LocalDate.of(2026, 1, 1),
+          LocalTime.of(9, 17),
+          0.0,
+          "url",
+          emptyList(),
+          emptyList(),
+          emptyList(),
+          1,
+          true,
+          emptyList(),
+          emptyList(),
+          null,
+          userVM,
+          eventId)
 
-        // Add the event to the user's favourites
-        userVM.editUser(userVM.getUser(uid)!!.copy(myFavorites = listOf(eventId)))
-        while (userVM.getUser(uid)!!.myFavorites.isEmpty()) {
-          TimeUnit.SECONDS.sleep(1)
-        }
-      }
+      // Add the event to the user's favourites
+      userVM.editUser(userVM.getUser(uid)!!.copy(myFavorites = listOf(eventId)))
+      TimeUnit.SECONDS.sleep(1)
     }
 
     @AfterClass
     @JvmStatic
-    fun tearDown() {
-      runBlocking {
-        // Clean up the event
-        eventVM.getAllEvents()?.forEach { eventVM.removeEvent(it.eventID) }
+    fun tearDown() = runBlocking {
+      // Clean up the event
+      eventVM.getAllEvents()?.forEach { eventVM.removeEvent(it.eventID) }
 
-        // Clean up the user
-        Firebase.auth.currentUser?.delete()
-        userVM.deleteUser(uid)
-      }
+      // Clean up the user
+      Firebase.auth.currentUser?.delete()?.await()
+      userVM.deleteUser(uid)
     }
   }
 

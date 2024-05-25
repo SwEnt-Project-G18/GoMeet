@@ -34,6 +34,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.tasks.await
 import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.junit.Rule
@@ -70,130 +71,100 @@ class EndToEndTest2 : TestCase() {
 
     @JvmStatic
     @BeforeClass
-    fun setup() {
-      runBlocking {
-        // create two new users
-        var result = Firebase.auth.createUserWithEmailAndPassword(email1, pwd1)
-        while (!result.isComplete) {
-          TimeUnit.SECONDS.sleep(1)
-        }
-        uid1 = result.result.user!!.uid
+    fun setup() = runBlocking {
+      // create two new users
+      Firebase.auth.createUserWithEmailAndPassword(email1, pwd1).await()
+      uid1 = Firebase.auth.currentUser!!.uid
 
-        result = Firebase.auth.createUserWithEmailAndPassword(email2, pwd2)
-        while (!result.isComplete) {
-          TimeUnit.SECONDS.sleep(1)
-        }
-        uid2 = result.result.user!!.uid
+      Firebase.auth.createUserWithEmailAndPassword(email2, pwd2).await()
+      uid2 = Firebase.auth.currentUser!!.uid
 
-        userVM = UserViewModel(uid1)
+      userVM = UserViewModel(uid1)
 
-        // Add the users to the view model
-        userVM.createUserIfNew(
-            uid1,
-            username1,
-            "testfirstname",
-            "testlastname",
-            email1,
-            "testphonenumber",
-            "testcountry")
-        while (userVM.getUser(uid1) == null) {
-          TimeUnit.SECONDS.sleep(1)
-        }
-        userVM.createUserIfNew(
-            uid2, username2, firstname2, lastname2, email2, "testphonenumber2", "testcountry2")
-        while (userVM.getUser(uid2) == null) {
-          TimeUnit.SECONDS.sleep(1)
-        }
+      // Add the users to the view model
+      userVM.createUserIfNew(
+          uid1,
+          username1,
+          "testfirstname",
+          "testlastname",
+          email1,
+          "testphonenumber",
+          "testcountry")
+      userVM.createUserIfNew(
+          uid2, username2, firstname2, lastname2, email2, "testphonenumber2", "testcountry2")
 
-        // user1 is used to create an event
-        result = Firebase.auth.signInWithEmailAndPassword(email1, pwd1)
-        while (!result.isComplete) {
-          TimeUnit.SECONDS.sleep(1)
-        }
+      // user1 is used to create an event
+      Firebase.auth.signInWithEmailAndPassword(email1, pwd1).await()
 
-        eventVM = EventViewModel(uid1)
-        eventVM.createEvent(
-            "title",
-            "description",
-            Location(0.0, 0.0, "location"),
-            LocalDate.of(2025, 3, 30),
-            LocalTime.now(),
-            0.0,
-            "url",
-            emptyList(),
-            emptyList(),
-            emptyList(),
-            0,
-            true,
-            emptyList(),
-            emptyList(),
-            null,
-            userVM,
-            "eventuid1")
-        while (eventVM.getEvent("eventuid1") == null) {
-          TimeUnit.SECONDS.sleep(1)
-        }
+      eventVM = EventViewModel(uid1)
+      eventVM.createEvent(
+          "title",
+          "description",
+          Location(0.0, 0.0, "location"),
+          LocalDate.of(2025, 3, 30),
+          LocalTime.now(),
+          0.0,
+          "url",
+          emptyList(),
+          emptyList(),
+          emptyList(),
+          0,
+          true,
+          emptyList(),
+          emptyList(),
+          null,
+          userVM,
+          "eventuid1")
 
-        Firebase.auth.signOut()
-        while (Firebase.auth.currentUser != null) {
-          TimeUnit.SECONDS.sleep(1)
-        }
+      Firebase.auth.signOut()
 
-        // user2 is used to create the second event
-        result = Firebase.auth.signInWithEmailAndPassword(email2, pwd2)
-        while (!result.isComplete) {
-          TimeUnit.SECONDS.sleep(1)
-        }
+      // user2 is used to create the second event
+      Firebase.auth.signInWithEmailAndPassword(email2, pwd2).await()
 
-        eventVM = EventViewModel(Firebase.auth.currentUser!!.uid)
-        eventVM.createEvent(
-            "title",
-            "description",
-            Location(0.0, 0.0, "location"),
-            LocalDate.of(2025, 3, 30),
-            LocalTime.now(),
-            0.0,
-            "url",
-            emptyList(),
-            emptyList(),
-            emptyList(),
-            0,
-            true,
-            emptyList(),
-            emptyList(),
-            null,
-            userVM,
-            "eventuid2")
-        TimeUnit.SECONDS.sleep(3)
+      eventVM = EventViewModel(Firebase.auth.currentUser!!.uid)
+      eventVM.createEvent(
+          "title",
+          "description",
+          Location(0.0, 0.0, "location"),
+          LocalDate.of(2025, 3, 30),
+          LocalTime.now(),
+          0.0,
+          "url",
+          emptyList(),
+          emptyList(),
+          emptyList(),
+          0,
+          true,
+          emptyList(),
+          emptyList(),
+          null,
+          userVM,
+          "eventuid2")
 
-        Firebase.auth.signOut()
-        TimeUnit.SECONDS.sleep(3)
+      Firebase.auth.signOut()
 
-        // user2 is used to log in and perform the tests
-        eventVM = EventViewModel(uid2)
-        userVM = UserViewModel(uid2)
-        authViewModel.signOut()
-      }
+      // user2 is used to log in and perform the tests
+      eventVM = EventViewModel(uid2)
+      userVM = UserViewModel(uid2)
+      authViewModel.signOut()
+
+      TimeUnit.SECONDS.sleep(1)
     }
 
     @AfterClass
     @JvmStatic
-    fun tearDown() {
-      runBlocking {
-        // clean up the event
-        eventVM.getAllEvents()?.forEach { eventVM.removeEvent(it.eventID) }
+    fun tearDown() = runBlocking {
+      // clean up the event
+      eventVM.getAllEvents()?.forEach { eventVM.removeEvent(it.eventID) }
 
-        // clean up the users
-        Firebase.auth.currentUser?.delete()
-        userVM.deleteUser(uid1)
-        userVM.deleteUser(uid2)
+      // clean up the users
+      Firebase.auth.currentUser?.delete()?.await()
+      userVM.deleteUser(uid1)
+      userVM.deleteUser(uid2)
 
-        val result = Firebase.auth.signInWithEmailAndPassword(email1, pwd1)
-        while (!result.isComplete) {
-          TimeUnit.SECONDS.sleep(1)
-        }
-        Firebase.auth.currentUser?.delete()
-      }
+      Firebase.auth.signInWithEmailAndPassword(email1, pwd1).await()
+      Firebase.auth.currentUser?.delete()?.await()
+      return@runBlocking
     }
   }
 

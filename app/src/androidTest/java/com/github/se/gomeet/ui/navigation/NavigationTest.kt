@@ -17,6 +17,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.tasks.await
 import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.junit.Rule
@@ -112,34 +113,25 @@ class NavigationTest {
 
     @BeforeClass
     @JvmStatic
-    fun setUp() {
-      TimeUnit.SECONDS.sleep(3)
+    fun setUp() = runBlocking {
 
       // Create a new user and sign in
-      var result = Firebase.auth.createUserWithEmailAndPassword(usr, pwd)
-      while (!result.isComplete) {
-        TimeUnit.SECONDS.sleep(1)
-      }
-      result = Firebase.auth.signInWithEmailAndPassword(usr, pwd)
-      while (!result.isComplete) {
-        TimeUnit.SECONDS.sleep(1)
-      }
+      Firebase.auth.createUserWithEmailAndPassword(usr, pwd).await()
+      Firebase.auth.signInWithEmailAndPassword(usr, pwd).await()
 
       // Set up the user view model
-      // Order is important here, since createUserIfNew sets current user to created user (so we
-      // need to create the current user last)
       currentUserId = Firebase.auth.currentUser!!.uid
       userVM = UserViewModel(currentUserId)
       eventVM = EventViewModel(currentUserId)
       userVM.createUserIfNew(currentUserId, "a", "b", "c", usr, "4567", "Angola", "")
-      TimeUnit.SECONDS.sleep(3)
+      TimeUnit.SECONDS.sleep(1)
     }
 
     @AfterClass
     @JvmStatic
-    fun tearDown() {
+    fun tearDown() = runBlocking {
       // Clean up the user view model
-      Firebase.auth.currentUser!!.delete()
+      Firebase.auth.currentUser!!.delete().await()
       userVM.deleteUser(currentUserId)
     }
   }

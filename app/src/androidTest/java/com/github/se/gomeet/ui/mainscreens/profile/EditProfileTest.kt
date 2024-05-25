@@ -17,6 +17,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.tasks.await
 import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.junit.Rule
@@ -36,36 +37,25 @@ class EditProfileTest {
 
     @BeforeClass
     @JvmStatic
-    fun setUp() {
-      runBlocking {
-        // Create a new user and sign in
-        var result = Firebase.auth.createUserWithEmailAndPassword(usr, pwd)
-        while (!result.isComplete) {
-          TimeUnit.SECONDS.sleep(1)
-        }
-        result = Firebase.auth.signInWithEmailAndPassword(usr, pwd)
-        while (!result.isComplete) {
-          TimeUnit.SECONDS.sleep(1)
-        }
+    fun setUp() = runBlocking {
 
-        // Add the user to the view model
-        uid = Firebase.auth.currentUser!!.uid
-        userVM = UserViewModel(uid)
-        userVM.createUserIfNew(uid, "a", "b", "c", usr, "4567", "Angola")
-        while (userVM.getUser(uid) == null) {
-          TimeUnit.SECONDS.sleep(1)
-        }
-      }
+      // Create a new user and sign in
+      Firebase.auth.createUserWithEmailAndPassword(usr, pwd).await()
+      Firebase.auth.signInWithEmailAndPassword(usr, pwd).await()
+
+      // Add the user to the view model
+      uid = Firebase.auth.currentUser!!.uid
+      userVM = UserViewModel(uid)
+      userVM.createUserIfNew(uid, "a", "b", "c", usr, "4567", "Angola")
+      TimeUnit.SECONDS.sleep(1)
     }
 
     @AfterClass
     @JvmStatic
-    fun tearDown() {
-      runBlocking {
-        // Clean up the user
-        Firebase.auth.currentUser!!.delete()
-        userVM.deleteUser(uid)
-      }
+    fun tearDown() = runBlocking {
+      // Clean up the user
+      Firebase.auth.currentUser!!.delete().await()
+      userVM.deleteUser(uid)
     }
   }
 

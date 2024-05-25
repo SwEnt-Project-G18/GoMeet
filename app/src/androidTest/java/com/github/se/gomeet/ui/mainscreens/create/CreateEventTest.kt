@@ -30,11 +30,11 @@ class CreateEventTest {
 
     @AfterClass
     @JvmStatic
-    fun tearDown() {
-      runBlocking {
-        // Clean up the event
-        eventVM.getAllEvents()?.forEach { eventVM.removeEvent(it.eventID) }
-      }
+    fun tearDown() = runBlocking {
+
+      // Clean up the events
+      eventVM.getAllEvents()?.forEach { eventVM.removeEvent(it.eventID) }
+      return@runBlocking
     }
   }
 

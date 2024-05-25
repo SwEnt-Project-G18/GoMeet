@@ -18,6 +18,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.tasks.await
 import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.junit.Rule
@@ -46,59 +47,45 @@ class EventInfoTest {
 
     @BeforeClass
     @JvmStatic
-    fun setUp() {
-      runBlocking {
-        // Create a new user and sign in
-        var result = Firebase.auth.createUserWithEmailAndPassword(usr, pwd)
-        while (!result.isComplete) {
-          TimeUnit.SECONDS.sleep(1)
-        }
-        result = Firebase.auth.signInWithEmailAndPassword(usr, pwd)
-        while (!result.isComplete) {
-          TimeUnit.SECONDS.sleep(1)
-        }
+    fun setUp() = runBlocking {
+      // Create a new user and sign in
+      Firebase.auth.createUserWithEmailAndPassword(usr, pwd).await()
+      Firebase.auth.signInWithEmailAndPassword(usr, pwd).await()
 
-        // Add the user to the view model and add a second user who created the event
-        uid = Firebase.auth.currentUser!!.uid
-        eventVM.createEvent(
-            eventTitle,
-            eventDescription,
-            Location(eventLocation.latitude, eventLocation.longitude, ""),
-            LocalDate.parse(eventDate),
-            LocalTime.parse(eventTime),
-            0.0,
-            "",
-            emptyList(),
-            emptyList(),
-            emptyList(),
-            0,
-            true,
-            emptyList(),
-            emptyList(),
-            null,
-            userVM,
-            eventId)
-        userVM.createUserIfNew(
-            organiserId, "testorganiser", "test", "name", "test@email.com", "0123", "Afghanistan")
-        while (userVM.getUser(organiserId) == null) {
-          TimeUnit.SECONDS.sleep(1)
-        }
-        userVM.createUserIfNew(uid, "a", "b", "c", usr, "4567", "Angola")
-        while (userVM.getUser(uid) == null) {
-          TimeUnit.SECONDS.sleep(1)
-        }
-      }
+      // Add the user to the view model and add a second user who created the event
+      uid = Firebase.auth.currentUser!!.uid
+      eventVM.createEvent(
+          eventTitle,
+          eventDescription,
+          Location(eventLocation.latitude, eventLocation.longitude, ""),
+          LocalDate.parse(eventDate),
+          LocalTime.parse(eventTime),
+          0.0,
+          "",
+          emptyList(),
+          emptyList(),
+          emptyList(),
+          0,
+          true,
+          emptyList(),
+          emptyList(),
+          null,
+          userVM,
+          eventId)
+
+      userVM.createUserIfNew(
+          organiserId, "testorganiser", "test", "name", "test@email.com", "0123", "Afghanistan")
+      userVM.createUserIfNew(uid, "a", "b", "c", usr, "4567", "Angola")
+      TimeUnit.SECONDS.sleep(1)
     }
 
     @AfterClass
     @JvmStatic
-    fun tearDown() {
-      runBlocking {
-        // Clean up the users
-        Firebase.auth.currentUser!!.delete()
-        userVM.deleteUser(organiserId)
-        userVM.deleteUser(uid)
-      }
+    fun tearDown() = runBlocking {
+      // Clean up the users
+      Firebase.auth.currentUser!!.delete().await()
+      userVM.deleteUser(organiserId)
+      userVM.deleteUser(uid)
     }
   }
 

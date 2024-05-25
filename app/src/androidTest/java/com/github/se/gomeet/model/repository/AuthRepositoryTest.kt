@@ -20,10 +20,7 @@ class AuthRepositoryTest {
   private val invEmail = "invalid.email.com"
   private val invPwd = "123"
 
-  @After
-  fun tearDown() {
-    Firebase.auth.currentUser?.delete()
-  }
+  @After fun tearDown() = runBlocking { Firebase.auth.currentUser?.delete()?.await() }
 
   @Test
   fun testSignUpSuccess() = runTest {

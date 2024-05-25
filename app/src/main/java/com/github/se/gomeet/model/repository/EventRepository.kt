@@ -120,6 +120,20 @@ class EventRepository private constructor() {
           .addOnFailureListener { e -> Log.w(TAG, "Error updating document", e) }
     }
 
+    suspend fun sendInvitation(eventID: String, userId: String) {
+      val event = Firebase.firestore.collection(EVENT_COLLECTION).document(eventID).get().await()
+      val pendingParticipants = event.get(PENDING_PARTICIPANTS) as MutableList<String>
+      if (pendingParticipants.contains(userId)) {
+        Log.w(TAG, "Event $eventID already has $userId as a pendingParticipant")
+        return
+      }
+      pendingParticipants.add(userId)
+      Firebase.firestore
+          .collection(EVENT_COLLECTION)
+          .document(eventID)
+          .update(PENDING_PARTICIPANTS, pendingParticipants)
+    }
+
     /**
      * This function updates the rating of an event by a particular user
      *

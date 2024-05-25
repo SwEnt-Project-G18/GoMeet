@@ -95,16 +95,15 @@ fun Events(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel:
     coroutineScope.launch {
       user.value = userViewModel.getUser(currentUID)
       Log.d(TAG, "User is ${user.value!!.username} with ${user.value!!.myEvents.size} events")
-      val allEvents =
-          (eventViewModel.getAllEvents() ?: emptyList()).filter { e ->
+      val allEvents = (eventViewModel.getAllEvents() ?: emptyList())
+      eventList.addAll(
+          allEvents.filter { e ->
             (user.value!!.myEvents.contains(e.eventID) ||
                 user.value!!.myFavorites.contains(e.eventID) ||
                 user.value!!.joinedEvents.contains(e.eventID)) && !e.isPastEvent()
-          }
-      if (allEvents.isNotEmpty()) {
-        eventList.addAll(allEvents)
-      }
-      Log.d(TAG, "Displaying ${eventList.size} events")
+          })
+
+      Log.d(TAG, "Displaying ${eventList.size} events out of ${allEvents.size} total events")
       eventsLoaded.value = true
     }
   }

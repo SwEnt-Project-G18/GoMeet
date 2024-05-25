@@ -15,8 +15,8 @@ import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.tasks.await
 import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.junit.Rule
@@ -36,33 +36,24 @@ class ProfileTest {
 
     @BeforeClass
     @JvmStatic
-    fun setUp() {
-      runBlocking {
-        // Create a new user and sign in
-        val result = Firebase.auth.createUserWithEmailAndPassword(usr, pwd)
-        while (!result.isComplete) {
-          TimeUnit.SECONDS.sleep(1)
-        }
-        uid = result.result.user!!.uid
+    fun setUp() = runBlocking {
+      // Create a new user and sign in
+      Firebase.auth.createUserWithEmailAndPassword(usr, pwd).await()
+      uid = Firebase.auth.currentUser!!.uid
 
-        userVM = UserViewModel(uid)
+      userVM = UserViewModel(uid)
 
-        // Add the user to the view model
-        userVM.createUserIfNew(uid, "a", "b", "c", usr, "4567", "Angola", "")
-        while (userVM.getUser(uid) == null) {
-          TimeUnit.SECONDS.sleep(1)
-        }
-      }
+      // Add the user to the view model
+      userVM.createUserIfNew(uid, "a", "b", "c", usr, "4567", "Angola", "")
+      return@runBlocking
     }
 
     @AfterClass
     @JvmStatic
-    fun tearDown() {
+    fun tearDown() = runBlocking {
       // Clean up the user
-      runBlocking {
-        Firebase.auth.currentUser!!.delete()
-        userVM.deleteUser(uid)
-      }
+      Firebase.auth.currentUser!!.delete().await()
+      userVM.deleteUser(uid)
     }
   }
 
