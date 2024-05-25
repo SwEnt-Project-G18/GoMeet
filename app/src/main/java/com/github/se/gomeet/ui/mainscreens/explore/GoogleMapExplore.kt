@@ -238,7 +238,7 @@ internal fun GoogleMapView(
                           // TODO: add image
                           )
                     },
-                    visible = event.title.contains(query.value, ignoreCase = true)) {
+                    visible = true) {
                       Row(modifier = Modifier.background(MaterialTheme.colorScheme.primaryContainer), verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.padding(20.dp)) {
                           Text(
