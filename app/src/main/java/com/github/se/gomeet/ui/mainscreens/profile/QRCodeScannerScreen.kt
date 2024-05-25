@@ -1,8 +1,6 @@
 package com.github.se.gomeet.ui.mainscreens.profile
 
 import android.Manifest
-import android.annotation.SuppressLint
-import android.content.Context
 import android.net.Uri
 import android.util.Log
 import android.view.ViewGroup
@@ -29,26 +27,24 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.LifecycleOwner
 import com.github.se.gomeet.R
-import com.github.se.gomeet.model.event.getEventDateString
-import com.github.se.gomeet.model.event.getEventTimeString
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.viewmodel.EventViewModel
+import com.github.se.gomeet.viewmodel.QRCodeAnalyzer
+import com.github.se.gomeet.viewmodel.fetchEventAndNavigate
+import com.github.se.gomeet.viewmodel.parseQRCodeContent
+import com.github.se.gomeet.viewmodel.processGalleryImage
 import com.google.accompanist.permissions.*
-import com.google.android.gms.maps.model.LatLng
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
-import com.google.mlkit.vision.barcode.BarcodeScanning
-import com.google.mlkit.vision.common.InputImage
-import java.io.IOException
 import java.util.concurrent.Executors
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun QRCodeScannerScreen(nav: NavigationActions) {
   val context = LocalContext.current
@@ -152,26 +148,6 @@ fun QRCodeScannerScreen(nav: NavigationActions) {
       }
 }
 
-fun processGalleryImage(context: Context, uri: Uri, onQRCodeScanned: (String) -> Unit) {
-  val scanner = BarcodeScanning.getClient()
-  try {
-    val image = InputImage.fromFilePath(context, uri)
-    scanner
-        .process(image)
-        .addOnSuccessListener { barcodes ->
-          for (barcode in barcodes) {
-            barcode.rawValue?.let {
-              Log.d("QRCodeScannerScreen", "QR Code detected: $it")
-              onQRCodeScanned(it)
-            }
-          }
-        }
-        .addOnFailureListener { e -> Log.e("QRCodeScannerScreen", "Error processing image", e) }
-  } catch (e: IOException) {
-    Log.e("QRCodeScannerScreen", "Error loading image", e)
-  }
-}
-
 @Composable
 fun CameraPreviewView(
     cameraProviderFuture: ListenableFuture<ProcessCameraProvider>,
@@ -215,61 +191,4 @@ fun CameraPreviewView(
 
         previewView
       })
-}
-
-class QRCodeAnalyzer(private val onQRCodeScanned: (String) -> Unit) : ImageAnalysis.Analyzer {
-  @SuppressLint("UnsafeOptInUsageError")
-  override fun analyze(imageProxy: ImageProxy) {
-    val mediaImage = imageProxy.image ?: return
-    val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
-
-    val scanner = BarcodeScanning.getClient()
-    scanner
-        .process(image)
-        .addOnSuccessListener { barcodes ->
-          for (barcode in barcodes) {
-            barcode.rawValue?.let { onQRCodeScanned(it) }
-          }
-        }
-        .addOnFailureListener {
-          // Handle errors
-        }
-        .addOnCompleteListener { imageProxy.close() }
-  }
-}
-
-fun parseQRCodeContent(content: String): Pair<String, String> {
-  val parts = content.split("/")
-  if (parts.size == 2) {
-    val type = parts[0]
-    val id = parts[1]
-    return Pair(type, id)
-  }
-  throw IllegalArgumentException("Invalid QR code content")
-}
-
-fun fetchEventAndNavigate(eventId: String, nav: NavigationActions, eventVM: EventViewModel) {
-  CoroutineScope(Dispatchers.Main).launch {
-    val navigationPerformed = mutableStateOf(false)
-    if (!navigationPerformed.value) {
-      navigationPerformed.value = true
-      CoroutineScope(Dispatchers.Main).launch {
-        val event = eventVM.getEvent(eventId)
-        if (event != null) {
-          Log.d("Event", "Navigating to event info screen")
-          nav.navigateToEventInfo(
-              eventId = event.eventID,
-              title = event.title,
-              date = getEventDateString(event.date),
-              time = getEventTimeString(event.time),
-              organizer = event.creator,
-              rating = 0.0,
-              description = event.description,
-              loc = LatLng(event.location.latitude, event.location.longitude))
-        } else {
-          // Handle event not found
-        }
-      }
-    }
-  }
 }

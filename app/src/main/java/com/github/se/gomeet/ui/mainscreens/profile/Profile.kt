@@ -1,12 +1,5 @@
 package com.github.se.gomeet.ui.mainscreens.profile
 
-import android.content.ContentValues
-import android.content.Context
-import android.content.Intent
-import android.graphics.Bitmap
-import android.net.Uri
-import android.provider.MediaStore
-import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -64,7 +57,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.core.content.FileProvider
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.github.se.gomeet.R
@@ -79,14 +71,10 @@ import com.github.se.gomeet.ui.navigation.SECOND_LEVEL_DESTINATION
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
+import com.github.se.gomeet.viewmodel.generateQRCode
+import com.github.se.gomeet.viewmodel.saveImageToGallery
+import com.github.se.gomeet.viewmodel.shareImage
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.zxing.BarcodeFormat
-import com.google.zxing.MultiFormatWriter
-import com.google.zxing.common.BitMatrix
-import com.journeyapps.barcodescanner.BarcodeEncoder
-import java.io.File
-import java.io.FileOutputStream
-import java.io.OutputStream
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
@@ -396,14 +384,6 @@ fun ProfileImage(
       contentScale = ContentScale.Crop)
 }
 
-fun generateQRCode(type: String, id: String): Bitmap {
-  val content = "$type/$id"
-  val writer = MultiFormatWriter()
-  val bitMatrix: BitMatrix = writer.encode(content, BarcodeFormat.QR_CODE, 1024, 1024)
-  val encoder = BarcodeEncoder()
-  return encoder.createBitmap(bitMatrix)
-}
-
 @Composable
 fun ShareDialog(type: String, uid: String, onDismiss: () -> Unit) {
   val context = LocalContext.current
@@ -449,50 +429,6 @@ fun ShareDialog(type: String, uid: String, onDismiss: () -> Unit) {
               Text("Share", color = Color.White)
             }
       })
-}
-
-fun saveImageToGallery(context: Context, bitmap: Bitmap) {
-  val values =
-      ContentValues().apply {
-        put(MediaStore.Images.Media.TITLE, "QR Code")
-        put(MediaStore.Images.Media.DISPLAY_NAME, "QR Code")
-        put(MediaStore.Images.Media.MIME_TYPE, "image/png")
-        put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/QR Codes")
-      }
-
-  val uri = context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
-
-  uri?.let {
-    val outputStream: OutputStream? = context.contentResolver.openOutputStream(it)
-    outputStream?.use { stream ->
-      if (bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)) {
-        Toast.makeText(context, "QR code saved to gallery", Toast.LENGTH_SHORT).show()
-      } else {
-        Toast.makeText(context, "Failed to save QR code", Toast.LENGTH_SHORT).show()
-      }
-    }
-  }
-}
-
-fun shareImage(context: Context, bitmap: Bitmap) {
-  val cachePath = File(context.cacheDir, "images")
-  cachePath.mkdirs() // Create the directory if it doesn't exist
-  val file = File(cachePath, "qr_code.png")
-  val fileOutputStream = FileOutputStream(file)
-  bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream)
-  fileOutputStream.close()
-
-  val fileUri: Uri =
-      FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
-
-  val shareIntent =
-      Intent().apply {
-        action = Intent.ACTION_SEND
-        putExtra(Intent.EXTRA_STREAM, fileUri)
-        type = "image/png"
-        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-      }
-  context.startActivity(Intent.createChooser(shareIntent, "Share QR Code"))
 }
 
 @Preview
