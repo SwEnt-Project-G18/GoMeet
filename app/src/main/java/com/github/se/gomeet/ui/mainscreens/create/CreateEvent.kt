@@ -67,6 +67,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.Popup
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.TagsSelector
 import com.github.se.gomeet.model.event.location.Location
@@ -76,12 +78,14 @@ import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
+import com.github.se.gomeet.viewmodel.EventCreationViewModel
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import java.io.InputStream
 import java.time.LocalDate
 import java.time.LocalTime
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 private const val NUMBER_OF_SUGGESTIONS = 3
 
@@ -98,7 +102,8 @@ fun CreateEvent(
     nav: NavigationActions,
     eventViewModel: EventViewModel,
     isPrivate: Boolean,
-    userViewModel: UserViewModel
+    userViewModel: UserViewModel,
+    eventCreationViewModel: EventCreationViewModel = viewModel() // Use the shared ViewModel
 ) {
   val screenHeight = LocalConfiguration.current.screenHeightDp.dp
   val screenWidth = LocalConfiguration.current.screenWidthDp.dp
@@ -145,6 +150,9 @@ fun CreateEvent(
   val showPopup = remember { mutableStateOf(false) }
   var tagsButtonText by remember { mutableStateOf("Add Tags") }
 
+  // Use the shared ViewModel for invitedParticipants
+  val invitedParticipants = eventCreationViewModel.invitedParticipants
+
   val textFieldColors =
       TextFieldDefaults.colors(
           focusedTextColor = MaterialTheme.colorScheme.onBackground,
@@ -168,12 +176,16 @@ fun CreateEvent(
                 // Empty title since we're placing our own components
               },
               navigationIcon = {
-                IconButton(onClick = { nav.goBack() }) {
-                  Icon(
-                      imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                      contentDescription = "Back",
-                      tint = MaterialTheme.colorScheme.onBackground)
-                }
+                IconButton(
+                    onClick = {
+                      eventCreationViewModel.invitedParticipants.clear()
+                      nav.goBack()
+                    }) {
+                      Icon(
+                          imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                          contentDescription = "Back",
+                          tint = MaterialTheme.colorScheme.onBackground)
+                    }
               })
 
           Row(
@@ -391,7 +403,7 @@ fun CreateEvent(
                                     pickedTime.value,
                                     price,
                                     url.value,
-                                    listOf(),
+                                    invitedParticipants.map { it.uid },
                                     listOf(),
                                     listOf(),
                                     0,
@@ -414,7 +426,7 @@ fun CreateEvent(
                               pickedTime.value,
                               price,
                               url.value,
-                              listOf(),
+                              invitedParticipants.map { it.uid },
                               listOf(),
                               listOf(),
                               0,
@@ -425,6 +437,13 @@ fun CreateEvent(
                               userViewModel,
                               uid)
                           nav.goBack()
+                        }
+                      }
+
+                      // Update pending requests for invited participants
+                      invitedParticipants.forEach { participant ->
+                        userViewModel.viewModelScope.launch {
+                          userViewModel.gotInvitation(uid, participant.uid)
                         }
                       }
                     }

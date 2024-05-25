@@ -59,9 +59,8 @@ import com.github.se.gomeet.viewmodel.EventViewModel.SortOption.DATE
 import com.github.se.gomeet.viewmodel.EventViewModel.SortOption.DEFAULT
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.HorizontalPagerIndicator
-import com.google.accompanist.pager.rememberPagerState
+import com.google.accompanist.pager.PagerScope
 import com.google.android.gms.maps.model.LatLng
 import java.text.SimpleDateFormat
 import java.time.ZoneId
@@ -181,7 +180,7 @@ fun Trends(
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun EventCarousel(events: List<Event>, nav: NavigationActions) {
-  val pagerState = rememberPagerState()
+  val pagerState = androidx.compose.foundation.pager.rememberPagerState(initialPage = 0)
 
   LaunchedEffect(pagerState) {
     launch {
@@ -194,8 +193,13 @@ fun EventCarousel(events: List<Event>, nav: NavigationActions) {
   }
 
   Column(modifier = Modifier.fillMaxWidth().height(250.dp)) {
-    HorizontalPager(count = events.size, state = pagerState, modifier = Modifier.weight(1f)) { page
-      ->
+    Modifier.weight(1f)
+    PaddingValues(0.dp)
+    PagerDefaults.flingBehavior(
+        state = state,
+        endContentPadding = contentPadding.calculateEndPadding(LayoutDirection.Ltr),
+    )
+    fun PagerScope.(page: Int) {
       val event = events[page]
       val painter =
           if (event.images.isNotEmpty()) {

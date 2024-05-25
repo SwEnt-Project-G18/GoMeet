@@ -14,9 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -44,8 +42,6 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.github.se.gomeet.model.event.Invitation
-import com.github.se.gomeet.model.event.InviteStatus
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.mainscreens.profile.ProfileImageUser
@@ -53,6 +49,7 @@ import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
+import com.github.se.gomeet.viewmodel.EventCreationViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -70,201 +67,192 @@ import kotlinx.coroutines.launch
 fun AddParticipants(
     nav: NavigationActions,
     userViewModel: UserViewModel,
-    eventId: String
+    eventCreationViewModel: EventCreationViewModel // Use the shared ViewModel
 ) {
-    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
-    val query = remember { mutableStateOf("") }
-    var isLoading by remember { mutableStateOf(true) }
-    val coroutineScope = rememberCoroutineScope()
-    val user = remember { mutableStateOf<GoMeetUser?>(null) }
-    val potentialParticipants = remember { mutableStateListOf<GoMeetUser>() }
+  val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+  val query = remember { mutableStateOf("") }
+  var isLoading by remember { mutableStateOf(true) }
+  val coroutineScope = rememberCoroutineScope()
+  val user = remember { mutableStateOf<GoMeetUser?>(null) }
+  val potentialParticipants = remember { mutableStateListOf<GoMeetUser>() }
 
-    LaunchedEffect(Unit) {
-        coroutineScope.launch {
-            val currentUser = Firebase.auth.currentUser!!.uid
+  LaunchedEffect(Unit) {
+    coroutineScope.launch {
+      val currentUser = Firebase.auth.currentUser!!.uid
 
-            user.value = userViewModel.getUser(currentUser)
+      user.value = userViewModel.getUser(currentUser)
 
-            val followers = user.value!!.followers
-            if (followers.isNotEmpty()) {
-                followers.forEach {
-                    val followerUser = userViewModel.getUser(it)
-                    potentialParticipants.add(followerUser!!)
-                }
-            }
-            val following = user.value!!.following
-            if (following.isNotEmpty()) {
-                following.forEach {
-                    val followingUser = userViewModel.getUser(it)
-                    if (!followers.contains(followingUser!!.uid)) {
-                        potentialParticipants.add(followingUser)
-                    }
-                }
-            }
-
-            isLoading = false
+      if (user.value != null) {
+        val followers = user.value!!.followers
+        if (followers.isNotEmpty()) {
+          followers.forEach {
+            val followerUser = userViewModel.getUser(it)
+            potentialParticipants.add(followerUser!!)
+          }
         }
-    }
+        val following = user.value!!.following
+        if (following.isNotEmpty()) {
+          following.forEach {
+            val followingUser = userViewModel.getUser(it)
+            if (!followers.contains(followingUser!!.uid)) {
+              potentialParticipants.add(followingUser)
+            }
+          }
+        }
+      }
 
-    // Filtered users based on search query
-    val filteredUsers by
-    remember(query.value, potentialParticipants) {
+      isLoading = false
+    }
+  }
+
+  // Filtered users based on search query
+  val filteredUsers by
+      remember(query.value, potentialParticipants) {
         derivedStateOf {
-            if (query.value.isEmpty()) {
-                potentialParticipants
-            } else {
-                potentialParticipants.filter { it.username.contains(query.value, ignoreCase = true) }
-            }
+          if (query.value.isEmpty()) {
+            potentialParticipants
+          } else {
+            potentialParticipants.filter { it.username.contains(query.value, ignoreCase = true) }
+          }
         }
-    }
+      }
 
-    Scaffold(
-        topBar = {
-            Column {
-                TopAppBar(
-                    modifier = Modifier.testTag("TopBar"),
-                    backgroundColor = MaterialTheme.colorScheme.background,
-                    elevation = 0.dp,
-                    title = {
-                        // Empty title since we're placing our own components
-                    },
-                    navigationIcon = {
-                        IconButton(onClick = { nav.goBack() }) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Back",
-                                tint = MaterialTheme.colorScheme.onBackground)
-                        }
-                    })
+  Scaffold(
+      topBar = {
+        Column {
+          TopAppBar(
+              modifier = Modifier.testTag("TopBar"),
+              backgroundColor = MaterialTheme.colorScheme.background,
+              elevation = 0.dp,
+              title = {
+                // Empty title since we're placing our own components
+              },
+              navigationIcon = {
+                IconButton(onClick = { nav.goBack() }) {
+                  Icon(
+                      imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                      contentDescription = "Back",
+                      tint = MaterialTheme.colorScheme.onBackground)
+                }
+              })
 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(start = 18.dp)) {
-                    Text(
-                        text = "Add Participants",
-                        color = MaterialTheme.colorScheme.onBackground,
-                        style =
+          Row(
+              verticalAlignment = Alignment.CenterVertically,
+              modifier = Modifier.padding(start = 18.dp)) {
+                Text(
+                    text = "Add Participants",
+                    color = MaterialTheme.colorScheme.onBackground,
+                    style =
                         MaterialTheme.typography.headlineSmall.copy(
                             fontWeight = FontWeight.SemiBold))
-
-                    Spacer(modifier = Modifier.weight(1f))
-
-                    Text(
-                        text = "Done",
-                        color = MaterialTheme.colorScheme.onBackground,
-                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
-                        modifier = Modifier.padding(end = 15.dp).clickable {
-                            // TODO: Handle the logic to add participants to the event
-                        })
-                }
-            }
-        },
-        bottomBar = {
-            BottomNavigationMenu(
-                onTabSelect = { selectedTab ->
-                    nav.navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == selectedTab })
-                },
-                tabList = TOP_LEVEL_DESTINATIONS,
-                selectedItem = Route.CREATE
-            )
+              }
         }
-    ) { innerPadding ->
+      },
+      bottomBar = {
+        BottomNavigationMenu(
+            onTabSelect = { selectedTab ->
+              nav.navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == selectedTab })
+            },
+            tabList = TOP_LEVEL_DESTINATIONS,
+            selectedItem = Route.CREATE)
+      }) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
-            if (isLoading) {
-                LoadingText()
-            } else {
-                Column {
-                    GoMeetSearchBar(
-                        nav,
-                        query,
-                        MaterialTheme.colorScheme.primaryContainer,
-                        MaterialTheme.colorScheme.tertiary)
+          if (isLoading) {
+            LoadingText()
+          } else {
+            Column {
+              GoMeetSearchBar(
+                  nav,
+                  query,
+                  MaterialTheme.colorScheme.primaryContainer,
+                  MaterialTheme.colorScheme.tertiary)
 
-                    Spacer(modifier = Modifier.height(screenHeight / 40))
+              Spacer(modifier = Modifier.height(screenHeight / 40))
 
-                    LazyColumn(
-                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        items(filteredUsers) { user ->
-                            InviteUserWidget(
-                                nav = nav,
-                                user = user,
-                                eventId = eventId,
-                                potentialParticipants = potentialParticipants.toSet(),
-                                onInviteButtonClick = { userId, isInvited ->
-                                    // Handle the logic to invite or cancel the invitation
-                                    // eventViewModel.inviteUser(eventId, userId, isInvited)
+              LazyColumn(
+                  contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                  verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    items(filteredUsers) { user ->
+                      InviteUserWidget(
+                          nav = nav,
+                          user = user,
+                          pendingParticipants = eventCreationViewModel.invitedParticipants,
+                          onInviteButtonClick = { _, isInvited ->
+                            coroutineScope.launch {
+                              if (isInvited) {
+                                if (eventCreationViewModel.invitedParticipants.contains(user)) {
+                                  eventCreationViewModel.invitedParticipants.remove(user)
                                 }
-                            )
-                        }
-
+                              } else {
+                                if (!eventCreationViewModel.invitedParticipants.contains(user)) {
+                                  eventCreationViewModel.invitedParticipants.add(user)
+                                }
+                              }
+                            }
+                          })
                     }
-                }
+                  }
             }
+          }
         }
-    }
+      }
 }
 
 @Composable
 fun InviteUserWidget(
     nav: NavigationActions,
     user: GoMeetUser,
-    eventId: String,
-    potentialParticipants: Set<GoMeetUser>,
+    pendingParticipants: List<GoMeetUser>,
     onInviteButtonClick: (String, Boolean) -> Unit
 ) {
-    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+  val screenWidth = LocalConfiguration.current.screenWidthDp.dp
 
-    val isInvited = user.pendingRequests.contains(Invitation(eventId, InviteStatus.PENDING))
+  val isInvited = pendingParticipants.contains(user)
 
-    Row(modifier =
-    Modifier.fillMaxWidth()
-        .padding(vertical = 3.dp)
-        .clickable { nav.navigateToScreen(Route.OTHERS_PROFILE.replace("{uid}", user.uid)) }
-        .testTag("InviteUserWidget"),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween) {
+  Row(
+      modifier =
+          Modifier.fillMaxWidth()
+              .padding(vertical = 3.dp)
+              .clickable { nav.navigateToScreen(Route.OTHERS_PROFILE.replace("{uid}", user.uid)) }
+              .testTag("InviteUserWidget"),
+      verticalAlignment = Alignment.CenterVertically,
+      horizontalArrangement = Arrangement.SpaceBetween) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            ProfileImageUser(userId = user.uid)
+          ProfileImageUser(userId = user.uid)
 
-            Spacer(modifier = Modifier.width(screenWidth / 20))
+          Spacer(modifier = Modifier.width(screenWidth / 20))
 
-            Column {
-                Text(
-                    text = "${user.firstName} ${user.lastName}",
-                    color = MaterialTheme.colorScheme.onBackground,
-                    style = MaterialTheme.typography.bodyLarge
-                )
-                Text(
-                    text = user.username,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6F)
-                )
-            }
+          Column {
+            Text(
+                text = "${user.firstName} ${user.lastName}",
+                color = MaterialTheme.colorScheme.onBackground,
+                style = MaterialTheme.typography.bodyLarge)
+            Text(
+                text = user.username,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6F))
+          }
         }
 
         Button(
             shape = RoundedCornerShape(10.dp),
             onClick = { onInviteButtonClick(user.uid, isInvited) },
             modifier =
-            Modifier.padding(start = 15.dp)
-                .width(110.dp)
-                .testTag(if (isInvited) "CancelButton" else "InviteButton"),
+                Modifier.padding(start = 15.dp)
+                    .width(110.dp)
+                    .testTag(if (isInvited) "CancelButton" else "InviteButton"),
             colors =
-            ButtonDefaults.buttonColors(
-                containerColor =
-                if (isInvited) MaterialTheme.colorScheme.primaryContainer
-                else MaterialTheme.colorScheme.outlineVariant,
-                contentColor = if (isInvited) Color.Black else Color.White,
-                disabledContentColor = Color.Transparent,
-                disabledContainerColor = Color.Transparent
-            )
-        ) {
-            Text(
-                text = if (isInvited) "Cancel" else "Invite",
-                style = MaterialTheme.typography.labelLarge,
-                color = if (isInvited) MaterialTheme.colorScheme.onBackground else Color.White
-            )
-        }
-    }
+                ButtonDefaults.buttonColors(
+                    containerColor =
+                        if (isInvited) MaterialTheme.colorScheme.primaryContainer
+                        else MaterialTheme.colorScheme.outlineVariant,
+                    contentColor = if (isInvited) Color.Black else Color.White,
+                    disabledContentColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent)) {
+              Text(
+                  text = if (isInvited) "Cancel" else "Invite",
+                  style = MaterialTheme.typography.labelLarge,
+                  color = if (isInvited) MaterialTheme.colorScheme.onBackground else Color.White)
+            }
+      }
 }

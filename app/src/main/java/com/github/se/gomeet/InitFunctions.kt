@@ -46,6 +46,7 @@ import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.navigation.TopLevelDestination
 import com.github.se.gomeet.viewmodel.AuthViewModel
+import com.github.se.gomeet.viewmodel.EventCreationViewModel
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.android.gms.maps.model.LatLng
@@ -134,6 +135,7 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
   val clientInitialisationState by client.clientState.initializationState.collectAsState()
   val authViewModel = AuthViewModel()
   val userViewModel = UserViewModel()
+  val eventCreationViewModel = EventCreationViewModel() // Shared ViewModel
   val startScreen = Route.WELCOME // The screen that gets navigated to when the app starts
   val postLoginScreen =
       Route.EXPLORE // The screen that gets navigated to after logging in/signing up
@@ -233,10 +235,10 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
               navAction, it.arguments?.getString("uid") ?: "", userViewModel, eventViewModel.value)
         }
     composable(Route.PRIVATE_CREATE) {
-      CreateEvent(navAction, eventViewModel.value, true, userViewModel)
+      CreateEvent(navAction, eventViewModel.value, true, userViewModel, eventCreationViewModel)
     }
     composable(Route.PUBLIC_CREATE) {
-      CreateEvent(navAction, eventViewModel.value, false, userViewModel)
+      CreateEvent(navAction, eventViewModel.value, false, userViewModel, eventCreationViewModel)
     }
 
     composable(
@@ -246,7 +248,7 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
           AddParticipants(
               nav = navAction,
               userViewModel = userViewModel,
-              eventId = eventId)
+              eventCreationViewModel = eventCreationViewModel)
         }
 
     composable(

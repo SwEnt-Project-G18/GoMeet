@@ -6,6 +6,7 @@ import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.util.Log
 import android.widget.ImageView
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -15,6 +16,7 @@ import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.Post
 import com.github.se.gomeet.model.event.location.Location
 import com.github.se.gomeet.model.repository.EventRepository
+import com.github.se.gomeet.model.user.GoMeetUser
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.firebase.firestore.FirebaseFirestore
@@ -503,4 +505,8 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
     ALPHABETICAL,
     DATE
   }
+}
+
+class EventCreationViewModel : ViewModel() {
+  val invitedParticipants = mutableStateListOf<GoMeetUser>()
 }
