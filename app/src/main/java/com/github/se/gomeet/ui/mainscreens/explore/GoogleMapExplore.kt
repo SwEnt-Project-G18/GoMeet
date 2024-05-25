@@ -266,12 +266,24 @@ internal fun GoogleMapView(
                       Modifier
                           .width((screenWidth * 0.5).dp)
                           .padding(10.dp)
+                          .clickable {
+                              nav.navigateToEventInfo(
+                                  eventId = event.eventID,
+                                  title = event.title,
+                                  date = getEventDateString(event.date),
+                                  time = getEventTimeString(event.time),
+                                  description = event.description,
+                                  organizer = event.creator,
+                                  loc = LatLng(event.location.latitude, event.location.longitude),
+                                  rating = 0.0 // TODO: replace with actual rating
+                                  // TODO: add image
+                              )
+                          }
                           .border(
                               3.dp,
                               MaterialTheme.colorScheme.outlineVariant,
                               RoundedCornerShape(10.dp)
-                          )
-                          .background(
+                          ).background(
                               MaterialTheme.colorScheme
                                   .primaryContainer,
                               columnShape
