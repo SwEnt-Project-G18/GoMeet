@@ -119,7 +119,10 @@ fun AddPost(
                   RoundedCornerShape(10.dp))
               .background(MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(10.dp))) {
         IconButton(onClick = { callbackCancel() }) {
-          Icon(Icons.Filled.Close, contentDescription = "Cancel", tint = MaterialTheme.colorScheme.tertiary)
+          Icon(
+              Icons.Filled.Close,
+              contentDescription = "Cancel",
+              tint = MaterialTheme.colorScheme.tertiary)
         }
         Column(modifier = Modifier.padding(top = 10.dp)) {
           Text(
