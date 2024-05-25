@@ -1,6 +1,5 @@
 package com.github.se.gomeet.viewmodel
 
-import android.content.ContentValues.TAG
 import android.content.Context
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
@@ -12,6 +11,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.se.gomeet.model.event.Event
+import com.github.se.gomeet.model.event.Post
 import com.github.se.gomeet.model.event.location.Location
 import com.github.se.gomeet.model.repository.EventRepository
 import com.google.android.gms.maps.model.BitmapDescriptor
@@ -39,17 +39,19 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONArray
 
+private const val TAG = "EventViewModel"
+
 /**
  * ViewModel for the event. The viewModel is responsible for handling the logic that comes from the
  * UI and the repository.
  *
- * @param creatorId the id of the creator of the event
+ * @param currentUID the id of the current user (and therefore the creator of any events)
  */
-class EventViewModel(private val creatorId: String? = null) : ViewModel() {
+class EventViewModel(val currentUID: String? = null) : ViewModel() {
   private val _bitmapDescriptors = mutableStateMapOf<String, BitmapDescriptor>()
   val bitmapDescriptors: MutableMap<String, BitmapDescriptor> = _bitmapDescriptors
 
-  private var lastLoadedEvents: List<Event>? = null
+  private var lastLoadedEvents: List<Event> = emptyList()
   private val _loading = MutableLiveData(false)
   val loading: LiveData<Boolean> = _loading
 
@@ -75,7 +77,7 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
                         loadBitmapFromUri(context, uri) // Load the bitmap as a BitmapDescriptor
                     _bitmapDescriptors[event.eventID] = bitmapDescriptor
                   } catch (e: Exception) {
-                    Log.e("ViewModel", "Error loading bitmap descriptor: ${e.message}")
+                    Log.e(TAG, "Error loading bitmap descriptor", e)
                     _bitmapDescriptors[event.eventID] =
                         BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)
                   }
@@ -86,7 +88,7 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
             loadJobs.awaitAll() // Await all loading jobs
           } finally {
             lastLoadedEvents = events.toList() // Update the last loaded events
-            Log.d("ViewModel", "Finished loading custom pins")
+            Log.d(TAG, "Finished loading custom pins")
             _loading.value = false
           }
         }
@@ -115,14 +117,14 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
                       continuation.resume(BitmapDescriptorFactory.fromBitmap(bitmap))
                     }
                         ?: run {
-                          Log.e("ViewModel", "Drawable is null after loading image.")
+                          Log.w(TAG, "Drawable is null after loading image.")
                           continuation.resumeWithException(
                               RuntimeException("Drawable is null after loading image"))
                         }
                   }
 
                   override fun onError(e: Exception?) {
-                    Log.e("ViewModel", "Error loading image from Picasso: ${e?.message}")
+                    Log.e(TAG, "Error loading image from Picasso", e)
                     continuation.resumeWithException(
                         e ?: RuntimeException("Unknown error in Picasso"))
                   }
@@ -178,7 +180,7 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
           .addOnFailureListener { event.completeExceptionally(it) }
       event.await()
     } catch (e: Exception) {
-      Log.e("Firebase", "Error fetching event image: ${e.localizedMessage}")
+      Log.e(TAG, "Error fetching event image for event $eventId", e)
       null
     }
   }
@@ -243,15 +245,17 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
       userViewModel: UserViewModel,
       eventId: String
   ) {
-    Log.d("CreatorID", "Creator ID is $creatorId")
+    Log.d(TAG, "User $currentUID is creating event $eventId")
     CoroutineScope(Dispatchers.IO).launch {
       try {
+        val participantsWithCreator =
+            if (participants.contains(currentUID)) participants else participants.plus(currentUID!!)
         val imageUrl = imageUri?.let { uploadImageAndGetUrl(it) }
         val updatedImages = images.toMutableList().apply { imageUrl?.let { add(it) } }
         val event =
             Event(
                 eventId,
-                creatorId!!,
+                currentUID!!,
                 title,
                 description,
                 location,
@@ -260,7 +264,7 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
                 price,
                 url,
                 pendingParticipants,
-                participants,
+                participantsWithCreator,
                 visibleToIfPrivate,
                 maxParticipants,
                 public,
@@ -268,11 +272,11 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
                 updatedImages)
 
         EventRepository.addEvent(event)
-        joinEvent(event, creatorId)
-        userViewModel.joinEvent(event.eventID, creatorId)
-        userViewModel.userCreatesEvent(event.eventID, creatorId)
+        lastLoadedEvents = lastLoadedEvents.plus(event)
+        userViewModel.joinEvent(event.eventID)
+        userViewModel.userCreatesEvent(event.eventID)
       } catch (e: Exception) {
-        Log.w(TAG, "Error uploading image or adding event", e)
+        Log.e(TAG, "Error uploading image or adding event", e)
       }
     }
   }
@@ -283,7 +287,42 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
    * @param event the event to edit
    */
   fun editEvent(event: Event) {
+    lastLoadedEvents = lastLoadedEvents.filter { it.eventID != event.eventID }
+    lastLoadedEvents = lastLoadedEvents.plus(event)
     EventRepository.updateEvent(event)
+  }
+
+  /**
+   * Edits a post in the specified event.
+   *
+   * @param event The event containing the post to be edited
+   * @param oldPost The original post to be edited
+   * @param newPost The new post data
+   */
+  fun editPost(event: Event, oldPost: Post, newPost: Post) {
+    val updatedPosts =
+        event.posts.map { currentPost ->
+          if (currentPost == oldPost) {
+            newPost
+          } else {
+            currentPost
+          }
+        }
+    editEvent(event.copy(posts = updatedPosts))
+  }
+
+  /**
+   * Update the rating of an event by one particular user.
+   *
+   * @param eventID the ID of the event to update
+   * @param newRating the new rating of the event
+   * @param oldRating the old rating of the event
+   * @param organiserID the id of the organiser of the event
+   */
+  fun updateRating(eventID: String, newRating: Long, oldRating: Long, organiserID: String) {
+    viewModelScope.launch {
+      EventRepository.updateRating(eventID, newRating, currentUID!!, oldRating, organiserID)
+    }
   }
 
   /**
@@ -292,6 +331,7 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
    * @param eventID the ID of the event to remove
    */
   fun removeEvent(eventID: String) {
+    lastLoadedEvents = lastLoadedEvents.filter { it.eventID != eventID }
     EventRepository.removeEvent(eventID)
   }
 
@@ -315,17 +355,11 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
    * Update the event pendingParticipants field by adding the given user to the list. Note that this
    * function should be called at the same time as the equivalent function in the UserViewModel.
    *
-   * @param event the event to update
+   * @param eventID the ID of the event to update
    * @param userId the ID of the user to add to the event
    */
-  fun sendInvitation(event: Event, userId: String) {
-    if (event.pendingParticipants.contains(userId)) {
-      Log.w(TAG, "User $userId is already invited to event ${event.eventID}")
-      return
-    }
-
-    EventRepository.updateEvent(
-        event.copy(pendingParticipants = event.pendingParticipants.plus(userId)))
+  fun sendInvitation(eventID: String, userId: String) {
+    viewModelScope.launch { EventRepository.sendInvitation(eventID, userId) }
   }
 
   /**
@@ -379,7 +413,7 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
    */
   fun cancelInvitation(event: Event, userId: String) {
     if (!event.pendingParticipants.contains(userId)) {
-      Log.w(TAG, "Event doesn't have $userId as a pendingParticipant")
+      Log.w(TAG, "Event ${event.eventID} doesn't have $userId as a pendingParticipant")
       return
     }
 
@@ -441,6 +475,35 @@ class EventViewModel(private val creatorId: String? = null) : ViewModel() {
       }
     }
     return locations
+  }
+
+  /** Companion object containing static methods. */
+  companion object {
+    /**
+     * Sort the events depending on the user's preferences according to their tags.
+     *
+     * @param userTags the user's tags
+     * @param eventsList the list of events to sort
+     */
+    fun sortEvents(
+        userTags: List<String>,
+        eventsList: MutableList<Event>,
+    ) {
+
+      // Only attempt to sort if user has tags
+      if (userTags.isNotEmpty()) {
+        val eventScoreList: MutableMap<String, Int> = mutableMapOf()
+        eventsList.forEach { event ->
+          val tagsInCommon = event.tags.intersect(userTags.toSet()).size
+          eventScoreList[event.eventID] = tagsInCommon
+        }
+        eventsList.sortByDescending { eventScoreList[it.eventID] }
+
+        Log.d(TAG, "Sort success")
+      } else {
+        Log.d(TAG, "User has no tags, no sorting done")
+      }
+    }
   }
 
   /** Events sorting enum, placed here because this is also where the sorting algorithm goes. */

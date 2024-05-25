@@ -1,5 +1,10 @@
 package com.github.se.gomeet.model.event.location
 
+// Constants for the keys in the Firestore database
+const val LATITUDE = "latitude"
+const val LONGITUDE = "longitude"
+const val NAME = "name"
+
 /**
  * This data class represents the location of an event.
  *

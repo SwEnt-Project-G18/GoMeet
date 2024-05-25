@@ -246,5 +246,17 @@ class AuthViewModel : ViewModel() {
   /** Sign out the user. */
   fun signOut() {
     AuthRepository.signOut()
+    // Reset sign in state after logging out
+    _signInState.value = SignInState()
   }
+
+  /** Delete the current user. */
+  /* TODO: merge Auth and User VM and repositories, deleteing a user
+  should also delete it on Firebase (not just on auth) */
+
+  //  fun deleteCurrentUser() {
+  //    if(currentUser == null) return
+  //    UserRepository.removeUser(currentUser.uid)
+  //  }
+
 }

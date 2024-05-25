@@ -1,7 +1,6 @@
 package com.github.se.gomeet.ui.mainscreens.events
 
 import android.net.Uri
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -16,6 +15,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.twotone.Star
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -36,7 +38,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -52,37 +53,40 @@ import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
+import com.github.se.gomeet.ui.theme.White
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import kotlinx.coroutines.launch
 
-/**
- * EventHeader is a composable that displays the header of an event.
- *
- * @param title Title of the event
- * @param organizer Organizer of the event
- * @param rating Rating of the event
- * @param nav NavigationActions object to handle navigation
- * @param date Date of the event
- * @param time Time of the event
- */
+private const val TAG = "EventInfo"
+
+/** EventHeader is a composable that displays the header of an event. */
 @Composable
 fun EventHeader(
-    title: String,
-    currentUser: GoMeetUser,
-    organizer: GoMeetUser,
-    rating: Double, // TODO: Implement rating system
+    eventViewModel: EventViewModel,
+    event: Event,
     nav: NavigationActions,
-    date: String,
-    time: String
+    rating: MutableState<Long>,
+    organiser: GoMeetUser
 ) {
+  val titleBuilder = StringBuilder()
+  var index = 0
+
+  while (index < event.title.length) {
+    if (index + 20 < event.title.length) {
+      titleBuilder.append(event.title.substring(index, index + 20)).append("\n")
+    } else {
+      titleBuilder.append(event.title.substring(index))
+    }
+    index += 20
+  }
   Row(
-      modifier = Modifier.fillMaxWidth().testTag("EventHeader"),
-      verticalAlignment = Alignment.CenterVertically,
+      modifier = Modifier.fillMaxWidth().testTag("EventHeader").padding(10.dp),
+      verticalAlignment = Alignment.Top,
       horizontalArrangement = Arrangement.SpaceBetween) {
         Column {
           Text(
-              text = title,
+              text = titleBuilder.toString(),
               style =
                   TextStyle(
                       fontSize = 24.sp,
@@ -93,14 +97,14 @@ fun EventHeader(
           Text(
               modifier =
                   Modifier.clickable {
-                        if (organizer.uid == currentUser.uid) {
+                        if (event.creator == eventViewModel.currentUID) {
                           nav.navigateToScreen(Route.PROFILE)
                         } else {
-                          nav.navigateToScreen(Route.OTHERS_PROFILE.replace("{uid}", organizer.uid))
+                          nav.navigateToScreen(Route.OTHERS_PROFILE.replace("{uid}", event.creator))
                         }
                       }
                       .testTag("Username"),
-              text = organizer.username,
+              text = organiser.username,
               style =
                   TextStyle(
                       fontSize = 16.sp,
@@ -108,11 +112,48 @@ fun EventHeader(
                       color = Color.Gray,
                       fontFamily = FontFamily(Font(R.font.roboto)),
                       letterSpacing = 0.5.sp))
-          // Add other details like rating here
+
+          RateEvent(rating, eventViewModel, event)
         }
         // Icon for settings or more options, assuming using Material Icons
-        EventDateTime(day = date, time = time)
+        EventDateTime(day = event.getDateString(), time = event.getTimeString())
       }
+}
+
+/**
+ * RateEvent is a composable that enables a user other than an event's creator to rate a past event.
+ *
+ * @param rating Rating of the event by the current user (0 if unrated, 1-5 otherwise)
+ * @param eventViewModel EventViewModel object to handle event operations
+ * @param event Event object
+ */
+@Composable
+fun RateEvent(rating: MutableState<Long>, eventViewModel: EventViewModel, event: Event) {
+  if (eventViewModel.currentUID!! != event.creator &&
+      event.isPastEvent() &&
+      event.hasUserJoined(eventViewModel.currentUID)) {
+    Row {
+      for (i in 1..5) {
+        val star = if (i <= rating.value) Icons.Filled.Star else Icons.TwoTone.Star
+        Icon(
+            imageVector = star,
+            contentDescription = "Rating stars",
+            tint = MaterialTheme.colorScheme.outlineVariant,
+            modifier =
+                Modifier.clickable {
+                      val oldRating = rating.value
+                      if (rating.value == i.toLong()) {
+                        rating.value = 0
+                      } else {
+                        rating.value = i.toLong()
+                      }
+                      eventViewModel.updateRating(
+                          event.eventID, rating.value, oldRating, event.creator)
+                    }
+                    .padding(4.dp))
+      }
+    }
+  }
 }
 
 /**
@@ -123,7 +164,6 @@ fun EventHeader(
  */
 @Composable
 fun EventDateTime(day: String, time: String) {
-  Log.d(day, "This is the day")
   Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(end = 15.dp)) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -133,7 +173,7 @@ fun EventDateTime(day: String, time: String) {
           style =
               TextStyle(
                   fontSize = 24.sp,
-                  color = MaterialTheme.colorScheme.onBackground,
+                  color = MaterialTheme.colorScheme.tertiary,
                   fontWeight = FontWeight.SemiBold,
                   textAlign = TextAlign.Center))
       Text(
@@ -141,7 +181,7 @@ fun EventDateTime(day: String, time: String) {
           style =
               TextStyle(
                   fontSize = 16.sp,
-                  color = MaterialTheme.colorScheme.onBackground,
+                  color = MaterialTheme.colorScheme.tertiary,
                   textAlign = TextAlign.Center))
     }
   }
@@ -154,9 +194,8 @@ fun EventDateTime(day: String, time: String) {
  */
 @Composable
 fun EventImage(imageUrl: String?) {
-  val defaultImagePainter = painterResource(id = R.drawable.gomeet_logo)
-  val imagePainter =
-      if (imageUrl != null) {
+  if (imageUrl != null) {
+    val imagePainter =
         rememberAsyncImagePainter(
             ImageRequest.Builder(LocalContext.current)
                 .data(data = imageUrl)
@@ -166,14 +205,13 @@ fun EventImage(imageUrl: String?) {
                           placeholder(R.drawable.gomeet_logo)
                         })
                 .build())
-      } else defaultImagePainter
-
-  Column(modifier = Modifier.fillMaxWidth().testTag("EventImage")) {
-    Image(
-        painter = imagePainter,
-        contentDescription = "Event Image",
-        contentScale = ContentScale.Crop,
-        modifier = Modifier.aspectRatio(3f / 1.75f).clip(RoundedCornerShape(20.dp)))
+    Column(modifier = Modifier.fillMaxWidth().testTag("EventImage").padding(top = 10.dp)) {
+      Image(
+          painter = imagePainter,
+          contentDescription = "Event Image",
+          contentScale = ContentScale.Crop,
+          modifier = Modifier.aspectRatio(3f / 1.75f).clip(RoundedCornerShape(20.dp)))
+    }
   }
 }
 
@@ -186,14 +224,9 @@ fun EventImage(imageUrl: String?) {
 fun EventDescription(text: String) {
   Text(
       text = text,
-      style =
-          TextStyle(
-              fontSize = 13.sp,
-              color = MaterialTheme.colorScheme.onBackground,
-              fontFamily = FontFamily(Font(R.font.roboto)),
-              fontWeight = FontWeight.SemiBold,
-              letterSpacing = 0.5.sp),
-      modifier = Modifier.testTag("EventDescription"))
+      color = MaterialTheme.colorScheme.tertiary,
+      style = MaterialTheme.typography.bodyLarge,
+      modifier = Modifier.testTag("EventDescription").padding(horizontal = 10.dp))
 }
 
 /**
@@ -237,6 +270,7 @@ fun EventButtons(
         TextButton(
             onClick = {
               eventAction(
+                  nav,
                   currentUser,
                   organiser,
                   eventId,
@@ -245,12 +279,18 @@ fun EventButtons(
                   isJoined,
                   currentEvent.value!!)
             },
-            shape = RoundedCornerShape(20.dp),
+            shape = RoundedCornerShape(10.dp),
             modifier = Modifier.weight(1f),
             colors =
-                ButtonDefaults.textButtonColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.tertiary)) {
+                if (organiser.uid == currentUser.uid || isJoined.value) {
+                  ButtonDefaults.textButtonColors(
+                      containerColor = MaterialTheme.colorScheme.primaryContainer,
+                      contentColor = MaterialTheme.colorScheme.tertiary)
+                } else {
+                  ButtonDefaults.textButtonColors(
+                      containerColor = MaterialTheme.colorScheme.outlineVariant,
+                      contentColor = White)
+                }) {
               if (organiser.uid == currentUser.uid) {
                 Text("Edit My Event")
               } else {
@@ -267,7 +307,7 @@ fun EventButtons(
               onClick = {
                 nav.navigateToScreen(Route.MANAGE_INVITES.replace("{eventId}", eventId))
               },
-              shape = RoundedCornerShape(20.dp),
+              shape = RoundedCornerShape(10.dp),
               modifier = Modifier.weight(1f),
               colors =
                   ButtonDefaults.textButtonColors(
@@ -354,6 +394,7 @@ private fun FavouriteButton(isFavourite: Boolean) {
  * @param currentEvent The current event
  */
 private fun eventAction(
+    nav: NavigationActions,
     currentUser: GoMeetUser,
     organiser: GoMeetUser,
     eventId: String,
@@ -364,7 +405,7 @@ private fun eventAction(
 ) {
 
   if (organiser.uid == currentUser.uid) {
-    // TODO: GO TO EDIT EVENT PARAMETERS SCREEN
+    nav.navigateToScreen(Route.EDIT_EVENT.replace("{eventId}", eventId))
   } else {
 
     if (!isJoined.value) {

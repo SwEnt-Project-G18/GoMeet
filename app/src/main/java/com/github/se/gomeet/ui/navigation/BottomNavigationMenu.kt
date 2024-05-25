@@ -11,10 +11,12 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.github.se.gomeet.ui.theme.TranslucentCyan
 
 /**
@@ -49,18 +51,20 @@ fun BottomNavigationMenu(
           },
           label = {
             Text(
-                destination.textId,
+                text = destination.textId,
+                maxLines = 1,
                 style =
                     if (selected)
-                        MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold)
-                    else MaterialTheme.typography.labelLarge)
+                        MaterialTheme.typography.labelLarge.copy(
+                            fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                    else MaterialTheme.typography.labelLarge.copy(fontSize = 12.sp))
           },
           selected = selected,
           onClick = { onTabSelect(destination.route) },
           colors =
               NavigationBarItemDefaults.colors(
-                  unselectedIconColor = MaterialTheme.colorScheme.primary,
-                  unselectedTextColor = MaterialTheme.colorScheme.primary,
+                  unselectedIconColor = Gray,
+                  unselectedTextColor = Gray,
                   selectedTextColor = MaterialTheme.colorScheme.tertiary,
                   selectedIconColor = MaterialTheme.colorScheme.tertiary,
                   indicatorColor = TranslucentCyan))
@@ -74,6 +78,6 @@ fun PreviewBottomNavigationMenu() {
   BottomNavigationMenu(
       onTabSelect = {},
       tabList = TOP_LEVEL_DESTINATIONS,
-      selectedItem = Route.CREATE,
+      selectedItem = Route.NOTIFICATIONS,
   )
 }

@@ -1,6 +1,7 @@
 package com.github.se.gomeet.ui.mainscreens
 
 import EventWidget
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -44,59 +45,61 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.github.se.gomeet.R
+import com.github.se.gomeet.model.Tag
 import com.github.se.gomeet.model.event.Event
-import com.github.se.gomeet.model.event.getEventDateString
-import com.github.se.gomeet.model.event.getEventTimeString
-import com.github.se.gomeet.model.event.isPastEvent
 import com.github.se.gomeet.ui.mainscreens.events.GoMeetSearchBar
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.viewmodel.EventViewModel
-import com.github.se.gomeet.viewmodel.EventViewModel.SortOption
+import com.github.se.gomeet.viewmodel.EventViewModel.SortOption.ALPHABETICAL
+import com.github.se.gomeet.viewmodel.EventViewModel.SortOption.DATE
+import com.github.se.gomeet.viewmodel.EventViewModel.SortOption.DEFAULT
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.rememberPagerState
 import com.google.android.gms.maps.model.LatLng
-import java.text.SimpleDateFormat
-import java.time.ZoneId
-import java.util.Calendar
-import java.util.Date
-import java.util.Locale
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-// TODO : This class has only been implemented for testing purposes!
-//  It is showing ALL EVENTS IN FIREBASE,
-//  THIS IS NOT THE IMPLEMENTATION OF TRENDS
+private const val TAG = "Trends"
 
 /**
  * Trends screen composable. This is where the popular trends are displayed.
  *
  * @param nav Navigation actions.
+ * @param userViewModel The user view model.
+ * @param eventViewModel The event view model.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Trends(
-    currentUserId: String,
     nav: NavigationActions,
     userViewModel: UserViewModel,
-    eventViewModel: EventViewModel
+    eventViewModel: EventViewModel,
 ) {
-
   val eventList = remember { mutableStateListOf<Event>() }
   val coroutineScope = rememberCoroutineScope()
   val query = remember { mutableStateOf("") }
   val eventsLoaded = remember { mutableStateOf(false) }
   val screenWidth = LocalConfiguration.current.screenWidthDp.dp
   val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+  val userTags = remember { mutableStateListOf<Tag>() }
+  val currentUserId = userViewModel.currentUID!!
 
   LaunchedEffect(Unit) {
     coroutineScope.launch {
-      val allEvents = eventViewModel.getAllEvents()!!.filter { !isPastEvent(it) }
+      val currentUser = userViewModel.getUser(currentUserId)
+      if (currentUser != null) {
+        userTags.addAll(Tag.entries.filter { currentUser.tags.contains(it.tagName) })
+        Log.d(TAG, "Current user: ${currentUser.username} with ${userTags.size} tags")
+      } else {
+        Log.e(TAG, "Current user is null")
+      }
+      val allEvents = eventViewModel.getAllEvents()!!.filter { !it.isPastEvent() }
       if (allEvents.isNotEmpty()) {
         eventList.addAll(allEvents)
       }
@@ -111,6 +114,7 @@ fun Trends(
             modifier = Modifier.padding(start = screenWidth / 15, top = screenHeight / 30)) {
               Text(
                   text = "Trends",
+                  color = MaterialTheme.colorScheme.onBackground,
                   style =
                       MaterialTheme.typography.headlineMedium.copy(
                           fontWeight = FontWeight.SemiBold))
@@ -137,20 +141,23 @@ fun Trends(
                   MaterialTheme.colorScheme.tertiary)
               Spacer(modifier = Modifier.height(5.dp))
 
-              SortButton(eventList)
+              SortButton(eventList, userTags)
 
               if (!eventsLoaded.value) {
                 LoadingText()
               } else {
                 Spacer(modifier = Modifier.height(5.dp))
                 // TODO: Use the top 5 events instead
-                EventCarousel(eventList.take(5), nav)
+                EventCarousel(eventList.take(5), nav, currentUserId)
 
                 Column(modifier = Modifier.fillMaxSize()) {
                   // TODO: Remove the top 5 events from the list
                   eventList.forEach { event ->
-                    if (event.title.contains(query.value, ignoreCase = true)) {
-
+                    if (event.title.contains(query.value, ignoreCase = true) &&
+                        !event.isPastEvent() &&
+                        (event.public ||
+                            event.visibleToIfPrivate.contains(currentUserId) ||
+                            event.creator == currentUserId)) {
                       EventWidget(
                           event = event, verified = false, nav = nav, userVM = userViewModel)
                     }
@@ -166,10 +173,11 @@ fun Trends(
  *
  * @param events The list of events to display.
  * @param nav Navigation actions.
+ * @param currentUserId The current user ID.
  */
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-fun EventCarousel(events: List<Event>, nav: NavigationActions) {
+fun EventCarousel(events: List<Event>, nav: NavigationActions, currentUserId: String) {
   val pagerState = rememberPagerState()
 
   LaunchedEffect(pagerState) {
@@ -193,8 +201,8 @@ fun EventCarousel(events: List<Event>, nav: NavigationActions) {
             painterResource(id = R.drawable.gomeet_logo)
           }
 
-        val dayString = getEventDateString(event.date)
-        val timeString = getEventTimeString(event.time)
+      val dayString = event.getDateString()
+      val timeString = event.getTimeString()
 
       Box(
           modifier =
@@ -208,7 +216,7 @@ fun EventCarousel(events: List<Event>, nav: NavigationActions) {
                         date = dayString,
                         time = timeString,
                         organizer = event.creator,
-                        rating = 0.0,
+                        rating = event.ratings[currentUserId] ?: 0,
                         description = event.description,
                         loc = LatLng(event.location.latitude, event.location.longitude))
                   }
@@ -247,11 +255,12 @@ fun EventCarousel(events: List<Event>, nav: NavigationActions) {
  * Sort button composable. This is where the user can sort the events.
  *
  * @param eventList The list of events to sort.
+ * @param userTags The list of the current user's tags.
  */
 @Composable
-fun SortButton(eventList: MutableList<Event>) {
+fun SortButton(eventList: MutableList<Event>, userTags: List<Tag>) {
   var expanded by remember { mutableStateOf(false) }
-  var selectedOption by remember { mutableStateOf(EventViewModel.SortOption.DEFAULT) }
+  var selectedOption by remember { mutableStateOf(DEFAULT) }
 
   Box(
       contentAlignment = Alignment.Center,
@@ -275,37 +284,37 @@ fun SortButton(eventList: MutableList<Event>) {
               DropdownMenuItem(
                   text = { Text("Popularity") },
                   onClick = {
-                    // TODO: Implement popularity sorting
-                    selectedOption = SortOption.DEFAULT
+                    EventViewModel.sortEvents(Tag.tagListToString(userTags), eventList)
+                    selectedOption = DEFAULT
                     expanded = false
                   },
                   modifier =
                       Modifier.background(
-                          if (selectedOption == SortOption.DEFAULT)
+                          if (selectedOption == DEFAULT)
                               MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
                           else Color.Transparent))
               DropdownMenuItem(
                   text = { Text("Name") },
                   onClick = {
-                    selectedOption = SortOption.ALPHABETICAL
+                    selectedOption = ALPHABETICAL
                     eventList.sortBy { it.title }
                     expanded = false
                   },
                   modifier =
                       Modifier.background(
-                          if (selectedOption == SortOption.ALPHABETICAL)
+                          if (selectedOption == ALPHABETICAL)
                               MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
                           else Color.Transparent))
               DropdownMenuItem(
                   text = { Text("Date") },
                   onClick = {
-                    selectedOption = SortOption.DATE
+                    selectedOption = DATE
                     eventList.sortBy { it.date }
                     expanded = false
                   },
                   modifier =
                       Modifier.background(
-                          if (selectedOption == SortOption.DATE)
+                          if (selectedOption == DATE)
                               MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
                           else Color.Transparent))
             }

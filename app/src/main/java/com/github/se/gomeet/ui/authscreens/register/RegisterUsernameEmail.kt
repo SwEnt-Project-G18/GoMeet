@@ -76,6 +76,7 @@ fun RegisterUsernameEmail(
         Text(
             text = "Welcome to GoMeet !\nPlease enter a username and an email.",
             modifier = Modifier.fillMaxWidth().testTag("Text"),
+            color = MaterialTheme.colorScheme.onBackground,
             style = MaterialTheme.typography.titleMedium,
             textAlign = TextAlign.Center)
 
@@ -140,8 +141,8 @@ fun RegisterUsernameEmail(
                   onClick = {
                     firstClick = false
                     isValidUsername =
-                        !(allUsers!!.any { u -> u.username == username }) && username.isNotBlank()
-                    isValidEmail = isValidEmail && !(allUsers!!.any { u -> u.email == username })
+                        !(allUsers.any { u -> u.username == username }) && username.isNotBlank()
+                    isValidEmail = isValidEmail && !(allUsers.any { u -> u.email == username })
                     if (isValidUsername && isValidEmail) {
                       callback(username, email)
                     }

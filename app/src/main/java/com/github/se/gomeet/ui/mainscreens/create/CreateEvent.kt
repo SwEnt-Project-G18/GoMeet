@@ -1,6 +1,7 @@
 package com.github.se.gomeet.ui.mainscreens.create
 
 import android.graphics.BitmapFactory
+import android.webkit.URLUtil
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -18,6 +19,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
@@ -58,6 +60,8 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -87,9 +91,15 @@ private const val NUMBER_OF_SUGGESTIONS = 3
  * @param nav The navigation actions.
  * @param eventViewModel The event view model.
  * @param isPrivate The boolean value to determine if the event is private or not.
+ * @param userViewModel The user view model.
  */
 @Composable
-fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivate: Boolean) {
+fun CreateEvent(
+    nav: NavigationActions,
+    eventViewModel: EventViewModel,
+    isPrivate: Boolean,
+    userViewModel: UserViewModel
+) {
   val screenHeight = LocalConfiguration.current.screenHeightDp.dp
   val screenWidth = LocalConfiguration.current.screenWidthDp.dp
 
@@ -98,9 +108,9 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
   val descriptionState = remember { mutableStateOf("") }
   val locationState = remember { mutableStateOf("") }
   var price by remember { mutableDoubleStateOf(0.0) }
-  var priceText by remember { mutableStateOf("") }
+  var priceText by remember { mutableStateOf("0.0") }
   val url = remember { mutableStateOf("") }
-  val isPrivateEvent = remember { mutableStateOf(false) }
+  var urlValid by remember { mutableStateOf(true) }
 
   val pickedTime = remember { mutableStateOf(LocalTime.now()) }
   val pickedDate = remember { mutableStateOf(LocalDate.now()) }
@@ -149,7 +159,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
 
   Scaffold(
       topBar = {
-        Column {
+        Column(modifier = Modifier.padding(bottom = screenHeight / 90)) {
           TopAppBar(
               modifier = Modifier.testTag("TopBar"),
               backgroundColor = MaterialTheme.colorScheme.background,
@@ -171,6 +181,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
               modifier = Modifier.padding(start = 18.dp)) {
                 Text(
                     text = "Create",
+                    color = MaterialTheme.colorScheme.onBackground,
                     style =
                         MaterialTheme.typography.headlineSmall.copy(
                             fontWeight = FontWeight.SemiBold))
@@ -191,7 +202,12 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
               TextField(
                   value = titleState.value,
                   singleLine = true,
-                  onValueChange = { newVal -> titleState.value = newVal },
+                  onValueChange = { newVal ->
+                    if ((titleState.value.isNotEmpty() || newVal != " ") &&
+                        titleState.value.length < 58) {
+                      titleState.value = newVal
+                    }
+                  },
                   label = { Text("Title") },
                   placeholder = { Text("Name the event") },
                   colors = textFieldColors,
@@ -199,10 +215,13 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
 
               TextField(
                   value = descriptionState.value,
-                  onValueChange = { newVal -> descriptionState.value = newVal },
+                  onValueChange = { newVal ->
+                    if ((descriptionState.value.isNotEmpty() || newVal != " ")) {
+                      descriptionState.value = newVal
+                    }
+                  },
                   label = { Text("Description") },
                   placeholder = { Text("Describe the task") },
-                  singleLine = true,
                   colors = textFieldColors,
                   modifier = Modifier.fillMaxWidth().padding(start = 15.dp, end = 15.dp))
 
@@ -215,12 +234,17 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
               TextField(
                   value = priceText,
                   onValueChange = { newVal ->
-                    priceText = newVal
-                    newVal.toDoubleOrNull()?.let { price = it }
+                    if (newVal.isEmpty() || isValidPrice(newVal)) {
+                      priceText = newVal
+                      newVal.toDoubleOrNull()?.let { price = it }
+                    }
                   },
                   label = { Text("Price") },
                   placeholder = { Text("Enter a price") },
                   singleLine = true,
+                  keyboardOptions =
+                      KeyboardOptions.Default.copy(
+                          imeAction = ImeAction.Done, keyboardType = KeyboardType.Number),
                   colors = textFieldColors,
                   modifier = Modifier.fillMaxWidth().padding(start = 15.dp, end = 15.dp))
 
@@ -232,6 +256,13 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                   singleLine = true,
                   colors = textFieldColors,
                   modifier = Modifier.fillMaxWidth().padding(start = 15.dp, end = 15.dp))
+
+              if (!urlValid) {
+                Text(
+                    text = "Url Not Valid",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = Color.Red)
+              }
 
               Spacer(modifier = Modifier.height(screenHeight / 80))
 
@@ -249,6 +280,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                     Icon(
                         Icons.AutoMirrored.Filled.KeyboardArrowRight,
                         null,
+                        tint = MaterialTheme.colorScheme.onBackground,
                         modifier =
                             Modifier.clickable { showPopup.value = true }.testTag("TagsButton"))
                   }
@@ -270,6 +302,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                       Icon(
                           Icons.AutoMirrored.Filled.KeyboardArrowRight,
                           null,
+                          tint = MaterialTheme.colorScheme.onBackground,
                           modifier =
                               Modifier.clickable {
                                 nav.navigateToScreen(
@@ -293,6 +326,7 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
                     Icon(
                         Icons.AutoMirrored.Filled.KeyboardArrowRight,
                         null,
+                        tint = MaterialTheme.colorScheme.onBackground,
                         modifier =
                             Modifier.clickable {
                                   if (imageUri != null) {
@@ -339,53 +373,59 @@ fun CreateEvent(nav: NavigationActions, eventViewModel: EventViewModel, isPrivat
               Button(
                   modifier = Modifier.width((screenWidth / 1.5.dp).dp).height(screenHeight / 17),
                   onClick = {
-                    if (titleState.value.isNotEmpty()) {
-                      if (selectedLocation.value == null) {
-                        eventViewModel.location(locationState.value, 1) { locations ->
-                          if (locations.isNotEmpty()) {
-                            eventViewModel.createEvent(
-                                titleState.value,
-                                descriptionState.value,
-                                locations[0],
-                                pickedDate.value,
-                                pickedTime.value,
-                                price,
-                                url.value,
-                                listOf(),
-                                listOf(),
-                                listOf(),
-                                0,
-                                !isPrivateEvent.value,
-                                listOf(),
-                                listOf(),
-                                imageUri,
-                                UserViewModel(),
-                                uid)
+                    urlValid = URLUtil.isValidUrl(url.value)
+                    titleState.value = titleState.value.trimEnd()
+                    descriptionState.value = descriptionState.value.trimEnd()
+                    url.value = url.value.trimEnd()
 
-                            nav.goBack()
-                          }
+                    if (titleState.value.isNotEmpty() && urlValid) {
+                      when (selectedLocation.value == null) {
+                        true ->
+                            eventViewModel.location(locationState.value, 1) { locations ->
+                              if (locations.isNotEmpty()) {
+                                eventViewModel.createEvent(
+                                    titleState.value,
+                                    descriptionState.value,
+                                    locations[0],
+                                    pickedDate.value,
+                                    pickedTime.value,
+                                    price,
+                                    url.value,
+                                    listOf(),
+                                    listOf(),
+                                    listOf(),
+                                    0,
+                                    !isPrivate,
+                                    listOf(),
+                                    listOf(),
+                                    imageUri,
+                                    userViewModel,
+                                    uid)
+
+                                nav.goBack()
+                              }
+                            }
+                        false -> {
+                          eventViewModel.createEvent(
+                              titleState.value,
+                              descriptionState.value,
+                              selectedLocation.value!!,
+                              pickedDate.value,
+                              pickedTime.value,
+                              price,
+                              url.value,
+                              listOf(),
+                              listOf(),
+                              listOf(),
+                              0,
+                              !isPrivate,
+                              tags.value,
+                              listOf(),
+                              imageUri,
+                              userViewModel,
+                              uid)
+                          nav.goBack()
                         }
-                      } else {
-                        eventViewModel.createEvent(
-                            titleState.value,
-                            descriptionState.value,
-                            selectedLocation.value!!,
-                            pickedDate.value,
-                            pickedTime.value,
-                            price,
-                            url.value,
-                            listOf(),
-                            listOf(),
-                            listOf(),
-                            0,
-                            !isPrivateEvent.value,
-                            tags.value,
-                            listOf(),
-                            imageUri,
-                            UserViewModel(),
-                            uid)
-
-                        nav.goBack()
                       }
                     }
 
@@ -537,9 +577,13 @@ private fun fieldsAreFull(
     price: String,
     url: String
 ): Boolean {
-  return title.isNotEmpty() &&
-      desc.isNotEmpty() &&
-      loc.isNotEmpty() &&
-      price.isNotEmpty() &&
-      url.isNotEmpty()
+  return title.isNotEmpty() && desc.isNotEmpty() && loc.isNotEmpty()
+}
+
+fun isValidPrice(price: String): Boolean {
+  val regex = """^(\d{1,6})(\.\d{0,2})?$""".toRegex()
+  if (!regex.matches(price)) return false
+
+  val value = price.toDoubleOrNull() ?: return false
+  return value <= 1_000_000
 }

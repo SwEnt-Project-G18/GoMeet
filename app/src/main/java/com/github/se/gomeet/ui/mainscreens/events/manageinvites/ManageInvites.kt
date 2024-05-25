@@ -1,31 +1,22 @@
-package com.github.se.gomeet.ui.mainscreens.events
+package com.github.se.gomeet.ui.mainscreens.events.manageinvites
 
-import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -41,25 +32,22 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.Invitation
 import com.github.se.gomeet.model.event.InviteStatus
-import com.github.se.gomeet.model.event.InviteStatus.*
+import com.github.se.gomeet.model.event.InviteStatus.ACCEPTED
+import com.github.se.gomeet.model.event.InviteStatus.PENDING
+import com.github.se.gomeet.model.event.InviteStatus.REFUSED
+import com.github.se.gomeet.model.event.InviteStatus.TO_INVITE
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
@@ -72,11 +60,15 @@ import kotlinx.coroutines.launch
 /**
  * This composable function represents the screen where the user can manage the invitations for one
  * of his event.
+ *
+ * @param currentEvent The event for which the user wants to manage the invitations.
+ * @param nav The navigation actions.
+ * @param userViewModel The user view model.
+ * @param eventViewModel The event view model.
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ManageInvites(
-    currentUser: String,
     currentEvent: String,
     nav: NavigationActions,
     userViewModel: UserViewModel,
@@ -91,6 +83,7 @@ fun ManageInvites(
   val event = remember { mutableStateOf<Event?>(null) }
   val followersFollowingList = remember { mutableListOf<GoMeetUser>() }
   val toUpdate = remember { mutableListOf<GoMeetUser>() }
+  val currentUser = userViewModel.currentUID!!
 
   LaunchedEffect(Unit) {
     coroutineScope.launch {
@@ -108,7 +101,9 @@ fun ManageInvites(
       if (following.isNotEmpty()) {
         following.forEach {
           val followingUser = userViewModel.getUser(it)
-          followersFollowingList.add(followingUser!!)
+          if (!followers.contains(followingUser!!.uid)) {
+            followersFollowingList.add(followingUser)
+          }
         }
       }
       isLoaded = true
@@ -137,7 +132,8 @@ fun ManageInvites(
                       }) {
                         Icon(
                             Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                            contentDescription = "Go back")
+                            contentDescription = "Go back",
+                            tint = MaterialTheme.colorScheme.onBackground)
                       }
                 }
             Row(
@@ -146,6 +142,7 @@ fun ManageInvites(
                 horizontalArrangement = Arrangement.Center) {
                   Text(
                       text = "Manage Invites",
+                      color = MaterialTheme.colorScheme.onBackground,
                       style =
                           MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold))
                 }
@@ -165,6 +162,7 @@ fun ManageInvites(
                         }) {
                       Text(
                           text = TO_INVITE.formattedName,
+                          color = MaterialTheme.colorScheme.onBackground,
                           style =
                               MaterialTheme.typography.bodyMedium.copy(
                                   fontWeight = pagerWeight(pagerState, TO_INVITE.formattedName)))
@@ -179,6 +177,7 @@ fun ManageInvites(
                         }) {
                       Text(
                           text = PENDING.formattedName,
+                          color = MaterialTheme.colorScheme.onBackground,
                           style =
                               MaterialTheme.typography.bodyMedium.copy(
                                   fontWeight = pagerWeight(pagerState, PENDING.formattedName)))
@@ -193,6 +192,7 @@ fun ManageInvites(
                         }) {
                       Text(
                           text = ACCEPTED.formattedName,
+                          color = MaterialTheme.colorScheme.onBackground,
                           style =
                               MaterialTheme.typography.bodyMedium.copy(
                                   fontWeight = pagerWeight(pagerState, ACCEPTED.formattedName)))
@@ -207,6 +207,7 @@ fun ManageInvites(
                         }) {
                       Text(
                           text = REFUSED.formattedName,
+                          color = MaterialTheme.colorScheme.onBackground,
                           style =
                               MaterialTheme.typography.bodyMedium.copy(
                                   fontWeight = pagerWeight(pagerState, REFUSED.formattedName)))
@@ -301,127 +302,6 @@ fun ManageInvites(
 }
 
 /**
- * This composable function represents the list of users that can be invited to an event.
- *
- * @param list the list of users that can be invited
- * @param currentEvent the event for which the users are invited
- * @param status the status of the invitation
- * @param callback the callback function to update the list of users to invite
- * @param initialClicked the initial state of the button
- */
-@Composable
-fun PageUserInvites(
-    list: List<GoMeetUser>,
-    currentEvent: Event,
-    status: InviteStatus?,
-    callback: (GoMeetUser) -> Unit,
-    initialClicked: Boolean
-) {
-
-  Column(
-      verticalArrangement = Arrangement.Top,
-      horizontalAlignment = Alignment.CenterHorizontally,
-      modifier = Modifier.fillMaxSize()) {
-        list.forEach { follower ->
-          UserInviteWidget(follower, currentEvent, status, initialClicked, callback)
-        }
-      }
-}
-
-/**
- * This composable function represents the user invite widget when the user can be invited to an
- * event.
- *
- * @param user the user that can be invited
- * @param event the event for which the user is invited
- * @param status the status of the invitation
- * @param initialClicked the initial state of the button
- * @param callback the callback function to update the list of users to invite
- */
-@Composable
-fun UserInviteWidget(
-    user: GoMeetUser,
-    event: Event,
-    status: InviteStatus?,
-    initialClicked: Boolean,
-    callback: (GoMeetUser) -> Unit
-) {
-
-  var clicked by rememberSaveable { mutableStateOf(initialClicked) }
-  Row(
-      modifier =
-          Modifier.fillMaxWidth()
-              .padding(start = 15.dp, end = 15.dp)
-              .height(50.dp)
-              .testTag("UserInviteWidget"),
-      horizontalArrangement = Arrangement.SpaceBetween,
-      verticalAlignment = Alignment.CenterVertically) {
-        // Profile picture
-        Image(
-            modifier =
-                Modifier.size(40.dp)
-                    .clip(CircleShape)
-                    .background(color = MaterialTheme.colorScheme.background),
-            painter = painterResource(id = R.drawable.gomeet_logo),
-            contentDescription = "profile picture",
-            contentScale = ContentScale.None)
-
-        // Username text
-        Text(text = user.username, color = MaterialTheme.colorScheme.onBackground)
-
-        // Status text
-        Text(
-            text =
-                when (status) {
-                  PENDING -> PENDING.formattedName
-                  ACCEPTED -> ACCEPTED.formattedName
-                  REFUSED -> REFUSED.formattedName
-                  else -> ""
-                },
-            modifier = Modifier.width(80.dp).testTag("InviteStatus"),
-            color =
-                when (status) {
-                  PENDING ->
-                      if (clicked) MaterialTheme.colorScheme.onBackground
-                      else MaterialTheme.colorScheme.primary
-                  ACCEPTED -> Color.Green
-                  REFUSED -> Color.Red
-                  else -> MaterialTheme.colorScheme.onBackground
-                })
-
-        // Button to invite or cancel invitation
-        Button(
-            onClick = {
-              clicked = !clicked
-              val toAdd =
-                  (clicked && (status == null || status == REFUSED)) ||
-                      (!clicked && (status == PENDING || status == ACCEPTED))
-              Log.d("ManageInvites", "toAdd: $toAdd, clicked: $clicked, status: $status")
-              callback(user.copy(pendingRequests = pendingRequests(user, event, status, toAdd)))
-            },
-            modifier = Modifier.height(26.dp).width(82.dp),
-            contentPadding = PaddingValues(vertical = 2.dp),
-            shape = RoundedCornerShape(10.dp),
-            colors = manageInvitesButtonColour(status, clicked)) {
-              Text(
-                  text =
-                      when (status) {
-                        PENDING,
-                        ACCEPTED -> if (clicked) "Invite" else "Cancel"
-                        else -> if (!clicked) "Invite" else "Cancel"
-                      },
-                  color =
-                      when (status) {
-                        PENDING,
-                        ACCEPTED -> if (clicked) Color.White else Color.DarkGray
-                        else -> if (!clicked) Color.White else Color.DarkGray
-                      },
-                  fontSize = 12.sp)
-            }
-      }
-}
-
-/**
  * This function updates the list of users to invite to an event.
  *
  * @param toUpdate The list of users to update.
@@ -442,7 +322,7 @@ private fun inviteAction(
     if (user.pendingRequests.any { invitation ->
       invitation.eventId == event.value!!.eventID && invitation.status == PENDING
     }) {
-      eventViewModel.sendInvitation(event.value!!, user.uid)
+      eventViewModel.sendInvitation(event.value!!.eventID, user.uid)
     } else {
       eventViewModel.cancelInvitation(event.value!!, user.uid)
     }
@@ -458,12 +338,12 @@ private fun inviteAction(
  */
 @OptIn(ExperimentalFoundationApi::class)
 private fun pagerWeight(pagerState: PagerState, button: String): FontWeight {
-  if ((pagerState.currentPage == TO_INVITE.ordinal && button == TO_INVITE.formattedName) ||
+  return if ((pagerState.currentPage == TO_INVITE.ordinal && button == TO_INVITE.formattedName) ||
       (pagerState.currentPage == PENDING.ordinal && button == PENDING.formattedName) ||
       (pagerState.currentPage == ACCEPTED.ordinal && button == ACCEPTED.formattedName) ||
       (pagerState.currentPage == REFUSED.ordinal && button == REFUSED.formattedName))
-      return FontWeight.Bold
-  else return FontWeight.Normal
+      FontWeight.Bold
+  else FontWeight.Normal
 }
 
 /**
@@ -484,8 +364,8 @@ fun pendingRequests(
     val possiblePreviousInvitationRefused =
         user.pendingRequests.find { it.eventId == event.eventID && it.status == REFUSED }
 
-    if (user.pendingRequests.contains(possiblePreviousInvitationRefused)) {
-      return user.pendingRequests
+    return if (user.pendingRequests.contains(possiblePreviousInvitationRefused)) {
+      user.pendingRequests
           .map {
             if (it == possiblePreviousInvitationRefused) {
               it.copy(status = PENDING)
@@ -495,7 +375,7 @@ fun pendingRequests(
           }
           .toSet()
     } else {
-      return user.pendingRequests.plus(Invitation(event.eventID, status ?: PENDING))
+      user.pendingRequests.plus(Invitation(event.eventID, status ?: PENDING))
     }
   } else {
     return user.pendingRequests.minus(Invitation(event.eventID, status ?: PENDING))
@@ -510,7 +390,7 @@ fun pendingRequests(
  * @return The button colours.
  */
 @Composable
-private fun manageInvitesButtonColour(status: InviteStatus?, clicked: Boolean): ButtonColors {
+internal fun manageInvitesButtonColour(status: InviteStatus?, clicked: Boolean): ButtonColors {
 
   val c1 = MaterialTheme.colorScheme.outlineVariant
   val c2 = Color.LightGray

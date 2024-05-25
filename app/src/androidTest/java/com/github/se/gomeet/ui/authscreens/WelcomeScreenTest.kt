@@ -1,6 +1,8 @@
 package com.github.se.gomeet.ui.authscreens
 
 import androidx.activity.ComponentActivity
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -31,7 +33,10 @@ class WelcomeScreenTest {
 
   @Test
   fun testWelcomeScreen() {
-    composeTestRule.setContent { WelcomeScreen({}, {}) { _, _, _, _, _, _ -> } }
+    composeTestRule.setContent {
+      val chatClientDisconnected = remember { mutableStateOf(true) }
+      WelcomeScreen({}, {}, { _, _, _, _, _, _ -> }, chatClientDisconnected)
+    }
 
     composeTestRule.waitForIdle()
 

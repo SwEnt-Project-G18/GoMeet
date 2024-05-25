@@ -10,7 +10,7 @@ enum class InviteStatus(val formattedName: String, val button: String = "") {
   TO_INVITE("To Invite"),
   PENDING("Pending"),
   ACCEPTED("Accepted", "Accept"),
-  REFUSED("Refused", "Refuse");
+  REFUSED("Refused", "Refuse")
 }
 
 /**

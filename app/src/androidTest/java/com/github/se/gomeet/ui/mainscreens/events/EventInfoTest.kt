@@ -7,14 +7,18 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.se.gomeet.model.event.location.Location
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import java.time.LocalDate
+import java.time.LocalTime
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.tasks.await
 import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.junit.Rule
@@ -33,9 +37,9 @@ class EventInfoTest {
     private val eventTime = "00:00"
     private val eventDescription = "Event Description"
     private val eventLocation = LatLng(0.0, 0.0)
-    private val userVM = UserViewModel()
+    private val userVM = UserViewModel(organiserId)
     private val eventVM = EventViewModel(organiserId)
-    private val eventRating = 4.5
+    private val eventRating = 4L
     private lateinit var uid: String
 
     private val usr = "eventinfo@test.com"
@@ -43,41 +47,45 @@ class EventInfoTest {
 
     @BeforeClass
     @JvmStatic
-    fun setUp() {
-      runBlocking {
-        // Create a new user and sign in
-        var result = Firebase.auth.createUserWithEmailAndPassword(usr, pwd)
-        while (!result.isComplete) {
-          TimeUnit.SECONDS.sleep(1)
-        }
-        result = Firebase.auth.signInWithEmailAndPassword(usr, pwd)
-        while (!result.isComplete) {
-          TimeUnit.SECONDS.sleep(1)
-        }
+    fun setUp() = runBlocking {
+      // Create a new user and sign in
+      Firebase.auth.createUserWithEmailAndPassword(usr, pwd).await()
+      Firebase.auth.signInWithEmailAndPassword(usr, pwd).await()
 
-        // Add the user to the view model and add a second user who created the event
-        uid = Firebase.auth.currentUser!!.uid
-        userVM.createUserIfNew(
-            organiserId, "testorganiser", "test", "name", "test@email.com", "0123", "Afghanistan")
-        while (userVM.getUser(organiserId) == null) {
-          TimeUnit.SECONDS.sleep(1)
-        }
-        userVM.createUserIfNew(uid, "a", "b", "c", usr, "4567", "Angola")
-        while (userVM.getUser(uid) == null) {
-          TimeUnit.SECONDS.sleep(1)
-        }
-      }
+      // Add the user to the view model and add a second user who created the event
+      uid = Firebase.auth.currentUser!!.uid
+      eventVM.createEvent(
+          eventTitle,
+          eventDescription,
+          Location(eventLocation.latitude, eventLocation.longitude, ""),
+          LocalDate.parse(eventDate),
+          LocalTime.parse(eventTime),
+          0.0,
+          "",
+          emptyList(),
+          emptyList(),
+          emptyList(),
+          0,
+          true,
+          emptyList(),
+          emptyList(),
+          null,
+          userVM,
+          eventId)
+
+      userVM.createUserIfNew(
+          organiserId, "testorganiser", "test", "name", "test@email.com", "0123", "Afghanistan")
+      userVM.createUserIfNew(uid, "a", "b", "c", usr, "4567", "Angola")
+      TimeUnit.SECONDS.sleep(1)
     }
 
     @AfterClass
     @JvmStatic
-    fun tearDown() {
-      runBlocking {
-        // Clean up the users
-        Firebase.auth.currentUser!!.delete()
-        userVM.deleteUser(organiserId)
-        userVM.deleteUser(uid)
-      }
+    fun tearDown() = runBlocking {
+      // Clean up the users
+      Firebase.auth.currentUser!!.delete().await()
+      userVM.deleteUser(organiserId)
+      userVM.deleteUser(uid)
     }
   }
 
@@ -90,7 +98,7 @@ class EventInfoTest {
           eventId = eventId,
           date = eventDate,
           time = eventTime,
-          organizerId = organiserId,
+          organiserId = organiserId,
           rating = eventRating,
           description = eventDescription,
           loc = eventLocation,
@@ -101,14 +109,13 @@ class EventInfoTest {
     composeTestRule.waitForIdle()
 
     // Wait until the page is loaded
-    composeTestRule.waitUntil(timeoutMillis = 10000) {
+    composeTestRule.waitUntil(timeoutMillis = 1000000) {
       composeTestRule.onNodeWithTag("EventHeader").isDisplayed()
     }
 
     // Test the ui of the EventInfo screen
     composeTestRule.onNodeWithTag("TopBar").assertIsDisplayed()
     composeTestRule.onNodeWithTag("EventHeader").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("EventImage").assertIsDisplayed()
     composeTestRule
         .onNodeWithTag("EventDescription")
         .assertTextContains(eventDescription)

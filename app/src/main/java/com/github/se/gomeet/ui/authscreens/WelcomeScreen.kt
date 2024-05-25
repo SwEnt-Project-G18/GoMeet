@@ -2,6 +2,9 @@ package com.github.se.gomeet.ui.authscreens
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Context
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -22,11 +25,13 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -37,22 +42,28 @@ import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.github.se.gomeet.R
 import com.google.firebase.auth.FirebaseAuth
 
+private const val TAG = "WelcomeScreen"
+
 /**
  * Composable function for the Welcome Screen.
  *
  * @param onNavToLogin The navigation function to navigate to the Login Screen.
  * @param onNavToRegister The navigation function to navigate to the Register Screen.
  * @param onSignInSuccess The function to call when the user successfully signs in.
+ * @param chatClientDisconnected True if the chat client is disconnected, false otherwise. It's
+ *   important for the chat client to have no active connection when the user attempts to sign in.
  */
 @SuppressLint("RestrictedApi")
 @Composable
 fun WelcomeScreen(
     onNavToLogin: () -> Unit,
     onNavToRegister: () -> Unit,
-    onSignInSuccess: (String, String, String, String, String, String) -> Unit
+    onSignInSuccess: (String, String, String, String, String, String) -> Unit,
+    chatClientDisconnected: MutableState<Boolean>
 ) {
   val screenHeight = LocalConfiguration.current.screenHeightDp.dp
   val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+  val context = LocalContext.current
 
   val launcher =
       rememberLauncherForActivityResult(FirebaseAuthUIActivityResultContract()) { res ->
@@ -66,10 +77,10 @@ fun WelcomeScreen(
           val lastName = res.idpResponse!!.user.name?.take(index) ?: ""
           val firstName = res.idpResponse!!.user.name?.drop(index) ?: ""
           userFirebase?.uid?.let { userId ->
-            onSignInSuccess(
-                userId, "user" + userId.take(6), email, firstName, lastName, phoneNumber)
+            onSignInSuccess(userId, email, firstName, lastName, phoneNumber, name)
           }
         } else {
+          Log.e(TAG, "Sign-in error")
           // Sign-in error
         }
       }
@@ -91,22 +102,26 @@ fun WelcomeScreen(
         Image(
             colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.tertiary),
             painter = painterResource(id = R.drawable.gomeet_text),
-            contentDescription = "GoMeet Logo")
+            contentDescription = "GoMeet Logo",
+            modifier = Modifier.size(width = 200.dp, height = 100.dp))
 
         Image(
-            painter = painterResource(id = R.drawable.welcomeimage),
+            painter = painterResource(id = R.drawable.welcome2),
             contentDescription = "Welcome Image")
 
         Text(
             text = "See what's happening around you right now.",
             modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
             textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onBackground,
             style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.SemiBold))
 
         Spacer(modifier = Modifier.size(screenHeight / 70))
 
         Button(
-            onClick = { onNavToLogin() },
+            onClick = {
+              if (chatClientDisconnected.value) onNavToLogin() else cantLogInToast(context)
+            },
             modifier =
                 Modifier.width((screenWidth / 1.5.dp).dp)
                     .height(screenHeight / 17)
@@ -124,7 +139,9 @@ fun WelcomeScreen(
 
         Spacer(modifier = Modifier.size(10.dp))
         OutlinedButton(
-            onClick = { onNavToRegister() },
+            onClick = {
+              if (chatClientDisconnected.value) onNavToRegister() else cantLogInToast(context)
+            },
             modifier = Modifier.width((screenWidth / 1.5.dp).dp).height(screenHeight / 17),
             shape = RoundedCornerShape(10.dp),
             border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
@@ -143,11 +160,18 @@ fun WelcomeScreen(
         OutlinedIconButton(
             modifier = Modifier.size(screenHeight / 18),
             border = BorderStroke(1.dp, MaterialTheme.colorScheme.primaryContainer),
-            onClick = { launcher.launch(signInIntent) },
+            onClick = {
+              if (chatClientDisconnected.value) launcher.launch(signInIntent)
+              else cantLogInToast(context)
+            },
             enabled = true) {
               Image(
                   painter = painterResource(id = R.drawable.multicolor_google_logo),
                   contentDescription = "Google logo")
             }
       }
+}
+
+private fun cantLogInToast(context: Context) {
+  Toast.makeText(context, "Please wait for log out to complete", Toast.LENGTH_SHORT).show()
 }

@@ -12,12 +12,15 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.rule.GrantPermissionRule
 import com.github.se.gomeet.MainActivity
 import com.github.se.gomeet.screens.CreateEventScreen
 import com.github.se.gomeet.screens.CreateScreen
 import com.github.se.gomeet.screens.EventsScreen
+import com.github.se.gomeet.screens.ExploreScreen
 import com.github.se.gomeet.screens.LoginScreenScreen
 import com.github.se.gomeet.screens.WelcomeScreenScreen
+import com.github.se.gomeet.viewmodel.AuthViewModel
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
@@ -26,6 +29,7 @@ import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.tasks.await
 import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.junit.Rule
@@ -40,6 +44,8 @@ import org.junit.runner.RunWith
 class EndToEndTest : TestCase() {
 
   @get:Rule val composeTestRule = createAndroidComposeRule<MainActivity>()
+  @get:Rule
+  var permissionRule = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
 
   companion object {
     private const val email = "user@test.com"
@@ -47,46 +53,38 @@ class EndToEndTest : TestCase() {
     private lateinit var uid: String
     private const val username = "EndToEndTestuser"
 
-    private val userVM = UserViewModel()
+    private lateinit var userVM: UserViewModel
     private lateinit var eventVM: EventViewModel
+    private val authViewModel = AuthViewModel()
 
     @JvmStatic
     @BeforeClass
-    fun setup() {
-      runBlocking {
-        // create a new user
-        var result = Firebase.auth.createUserWithEmailAndPassword(email, pwd)
-        while (!result.isComplete) {
-          TimeUnit.SECONDS.sleep(1)
-        }
-        uid = result.result.user!!.uid
+    fun setup() = runBlocking {
+      // create a new user
+      Firebase.auth.createUserWithEmailAndPassword(email, pwd).await()
+      uid = Firebase.auth.currentUser!!.uid
 
-        // Add the user to the view model
-        userVM.createUserIfNew(
-            uid, username, "testfirstname", "testlastname", email, "testphonenumber", "testcountry")
-        while (userVM.getUser(uid) == null) {
-          TimeUnit.SECONDS.sleep(1)
-        }
+      userVM = UserViewModel(uid)
 
-        // Sign in
-        result = Firebase.auth.signInWithEmailAndPassword(email, pwd)
-        while (!result.isComplete) {
-          TimeUnit.SECONDS.sleep(1)
-        }
-        eventVM = EventViewModel(uid)
-      }
+      // Add the user to the view model
+      userVM.createUserIfNew(
+          uid, username, "testfirstname", "testlastname", email, "testphonenumber", "testcountry")
+      // Sign in
+      Firebase.auth.signInWithEmailAndPassword(email, pwd).await()
+      eventVM = EventViewModel(uid)
+      authViewModel.signOut()
+      TimeUnit.SECONDS.sleep(1)
     }
 
     @AfterClass
     @JvmStatic
-    fun tearDown() {
-      runBlocking {
-        // Clean up the event
-        eventVM.getAllEvents()?.forEach { eventVM.removeEvent(it.eventID) }
-        // Clean up the user
-        Firebase.auth.currentUser?.delete()
-        userVM.deleteUser(uid)
-      }
+    fun tearDown() = runBlocking {
+
+      // Clean up the event
+      eventVM.getAllEvents()?.forEach { eventVM.removeEvent(it.eventID) }
+      // Clean up the user
+      Firebase.auth.currentUser?.delete()?.await()
+      userVM.deleteUser(uid)
     }
   }
 
@@ -106,10 +104,24 @@ class EndToEndTest : TestCase() {
         composeTestRule.onNodeWithText("Log In").assertIsEnabled().performClick()
         composeTestRule.waitForIdle()
         composeTestRule.waitUntil(timeoutMillis = 10000) {
-          composeTestRule.onNodeWithTag("CreateUI").isDisplayed()
+          composeTestRule.onNodeWithTag("ExploreUI").isDisplayed()
         }
       }
     }
+
+    ComposeScreen.onComposeScreen<ExploreScreen>(composeTestRule) {
+      step("Go to Events") {
+        composeTestRule.onNodeWithText("Events").assertIsDisplayed().performClick()
+      }
+    }
+
+    composeTestRule.waitForIdle()
+
+    ComposeScreen.onComposeScreen<EventsScreen>(composeTestRule) {
+      composeTestRule.onNodeWithTag("CreateEventButton").assertIsDisplayed().performClick()
+    }
+
+    composeTestRule.waitForIdle()
 
     ComposeScreen.onComposeScreen<CreateScreen>(composeTestRule) {
       step("Select which type of event to create") {

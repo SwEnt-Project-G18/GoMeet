@@ -4,17 +4,15 @@ import android.net.Uri
 import android.util.Log
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.AccountCircle
-import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.AddCircle
 import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -23,6 +21,8 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import com.github.se.gomeet.R
 import com.google.android.gms.maps.model.LatLng
+
+private const val TAG = "NavigationAction"
 
 /**
  * Data class representing a top level destination in the app.
@@ -66,6 +66,8 @@ object Route {
   const val MESSAGE_CHANNELS = "MessageChannel"
   const val CHANNEL = "Channel/{id}"
   const val ADD_FRIEND = "AddFriend"
+  const val EDIT_EVENT = "EditEvent/{eventId}"
+  const val SCAN = "Scan"
 }
 
 val CREATE_ITEMS =
@@ -97,7 +99,7 @@ val TOP_LEVEL_DESTINATIONS =
         TopLevelDestination(route = Route.TRENDS, icon = Icons.Default.Home, textId = Route.TRENDS),
         TopLevelDestination(
             route = Route.EXPLORE, icon = Icons.Default.Home, textId = Route.EXPLORE),
-        TopLevelDestination(route = Route.CREATE, icon = Icons.Default.Add, textId = Route.CREATE),
+        TopLevelDestination(Route.NOTIFICATIONS, Icons.Default.Notifications, Route.NOTIFICATIONS),
         TopLevelDestination(
             route = Route.PROFILE, icon = Icons.Default.Person, textId = Route.PROFILE))
 
@@ -123,6 +125,8 @@ val SECOND_LEVEL_DESTINATION =
             Route.EDIT_PROFILE, icon = Icons.Default.Person, textId = Route.EDIT_PROFILE),
         TopLevelDestination(
             route = Route.ADD_FRIEND, icon = Icons.Default.Person, textId = Route.ADD_FRIEND),
+        TopLevelDestination(
+            route = Route.EDIT_EVENT, icon = Icons.Default.Person, textId = Route.EDIT_EVENT),
     )
 
 val SETTINGS =
@@ -149,7 +153,7 @@ class NavigationActions(val navController: NavHostController) {
    * @param clearBackStack Whether to clear the back stack.
    */
   fun navigateTo(destination: TopLevelDestination, clearBackStack: Boolean = false) {
-    Log.d("Navigation", "Navigating to ${destination.route}, clear back stack: $clearBackStack")
+    Log.d(TAG, "Navigating to ${destination.route}, clear back stack: $clearBackStack")
     navController.navigate(destination.route) {
       if (clearBackStack) {
         popUpTo(navController.graph.findStartDestination().id) { inclusive = true }
@@ -175,7 +179,7 @@ class NavigationActions(val navController: NavHostController) {
    * @param date The date of the event.
    * @param time The time of the event.
    * @param organizer The organizer of the event.
-   * @param rating The rating of the event.
+   * @param rating The rating of the event by the current user (0 if unrated, 1-5 otherwise).
    * @param description The description of the event.
    * @param loc The location of the event.
    */
@@ -185,7 +189,7 @@ class NavigationActions(val navController: NavHostController) {
       date: String,
       time: String,
       organizer: String,
-      rating: Double,
+      rating: Long,
       description: String,
       loc: LatLng
   ) {
@@ -199,7 +203,7 @@ class NavigationActions(val navController: NavHostController) {
             .replace("{description}", Uri.encode(description))
             .replace("{latitude}", loc.latitude.toString())
             .replace("{longitude}", loc.longitude.toString())
-    navController.navigate(route)
+    navController.navigate(route) { popUpTo(Route.EVENTS) { inclusive = false } }
   }
 
   /** Navigates to the previous screen. */
@@ -218,7 +222,7 @@ fun getIconForRoute(route: String): ImageVector {
     Route.EVENTS -> Icons.Outlined.DateRange
     Route.TRENDS -> ImageVector.vectorResource(R.drawable.arrow_trending)
     Route.EXPLORE -> Icons.Outlined.Home
-    Route.CREATE -> Icons.Outlined.AddCircle
+    Route.NOTIFICATIONS -> Icons.Outlined.Notifications
     Route.PROFILE -> Icons.Outlined.Person
     else -> Icons.Outlined.AccountCircle
   }
@@ -235,7 +239,7 @@ fun getIconForSelectedRoute(route: String): ImageVector {
     Route.EVENTS -> Icons.Filled.DateRange
     Route.TRENDS -> ImageVector.vectorResource(R.drawable.arrow_trending)
     Route.EXPLORE -> Icons.Filled.Home
-    Route.CREATE -> Icons.Filled.AddCircle
+    Route.NOTIFICATIONS -> Icons.Filled.Notifications
     Route.PROFILE -> Icons.Filled.Person
     else -> Icons.Filled.AccountCircle
   }
