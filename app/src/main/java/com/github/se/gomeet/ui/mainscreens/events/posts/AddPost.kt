@@ -119,12 +119,13 @@ fun AddPost(
                   RoundedCornerShape(10.dp))
               .background(MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(10.dp))) {
         IconButton(onClick = { callbackCancel() }) {
-          Icon(Icons.Filled.Close, contentDescription = "Cancel")
+          Icon(Icons.Filled.Close, contentDescription = "Cancel", tint = MaterialTheme.colorScheme.tertiary)
         }
         Column(modifier = Modifier.padding(top = 10.dp)) {
           Text(
               modifier = Modifier.align(Alignment.CenterHorizontally),
               text = "Add a Post",
+              color = MaterialTheme.colorScheme.tertiary,
               style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.SemiBold))
 
           Spacer(modifier = Modifier.height(screenHeight / 40))
