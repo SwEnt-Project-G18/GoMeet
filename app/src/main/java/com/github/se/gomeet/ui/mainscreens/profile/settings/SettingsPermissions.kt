@@ -24,12 +24,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -58,6 +60,7 @@ import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
+import com.github.se.gomeet.ui.theme.White
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
@@ -114,10 +117,11 @@ fun SettingsPermissions(
 
             // Center and Align
             modifier =
-                Modifier.padding(innerPadding)
-                    .verticalScroll(rememberScrollState())
-                    .testTag("Settings")
-                    .fillMaxWidth(),
+            Modifier
+                .padding(innerPadding)
+                .verticalScroll(rememberScrollState())
+                .testTag("Settings")
+                .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center)
 
@@ -301,7 +305,9 @@ fun PermissionComposable(
 ) {
 
   Row(
-      modifier = Modifier.padding(start = 15.dp).clickable(onClick = onClick),
+      modifier = Modifier
+          .padding(start = 15.dp)
+          .clickable(onClick = onClick),
       horizontalArrangement = Arrangement.Start,
       verticalAlignment = Alignment.CenterVertically,
   ) {
@@ -316,7 +322,7 @@ fun PermissionComposable(
     Text(
         text = text,
         modifier = Modifier.padding(start = 15.dp),
-        color = MaterialTheme.colorScheme.onBackground,
+        color = MaterialTheme.colorScheme.tertiary,
         fontStyle = FontStyle.Normal,
         fontWeight = FontWeight.SemiBold,
         fontFamily = FontFamily.Default,
@@ -361,11 +367,19 @@ fun SettingsDialogue(
 ) {
   AlertDialog(
       onDismissRequest = { onClose() },
-      title = { Text(title) },
+      title = { Text(title, color = MaterialTheme.colorScheme.tertiary) },
       text = { Text(text) },
       confirmButton = {
         Button(
-            modifier = Modifier.fillMaxWidth().width(90.dp),
+            shape = RoundedCornerShape(10.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.outlineVariant,
+                contentColor = White
+            ),
+
+            modifier = Modifier
+                .fillMaxWidth()
+                .width(90.dp),
             onClick = {
               openPermissionSettings(context, settingsLauncher)
               onClose()
@@ -376,7 +390,14 @@ fun SettingsDialogue(
       },
       dismissButton = {
         Button(
-            modifier = Modifier.fillMaxWidth().width(90.dp),
+            shape = RoundedCornerShape(10.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.tertiary
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .width(90.dp),
             onClick = {
               onClose()
               updatePermissions(context, permissionsState)
