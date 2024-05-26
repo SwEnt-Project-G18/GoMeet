@@ -58,6 +58,7 @@ import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapType
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.MarkerInfoWindow
+import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 import java.time.LocalDate
@@ -109,10 +110,6 @@ internal fun GoogleMapView(
 
   val ctx = LocalContext.current
   val coroutineScope = rememberCoroutineScope()
-
-  val eventLocations =
-      events.value.map { event -> LatLng(event.location.latitude, event.location.longitude) }
-  val eventStates = eventLocations.map { location -> rememberMarkerState(position = location) }
 
   val uiSettings by remember {
     mutableStateOf(
@@ -166,7 +163,7 @@ internal fun GoogleMapView(
 
   val context = LocalContext.current
 
-  LaunchedEffect(events.value) {
+  LaunchedEffect(allEvents.value) {
     Log.d("ViewModel", "Loading custom pins for ${events.value.size} events.")
     eventViewModel.loadCustomPins(context, events.value)
   }
@@ -215,7 +212,7 @@ internal fun GoogleMapView(
                 selectedLocation.value = location
                 false
               }
-              events.value.forEachIndexed { index, event ->
+              allEvents.value.forEach { event ->
                 val today = LocalDate.now()
                 val oneWeekLater = today.plusWeeks(1)
 
@@ -237,15 +234,16 @@ internal fun GoogleMapView(
 
                 val customPinBitmapDescriptor =
                     if (isEventThisWeek) stablePins[event.eventID] else scaledPin
+                  val markerState = MarkerState(position = LatLng(event.location.latitude, event.location.longitude))
 
                 MarkerInfoWindow(
-                    state = eventStates[index],
+                    state = markerState,
                     title = event.title,
                     icon =
                         customPinBitmapDescriptor
                             ?: BitmapDescriptorFactory.defaultMarker(
                                 BitmapDescriptorFactory.HUE_RED),
-                    onClick = { markerClick(eventLocations[index]) },
+                    onClick = { markerClick(markerState.position) },
                     onInfoWindowClick = {
                       nav.navigateToEventInfo(
                           eventId = event.eventID,

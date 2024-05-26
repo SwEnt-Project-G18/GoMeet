@@ -161,24 +161,24 @@ fun Events(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel:
                   MaterialTheme.colorScheme.secondaryContainer,
                   MaterialTheme.colorScheme.tertiary)
               Spacer(modifier = Modifier.height(5.dp))
-              Row( // Row to display filter buttons
+              Row(
                   verticalAlignment = Alignment.CenterVertically,
                   horizontalArrangement = Arrangement.SpaceEvenly,
-                  modifier = Modifier.heightIn(min = 56.dp).fillMaxWidth()) {
+                  modifier = Modifier.fillMaxWidth()) {
                     Button(
-                        modifier = Modifier.testTag("JoinedButton"),
+                        modifier = Modifier.fillMaxWidth(0.25f).testTag("JoinedButton"),
                         onClick = { onFilterButtonClick(JOINED) },
                         content = { Text(JOINED.formattedName) },
                         shape = RoundedCornerShape(10.dp),
                         colors = eventsButtonColour(selectedFilter, JOINED))
                     Button(
-                        modifier = Modifier.testTag("FavouritesButton"),
+                        modifier = Modifier.fillMaxWidth(0.25f).testTag("FavouritesButton"),
                         onClick = { onFilterButtonClick(FAVOURITES) },
                         content = { Text(FAVOURITES.formattedName) },
                         shape = RoundedCornerShape(10.dp),
                         colors = eventsButtonColour(selectedFilter, FAVOURITES))
                     Button(
-                        modifier = Modifier.testTag("MyEventsButton"),
+                        modifier = Modifier.fillMaxWidth(0.25f).testTag("MyEventsButton"),
                         onClick = { onFilterButtonClick(MY_EVENTS) },
                         content = { Text(MY_EVENTS.formattedName) },
                         shape = RoundedCornerShape(10.dp),
