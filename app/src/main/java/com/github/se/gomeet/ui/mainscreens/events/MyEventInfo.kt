@@ -386,6 +386,12 @@ private fun MapViewComposable(
   }
 }
 
+/**
+ * Helper function to display the dialog window when a user wants to delete an event.
+ *
+ * @param onConfirm Callback function to be called when the user confirms the deletion
+ * @param onDismiss Callback function to be called when the user dismisses the dialog
+ */
 @Composable
 fun DeleteEventDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
   AlertDialog(

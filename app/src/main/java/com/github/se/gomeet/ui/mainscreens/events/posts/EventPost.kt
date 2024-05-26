@@ -213,6 +213,12 @@ fun EventPost(
   }
 }
 
+/**
+ * Composable function to display a dialog to confirm the deletion of a post.
+ *
+ * @param onConfirm Callback function to be called when the deletion is confirmed
+ * @param onDismiss Callback function to be called when the dialog is dismissed
+ */
 @Composable
 private fun DeletePostDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
   AlertDialog(
