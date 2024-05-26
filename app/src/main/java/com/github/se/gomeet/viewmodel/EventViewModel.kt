@@ -5,8 +5,12 @@ import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.util.Log
 import android.widget.ImageView
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -528,5 +532,15 @@ class EventViewModel(val currentUID: String? = null) : ViewModel() {
  * are invited to an event that is in creation (i.e. not created yet).
  */
 class EventCreationViewModel : ViewModel() {
+  val title: MutableState<String> = mutableStateOf("")
+  val description: MutableState<String> = mutableStateOf("")
+  val location: MutableState<String> = mutableStateOf("")
+  val price: MutableState<Double> = mutableDoubleStateOf(0.0)
+  val url: MutableState<String> = mutableStateOf("")
+  val pickedTime: MutableState<LocalTime> = mutableStateOf(LocalTime.now())
+  val pickedDate: MutableState<LocalDate> = mutableStateOf(LocalDate.now())
   val invitedParticipants = mutableStateListOf<GoMeetUser>()
+  val tags: MutableState<List<String>> = mutableStateOf(emptyList())
+  val imageUri: MutableState<Uri?> = mutableStateOf(null)
+  val imageBitmap: MutableState<ImageBitmap?> = mutableStateOf(null)
 }
