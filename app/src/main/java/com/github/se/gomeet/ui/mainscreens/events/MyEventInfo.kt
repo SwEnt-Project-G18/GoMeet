@@ -21,6 +21,7 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -116,6 +117,7 @@ fun MyEventInfo(
   val screenHeight = LocalConfiguration.current.screenHeightDp.dp
   var expanded by remember { mutableStateOf(false) }
   var showShareEventDialog by remember { mutableStateOf(false) }
+    var showDeleteEventDialog by remember { mutableStateOf(false) }
 
   LaunchedEffect(Unit) {
     coroutineScope.launch {
@@ -144,6 +146,15 @@ fun MyEventInfo(
               }
             },
             actions = {
+                IconButton(onClick = { showDeleteEventDialog = true }) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Delete",
+                        tint = MaterialTheme.colorScheme.onBackground,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+
               IconButton(onClick = { showShareEventDialog = true }) {
                 Icon(
                     imageVector = ImageVector.vectorResource(R.drawable.upload_icon),
@@ -161,10 +172,11 @@ fun MyEventInfo(
         } else {
           Column(
               modifier =
-                  Modifier.padding(innerPadding)
-                      .padding(horizontal = 10.dp)
-                      .fillMaxSize()
-                      .verticalScroll(state = rememberScrollState())) {
+              Modifier
+                  .padding(innerPadding)
+                  .padding(horizontal = 10.dp)
+                  .fillMaxSize()
+                  .verticalScroll(state = rememberScrollState())) {
                 EventHeader(
                     eventViewModel = eventViewModel,
                     event = myEvent.value!!,
@@ -266,6 +278,11 @@ fun MyEventInfo(
   if (showShareEventDialog) {
     ShareDialog("Event", eventId, onDismiss = { showShareEventDialog = false })
   }
+
+    if (showDeleteEventDialog) {
+        DeleteEventDialog()
+
+    }
 }
 
 /**
@@ -310,7 +327,11 @@ private fun MapViewComposable(
   // Set up the GoogleMap composable
   GoogleMap(
       modifier =
-          Modifier.testTag("MapView").fillMaxWidth().height(200.dp).clip(RoundedCornerShape(20.dp)),
+      Modifier
+          .testTag("MapView")
+          .fillMaxWidth()
+          .height(200.dp)
+          .clip(RoundedCornerShape(20.dp)),
       cameraPositionState = cameraPositionState,
       properties = mapProperties,
       uiSettings = uiSettings) {
@@ -327,4 +348,9 @@ private fun MapViewComposable(
     markerState.position = loc
     onDispose {}
   }
+}
+
+@Composable
+private fun DeleteEventDialog() {
+    // Your dialog content
 }
