@@ -39,6 +39,7 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,6 +53,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
+import com.github.se.gomeet.model.event.Post
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.mainscreens.events.posts.AddPost
@@ -108,75 +110,77 @@ fun MyEventInfo(
     userViewModel: UserViewModel,
     eventViewModel: EventViewModel
 ) {
-  var addPost by remember { mutableStateOf(false) }
-  val organiser = remember { mutableStateOf<GoMeetUser?>(null) }
-  val currentUser = remember { mutableStateOf<GoMeetUser?>(null) }
-  val myEvent = remember { mutableStateOf<Event?>(null) }
-  val ratingState = remember { mutableLongStateOf(rating) }
-  val coroutineScope = rememberCoroutineScope()
-  val screenHeight = LocalConfiguration.current.screenHeightDp.dp
-  var expanded by remember { mutableStateOf(false) }
-  var showShareEventDialog by remember { mutableStateOf(false) }
+    var addPost by remember { mutableStateOf(false) }
+    val organiser = remember { mutableStateOf<GoMeetUser?>(null) }
+    val currentUser = remember { mutableStateOf<GoMeetUser?>(null) }
+    val myEvent = remember { mutableStateOf<Event?>(null) }
+    val ratingState = remember { mutableLongStateOf(rating) }
+    val coroutineScope = rememberCoroutineScope()
+    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+    var expanded by remember { mutableStateOf(false) }
+    var showShareEventDialog by remember { mutableStateOf(false) }
     var showDeleteEventDialog by remember { mutableStateOf(false) }
+    var posts by rememberSaveable { mutableStateOf<List<Post>>(emptyList()) }
 
-  LaunchedEffect(Unit) {
-    coroutineScope.launch {
-      organiser.value = userViewModel.getUser(organiserId)
-      currentUser.value = userViewModel.getUser(Firebase.auth.currentUser!!.uid)
-      myEvent.value = eventViewModel.getEvent(eventId)
+    LaunchedEffect(Unit) {
+        coroutineScope.launch {
+            organiser.value = userViewModel.getUser(organiserId)
+            currentUser.value = userViewModel.getUser(Firebase.auth.currentUser!!.uid)
+            myEvent.value = eventViewModel.getEvent(eventId)
+            posts = myEvent.value!!.posts
+        }
     }
-  }
 
-  Log.d(TAG, "Organiser is $organiserId")
-  Scaffold(
-      topBar = {
-        TopAppBar(
-            modifier = Modifier.testTag("TopBar"),
-            backgroundColor = MaterialTheme.colorScheme.background,
-            elevation = 0.dp,
-            title = {
-              // Empty title since we're placing our own components
-            },
-            navigationIcon = {
-              IconButton(onClick = { nav.goBack() }) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
-                    tint = MaterialTheme.colorScheme.onBackground)
-              }
-            },
-            actions = {
-                IconButton(onClick = { showDeleteEventDialog = true }) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = "Delete",
-                        tint = MaterialTheme.colorScheme.onBackground,
-                        modifier = Modifier.size(24.dp)
-                    )
-                }
+    Log.d(TAG, "Organiser is $organiserId")
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                modifier = Modifier.testTag("TopBar"),
+                backgroundColor = MaterialTheme.colorScheme.background,
+                elevation = 0.dp,
+                title = {
+                    // Empty title since we're placing our own components
+                },
+                navigationIcon = {
+                    IconButton(onClick = { nav.goBack() }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back",
+                            tint = MaterialTheme.colorScheme.onBackground)
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { showDeleteEventDialog = true }) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = "Delete",
+                            tint = MaterialTheme.colorScheme.onBackground,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
 
-              IconButton(onClick = { showShareEventDialog = true }) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.upload_icon),
-                    contentDescription = "Share",
-                    tint = MaterialTheme.colorScheme.onBackground,
-                    modifier = Modifier.size(24.dp))
-              }
-            })
-      },
-      bottomBar = {
-        // Your bottom bar content
-      }) { innerPadding ->
+                    IconButton(onClick = { showShareEventDialog = true }) {
+                        Icon(
+                            imageVector = ImageVector.vectorResource(R.drawable.upload_icon),
+                            contentDescription = "Share",
+                            tint = MaterialTheme.colorScheme.onBackground,
+                            modifier = Modifier.size(24.dp))
+                    }
+                })
+        },
+        bottomBar = {
+            // Your bottom bar content
+        }) { innerPadding ->
         if (organiser.value == null || currentUser.value == null || myEvent.value == null) {
-          LoadingText()
+            LoadingText()
         } else {
-          Column(
-              modifier =
-              Modifier
-                  .padding(innerPadding)
-                  .padding(horizontal = 10.dp)
-                  .fillMaxSize()
-                  .verticalScroll(state = rememberScrollState())) {
+            Column(
+                modifier =
+                Modifier
+                    .padding(innerPadding)
+                    .padding(horizontal = 10.dp)
+                    .fillMaxSize()
+                    .verticalScroll(state = rememberScrollState())) {
                 EventHeader(
                     eventViewModel = eventViewModel,
                     event = myEvent.value!!,
@@ -201,23 +205,24 @@ fun MyEventInfo(
                 Spacer(modifier = Modifier.height(20.dp))
                 MapViewComposable(loc = loc)
                 if (addPost) {
-                  Spacer(modifier = Modifier.height(screenHeight / 80))
-                  HorizontalDivider(
-                      thickness = 5.dp, color = MaterialTheme.colorScheme.primaryContainer)
-                  Spacer(modifier = Modifier.height(screenHeight / 80))
-                  AddPost(
-                      callbackCancel = { addPost = false },
-                      callbackPost = { post ->
-                        addPost = false
-                        coroutineScope.launch {
-                          eventViewModel.editEvent(
-                              myEvent.value!!.copy(
-                                  posts = myEvent.value!!.posts.reversed().plus(post).reversed()))
-                          myEvent.value = eventViewModel.getEvent(eventId)
-                        }
-                      },
-                      user = currentUser.value!!,
-                      userViewModel = userViewModel)
+                    Spacer(modifier = Modifier.height(screenHeight / 80))
+                    HorizontalDivider(
+                        thickness = 5.dp, color = MaterialTheme.colorScheme.primaryContainer)
+                    Spacer(modifier = Modifier.height(screenHeight / 80))
+                    AddPost(
+                        callbackCancel = { addPost = false },
+                        callbackPost = { post ->
+                            addPost = false
+                            coroutineScope.launch {
+                                eventViewModel.editEvent(
+                                    myEvent.value!!.copy(
+                                        posts = myEvent.value!!.posts.reversed().plus(post).reversed()))
+                                myEvent.value = eventViewModel.getEvent(eventId)
+                                posts = myEvent.value!!.posts
+                            }
+                        },
+                        user = currentUser.value!!,
+                        userViewModel = userViewModel)
                 }
                 Spacer(Modifier.height(screenHeight / 80))
                 HorizontalDivider(
@@ -226,63 +231,68 @@ fun MyEventInfo(
                 Row(
                     horizontalArrangement = Arrangement.SpaceAround,
                     verticalAlignment = Alignment.Top) {
-                      Text(
-                          text = "Posts",
-                          color = MaterialTheme.colorScheme.tertiary,
-                          style =
-                              MaterialTheme.typography.headlineSmall.copy(
-                                  fontWeight = FontWeight.SemiBold))
+                    Text(
+                        text = "Posts",
+                        color = MaterialTheme.colorScheme.tertiary,
+                        style =
+                        MaterialTheme.typography.headlineSmall.copy(
+                            fontWeight = FontWeight.SemiBold))
 
-                      Spacer(modifier = Modifier.weight(1f))
-                      if (!addPost && organiser.value!!.uid == currentUser.value!!.uid) {
+                    Spacer(modifier = Modifier.weight(1f))
+                    if (!addPost && organiser.value!!.uid == currentUser.value!!.uid) {
                         Button(
                             onClick = { addPost = true },
                             shape = RoundedCornerShape(10.dp),
                             colors =
-                                ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.outlineVariant)) {
-                              Icon(Icons.Filled.Add, contentDescription = "Add Post", tint = White)
-                            }
-                      }
+                            ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.outlineVariant)) {
+                            Icon(Icons.Filled.Add, contentDescription = "Add Post", tint = White)
+                        }
                     }
+                }
 
-                if (myEvent.value!!.posts.isEmpty()) {
-                  Spacer(Modifier.height(10.dp))
-                  Text(
-                      text = "No updates about this event at the moment.",
-                      color = MaterialTheme.colorScheme.tertiary,
-                      modifier = Modifier.align(Alignment.CenterHorizontally),
-                      style = MaterialTheme.typography.bodyLarge)
-                  Spacer(Modifier.height(screenHeight / 50))
+                if (posts.isEmpty()) {
+                    Spacer(Modifier.height(10.dp))
+                    Text(
+                        text = "No updates about this event at the moment.",
+                        color = MaterialTheme.colorScheme.tertiary,
+                        modifier = Modifier.align(Alignment.CenterHorizontally),
+                        style = MaterialTheme.typography.bodyLarge)
+                    Spacer(Modifier.height(screenHeight / 50))
                 } else {
-                  Spacer(Modifier.height(10.dp))
-                  myEvent.value!!.posts.forEach { post ->
-                    key(post.date.toString() + post.time.toString()) {
-                      EventPost(
-                          nav = nav,
-                          event = myEvent.value!!,
-                          post = post,
-                          userViewModel = userViewModel,
-                          eventViewModel = eventViewModel,
-                          currentUser = currentUser.value!!.uid)
-                      HorizontalDivider(color = MaterialTheme.colorScheme.primaryContainer)
-                      Spacer(Modifier.height(10.dp))
+                    Spacer(Modifier.height(10.dp))
+                    posts.forEach { post ->
+                        key(post.date.toString() + post.time.toString()) {
+                            EventPost(
+                                nav = nav,
+                                event = myEvent.value!!,
+                                post = post,
+                                userViewModel = userViewModel,
+                                eventViewModel = eventViewModel,
+                                currentUser = currentUser.value!!.uid,
+                                onPostDeleted = { deletedPost ->
+                                    posts = posts.filter { it != deletedPost }
+                                }
+                            )
+                            HorizontalDivider(color = MaterialTheme.colorScheme.primaryContainer)
+                            Spacer(Modifier.height(10.dp))
+                        }
                     }
-                  }
                 }
                 Spacer(Modifier.height(screenHeight / 10))
-              }
+            }
         }
-      }
+    }
 
-  if (showShareEventDialog) {
-    ShareDialog("Event", eventId, onDismiss = { showShareEventDialog = false })
-  }
+    if (showShareEventDialog) {
+        ShareDialog("Event", eventId, onDismiss = { showShareEventDialog = false })
+    }
 
     if (showDeleteEventDialog) {
         DeleteEventDialog()
     }
 }
+
 
 /**
  * Helper function to display the map view of an event.
