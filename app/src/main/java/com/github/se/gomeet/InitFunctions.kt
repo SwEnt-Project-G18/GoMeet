@@ -175,8 +175,6 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
               val country = authViewModel.signInState.value.countryRegister
               userViewModel.value.createUserIfNew(
                   userId, username, firstName, lastName, email, phone, country)
-              // userViewModel.value.currentUID is null here, but this doesn't matter since
-              // createUserIfNew doesn't use it (this code will be cleaned up later)
             }
             connectChatClient(
                 client,
