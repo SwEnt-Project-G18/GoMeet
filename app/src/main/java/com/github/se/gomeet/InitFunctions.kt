@@ -237,10 +237,12 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
               eventViewModel.value)
         }
     composable(Route.PRIVATE_CREATE) {
-      CreateEvent(navAction, eventViewModel.value, true, userViewModel.value, eventCreationViewModel)
+      CreateEvent(
+          navAction, eventViewModel.value, true, userViewModel.value, eventCreationViewModel)
     }
     composable(Route.PUBLIC_CREATE) {
-      CreateEvent(navAction, eventViewModel.value, false, userViewModel.value, eventCreationViewModel)
+      CreateEvent(
+          navAction, eventViewModel.value, false, userViewModel.value, eventCreationViewModel)
     }
 
     composable(
