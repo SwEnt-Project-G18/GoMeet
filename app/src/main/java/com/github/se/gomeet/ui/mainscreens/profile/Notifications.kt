@@ -55,11 +55,11 @@ import kotlinx.coroutines.launch
  * This composable function displays the notifications screen.
  *
  * @param nav The navigation actions.
- * @param currentUserID The current user's ID.
+ * @param userViewModel The user view model.
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun Notifications(nav: NavigationActions, currentUserID: String, userViewModel: UserViewModel) {
+fun Notifications(nav: NavigationActions, userViewModel: UserViewModel) {
   val eventViewModel = EventViewModel(null)
   val pagerState = rememberPagerState(pageCount = { 2 })
   val screenHeight = LocalConfiguration.current.screenHeightDp.dp
@@ -71,6 +71,7 @@ fun Notifications(nav: NavigationActions, currentUserID: String, userViewModel: 
   val user = remember { mutableStateOf<GoMeetUser?>(null) }
   val eventsList = remember { mutableStateListOf<Event>() }
   val eventToCreatorMap = remember { mutableStateMapOf<Event, String>() }
+  val currentUserID = userViewModel.currentUID!!
 
   LaunchedEffect(Unit) {
     coroutineScope.launch {

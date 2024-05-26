@@ -23,8 +23,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.twotone.Star
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -54,14 +56,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.rememberNavController
+import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
-import com.github.se.gomeet.model.event.isPastEvent
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
@@ -75,6 +75,7 @@ import com.github.se.gomeet.viewmodel.generateQRCode
 import com.github.se.gomeet.viewmodel.saveImageToGallery
 import com.github.se.gomeet.viewmodel.shareImage
 import com.google.firebase.firestore.FirebaseFirestore
+import java.util.Locale
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
@@ -83,14 +84,10 @@ import kotlinx.coroutines.tasks.await
  *
  * @param nav NavigationActions
  * @param userViewModel UserViewModel
+ * @param eventViewModel EventViewModel
  */
 @Composable
-fun Profile(
-    nav: NavigationActions,
-    userId: String,
-    userViewModel: UserViewModel,
-    eventViewModel: EventViewModel
-) {
+fun Profile(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel: EventViewModel) {
   val screenWidth = LocalConfiguration.current.screenWidthDp.dp
 
   val screenHeight = LocalConfiguration.current.screenHeightDp.dp
@@ -99,6 +96,7 @@ fun Profile(
   var currentUser by remember { mutableStateOf<GoMeetUser?>(null) }
   val joinedEventsList = remember { mutableListOf<Event>() }
   val myHistoryList = remember { mutableListOf<Event>() }
+  val userId = userViewModel.currentUID!!
   var showShareProfileDialog by remember { mutableStateOf(false) }
 
   LaunchedEffect(Unit) {
@@ -109,7 +107,7 @@ fun Profile(
             currentUser!!.joinedEvents.contains(e.eventID)
           }
       allEvents.forEach {
-        if (!isPastEvent(it)) {
+        if (!it.isPastEvent()) {
           joinedEventsList.add(it)
         } else {
           myHistoryList.add(it)
@@ -209,6 +207,9 @@ fun Profile(
                             text = ("@" + currentUser?.username),
                             color = MaterialTheme.colorScheme.onBackground,
                             style = MaterialTheme.typography.bodyLarge)
+
+                        Spacer(modifier = Modifier.height(screenHeight / 180))
+                        RatingStarWithText(rating = currentUser!!.rating)
                       }
                     }
                 Spacer(modifier = Modifier.height(screenHeight / 40))
@@ -333,9 +334,10 @@ fun Profile(
 
                 Spacer(modifier = Modifier.height(screenHeight / 40))
 
-                ProfileEventsList("Joined Events", rememberLazyListState(), joinedEventsList, nav)
+                ProfileEventsList(
+                    "Joined Events", rememberLazyListState(), joinedEventsList, nav, userId)
                 Spacer(modifier = Modifier.height(screenHeight / 30))
-                ProfileEventsList("My History", rememberLazyListState(), myHistoryList, nav)
+                ProfileEventsList("My History", rememberLazyListState(), myHistoryList, nav, userId)
               }
         } else {
           LoadingText()
@@ -385,6 +387,26 @@ fun ProfileImage(
 }
 
 @Composable
+fun RatingStarWithText(rating: Pair<Long, Long>) {
+  val doubleRating =
+      if (rating.second > 0) rating.first.toDouble() / rating.second.toDouble() else 0.0
+  Row {
+    Icon(
+        imageVector = Icons.Filled.Star,
+        contentDescription = "Rating",
+        tint = MaterialTheme.colorScheme.outlineVariant,
+        modifier = Modifier.size(20.dp) // Set the size of the icon
+        )
+    Text(
+        text = String.format(Locale.UK, "%.1f (%d)", doubleRating, rating.second),
+        fontSize = 16.sp, // Set the font size
+        color = MaterialTheme.colorScheme.tertiary,
+        textAlign = TextAlign.Center,
+    )
+  }
+}
+
+@Composable
 fun ShareDialog(type: String, uid: String, onDismiss: () -> Unit) {
   val context = LocalContext.current
   val qrCodeBitmap by remember { mutableStateOf(generateQRCode(type, uid)) }
@@ -429,14 +451,4 @@ fun ShareDialog(type: String, uid: String, onDismiss: () -> Unit) {
               Text("Share", color = Color.White)
             }
       })
-}
-
-@Preview
-@Composable
-fun ProfilePreview() {
-  Profile(
-      nav = NavigationActions(rememberNavController()),
-      "John",
-      UserViewModel(),
-      EventViewModel("John"))
 }

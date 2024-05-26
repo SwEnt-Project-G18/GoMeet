@@ -1,6 +1,7 @@
 package com.github.se.gomeet.ui.mainscreens.profile
 
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -48,7 +49,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.model.event.Event
-import com.github.se.gomeet.model.event.isPastEvent
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
@@ -57,24 +57,22 @@ import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 
-private var user: GoMeetUser? = null
-private var currentUser = Firebase.auth.currentUser?.uid ?: ""
+private const val TAG = "OthersProfile"
 
 /**
  * Composable function for the OthersProfile screen.
  *
  * @param nav The navigation actions for the OthersProfile screen.
- * @param uid The user id of the user whose profile is being viewed.
- * @param userViewModel userViewModel
+ * @param viewedUID The user id of the user whose profile is being viewed.
+ * @param userViewModel The user view model.
+ * @param eventViewModel The event view model.
  */
 @Composable
 fun OthersProfile(
     nav: NavigationActions,
-    uid: String,
+    viewedUID: String,
     userViewModel: UserViewModel,
     eventViewModel: EventViewModel
 ) { // TODO Add parameters to the function
@@ -86,24 +84,26 @@ fun OthersProfile(
   val myHistoryList = remember { mutableListOf<Event>() }
   val screenWidth = LocalConfiguration.current.screenWidthDp.dp
   val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+  val viewedUser = remember { mutableStateOf<GoMeetUser?>(null) }
+  val currentUID = userViewModel.currentUID!!
 
   LaunchedEffect(Unit) {
     coroutineScope.launch {
-      user = userViewModel.getUser(uid)
-      if (user != null) {
-        isFollowing = user!!.followers.contains(currentUser)
-        followerCount = user!!.followers.size
+      viewedUser.value = userViewModel.getUser(viewedUID)
+      if (viewedUser.value == null) Log.e(TAG, "User $viewedUID not found")
+      else Log.d(TAG, "Found user: $viewedUser")
+      isFollowing = viewedUser.value?.followers?.contains(currentUID) ?: false
+      followerCount = viewedUser.value?.followers?.size ?: 0
 
-        val allEvents =
-            (eventViewModel.getAllEvents() ?: emptyList()).filter { e ->
-              user!!.joinedEvents.contains(e.eventID) && e.public
-            }
-        allEvents.forEach {
-          if (!isPastEvent(it)) {
-            joinedEventsList.add(it)
-          } else {
-            myHistoryList.add(it)
+      val allEvents =
+          (eventViewModel.getAllEvents() ?: emptyList()).filter { e ->
+            viewedUser.value!!.joinedEvents.contains(e.eventID) && e.public
           }
+      allEvents.forEach {
+        if (!it.isPastEvent()) {
+          joinedEventsList.add(it)
+        } else {
+          myHistoryList.add(it)
         }
       }
       isProfileLoaded = true
@@ -129,7 +129,7 @@ fun OthersProfile(
                 tint = MaterialTheme.colorScheme.onBackground)
           }
           Spacer(modifier = Modifier.weight(1F))
-          MoreActionsButton(uid, true)
+          MoreActionsButton(currentUID, true)
         }
       }) { innerPadding ->
         if (isProfileLoaded) {
@@ -146,20 +146,23 @@ fun OthersProfile(
                             .padding(start = screenWidth / 20)
                             .testTag("UserInfo")) {
                       ProfileImage(
-                          userId = uid,
+                          userId = viewedUID,
                           modifier = Modifier.testTag("Profile Picture"),
                           size = 101.dp)
                       Column(modifier = Modifier.padding(start = screenWidth / 20)) {
                         Text(
-                            (user?.firstName ?: "First") + " " + (user?.lastName ?: " Last"),
+                            "${(viewedUser.value?.firstName ?: "First")} ${(viewedUser.value?.lastName ?: "Last")}",
                             textAlign = TextAlign.Center,
                             color = MaterialTheme.colorScheme.onBackground,
                             style = MaterialTheme.typography.titleLarge)
 
                         Text(
-                            text = "@" + (user?.username ?: "username"),
+                            text = "@${(viewedUser.value?.username ?: "username")}",
                             color = MaterialTheme.colorScheme.onBackground,
                             style = MaterialTheme.typography.bodyLarge)
+
+                        Spacer(modifier = Modifier.height(screenHeight / 180))
+                        RatingStarWithText(rating = viewedUser.value!!.rating)
                       }
                     }
 
@@ -173,7 +176,7 @@ fun OthersProfile(
                             onClick = {
                               isFollowing = false
                               followerCount -= 1
-                              userViewModel.unfollow(uid)
+                              userViewModel.unfollow(viewedUID)
                             },
                             modifier = Modifier.height(40.dp).width(180.dp),
                             shape = RoundedCornerShape(10.dp),
@@ -187,7 +190,7 @@ fun OthersProfile(
                             onClick = {
                               isFollowing = true
                               followerCount += 1
-                              userViewModel.follow(uid)
+                              userViewModel.follow(viewedUID)
                             },
                             modifier = Modifier.height(40.dp).width(180.dp),
                             shape = RoundedCornerShape(10.dp),
@@ -202,7 +205,8 @@ fun OthersProfile(
 
                       Button(
                           onClick = {
-                            nav.navigateToScreen(Route.MESSAGE.replace("{id}", Uri.encode(uid)))
+                            nav.navigateToScreen(
+                                Route.MESSAGE.replace("{id}", Uri.encode(viewedUID)))
                           },
                           modifier = Modifier.height(40.dp).width(180.dp),
                           shape = RoundedCornerShape(10.dp),
@@ -225,7 +229,7 @@ fun OthersProfile(
                                 // TODO
                               }) {
                             Text(
-                                text = user?.myEvents?.size.toString(),
+                                text = viewedUser.value?.myEvents?.size.toString(),
                                 color = MaterialTheme.colorScheme.onBackground,
                                 style = MaterialTheme.typography.titleLarge,
                                 modifier = Modifier.align(Alignment.CenterHorizontally))
@@ -238,10 +242,11 @@ fun OthersProfile(
                       Column(
                           modifier =
                               Modifier.clickable {
-                                nav.navigateToScreen(Route.FOLLOWERS.replace("{uid}", user!!.uid))
+                                nav.navigateToScreen(
+                                    Route.FOLLOWERS.replace("{uid}", viewedUser.value!!.uid))
                               }) {
                             Text(
-                                text = user?.followers?.size.toString(),
+                                text = viewedUser.value?.followers?.size.toString(),
                                 color = MaterialTheme.colorScheme.onBackground,
                                 style = MaterialTheme.typography.titleLarge,
                                 modifier = Modifier.align(Alignment.CenterHorizontally))
@@ -254,10 +259,11 @@ fun OthersProfile(
                       Column(
                           modifier =
                               Modifier.clickable {
-                                nav.navigateToScreen(Route.FOLLOWING.replace("{uid}", user!!.uid))
+                                nav.navigateToScreen(
+                                    Route.FOLLOWING.replace("{uid}", viewedUser.value!!.uid))
                               }) {
                             Text(
-                                text = user?.following?.size.toString(),
+                                text = viewedUser.value?.following?.size.toString(),
                                 color = MaterialTheme.colorScheme.onBackground,
                                 style = MaterialTheme.typography.titleLarge,
                                 modifier = Modifier.align(Alignment.CenterHorizontally))
@@ -276,12 +282,12 @@ fun OthersProfile(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Start,
                     contentPadding = PaddingValues(start = 15.dp, end = 15.dp)) {
-                      items(user!!.tags.size) { index ->
+                      items(viewedUser.value!!.tags.size) { index ->
                         Button(
                             onClick = {},
                             content = {
                               Text(
-                                  text = user!!.tags[index],
+                                  text = viewedUser.value!!.tags[index],
                                   style = MaterialTheme.typography.labelLarge)
                             },
                             colors =
@@ -294,13 +300,18 @@ fun OthersProfile(
                     }
                 Spacer(modifier = Modifier.height(screenHeight / 40))
                 ProfileEventsList(
-                    (user!!.firstName) + "'s joined Events",
+                    (viewedUser.value!!.firstName) + "'s joined Events",
                     rememberLazyListState(),
                     joinedEventsList,
-                    nav)
+                    nav,
+                    currentUID)
                 Spacer(modifier = Modifier.height(screenHeight / 40))
                 ProfileEventsList(
-                    (user!!.firstName) + "'s History", rememberLazyListState(), myHistoryList, nav)
+                    (viewedUser.value!!.firstName) + "'s History",
+                    rememberLazyListState(),
+                    myHistoryList,
+                    nav,
+                    currentUID)
               }
         } else {
           LoadingText()
@@ -378,5 +389,5 @@ fun StyledTextButton(text: String, onClick: () -> Unit) {
 @Composable
 fun OthersProfilePreview() {
   OthersProfile(
-      nav = NavigationActions(rememberNavController()), "", UserViewModel(), EventViewModel(null))
+      nav = NavigationActions(rememberNavController()), "", UserViewModel(""), EventViewModel(null))
 }

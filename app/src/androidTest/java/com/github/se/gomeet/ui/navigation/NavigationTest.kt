@@ -17,6 +17,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.tasks.await
 import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.junit.Rule
@@ -34,29 +35,23 @@ class NavigationTest {
       val nav = rememberNavController()
       NavHost(navController = nav, startDestination = Route.EVENTS) {
         composable(TOP_LEVEL_DESTINATIONS[0].route) {
-          Explore(nav = NavigationActions(nav), EventViewModel(null))
+          Explore(nav = NavigationActions(nav), eventVM)
         }
         composable(TOP_LEVEL_DESTINATIONS[1].route) {
           Events(
-              currentUser = currentUserId,
               nav = NavigationActions(rememberNavController()),
-              userViewModel = UserViewModel(),
-              eventViewModel = EventViewModel("NEEGn5cbkJZDXaezeGdfd2D4u6b2"))
+              userViewModel = userVM,
+              eventViewModel = eventVM)
         }
         composable(TOP_LEVEL_DESTINATIONS[2].route) {
           Trends(
-              currentUserId = currentUserId,
               nav = NavigationActions(rememberNavController()),
-              userViewModel = UserViewModel(),
-              eventViewModel = EventViewModel("NEEGn5cbkJZDXaezeGdfd2D4u6b2"))
+              userViewModel = userVM,
+              eventViewModel = eventVM)
         }
         composable(TOP_LEVEL_DESTINATIONS[3].route) { Create(NavigationActions(nav)) }
         composable(TOP_LEVEL_DESTINATIONS[4].route) {
-          Profile(
-              NavigationActions(nav),
-              userId = currentUserId,
-              UserViewModel(),
-              EventViewModel(currentUserId))
+          Profile(NavigationActions(nav), userVM, eventVM)
         }
         // Add more destinations as needed
       }
@@ -76,29 +71,23 @@ class NavigationTest {
       val nav = rememberNavController()
       NavHost(navController = nav, startDestination = TOP_LEVEL_DESTINATIONS[0].route) {
         composable(TOP_LEVEL_DESTINATIONS[0].route) {
-          Explore(nav = NavigationActions(nav), EventViewModel(null))
+          Explore(nav = NavigationActions(nav), eventVM)
         }
         composable(TOP_LEVEL_DESTINATIONS[1].route) {
           Events(
-              currentUser = currentUserId,
               nav = NavigationActions(rememberNavController()),
-              userViewModel = UserViewModel(),
-              eventViewModel = EventViewModel("NEEGn5cbkJZDXaezeGdfd2D4u6b2"))
+              userViewModel = userVM,
+              eventViewModel = eventVM)
         }
         composable(TOP_LEVEL_DESTINATIONS[2].route) {
           Trends(
-              currentUserId = currentUserId,
               nav = NavigationActions(rememberNavController()),
-              userViewModel = UserViewModel(),
-              eventViewModel = EventViewModel("NEEGn5cbkJZDXaezeGdfd2D4u6b2"))
+              userViewModel = userVM,
+              eventViewModel = eventVM)
         }
         composable(TOP_LEVEL_DESTINATIONS[3].route) { Create(NavigationActions(nav)) }
         composable(TOP_LEVEL_DESTINATIONS[4].route) {
-          Profile(
-              NavigationActions(nav),
-              userId = currentUserId,
-              UserViewModel(),
-              EventViewModel(currentUserId))
+          Profile(NavigationActions(nav), userVM, eventVM)
         }
       }
 
@@ -115,40 +104,34 @@ class NavigationTest {
   }
 
   companion object {
-    private val userVM = UserViewModel()
+    private lateinit var userVM: UserViewModel
     private lateinit var currentUserId: String
+    private lateinit var eventVM: EventViewModel
 
     private val usr = "u@navtest.com"
     private val pwd = "123456"
 
     @BeforeClass
     @JvmStatic
-    fun setUp() {
-      TimeUnit.SECONDS.sleep(3)
+    fun setUp() = runBlocking {
 
       // Create a new user and sign in
-      var result = Firebase.auth.createUserWithEmailAndPassword(usr, pwd)
-      while (!result.isComplete) {
-        TimeUnit.SECONDS.sleep(1)
-      }
-      result = Firebase.auth.signInWithEmailAndPassword(usr, pwd)
-      while (!result.isComplete) {
-        TimeUnit.SECONDS.sleep(1)
-      }
+      Firebase.auth.createUserWithEmailAndPassword(usr, pwd).await()
+      Firebase.auth.signInWithEmailAndPassword(usr, pwd).await()
 
       // Set up the user view model
-      // Order is important here, since createUserIfNew sets current user to created user (so we
-      // need to create the current user last)
       currentUserId = Firebase.auth.currentUser!!.uid
+      userVM = UserViewModel(currentUserId)
+      eventVM = EventViewModel(currentUserId)
       userVM.createUserIfNew(currentUserId, "a", "b", "c", usr, "4567", "Angola", "")
-      TimeUnit.SECONDS.sleep(3)
+      TimeUnit.SECONDS.sleep(1)
     }
 
     @AfterClass
     @JvmStatic
-    fun tearDown() {
+    fun tearDown() = runBlocking {
       // Clean up the user view model
-      Firebase.auth.currentUser!!.delete()
+      Firebase.auth.currentUser!!.delete().await()
       userVM.deleteUser(currentUserId)
     }
   }

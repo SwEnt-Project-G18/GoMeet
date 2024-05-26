@@ -4,6 +4,7 @@ import android.net.Uri
 import android.util.Log
 import com.github.se.gomeet.model.event.Invitation
 import com.github.se.gomeet.model.event.InviteStatus
+import com.github.se.gomeet.model.user.*
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -129,6 +130,37 @@ class UserRepository private constructor() {
           .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }
     }
 
+    suspend fun updateUserRating(userID: String, newRating: Long, oldRating: Long) {
+
+      if (oldRating == newRating ||
+          newRating < 0 ||
+          newRating > 5 ||
+          oldRating < 0 ||
+          oldRating > 5)
+          return
+
+      val oldUserRatingMap =
+          Firebase.firestore.collection(USERS_COLLECTION).document(userID).get().await().get(RATING)
+              as Map<String, Long>
+      val oldUserRating = Pair(oldUserRatingMap["first"], oldUserRatingMap["second"])
+      val addOrRemoveCount =
+          if (oldRating == 0L) 1L
+          else if (newRating == 0L && oldUserRating.second!! > 0) -1L else 0L
+      val newUserRating =
+          Pair(
+              oldUserRating.first!! + newRating - oldRating,
+              oldUserRating.second!! + addOrRemoveCount)
+      Firebase.firestore
+          .collection(USERS_COLLECTION)
+          .document(userID)
+          .update(RATING, newUserRating)
+          .addOnSuccessListener { Log.d(TAG, "Successfully updated rating of user ${userID}") }
+          .addOnFailureListener { e -> Log.w(TAG, "Error updating rating of user ${userID}", e) }
+      Log.d(
+          TAG,
+          "Updating rating of user($oldRating to $newRating) ${userID} from ${oldUserRating} to ${newUserRating}")
+    }
+
     /**
      * Convert a GoMeetUser to a map.
      *
@@ -136,21 +168,22 @@ class UserRepository private constructor() {
      */
     private fun GoMeetUser.toMap(): Map<String, Any?> {
       return mapOf(
-          "uid" to uid,
-          "username" to username,
-          "following" to following,
-          "followers" to followers,
-          "pendingRequests" to pendingRequests.toList(),
-          "firstName" to firstName,
-          "lastName" to lastName,
-          "email" to email,
-          "phoneNumber" to phoneNumber,
-          "country" to country,
-          "joinedEvents" to joinedEvents,
-          "myEvents" to myEvents,
-          "myFavorites" to myFavorites,
-          "profilePicture" to profilePicture,
-          "tags" to tags)
+          UID to uid,
+          USERNAME to username,
+          FOLLOWING to following,
+          FOLLOWERS to followers,
+          PENDING_REQUESTS to pendingRequests.toList(),
+          FIRST_NAME to firstName,
+          LAST_NAME to lastName,
+          EMAIL to email,
+          PHONE_NUMBER to phoneNumber,
+          COUNTRY to country,
+          JOINED_EVENTS to joinedEvents,
+          MY_EVENTS to myEvents,
+          MY_FAVORITES to myFavorites,
+          PROFILE_PICTURE to profilePicture,
+          TAGS to tags,
+          RATING to rating)
     }
 
     /**
@@ -160,22 +193,26 @@ class UserRepository private constructor() {
      * @return the GoMeetUser
      */
     private fun Map<String, Any>.toUser(id: String): GoMeetUser {
+      val ratingMap = this[RATING] as? Map<String, Long>
+      val ratingFst = ratingMap?.get("first") ?: 0L
+      val ratingSnd = ratingMap?.get("second") ?: 0L
       return GoMeetUser(
           uid = id,
-          username = this["username"] as String,
-          following = (this["following"] as? List<String>) ?: emptyList(),
-          followers = (this["followers"] as? List<String>) ?: emptyList(),
-          pendingRequests = convertToInvitationsList(this["pendingRequests"]).toSet(),
-          firstName = this["firstName"] as? String ?: "",
-          lastName = this["lastName"] as? String ?: "",
-          email = this["email"] as? String ?: "",
-          phoneNumber = this["phoneNumber"] as? String ?: "",
-          profilePicture = this["profilePicture"] as? String ?: "",
-          country = this["country"] as? String ?: "",
-          joinedEvents = (this["joinedEvents"] as? List<String>) ?: emptyList(),
-          myEvents = (this["myEvents"] as? List<String>) ?: emptyList(),
-          myFavorites = (this["myFavorites"] as? List<String>) ?: emptyList(),
-          tags = (this["tags"] as? List<String>) ?: emptyList())
+          username = this[USERNAME] as String,
+          following = (this[FOLLOWING] as? List<String>) ?: emptyList(),
+          followers = (this[FOLLOWERS] as? List<String>) ?: emptyList(),
+          pendingRequests = convertToInvitationsList(this[PENDING_REQUESTS]).toSet(),
+          firstName = this[FIRST_NAME] as? String ?: "",
+          lastName = this[LAST_NAME] as? String ?: "",
+          email = this[EMAIL] as? String ?: "",
+          phoneNumber = this[PHONE_NUMBER] as? String ?: "",
+          profilePicture = this[PROFILE_PICTURE] as? String ?: "",
+          country = this[COUNTRY] as? String ?: "",
+          joinedEvents = (this[JOINED_EVENTS] as? List<String>) ?: emptyList(),
+          myEvents = (this[MY_EVENTS] as? List<String>) ?: emptyList(),
+          myFavorites = (this[MY_FAVORITES] as? List<String>) ?: emptyList(),
+          tags = (this[TAGS] as? List<String>) ?: emptyList(),
+          rating = Pair(ratingFst, ratingSnd))
     }
 
     private fun convertToInvitationsList(data: Any?): List<Invitation> {

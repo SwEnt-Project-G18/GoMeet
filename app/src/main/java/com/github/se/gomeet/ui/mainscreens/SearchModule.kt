@@ -61,7 +61,12 @@ import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.launch
 
 @Composable
-fun SearchModule(nav: NavigationActions, backgroundColor: Color, contentColor: Color) {
+fun SearchModule(
+    nav: NavigationActions,
+    backgroundColor: Color,
+    contentColor: Color,
+    currentUID: String
+) {
   val viewModel = viewModel<SearchViewModel>()
   val searchText by viewModel.searchText.collectAsState()
   val persons by viewModel.searchQuery.collectAsState()
@@ -117,7 +122,7 @@ fun SearchModule(nav: NavigationActions, backgroundColor: Color, contentColor: C
     } else if (persons.isNotEmpty() && searchText.isNotEmpty()) {
       LazyColumn(modifier = Modifier.fillMaxWidth().weight(1f)) {
         items(persons) { item ->
-          SearchModuleSnippet(item, nav = nav, backgroundColor = backgroundColor)
+          SearchModuleSnippet(item, nav = nav, backgroundColor = backgroundColor, currentUID)
         }
       }
     }
@@ -128,7 +133,8 @@ fun SearchModule(nav: NavigationActions, backgroundColor: Color, contentColor: C
 fun SearchModuleSnippet(
     item: SearchViewModel.SearchableItem,
     nav: NavigationActions,
-    backgroundColor: Color
+    backgroundColor: Color,
+    currentUID: String
 ) {
   when (item) {
     is SearchViewModel.SearchableItem.User -> {
@@ -200,7 +206,7 @@ fun SearchModuleSnippet(
                         description = item.event.description,
                         organizer = item.event.creator,
                         loc = LatLng(item.event.location.latitude, item.event.location.longitude),
-                        rating = 0.0)
+                        rating = item.event.ratings[currentUID] ?: 0)
                   }) {
             Image(
                 painter = painter,
@@ -246,5 +252,6 @@ fun PreviewSearchModule() {
   SearchModule(
       nav = NavigationActions(rememberNavController()),
       backgroundColor = MaterialTheme.colorScheme.background,
-      contentColor = MaterialTheme.colorScheme.tertiary)
+      contentColor = MaterialTheme.colorScheme.tertiary,
+      currentUID = "1234")
 }

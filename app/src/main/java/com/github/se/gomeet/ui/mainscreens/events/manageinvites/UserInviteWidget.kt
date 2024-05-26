@@ -41,6 +41,8 @@ import com.github.se.gomeet.model.event.InviteStatus
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.theme.DarkerGreen
 
+private const val TAG = "UserInviteWidget"
+
 /**
  * This composable function represents the user invite widget when the user can be invited to an
  * event.
@@ -122,7 +124,9 @@ fun UserInviteWidget(
                   (clicked && (status == null || status == InviteStatus.REFUSED)) ||
                       (!clicked &&
                           (status == InviteStatus.PENDING || status == InviteStatus.ACCEPTED))
-              Log.d("ManageInvites", "toAdd: $toAdd, clicked: $clicked, status: $status")
+              Log.d(
+                  TAG,
+                  "Clicked invite/cancel button. toAdd: $toAdd, clicked: $clicked, status: $status")
               callback(user.copy(pendingRequests = pendingRequests(user, event, status, toAdd)))
             },
             modifier = Modifier.height(26.dp).width(82.dp),

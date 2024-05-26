@@ -26,14 +26,15 @@ class CreateEventTest {
   companion object {
     private val uid = "CreateEventTestUser"
     private val eventVM = EventViewModel(uid)
+    private val userVM = UserViewModel(uid)
 
     @AfterClass
     @JvmStatic
-    fun tearDown() {
-      runBlocking {
-        // Clean up the event
-        eventVM.getAllEvents()?.forEach { eventVM.removeEvent(it.eventID) }
-      }
+    fun tearDown() = runBlocking {
+
+      // Clean up the events
+      eventVM.getAllEvents()?.forEach { eventVM.removeEvent(it.eventID) }
+      return@runBlocking
     }
   }
 
@@ -42,8 +43,7 @@ class CreateEventTest {
     val eventVM = EventViewModel(uid)
 
     composeTestRule.setContent {
-      CreateEvent(
-          NavigationActions(rememberNavController()), eventVM, isPrivate = true, UserViewModel())
+      CreateEvent(NavigationActions(rememberNavController()), eventVM, isPrivate = true, userVM)
     }
 
     composeTestRule.waitForIdle()
@@ -86,8 +86,7 @@ class CreateEventTest {
   @Test
   fun testCreatePublicEvent() {
     composeTestRule.setContent {
-      CreateEvent(
-          NavigationActions(rememberNavController()), eventVM, isPrivate = false, UserViewModel())
+      CreateEvent(NavigationActions(rememberNavController()), eventVM, isPrivate = false, userVM)
     }
 
     composeTestRule.waitForIdle()

@@ -73,8 +73,10 @@ import com.google.firebase.ktx.Firebase
 import java.io.InputStream
 import kotlinx.coroutines.tasks.await
 
+private const val TAG = "EditProfile"
+
 @Composable
-fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel = UserViewModel()) {
+fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel) {
 
   val countries = getCountries()
   val currentUser = remember { mutableStateOf<GoMeetUser?>(null) }
@@ -211,8 +213,7 @@ fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel = UserViewM
                             nav.goBack()
                           },
                           onError = { exception ->
-                            Log.e(
-                                "ProfileUpdate", "Failed to upload new image: ${exception.message}")
+                            Log.e(TAG, "Failed to upload new image: ${exception.message}")
                           })
                     } else if (firstNameValid &&
                         lastNameValid &&
@@ -229,7 +230,7 @@ fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel = UserViewM
                               profilePicture = profilePictureUrl ?: "")
                       userViewModel.editUser(updatedUser)
                       nav.goBack()
-                      Log.e("ProfileUpdate", "No image selected")
+                      Log.e(TAG, "No image selected")
                     }
                   })
         }

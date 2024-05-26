@@ -34,6 +34,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -75,6 +76,8 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 import kotlinx.coroutines.launch
 
+private const val TAG = "EventInfo"
+
 /**
  * Composable function to display the details of an event.
  *
@@ -83,8 +86,8 @@ import kotlinx.coroutines.launch
  * @param eventId ID of the event
  * @param date Date of the event
  * @param time Time of the event
- * @param organizerId ID of the organizer of the event
- * @param rating Rating of the event
+ * @param organiserId ID of the organizer of the event
+ * @param rating Rating of the event by the current user (0 if unrated, 1-5 otherwise)
  * @param description Description of the event
  * @param loc Location of the event
  * @param userViewModel UserViewModel object to interact with user data
@@ -97,17 +100,18 @@ fun MyEventInfo(
     eventId: String = "",
     date: String = "",
     time: String = "",
-    organizerId: String,
-    rating: Double = 0.0, // TODO: Implement rating system
+    organiserId: String,
+    rating: Long,
     description: String = "",
     loc: LatLng = LatLng(0.0, 0.0),
     userViewModel: UserViewModel,
     eventViewModel: EventViewModel
 ) {
   var addPost by remember { mutableStateOf(false) }
-  val organizer = remember { mutableStateOf<GoMeetUser?>(null) }
+  val organiser = remember { mutableStateOf<GoMeetUser?>(null) }
   val currentUser = remember { mutableStateOf<GoMeetUser?>(null) }
   val myEvent = remember { mutableStateOf<Event?>(null) }
+  val ratingState = remember { mutableLongStateOf(rating) }
   val coroutineScope = rememberCoroutineScope()
   val screenHeight = LocalConfiguration.current.screenHeightDp.dp
   var expanded by remember { mutableStateOf(false) }
@@ -115,13 +119,13 @@ fun MyEventInfo(
 
   LaunchedEffect(Unit) {
     coroutineScope.launch {
-      organizer.value = userViewModel.getUser(organizerId)
+      organiser.value = userViewModel.getUser(organiserId)
       currentUser.value = userViewModel.getUser(Firebase.auth.currentUser!!.uid)
       myEvent.value = eventViewModel.getEvent(eventId)
     }
   }
 
-  Log.d("EventInfo", "Organizer is $organizerId")
+  Log.d(TAG, "Organiser is $organiserId")
   Scaffold(
       topBar = {
         TopAppBar(
@@ -152,7 +156,7 @@ fun MyEventInfo(
       bottomBar = {
         // Your bottom bar content
       }) { innerPadding ->
-        if (organizer.value == null || currentUser.value == null || myEvent.value == null) {
+        if (organiser.value == null || currentUser.value == null || myEvent.value == null) {
           LoadingText()
         } else {
           Column(
@@ -162,18 +166,15 @@ fun MyEventInfo(
                       .fillMaxSize()
                       .verticalScroll(state = rememberScrollState())) {
                 EventHeader(
-                    title = title,
-                    currentUser = currentUser.value!!,
-                    organizer = organizer.value!!,
-                    rating = rating,
+                    eventViewModel = eventViewModel,
+                    event = myEvent.value!!,
+                    rating = ratingState,
                     nav = nav,
-                    date = date,
-                    time = time)
-
+                    organiser = organiser.value!!)
                 Spacer(modifier = Modifier.height(20.dp))
                 EventButtons(
                     currentUser.value!!,
-                    organizer.value!!,
+                    organiser.value!!,
                     eventId,
                     userViewModel,
                     eventViewModel,
@@ -221,7 +222,7 @@ fun MyEventInfo(
                                   fontWeight = FontWeight.SemiBold))
 
                       Spacer(modifier = Modifier.weight(1f))
-                      if (!addPost && organizer.value!!.uid == currentUser.value!!.uid) {
+                      if (!addPost && organiser.value!!.uid == currentUser.value!!.uid) {
                         Button(
                             onClick = { addPost = true },
                             shape = RoundedCornerShape(10.dp),

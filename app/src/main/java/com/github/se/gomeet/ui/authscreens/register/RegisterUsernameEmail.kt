@@ -141,8 +141,8 @@ fun RegisterUsernameEmail(
                   onClick = {
                     firstClick = false
                     isValidUsername =
-                        !(allUsers!!.any { u -> u.username == username }) && username.isNotBlank()
-                    isValidEmail = isValidEmail && !(allUsers!!.any { u -> u.email == username })
+                        !(allUsers.any { u -> u.username == username }) && username.isNotBlank()
+                    isValidEmail = isValidEmail && !(allUsers.any { u -> u.email == username })
                     if (isValidUsername && isValidEmail) {
                       callback(username, email)
                     }

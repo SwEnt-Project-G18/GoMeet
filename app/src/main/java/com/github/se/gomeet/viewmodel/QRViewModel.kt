@@ -13,8 +13,6 @@ import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.content.FileProvider
-import com.github.se.gomeet.model.event.getEventDateString
-import com.github.se.gomeet.model.event.getEventTimeString
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.google.android.gms.maps.model.LatLng
 import com.google.mlkit.vision.barcode.BarcodeScanning
@@ -94,10 +92,10 @@ fun fetchEventAndNavigate(eventId: String, nav: NavigationActions, eventVM: Even
           nav.navigateToEventInfo(
               eventId = event.eventID,
               title = event.title,
-              date = getEventDateString(event.date),
-              time = getEventTimeString(event.time),
+              date = event.getDateString(),
+              time = event.getTimeString(),
               organizer = event.creator,
-              rating = 0.0,
+              rating = event.ratings[eventVM.currentUID!!] ?: 0L,
               description = event.description,
               loc = LatLng(event.location.latitude, event.location.longitude))
         } else {
