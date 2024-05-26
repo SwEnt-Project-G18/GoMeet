@@ -39,6 +39,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.vectorResource
@@ -72,24 +73,14 @@ fun EventHeader(
     rating: MutableState<Long>,
     organiser: GoMeetUser
 ) {
-  val titleBuilder = StringBuilder()
-  var index = 0
-
-  while (index < event.title.length) {
-    if (index + 20 < event.title.length) {
-      titleBuilder.append(event.title.substring(index, index + 20)).append("\n")
-    } else {
-      titleBuilder.append(event.title.substring(index))
-    }
-    index += 20
-  }
+    val screenWidth = LocalConfiguration.current.screenWidthDp
   Row(
       modifier = Modifier.fillMaxWidth().testTag("EventHeader").padding(10.dp),
       verticalAlignment = Alignment.Top,
       horizontalArrangement = Arrangement.SpaceBetween) {
-        Column {
+        Column (Modifier.width((screenWidth *0.6).dp)){
           Text(
-              text = titleBuilder.toString(),
+              text = event.title,
               style =
                   TextStyle(
                       fontSize = 24.sp,
