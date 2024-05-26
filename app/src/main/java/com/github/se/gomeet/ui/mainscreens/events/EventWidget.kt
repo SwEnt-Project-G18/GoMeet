@@ -34,6 +34,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
@@ -110,6 +111,7 @@ fun EventWidget(event: Event, verified: Boolean, nav: NavigationActions, userVM:
               horizontalAlignment = Alignment.Start, // Align text horizontally to center
               verticalArrangement = Arrangement.Center) {
                 Text(
+                    maxLines = 1,
                     text = event.title,
                     style =
                         TextStyle(
