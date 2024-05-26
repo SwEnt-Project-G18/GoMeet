@@ -300,7 +300,6 @@ fun TabRow(pagerState: PagerState, coroutineScope: CoroutineScope, screenHeight:
             else Offset(x = canvasWidth, y = 0f),
         strokeWidth = 5f)
   }
-  Spacer(modifier = Modifier.height(screenHeight / 30))
 }
 
 /**
