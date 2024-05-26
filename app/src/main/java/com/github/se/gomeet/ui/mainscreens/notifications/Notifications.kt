@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -65,6 +66,7 @@ fun Notifications(nav: NavigationActions, userViewModel: UserViewModel) {
   val eventViewModel = EventViewModel(null)
   val pagerState = rememberPagerState(pageCount = { 2 })
   val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
 
   var isLoaded by remember { mutableStateOf(false) }
   val coroutineScope = rememberCoroutineScope()
@@ -105,7 +107,7 @@ fun Notifications(nav: NavigationActions, userViewModel: UserViewModel) {
 
     Scaffold(
         modifier = Modifier.testTag("NotificationsScreen"),
-        topBar = { NotificationsTopBar(pagerState, coroutineScope, screenHeight) },
+        topBar = { NotificationsTopBar(pagerState, coroutineScope, screenHeight, screenWidth) },
         bottomBar = { BottomNavigation(nav) }) { innerPadding ->
           HorizontalPager(state = pagerState, modifier = Modifier.padding(innerPadding)) { page ->
             when (page) {
@@ -143,26 +145,24 @@ fun NotificationsTopBar(
     pagerState: PagerState,
     coroutineScope: CoroutineScope,
     screenHeight: Dp,
+    screenWidth: Dp
 ) {
   Column {
-    TopAppBar()
+      Row(
+          verticalAlignment = Alignment.CenterVertically,
+          modifier = Modifier.padding(start = screenWidth / 15, top = screenHeight / 30)) {
+          Text(
+              text = "Notifications",
+              color = MaterialTheme.colorScheme.onBackground,
+              style =
+              MaterialTheme.typography.headlineMedium.copy(
+                  fontWeight = FontWeight.SemiBold))
+          Spacer(Modifier.weight(1f))
+      }
     TabRow(pagerState, coroutineScope, screenHeight)
   }
 }
 
-/** This composable is used to display the top app bar. */
-@Composable
-fun TopAppBar() {
-  Row(
-      modifier = Modifier.fillMaxWidth(),
-      verticalAlignment = Alignment.CenterVertically,
-      horizontalArrangement = Arrangement.Center) {
-        Text(
-            text = "Notifications",
-            color = MaterialTheme.colorScheme.onBackground,
-            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold))
-      }
-}
 
 /**
  * This composable is used to display the tab row showing "Invitations" and "Messages" texts.

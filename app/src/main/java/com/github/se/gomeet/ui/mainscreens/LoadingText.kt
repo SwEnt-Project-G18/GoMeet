@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.github.se.gomeet.ui.theme.Grey
 
 /** Composable for the loading text, to be called whenever there is loading downtime. */
 @Composable
@@ -22,8 +23,8 @@ fun LoadingText() {
       verticalArrangement = Arrangement.Center,
       horizontalAlignment = Alignment.CenterHorizontally) {
         CircularProgressIndicator(
-            modifier = Modifier.size(60.dp), color = MaterialTheme.colorScheme.onBackground)
+            modifier = Modifier.size(60.dp), color = Grey)
         Spacer(modifier = Modifier.height(10.dp))
-        Text(text = "Loading...", color = MaterialTheme.colorScheme.onBackground)
+        Text(text = "Loading...", color = Grey)
       }
 }

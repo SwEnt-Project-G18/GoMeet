@@ -11,6 +11,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -30,11 +31,12 @@ import com.github.se.gomeet.ui.theme.TranslucentCyan
 fun BottomNavigationMenu(
     onTabSelect: (String) -> Unit,
     tabList: List<TopLevelDestination>,
-    selectedItem: String
+    selectedItem: String,
+    containerColor: Color = MaterialTheme.colorScheme.background,
 ) {
   NavigationBar(
       modifier = Modifier.navigationBarsPadding().height(80.dp),
-      containerColor = MaterialTheme.colorScheme.background,
+      containerColor = containerColor,
       tonalElevation = 0.dp,
   ) {
     tabList.forEach { destination ->

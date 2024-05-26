@@ -22,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.core.content.ContextCompat
@@ -32,6 +33,9 @@ import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
+import com.github.se.gomeet.ui.theme.BabyBlue
+import com.github.se.gomeet.ui.theme.DarkModeBackground
+import com.github.se.gomeet.ui.theme.DarkerBlue
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority.PRIORITY_BALANCED_POWER_ACCURACY
@@ -156,7 +160,7 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
 
     SearchModule(
         nav = nav,
-        backgroundColor = MaterialTheme.colorScheme.background,
+        backgroundColor = MaterialTheme.colorScheme.secondaryContainer,
         contentColor = MaterialTheme.colorScheme.tertiary,
         currentUID = eventViewModel.currentUID!!,
     )
@@ -173,5 +177,6 @@ private fun BottomNavigationFun(nav: NavigationActions) {
         }
       },
       tabList = TOP_LEVEL_DESTINATIONS,
-      selectedItem = Route.EXPLORE)
+      selectedItem = Route.EXPLORE
+  )
 }
