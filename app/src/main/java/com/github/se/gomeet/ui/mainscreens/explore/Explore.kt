@@ -156,7 +156,7 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
 
     SearchModule(
         nav = nav,
-        backgroundColor = MaterialTheme.colorScheme.secondaryContainer,
+        backgroundColor = MaterialTheme.colorScheme.background,
         contentColor = MaterialTheme.colorScheme.tertiary,
         currentUID = eventViewModel.currentUID!!,
     )

@@ -120,10 +120,12 @@ fun Events(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel:
         Box(modifier = Modifier.padding(8.dp)) {
           IconButton(
               modifier =
-                  Modifier.background(
-                          color = MaterialTheme.colorScheme.outlineVariant,
-                          shape = RoundedCornerShape(10.dp))
-                      .testTag("CreateEventButton"),
+              Modifier
+                  .background(
+                      color = MaterialTheme.colorScheme.outlineVariant,
+                      shape = RoundedCornerShape(10.dp)
+                  )
+                  .testTag("CreateEventButton"),
               onClick = { nav.navigateToScreen(Route.CREATE) }) {
                 Icon(Icons.Filled.Add, contentDescription = "Create Event", tint = Color.White)
               }
@@ -158,13 +160,15 @@ fun Events(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel:
               GoMeetSearchBar(
                   nav,
                   query,
-                  MaterialTheme.colorScheme.primaryContainer,
+                  MaterialTheme.colorScheme.secondaryContainer,
                   MaterialTheme.colorScheme.tertiary)
               Spacer(modifier = Modifier.height(5.dp))
               Row( // Row to display filter buttons
                   verticalAlignment = Alignment.CenterVertically,
                   horizontalArrangement = Arrangement.SpaceEvenly,
-                  modifier = Modifier.heightIn(min = 56.dp).fillMaxWidth()) {
+                  modifier = Modifier
+                      .heightIn(min = 56.dp)
+                      .fillMaxWidth()) {
                     Button(
                         modifier = Modifier.testTag("JoinedButton"),
                         onClick = { onFilterButtonClick(JOINED) },
@@ -191,7 +195,9 @@ fun Events(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel:
 
                 // Display events based on the selected filter
                 Column(
-                    modifier = Modifier.verticalScroll(rememberScrollState()).fillMaxSize(),
+                    modifier = Modifier
+                        .verticalScroll(rememberScrollState())
+                        .fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally) {
 
                       // Display joined events if 'All' or 'Joined' is selected
@@ -202,8 +208,9 @@ fun Events(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel:
                             style = MaterialTheme.typography.titleLarge,
                             color = MaterialTheme.colorScheme.onBackground,
                             modifier =
-                                Modifier.padding(horizontal = screenWidth / 15)
-                                    .testTag("JoinedTitle"))
+                            Modifier
+                                .padding(horizontal = screenWidth / 15)
+                                .testTag("JoinedTitle"))
 
                         // Loop through and display events that match the joined events criteria
                         eventList
@@ -225,8 +232,9 @@ fun Events(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel:
                             style = MaterialTheme.typography.titleLarge,
                             color = MaterialTheme.colorScheme.onBackground,
                             modifier =
-                                Modifier.padding(horizontal = screenWidth / 15)
-                                    .testTag("FavouritesTitle"))
+                            Modifier
+                                .padding(horizontal = screenWidth / 15)
+                                .testTag("FavouritesTitle"))
 
                         // Loop through and display events are marked favourites by the currentUser
                         eventList
@@ -248,8 +256,9 @@ fun Events(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel:
                             style = MaterialTheme.typography.titleLarge,
                             color = MaterialTheme.colorScheme.onBackground,
                             modifier =
-                                Modifier.padding(horizontal = screenWidth / 15)
-                                    .testTag("MyEventsTitle"))
+                            Modifier
+                                .padding(horizontal = screenWidth / 15)
+                                .testTag("MyEventsTitle"))
 
                         // Loop through and display events created by currentUser
                         eventList
@@ -291,15 +300,18 @@ fun GoMeetSearchBar(
         query = query.value,
         onQueryChange = { query.value = it },
         active = false,
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
-        placeholder = { Text("Search", color = contentColor) },
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(45.dp)
+            .padding(horizontal = 10.dp),
+        placeholder = { Text("Search", color = contentColor, style = MaterialTheme.typography.bodySmall) },
         leadingIcon = {
           IconButton(onClick = { nav.navigateToScreen(Route.MESSAGE_CHANNELS) }) {
             Icon(
                 ImageVector.vectorResource(R.drawable.gomeet_icon),
                 contentDescription = null,
                 tint = contentColor,
-                modifier = Modifier.size(24.dp))
+                modifier = Modifier.size(15.dp))
           }
         },
         trailingIcon = {
@@ -308,8 +320,10 @@ fun GoMeetSearchBar(
               contentDescription = null,
               tint = contentColor,
               modifier =
-                  Modifier.clickable {
-                    // TODO: handle voice search
+              Modifier
+                  .size(15.dp)
+                  .clickable {
+                      // TODO: handle voice search
                   })
         },
         colors =

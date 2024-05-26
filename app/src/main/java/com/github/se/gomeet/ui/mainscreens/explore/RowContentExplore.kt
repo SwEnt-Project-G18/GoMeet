@@ -59,7 +59,7 @@ fun ContentInRow(
             Column(
                 modifier =
                     Modifier.padding(start = 10.dp)
-                        .background(MaterialTheme.colorScheme.secondaryContainer, columnShape)
+                        .background(MaterialTheme.colorScheme.primaryContainer, columnShape)
                         .fillMaxWidth()) {
                   Card(
                       shape = RoundedCornerShape(16.dp),

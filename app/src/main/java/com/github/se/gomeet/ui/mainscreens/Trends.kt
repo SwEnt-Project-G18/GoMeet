@@ -142,7 +142,7 @@ fun Trends(
               GoMeetSearchBar(
                   nav,
                   query,
-                  MaterialTheme.colorScheme.primaryContainer,
+                  MaterialTheme.colorScheme.secondaryContainer,
                   MaterialTheme.colorScheme.tertiary)
               Spacer(modifier = Modifier.height(5.dp))
 

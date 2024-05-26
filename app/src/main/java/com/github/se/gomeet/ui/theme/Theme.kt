@@ -29,11 +29,11 @@ private val DarkColorScheme =
 
 private val LightColorScheme =
     lightColorScheme(
-        primary = AliceBlue,
+        primary = White,
         secondary = DarkGrey,
         tertiary = DarkGrey,
-        background = AliceBlue,
-        primaryContainer = White,
+        background = White,
+        primaryContainer = AliceBlue,
         secondaryContainer = AliceBlue,
         tertiaryContainer = Color(0xFFEEEEEE),
         outline = Cyan,
