@@ -293,8 +293,28 @@ fun MyEventInfo(
         DeleteEventDialog(
             onConfirm = {
                 coroutineScope.launch {
+                    myEvent.value!!.participants.forEach{ participant ->
+                        userViewModel.gotKickedFromEvent(eventId, participant)
+
+                        if (participant == currentUser.value!!.uid) {
+                            userViewModel.userDeletesEvent(eventId, participant)
+                        }
+                    }
+
+                    myEvent.value!!.pendingParticipants.forEach{pendingParticipant ->
+                        userViewModel.invitationCanceled(eventId, pendingParticipant)
+                    }
+
+                    val allUsers = userViewModel.getAllUsers()
+
+                    allUsers!!.forEach { user ->
+                        if (user.myFavorites.contains(eventId)) {
+                            userViewModel.removeFavoriteEvent(eventId, user.uid)
+                        }
+                    }
+
                     eventViewModel.removeEvent(eventId)
-                    nav.goBack() // Navigate back to the Events screen
+                    nav.goBack()
                 }
             },
             onDismiss = { showDeleteEventDialog = false }

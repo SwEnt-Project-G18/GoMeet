@@ -196,6 +196,24 @@ class UserViewModel(val currentUID: String? = null) : ViewModel() {
     }
   }
 
+    suspend fun userDeletesEvent(eventId: String, userId: String = currentUID!!) {
+        try {
+            val goMeetUser = getUser(userId)!!
+            editUser(goMeetUser.copy(myEvents = goMeetUser.myEvents.minus(eventId)))
+        } catch (e: Exception) {
+            Log.w(TAG, "Couldn't delete the event", e)
+        }
+    }
+
+    suspend fun removeFavoriteEvent(eventId: String, userId: String = currentUID!!) {
+        try {
+            val goMeetUser = getUser(userId)!!
+            editUser(goMeetUser.copy(myFavorites = goMeetUser.myFavorites.minus(eventId)))
+        } catch (e: Exception) {
+            Log.w(TAG, "Couldn't remove the event from favorites", e)
+        }
+    }
+
   /**
    * The user receives an invitation and adds it to their list of pendingRequests. Note that this
    * function should be called in the same time as the equivalent function in the EventViewModel.
