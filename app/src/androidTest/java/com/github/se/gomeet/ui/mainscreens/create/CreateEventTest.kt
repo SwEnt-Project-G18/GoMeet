@@ -45,7 +45,12 @@ class CreateEventTest {
     val eventVM = EventViewModel(uid)
 
     composeTestRule.setContent {
-      CreateEvent(NavigationActions(rememberNavController()), eventVM, isPrivate = true, userVM, eventCreationVM)
+      CreateEvent(
+          NavigationActions(rememberNavController()),
+          eventVM,
+          isPrivate = true,
+          userVM,
+          eventCreationVM)
     }
 
     composeTestRule.waitForIdle()
@@ -88,7 +93,12 @@ class CreateEventTest {
   @Test
   fun testCreatePublicEvent() {
     composeTestRule.setContent {
-      CreateEvent(NavigationActions(rememberNavController()), eventVM, isPrivate = false, userVM, eventCreationVM)
+      CreateEvent(
+          NavigationActions(rememberNavController()),
+          eventVM,
+          isPrivate = false,
+          userVM,
+          eventCreationVM)
     }
 
     composeTestRule.waitForIdle()
