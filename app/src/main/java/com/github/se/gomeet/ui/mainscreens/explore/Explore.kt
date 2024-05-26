@@ -173,5 +173,7 @@ private fun BottomNavigationFun(nav: NavigationActions) {
         }
       },
       tabList = TOP_LEVEL_DESTINATIONS,
-      selectedItem = Route.EXPLORE)
+      selectedItem = Route.EXPLORE,
+      containerColor = MaterialTheme.colorScheme.secondaryContainer,
+      selectedColor = MaterialTheme.colorScheme.outlineVariant)
 }

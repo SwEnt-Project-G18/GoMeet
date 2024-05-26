@@ -13,7 +13,7 @@ val DarkModeBackground = Color(0xFF1A1B21)
 val LightGray = Color(0xFFECEFF1)
 val MidLightGray = Color(0xFFD3D3D3)
 
-val VeryLightBlue = Color(0xFFF5FAFF)
+val AliceBlue = Color(0xFFF0F8FF)
 val DarkerBlue = Color(0xFF00796B)
 
 val NavBarUnselected = Color(216, 223, 225)

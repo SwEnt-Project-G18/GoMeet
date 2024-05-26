@@ -30,6 +30,7 @@ fun BottomNavigationMenu(
     tabList: List<TopLevelDestination>,
     selectedItem: String,
     containerColor: Color = MaterialTheme.colorScheme.background,
+    selectedColor: Color = MaterialTheme.colorScheme.outlineVariant
 ) {
 
   NavigationBar(
@@ -56,8 +57,8 @@ fun BottomNavigationMenu(
               NavigationBarItemDefaults.colors(
                   unselectedIconColor = Gray,
                   unselectedTextColor = Gray,
-                  selectedTextColor = MaterialTheme.colorScheme.tertiary,
-                  selectedIconColor = MaterialTheme.colorScheme.tertiary,
+                  selectedTextColor = selectedColor,
+                  selectedIconColor = selectedColor,
                   indicatorColor = TranslucentCyan))
     }
   }
