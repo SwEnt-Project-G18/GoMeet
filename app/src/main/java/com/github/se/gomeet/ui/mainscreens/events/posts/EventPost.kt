@@ -193,7 +193,7 @@ fun EventPost(
 
         Spacer(modifier = Modifier.weight(1f))
         Text(
-            text = "${event.date}, ${event.time}",
+            text = "${event.getDateString()}, ${event.getTimeString()}",
             style = MaterialTheme.typography.bodyMedium,
             color = Grey)
       }
