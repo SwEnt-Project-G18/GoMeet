@@ -80,16 +80,15 @@ fun SearchModule(
         textStyle = MaterialTheme.typography.bodySmall,
         value = searchText,
         leadingIcon = {
-          IconButton(onClick = { //TODO: Handle Voice Search
-          }) {
-              Icon(
-                  ImageVector.vectorResource(R.drawable.mic_icon),
-                  contentDescription = null,
-                  tint = contentColor,
-                  modifier =
-                  Modifier
-                      .size(20.dp))
-          }
+          IconButton(
+              onClick = { // TODO: Handle Voice Search
+              }) {
+                Icon(
+                    ImageVector.vectorResource(R.drawable.mic_icon),
+                    contentDescription = null,
+                    tint = contentColor,
+                    modifier = Modifier.size(20.dp))
+              }
         },
         onValueChange = viewModel::onSearchTextChange,
         modifier =
@@ -98,7 +97,9 @@ fun SearchModule(
                 .focusRequester(focusRequester)
                 .clip(RoundedCornerShape(10.dp))
                 .background(backgroundColor),
-        placeholder = { Text("Search", color = contentColor, style = MaterialTheme.typography.bodySmall) },
+        placeholder = {
+          Text("Search", color = contentColor, style = MaterialTheme.typography.bodySmall)
+        },
         keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
         keyboardActions =
             KeyboardActions(

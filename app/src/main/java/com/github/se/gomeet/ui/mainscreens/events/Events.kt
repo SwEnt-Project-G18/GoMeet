@@ -31,7 +31,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
@@ -121,12 +120,10 @@ fun Events(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel:
         Box(modifier = Modifier.padding(8.dp)) {
           IconButton(
               modifier =
-              Modifier
-                  .background(
-                      color = MaterialTheme.colorScheme.outlineVariant,
-                      shape = RoundedCornerShape(10.dp)
-                  )
-                  .testTag("CreateEventButton"),
+                  Modifier.background(
+                          color = MaterialTheme.colorScheme.outlineVariant,
+                          shape = RoundedCornerShape(10.dp))
+                      .testTag("CreateEventButton"),
               onClick = { nav.navigateToScreen(Route.CREATE) }) {
                 Icon(Icons.Filled.Add, contentDescription = "Create Event", tint = Color.White)
               }
@@ -167,9 +164,7 @@ fun Events(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel:
               Row( // Row to display filter buttons
                   verticalAlignment = Alignment.CenterVertically,
                   horizontalArrangement = Arrangement.SpaceEvenly,
-                  modifier = Modifier
-                      .heightIn(min = 56.dp)
-                      .fillMaxWidth()) {
+                  modifier = Modifier.heightIn(min = 56.dp).fillMaxWidth()) {
                     Button(
                         modifier = Modifier.testTag("JoinedButton"),
                         onClick = { onFilterButtonClick(JOINED) },
@@ -196,9 +191,7 @@ fun Events(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel:
 
                 // Display events based on the selected filter
                 Column(
-                    modifier = Modifier
-                        .verticalScroll(rememberScrollState())
-                        .fillMaxSize(),
+                    modifier = Modifier.verticalScroll(rememberScrollState()).fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally) {
 
                       // Display joined events if 'All' or 'Joined' is selected
@@ -209,9 +202,8 @@ fun Events(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel:
                             style = MaterialTheme.typography.titleLarge,
                             color = MaterialTheme.colorScheme.onBackground,
                             modifier =
-                            Modifier
-                                .padding(horizontal = screenWidth / 15)
-                                .testTag("JoinedTitle"))
+                                Modifier.padding(horizontal = screenWidth / 15)
+                                    .testTag("JoinedTitle"))
 
                         // Loop through and display events that match the joined events criteria
                         eventList
@@ -233,9 +225,8 @@ fun Events(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel:
                             style = MaterialTheme.typography.titleLarge,
                             color = MaterialTheme.colorScheme.onBackground,
                             modifier =
-                            Modifier
-                                .padding(horizontal = screenWidth / 15)
-                                .testTag("FavouritesTitle"))
+                                Modifier.padding(horizontal = screenWidth / 15)
+                                    .testTag("FavouritesTitle"))
 
                         // Loop through and display events are marked favourites by the currentUser
                         eventList
@@ -257,9 +248,8 @@ fun Events(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel:
                             style = MaterialTheme.typography.titleLarge,
                             color = MaterialTheme.colorScheme.onBackground,
                             modifier =
-                            Modifier
-                                .padding(horizontal = screenWidth / 15)
-                                .testTag("MyEventsTitle"))
+                                Modifier.padding(horizontal = screenWidth / 15)
+                                    .testTag("MyEventsTitle"))
 
                         // Loop through and display events created by currentUser
                         eventList
@@ -296,26 +286,22 @@ fun GoMeetSearchBar(
   val customTextSelectionColors =
       TextSelectionColors(handleColor = DarkCyan, backgroundColor = DarkCyan.copy(alpha = 0.4f))
   CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
-      DockedSearchBar(
+    DockedSearchBar(
         shape = RoundedCornerShape(10.dp),
         query = query.value,
         onQueryChange = { query.value = it },
         active = false,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 10.dp),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
         placeholder = { Text("Search", color = contentColor) },
         leadingIcon = {
-            Icon(
-                ImageVector.vectorResource(R.drawable.mic_icon),
-                contentDescription = null,
-                tint = contentColor,
-                modifier =
-                Modifier
-                    .size(20.dp)
-                    .clickable {
-                        // TODO: handle voice search
-                    })
+          Icon(
+              ImageVector.vectorResource(R.drawable.mic_icon),
+              contentDescription = null,
+              tint = contentColor,
+              modifier =
+                  Modifier.size(20.dp).clickable {
+                    // TODO: handle voice search
+                  })
         },
         trailingIcon = {},
         colors =

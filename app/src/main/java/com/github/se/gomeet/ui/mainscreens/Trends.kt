@@ -304,7 +304,8 @@ fun SortButton(eventList: MutableList<Event>, userTags: List<Tag>) {
             modifier = Modifier.fillMaxWidth(0.6f),
             colors =
                 ButtonDefaults.buttonColors(
-                    MaterialTheme.colorScheme.secondaryContainer, MaterialTheme.colorScheme.tertiary),
+                    MaterialTheme.colorScheme.secondaryContainer,
+                    MaterialTheme.colorScheme.tertiary),
             onClick = { expanded = true }) {
               Text("Sort")
             }

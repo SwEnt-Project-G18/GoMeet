@@ -24,7 +24,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.twotone.Star
 import androidx.compose.material3.AlertDialog
@@ -147,8 +146,7 @@ fun Profile(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier =
-                Modifier.padding(start = 30.dp, top = 20.dp, end = 10.dp)
-                    .testTag("TopBar")) {
+                Modifier.padding(start = 30.dp, top = 20.dp, end = 10.dp).testTag("TopBar")) {
               Text(
                   text = "My Profile",
                   color = MaterialTheme.colorScheme.onBackground,
@@ -157,29 +155,27 @@ fun Profile(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel
                           fontWeight = FontWeight.SemiBold))
               Spacer(Modifier.weight(1f))
 
-            Row(horizontalArrangement = Arrangement.Center){
+              Row(horizontalArrangement = Arrangement.Center) {
                 IconButton(onClick = { nav.navigateToScreen(Route.MESSAGE_CHANNELS) }) {
-                    Icon(
-                        ImageVector.vectorResource(R.drawable.baseline_chat_bubble_outline_24),
-                        contentDescription = null,
-                        modifier = Modifier.size(24.dp),
-                        tint = MaterialTheme.colorScheme.tertiary)
+                  Icon(
+                      ImageVector.vectorResource(R.drawable.baseline_chat_bubble_outline_24),
+                      contentDescription = null,
+                      modifier = Modifier.size(24.dp),
+                      tint = MaterialTheme.colorScheme.tertiary)
                 }
 
                 IconButton(
                     onClick = {
-                        nav.navigateTo(SECOND_LEVEL_DESTINATION.first { it.route == Route.SETTINGS })
+                      nav.navigateTo(SECOND_LEVEL_DESTINATION.first { it.route == Route.SETTINGS })
                     }) {
-                    Icon(
-                        Icons.Outlined.Settings,
-                        contentDescription = "Settings",
-                        modifier = Modifier.size(24.dp),
-                        tint = MaterialTheme.colorScheme.onBackground)
-                }
+                      Icon(
+                          Icons.Outlined.Settings,
+                          contentDescription = "Settings",
+                          modifier = Modifier.size(24.dp),
+                          tint = MaterialTheme.colorScheme.onBackground)
+                    }
+              }
             }
-            }
-
-
       }) { innerPadding ->
         if (isProfileLoaded) {
           Column(
