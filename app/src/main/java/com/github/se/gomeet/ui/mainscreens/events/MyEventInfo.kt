@@ -111,77 +111,75 @@ fun MyEventInfo(
     userViewModel: UserViewModel,
     eventViewModel: EventViewModel
 ) {
-    var addPost by remember { mutableStateOf(false) }
-    val organiser = remember { mutableStateOf<GoMeetUser?>(null) }
-    val currentUser = remember { mutableStateOf<GoMeetUser?>(null) }
-    val myEvent = remember { mutableStateOf<Event?>(null) }
-    val ratingState = remember { mutableLongStateOf(rating) }
-    val coroutineScope = rememberCoroutineScope()
-    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
-    var expanded by remember { mutableStateOf(false) }
-    var showShareEventDialog by remember { mutableStateOf(false) }
-    var showDeleteEventDialog by remember { mutableStateOf(false) }
-    var posts by rememberSaveable { mutableStateOf<List<Post>>(emptyList()) }
+  var addPost by remember { mutableStateOf(false) }
+  val organiser = remember { mutableStateOf<GoMeetUser?>(null) }
+  val currentUser = remember { mutableStateOf<GoMeetUser?>(null) }
+  val myEvent = remember { mutableStateOf<Event?>(null) }
+  val ratingState = remember { mutableLongStateOf(rating) }
+  val coroutineScope = rememberCoroutineScope()
+  val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+  var expanded by remember { mutableStateOf(false) }
+  var showShareEventDialog by remember { mutableStateOf(false) }
+  var showDeleteEventDialog by remember { mutableStateOf(false) }
+  var posts by rememberSaveable { mutableStateOf<List<Post>>(emptyList()) }
 
-    LaunchedEffect(Unit) {
-        coroutineScope.launch {
-            organiser.value = userViewModel.getUser(organiserId)
-            currentUser.value = userViewModel.getUser(Firebase.auth.currentUser!!.uid)
-            myEvent.value = eventViewModel.getEvent(eventId)
-            posts = myEvent.value!!.posts
-        }
+  LaunchedEffect(Unit) {
+    coroutineScope.launch {
+      organiser.value = userViewModel.getUser(organiserId)
+      currentUser.value = userViewModel.getUser(Firebase.auth.currentUser!!.uid)
+      myEvent.value = eventViewModel.getEvent(eventId)
+      posts = myEvent.value!!.posts.reversed()
     }
+  }
 
-    Log.d(TAG, "Organiser is $organiserId")
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                modifier = Modifier.testTag("TopBar"),
-                backgroundColor = MaterialTheme.colorScheme.background,
-                elevation = 0.dp,
-                title = {
-                    // Empty title since we're placing our own components
-                },
-                navigationIcon = {
-                    IconButton(onClick = { nav.goBack() }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
-                            tint = MaterialTheme.colorScheme.onBackground)
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { showDeleteEventDialog = true }) {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = "Delete",
-                            tint = MaterialTheme.colorScheme.onBackground,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
+  Log.d(TAG, "Organiser is $organiserId")
+  Scaffold(
+      topBar = {
+        TopAppBar(
+            modifier = Modifier.testTag("TopBar"),
+            backgroundColor = MaterialTheme.colorScheme.background,
+            elevation = 0.dp,
+            title = {
+              // Empty title since we're placing our own components
+            },
+            navigationIcon = {
+              IconButton(onClick = { nav.goBack() }) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back",
+                    tint = MaterialTheme.colorScheme.onBackground)
+              }
+            },
+            actions = {
+              IconButton(onClick = { showDeleteEventDialog = true }) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Delete",
+                    tint = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.size(24.dp))
+              }
 
-                    IconButton(onClick = { showShareEventDialog = true }) {
-                        Icon(
-                            imageVector = ImageVector.vectorResource(R.drawable.upload_icon),
-                            contentDescription = "Share",
-                            tint = MaterialTheme.colorScheme.onBackground,
-                            modifier = Modifier.size(24.dp))
-                    }
-                })
-        },
-        bottomBar = {
-            // Your bottom bar content
-        }) { innerPadding ->
+              IconButton(onClick = { showShareEventDialog = true }) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.upload_icon),
+                    contentDescription = "Share",
+                    tint = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.size(24.dp))
+              }
+            })
+      },
+      bottomBar = {
+        // Your bottom bar content
+      }) { innerPadding ->
         if (organiser.value == null || currentUser.value == null || myEvent.value == null) {
-            LoadingText()
+          LoadingText()
         } else {
-            Column(
-                modifier =
-                Modifier
-                    .padding(innerPadding)
-                    .padding(horizontal = 10.dp)
-                    .fillMaxSize()
-                    .verticalScroll(state = rememberScrollState())) {
+          Column(
+              modifier =
+                  Modifier.padding(innerPadding)
+                      .padding(horizontal = 10.dp)
+                      .fillMaxSize()
+                      .verticalScroll(state = rememberScrollState())) {
                 EventHeader(
                     eventViewModel = eventViewModel,
                     event = myEvent.value!!,
@@ -206,24 +204,24 @@ fun MyEventInfo(
                 Spacer(modifier = Modifier.height(20.dp))
                 MapViewComposable(loc = loc)
                 if (addPost) {
-                    Spacer(modifier = Modifier.height(screenHeight / 80))
-                    HorizontalDivider(
-                        thickness = 5.dp, color = MaterialTheme.colorScheme.primaryContainer)
-                    Spacer(modifier = Modifier.height(screenHeight / 80))
-                    AddPost(
-                        callbackCancel = { addPost = false },
-                        callbackPost = { post ->
-                            addPost = false
-                            coroutineScope.launch {
-                                eventViewModel.editEvent(
-                                    myEvent.value!!.copy(
-                                        posts = myEvent.value!!.posts.reversed().plus(post).reversed()))
-                                myEvent.value = eventViewModel.getEvent(eventId)
-                                posts = myEvent.value!!.posts
-                            }
-                        },
-                        user = currentUser.value!!,
-                        userViewModel = userViewModel)
+                  Spacer(modifier = Modifier.height(screenHeight / 80))
+                  HorizontalDivider(
+                      thickness = 5.dp, color = MaterialTheme.colorScheme.primaryContainer)
+                  Spacer(modifier = Modifier.height(screenHeight / 80))
+                  AddPost(
+                      callbackCancel = { addPost = false },
+                      callbackPost = { post ->
+                        addPost = false
+                        coroutineScope.launch {
+                          val updatedEvent =
+                              myEvent.value!!.copy(posts = listOf(post) + myEvent.value!!.posts)
+                          eventViewModel.editEvent(updatedEvent)
+                          myEvent.value = updatedEvent
+                          posts = updatedEvent.posts.reversed()
+                        }
+                      },
+                      user = currentUser.value!!,
+                      userViewModel = userViewModel)
                 }
                 Spacer(Modifier.height(screenHeight / 80))
                 HorizontalDivider(
@@ -232,97 +230,100 @@ fun MyEventInfo(
                 Row(
                     horizontalArrangement = Arrangement.SpaceAround,
                     verticalAlignment = Alignment.Top) {
-                    Text(
-                        text = "Posts",
-                        color = MaterialTheme.colorScheme.tertiary,
-                        style =
-                        MaterialTheme.typography.headlineSmall.copy(
-                            fontWeight = FontWeight.SemiBold))
+                      Text(
+                          text = "Posts",
+                          color = MaterialTheme.colorScheme.tertiary,
+                          style =
+                              MaterialTheme.typography.headlineSmall.copy(
+                                  fontWeight = FontWeight.SemiBold))
 
-                    Spacer(modifier = Modifier.weight(1f))
-                    if (!addPost && organiser.value!!.uid == currentUser.value!!.uid) {
+                      Spacer(modifier = Modifier.weight(1f))
+                      if (!addPost && organiser.value!!.uid == currentUser.value!!.uid) {
                         Button(
                             onClick = { addPost = true },
                             shape = RoundedCornerShape(10.dp),
                             colors =
-                            ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.outlineVariant)) {
-                            Icon(Icons.Filled.Add, contentDescription = "Add Post", tint = White)
-                        }
+                                ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.outlineVariant)) {
+                              Icon(Icons.Filled.Add, contentDescription = "Add Post", tint = White)
+                            }
+                      }
                     }
-                }
 
                 if (posts.isEmpty()) {
-                    Spacer(Modifier.height(10.dp))
-                    Text(
-                        text = "No updates about this event at the moment.",
-                        color = MaterialTheme.colorScheme.tertiary,
-                        modifier = Modifier.align(Alignment.CenterHorizontally),
-                        style = MaterialTheme.typography.bodyLarge)
-                    Spacer(Modifier.height(screenHeight / 50))
+                  Spacer(Modifier.height(10.dp))
+                  Text(
+                      text = "No updates about this event at the moment.",
+                      color = MaterialTheme.colorScheme.tertiary,
+                      modifier = Modifier.align(Alignment.CenterHorizontally),
+                      style = MaterialTheme.typography.bodyLarge)
+                  Spacer(Modifier.height(screenHeight / 50))
                 } else {
-                    Spacer(Modifier.height(10.dp))
-                    posts.forEach { post ->
-                        key(post.date.toString() + post.time.toString()) {
-                            EventPost(
-                                nav = nav,
-                                event = myEvent.value!!,
-                                post = post,
-                                userViewModel = userViewModel,
-                                eventViewModel = eventViewModel,
-                                currentUser = currentUser.value!!.uid,
-                                onPostDeleted = { deletedPost ->
-                                    posts = posts.filter { it != deletedPost }
-                                }
-                            )
-                            HorizontalDivider(color = MaterialTheme.colorScheme.primaryContainer)
-                            Spacer(Modifier.height(10.dp))
-                        }
+                  Spacer(Modifier.height(10.dp))
+                  posts.reversed().forEach { post ->
+                    key(post.date.toString() + post.time.toString()) {
+                      EventPost(
+                          nav = nav,
+                          event = myEvent.value!!,
+                          post = post,
+                          userViewModel = userViewModel,
+                          eventViewModel = eventViewModel,
+                          currentUser = currentUser.value!!.uid,
+                          onPostDeleted = { deletedPost ->
+                            coroutineScope.launch {
+                              val updatedEvent =
+                                  myEvent.value!!.copy(
+                                      posts = myEvent.value!!.posts.minus(deletedPost))
+                              eventViewModel.editEvent(updatedEvent)
+                              myEvent.value = updatedEvent
+                              posts = updatedEvent.posts.reversed()
+                            }
+                          })
+                      HorizontalDivider(color = MaterialTheme.colorScheme.primaryContainer)
+                      Spacer(Modifier.height(10.dp))
                     }
+                  }
                 }
                 Spacer(Modifier.height(screenHeight / 10))
-            }
+              }
         }
-    }
+      }
 
-    if (showShareEventDialog) {
-        ShareDialog("Event", eventId, onDismiss = { showShareEventDialog = false })
-    }
+  if (showShareEventDialog) {
+    ShareDialog("Event", eventId, onDismiss = { showShareEventDialog = false })
+  }
 
-    if (showDeleteEventDialog) {
-        DeleteEventDialog(
-            onConfirm = {
-                coroutineScope.launch {
-                    myEvent.value!!.participants.forEach{ participant ->
-                        userViewModel.gotKickedFromEvent(eventId, participant)
+  if (showDeleteEventDialog) {
+    DeleteEventDialog(
+        onConfirm = {
+          coroutineScope.launch {
+            myEvent.value!!.participants.forEach { participant ->
+              userViewModel.gotKickedFromEvent(eventId, participant)
 
-                        if (participant == currentUser.value!!.uid) {
-                            userViewModel.userDeletesEvent(eventId, participant)
-                        }
-                    }
+              if (participant == currentUser.value!!.uid) {
+                userViewModel.userDeletesEvent(eventId, participant)
+              }
+            }
 
-                    myEvent.value!!.pendingParticipants.forEach{pendingParticipant ->
-                        userViewModel.invitationCanceled(eventId, pendingParticipant)
-                    }
+            myEvent.value!!.pendingParticipants.forEach { pendingParticipant ->
+              userViewModel.invitationCanceled(eventId, pendingParticipant)
+            }
 
-                    val allUsers = userViewModel.getAllUsers()
+            val allUsers = userViewModel.getAllUsers()
 
-                    allUsers!!.forEach { user ->
-                        if (user.myFavorites.contains(eventId)) {
-                            userViewModel.removeFavoriteEvent(eventId, user.uid)
-                        }
-                    }
+            allUsers!!.forEach { user ->
+              if (user.myFavorites.contains(eventId)) {
+                userViewModel.removeFavoriteEvent(eventId, user.uid)
+              }
+            }
 
-                    eventViewModel.removeEvent(eventId)
-                    nav.goBack()
-                }
-            },
-            onDismiss = { showDeleteEventDialog = false }
-        )
-    }
+            eventViewModel.removeEvent(eventId)
+            nav.goBack()
+          }
+        },
+        onDismiss = { showDeleteEventDialog = false })
+  }
 }
-
-
 
 /**
  * Helper function to display the map view of an event.
@@ -366,11 +367,7 @@ private fun MapViewComposable(
   // Set up the GoogleMap composable
   GoogleMap(
       modifier =
-      Modifier
-          .testTag("MapView")
-          .fillMaxWidth()
-          .height(200.dp)
-          .clip(RoundedCornerShape(20.dp)),
+          Modifier.testTag("MapView").fillMaxWidth().height(200.dp).clip(RoundedCornerShape(20.dp)),
       cameraPositionState = cameraPositionState,
       properties = mapProperties,
       uiSettings = uiSettings) {
@@ -390,31 +387,29 @@ private fun MapViewComposable(
 }
 
 @Composable
-fun DeleteEventDialog(
-    onConfirm: () -> Unit,
-    onDismiss: () -> Unit
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        confirmButton = {
-            Button(onClick = onConfirm,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.outlineVariant
-                )) {
-                Text("Confirm")
+fun DeleteEventDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
+  AlertDialog(
+      onDismissRequest = onDismiss,
+      confirmButton = {
+        Button(
+            onClick = onConfirm,
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.outlineVariant)) {
+              Text("Confirm")
             }
-        },
-        dismissButton = {
-            Button(onClick = onDismiss,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.onErrorContainer
-                )) {
-                Text("Cancel")
+      },
+      dismissButton = {
+        Button(
+            onClick = onDismiss,
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.onErrorContainer)) {
+              Text("Cancel")
             }
-        },
-        title = { Text("Delete Event") },
-        text = { Text("Are you sure you want to delete this event?") },
-        containerColor = MaterialTheme.colorScheme.background,
-    )
+      },
+      title = { Text("Delete Event") },
+      text = { Text("Are you sure you want to delete this event?") },
+      containerColor = MaterialTheme.colorScheme.background,
+  )
 }
-
