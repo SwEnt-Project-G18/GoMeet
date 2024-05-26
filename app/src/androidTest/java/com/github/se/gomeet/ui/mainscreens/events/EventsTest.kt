@@ -120,7 +120,7 @@ class EventsTest {
     composeTestRule.onNodeWithTag("JoinedTitle").assertIsDisplayed()
     composeTestRule.onNodeWithTag("FavouritesTitle").assertIsDisplayed()
     composeTestRule.onNodeWithTag("MyEventsTitle").assertIsDisplayed()
-    composeTestRule.onAllNodesWithText("title").assertCountEquals(2)
+    composeTestRule.onAllNodesWithText("title").assertCountEquals(3)
     for (i in 0..2) {
       composeTestRule.onAllNodesWithText("title")[i].assertIsDisplayed()
     }
