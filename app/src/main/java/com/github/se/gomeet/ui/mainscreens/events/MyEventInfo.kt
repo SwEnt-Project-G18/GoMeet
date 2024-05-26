@@ -22,6 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -289,9 +290,18 @@ fun MyEventInfo(
     }
 
     if (showDeleteEventDialog) {
-        DeleteEventDialog()
+        DeleteEventDialog(
+            onConfirm = {
+                coroutineScope.launch {
+                    eventViewModel.removeEvent(eventId)
+                    nav.goBack() // Navigate back to the Events screen
+                }
+            },
+            onDismiss = { showDeleteEventDialog = false }
+        )
     }
 }
+
 
 
 /**
@@ -360,6 +370,31 @@ private fun MapViewComposable(
 }
 
 @Composable
-private fun DeleteEventDialog() {
-    // Your dialog content
+fun DeleteEventDialog(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            Button(onClick = onConfirm,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.outlineVariant
+                )) {
+                Text("Confirm")
+            }
+        },
+        dismissButton = {
+            Button(onClick = onDismiss,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.onErrorContainer
+                )) {
+                Text("Cancel")
+            }
+        },
+        title = { Text("Delete Event") },
+        text = { Text("Are you sure you want to delete this event?") },
+        containerColor = MaterialTheme.colorScheme.background,
+    )
 }
+
