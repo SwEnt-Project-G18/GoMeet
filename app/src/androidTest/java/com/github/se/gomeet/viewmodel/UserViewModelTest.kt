@@ -5,14 +5,14 @@ import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.InviteStatus
 import com.github.se.gomeet.model.event.location.Location
 import com.github.se.gomeet.model.user.GoMeetUser
+import java.time.LocalDate
+import java.time.LocalTime
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
 import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.time.LocalDate
-import java.time.LocalTime
 
 @RunWith(AndroidJUnit4::class)
 class UserViewModelTest {
@@ -24,10 +24,54 @@ class UserViewModelTest {
     private const val email = "testemail"
     private const val phonenumber = "testphonenumber"
     private const val country = "testcountry"
-    private val user = GoMeetUser(uid, username, firstname, lastname, email, phonenumber, country, emptyList(), emptyList(), emptySet(), emptyList(), emptyList(), emptyList(), tags = emptyList())
-    private val event1 = Event("event6", uid, "", "", Location(0.0, 0.0, ""), LocalDate.now(), LocalTime.now(), 0.0, "", emptyList(), emptyList(), emptyList(), 0, true)
-    private val event2 = Event("event7", uid, "", "", Location(0.0, 0.0, ""), LocalDate.now(), LocalTime.now(), 0.0, "", emptyList(), emptyList(), emptyList(), 0, true)
-
+    private val user =
+        GoMeetUser(
+            uid,
+            username,
+            firstname,
+            lastname,
+            email,
+            phonenumber,
+            country,
+            emptyList(),
+            emptyList(),
+            emptySet(),
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            tags = emptyList())
+    private val event1 =
+        Event(
+            "event6",
+            uid,
+            "",
+            "",
+            Location(0.0, 0.0, ""),
+            LocalDate.now(),
+            LocalTime.now(),
+            0.0,
+            "",
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            0,
+            true)
+    private val event2 =
+        Event(
+            "event7",
+            uid,
+            "",
+            "",
+            Location(0.0, 0.0, ""),
+            LocalDate.now(),
+            LocalTime.now(),
+            0.0,
+            "",
+            emptyList(),
+            emptyList(),
+            emptyList(),
+            0,
+            true)
 
     private val userVM = UserViewModel(uid)
     private val eventVM = EventViewModel(uid)
@@ -150,7 +194,6 @@ class UserViewModelTest {
   @Test
   fun userAcceptsInvitationTest() {
     val eventId = "event6"
-
 
     // Invite the user to the event
     runBlocking { userVM.gotInvitation(eventId, uid) }

@@ -60,7 +60,6 @@ import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.MarkerInfoWindow
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.google.maps.android.compose.rememberMarkerState
 import java.time.LocalDate
 import kotlinx.coroutines.launch
 
@@ -234,7 +233,9 @@ internal fun GoogleMapView(
 
                 val customPinBitmapDescriptor =
                     if (isEventThisWeek) stablePins[event.eventID] else scaledPin
-                  val markerState = MarkerState(position = LatLng(event.location.latitude, event.location.longitude))
+                val markerState =
+                    MarkerState(
+                        position = LatLng(event.location.latitude, event.location.longitude))
 
                 MarkerInfoWindow(
                     state = markerState,
