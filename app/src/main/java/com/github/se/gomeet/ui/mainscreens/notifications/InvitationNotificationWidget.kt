@@ -101,7 +101,6 @@ fun InvitationsNotificationsWidget(
                   }
             }
 
-        // Accept and Decline buttons
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
           Button(
               onClick = {
@@ -122,7 +121,8 @@ fun InvitationsNotificationsWidget(
 
           Button(
               onClick = {
-                userViewModel.userRefusesInvitation(event, user, eventViewModel)
+                  clicked = true
+                  userViewModel.userRefusesInvitation(event, user, eventViewModel)
               },
               shape = RoundedCornerShape(10.dp),
               colors =
@@ -131,7 +131,6 @@ fun InvitationsNotificationsWidget(
                       contentColor = MaterialTheme.colorScheme.tertiary),
               enabled = !clicked,
               modifier = Modifier.width((screenWidth / 3).dp).testTag("DeclineButton")) {
-                clicked = true
                 Text("Decline")
               }
         }

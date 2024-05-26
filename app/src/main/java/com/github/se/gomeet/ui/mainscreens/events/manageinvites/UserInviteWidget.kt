@@ -98,12 +98,11 @@ fun UserInviteWidget(
                 )
             }
 
-            if (status == InviteStatus.PENDING || status == InviteStatus.TO_INVITE){
-                // Button to invite or cancel invitation
+            if (status == InviteStatus.PENDING || status == InviteStatus.TO_INVITE || status == null){
                 Button(
                     onClick = {
                         clicked = !clicked
-                        val toAdd = (!clicked && status == InviteStatus.PENDING)
+                        val toAdd = (!clicked && status == InviteStatus.PENDING || status == null)
                         callback(user.copy(pendingRequests = pendingRequests(user, event, status, toAdd)))
                     },
                     modifier = Modifier

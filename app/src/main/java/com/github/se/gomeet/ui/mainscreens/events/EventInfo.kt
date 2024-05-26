@@ -342,7 +342,7 @@ fun EventButtons(
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
                         contentColor = MaterialTheme.colorScheme.tertiary)) {
                   if (buttons == 0) {
-                    Text("Participants")
+                    Text("Manage Participants")
                   } else {
                     Text("Decline Invite")
                   }
