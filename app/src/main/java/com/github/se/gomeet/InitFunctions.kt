@@ -132,7 +132,6 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
   val navAction = NavigationActions(nav)
   val clientInitialisationState by client.clientState.initializationState.collectAsState()
   val authViewModel = AuthViewModel()
-  val userViewModel = UserViewModel()
   val eventCreationViewModel = EventCreationViewModel()
   val startScreen = Route.WELCOME // The screen that gets navigated to when the app starts
   val postLoginScreen =
@@ -238,10 +237,10 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
               eventViewModel.value)
         }
     composable(Route.PRIVATE_CREATE) {
-      CreateEvent(navAction, eventViewModel.value, true, userViewModel, eventCreationViewModel)
+      CreateEvent(navAction, eventViewModel.value, true, userViewModel.value, eventCreationViewModel)
     }
     composable(Route.PUBLIC_CREATE) {
-      CreateEvent(navAction, eventViewModel.value, false, userViewModel, eventCreationViewModel)
+      CreateEvent(navAction, eventViewModel.value, false, userViewModel.value, eventCreationViewModel)
     }
 
     composable(
@@ -250,7 +249,7 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
           val eventId = entry.arguments?.getString("eventId") ?: ""
           AddParticipants(
               nav = navAction,
-              userViewModel = userViewModel,
+              userViewModel = userViewModel.value,
               eventCreationViewModel = eventCreationViewModel)
         }
 
