@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -22,8 +21,7 @@ fun LoadingText() {
       modifier = Modifier.fillMaxSize(),
       verticalArrangement = Arrangement.Center,
       horizontalAlignment = Alignment.CenterHorizontally) {
-        CircularProgressIndicator(
-            modifier = Modifier.size(60.dp), color = Grey)
+        CircularProgressIndicator(modifier = Modifier.size(60.dp), color = Grey)
         Spacer(modifier = Modifier.height(10.dp))
         Text(text = "Loading...", color = Grey)
       }

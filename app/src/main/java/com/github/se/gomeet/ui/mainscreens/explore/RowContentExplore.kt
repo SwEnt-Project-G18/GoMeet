@@ -33,7 +33,6 @@ import coil.request.ImageRequest
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.ui.navigation.NavigationActions
-import com.github.se.gomeet.ui.theme.BabyBlue
 import com.google.android.gms.maps.model.LatLng
 
 @SuppressLint("SuspiciousIndentation")

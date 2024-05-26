@@ -23,7 +23,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
@@ -31,8 +30,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -66,7 +63,7 @@ fun Notifications(nav: NavigationActions, userViewModel: UserViewModel) {
   val eventViewModel = EventViewModel(null)
   val pagerState = rememberPagerState(pageCount = { 2 })
   val screenHeight = LocalConfiguration.current.screenHeightDp.dp
-    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+  val screenWidth = LocalConfiguration.current.screenWidthDp.dp
 
   var isLoaded by remember { mutableStateOf(false) }
   val coroutineScope = rememberCoroutineScope()
@@ -78,28 +75,28 @@ fun Notifications(nav: NavigationActions, userViewModel: UserViewModel) {
 
   LaunchedEffect(Unit) {
     coroutineScope.launch {
-        val currentUser = userViewModel.getUser(currentUserID)
-        currentUser?.let {
-            user.value = it
-            val events = mutableListOf<Event>()
-            val creatorMap = mutableMapOf<Event, String>()
+      val currentUser = userViewModel.getUser(currentUserID)
+      currentUser?.let {
+        user.value = it
+        val events = mutableListOf<Event>()
+        val creatorMap = mutableMapOf<Event, String>()
 
-            it.pendingRequests
-                .filter { invitation -> invitation.status == InviteStatus.PENDING }
-                .forEach { request ->
-                    val invitedEvent = eventViewModel.getEvent(request.eventId)
-                    invitedEvent?.let { event ->
-                        events.add(event)
-                        val creatorName = userViewModel.getUser(event.creator)?.username ?: "GoMeetUser"
-                        creatorMap[event] = creatorName
-                    }
-                }
+        it.pendingRequests
+            .filter { invitation -> invitation.status == InviteStatus.PENDING }
+            .forEach { request ->
+              val invitedEvent = eventViewModel.getEvent(request.eventId)
+              invitedEvent?.let { event ->
+                events.add(event)
+                val creatorName = userViewModel.getUser(event.creator)?.username ?: "GoMeetUser"
+                creatorMap[event] = creatorName
+              }
+            }
 
-            eventsList.clear()
-            eventsList.addAll(events)
-            eventToCreatorMap.clear()
-            eventToCreatorMap.putAll(creatorMap)
-        }
+        eventsList.clear()
+        eventsList.addAll(events)
+        eventToCreatorMap.clear()
+        eventToCreatorMap.putAll(creatorMap)
+      }
       isLoaded = true
     }
   }
@@ -148,21 +145,19 @@ fun NotificationsTopBar(
     screenWidth: Dp
 ) {
   Column {
-      Row(
-          verticalAlignment = Alignment.CenterVertically,
-          modifier = Modifier.padding(start = screenWidth / 15, top = screenHeight / 30)) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.padding(start = screenWidth / 15, top = screenHeight / 30)) {
           Text(
               text = "Notifications",
               color = MaterialTheme.colorScheme.onBackground,
               style =
-              MaterialTheme.typography.headlineMedium.copy(
-                  fontWeight = FontWeight.SemiBold))
+                  MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.SemiBold))
           Spacer(Modifier.weight(1f))
-      }
+        }
     TabRow(pagerState, coroutineScope, screenHeight)
   }
 }
-
 
 /**
  * This composable is used to display the tab row showing "Invitations" and "Messages" texts.
