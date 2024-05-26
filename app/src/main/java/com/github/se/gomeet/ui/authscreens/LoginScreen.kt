@@ -101,7 +101,7 @@ fun LoginScreen(
           Image(
               painter = painterResource(id = R.drawable.gomeet_text),
               contentDescription = "GoMeet",
-              modifier = Modifier.padding(top = 40.dp),
+              modifier = Modifier.padding(top = 40.dp).width(200.dp),
               alignment = Alignment.Center,
               colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.tertiary))
 
