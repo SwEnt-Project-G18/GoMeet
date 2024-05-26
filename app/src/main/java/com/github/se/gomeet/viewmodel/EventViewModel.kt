@@ -273,7 +273,7 @@ class EventViewModel(val currentUID: String? = null) : ViewModel() {
 
         EventRepository.addEvent(event)
         lastLoadedEvents = lastLoadedEvents.plus(event)
-        userViewModel.joinEvent(event.eventID)
+        userViewModel.joinEvent(event.eventID, currentUID)
         userViewModel.userCreatesEvent(event.eventID)
       } catch (e: Exception) {
         Log.e(TAG, "Error uploading image or adding event", e)
@@ -347,8 +347,22 @@ class EventViewModel(val currentUID: String? = null) : ViewModel() {
       Log.w(TAG, "User $userId is already in event ${event.eventID}")
       return
     }
+    editEvent(event.copy(participants = event.participants.plus(userId)))
+  }
 
-    EventRepository.updateEvent(event.copy(participants = event.participants.plus(userId)))
+  /**
+   * Update the event participants field by removing the given user to the list. Note that this
+   * function should be called at the same time as the equivalent function in the UserViewModel.
+   *
+   * @param event the event to update
+   * @param userId the ID of the user to remove from the event
+   */
+  fun leaveEvent(event: Event, userId: String) {
+    if (!event.participants.contains(userId)) {
+      Log.w(TAG, "User $userId is has never joined event ${event.eventID}")
+      return
+    }
+    editEvent(event.copy(participants = event.participants.minus(userId)))
   }
 
   /**

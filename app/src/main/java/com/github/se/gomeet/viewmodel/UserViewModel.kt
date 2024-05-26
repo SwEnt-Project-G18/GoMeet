@@ -5,6 +5,7 @@ import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.Invitation
 import com.github.se.gomeet.model.event.InviteStatus
 import com.github.se.gomeet.model.repository.UserRepository
@@ -164,17 +165,35 @@ class UserViewModel(val currentUID: String? = null) : ViewModel() {
    * @param userId The id of the user joining the event.
    */
   suspend fun joinEvent(eventId: String, userId: String = currentUID!!) {
+    val goMeetUser = getUser(userId)!!
     val possibleInvitation =
         getUser(userId)!!.pendingRequests.find {
           it.eventId == eventId && it.status == InviteStatus.PENDING
         }
     try {
-      val goMeetUser = getUser(userId)!!
       if (possibleInvitation != null) {
         editUser(
-            goMeetUser.copy(pendingRequests = goMeetUser.pendingRequests.minus(possibleInvitation)))
+            goMeetUser.copy(
+                pendingRequests = goMeetUser.pendingRequests.minus(possibleInvitation),
+                joinedEvents = goMeetUser.joinedEvents.plus(eventId)))
+      } else {
+        editUser(goMeetUser.copy(joinedEvents = goMeetUser.joinedEvents.plus(eventId)))
       }
-      editUser(goMeetUser.copy(joinedEvents = goMeetUser.joinedEvents.plus(eventId)))
+    } catch (e: Exception) {
+      Log.w(TAG, "Couldn't join the event", e)
+    }
+  }
+
+  /**
+   * Leave an event.
+   *
+   * @param eventId The id of the event to leave.
+   * @param userId The id of the user leaving the event.
+   */
+  suspend fun leaveEvent(eventId: String, userId: String = currentUID!!) {
+    try {
+      val goMeetUser = getUser(userId)!!
+      editUser(goMeetUser.copy(joinedEvents = goMeetUser.joinedEvents.minus(eventId)))
     } catch (e: Exception) {
       Log.w(TAG, "Couldn't join the event", e)
     }
@@ -291,24 +310,26 @@ class UserViewModel(val currentUID: String? = null) : ViewModel() {
    * from his list of pendingRequests. Note that this function should be called in the same time as
    * the equivalent function in the EventViewModel.
    *
-   * @param eventId The id of the event to accept the invitation for.
-   * @param userId The id of the user to accept the invitation for.
+   * @param event The event to accept the invitation for.
+   * @param user The user to accept the invitation for.
+   * @param eventViewModel Event View Model
    */
-  fun userAcceptsInvitation(eventId: String, userId: String) {
+  fun userAcceptsInvitation(event: Event, user: GoMeetUser, eventViewModel: EventViewModel) {
     CoroutineScope(Dispatchers.IO).launch {
-      val goMeetUser = getUser(userId)!!
-      val possibleInvitation =
-          goMeetUser.pendingRequests.find {
-            it.eventId == eventId && it.status == InviteStatus.PENDING
-          }
+      val possibleInvitation = user.pendingRequests.find { it.eventId == event.eventID }
 
       if (possibleInvitation != null) {
         editUser(
-            goMeetUser.copy(
-                pendingRequests = goMeetUser.pendingRequests.minus(possibleInvitation),
-                joinedEvents = goMeetUser.joinedEvents.plus(eventId)))
+            user.copy(
+                pendingRequests = user.pendingRequests.minus(possibleInvitation),
+                joinedEvents = user.joinedEvents.plus(event.eventID)))
+        eventViewModel.editEvent(
+            event =
+                event.copy(
+                    participants = event.participants.plus(user.uid),
+                    pendingParticipants = event.pendingParticipants.minus(user.uid)))
       } else {
-        Log.w(TAG, "User $userId couldn't accept the invitation to event $eventId")
+        Log.w(TAG, "User ${user.uid} couldn't accept the invitation to event ${event.eventID}")
       }
     }
   }
@@ -317,22 +338,22 @@ class UserViewModel(val currentUID: String? = null) : ViewModel() {
    * The user refuses an invitation and removes it from his list of pendingRequests. Note that this
    * function should be called in the same time as the equivalent function in the EventViewModel.
    *
-   * @param eventId The id of the event to refuse the invitation for.
-   * @param userId The id of the user to refuse the invitation for.
+   * @param event The event to refuse the invitation for.
+   * @param user The user to refuse the invitation for.
+   * @param eventViewModel Event View Model
    */
-  fun userRefusesInvitation(eventId: String, userId: String) {
+  fun userRefusesInvitation(event: Event, user: GoMeetUser, eventViewModel: EventViewModel) {
     CoroutineScope(Dispatchers.IO).launch {
-      val goMeetUser = getUser(userId)!!
       val possibleInvitation =
-          goMeetUser.pendingRequests.find {
-            it.eventId == eventId && it.status == InviteStatus.PENDING
+          user.pendingRequests.find {
+            it.eventId == event.eventID && it.status == InviteStatus.PENDING
           }
 
       if (possibleInvitation != null) {
         val updatedPendingRequests =
-            goMeetUser.pendingRequests
+            user.pendingRequests
                 .map {
-                  if (it.eventId == eventId) {
+                  if (it.eventId == event.eventID) {
                     it.copy(status = InviteStatus.REFUSED)
                   } else {
                     it
@@ -340,11 +361,16 @@ class UserViewModel(val currentUID: String? = null) : ViewModel() {
                 }
                 .toSet()
 
-        editUser(goMeetUser.copy(pendingRequests = updatedPendingRequests))
+        editUser(user.copy(pendingRequests = updatedPendingRequests))
+        eventViewModel.editEvent(
+            event =
+                event.copy(
+                    participants = event.participants.minus(user.uid),
+                    pendingParticipants = event.pendingParticipants.minus(user.uid)))
       } else {
         Log.w(
             TAG,
-            "User $userId couldn't refuse the invitation to event $eventId: Invitation not found")
+            "User ${user.uid} couldn't refuse the invitation to event ${event.eventID}: Invitation not found")
       }
     }
   }

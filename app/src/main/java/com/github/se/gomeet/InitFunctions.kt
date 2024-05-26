@@ -28,10 +28,10 @@ import com.github.se.gomeet.ui.mainscreens.events.Events
 import com.github.se.gomeet.ui.mainscreens.events.MyEventInfo
 import com.github.se.gomeet.ui.mainscreens.events.manageinvites.ManageInvites
 import com.github.se.gomeet.ui.mainscreens.explore.Explore
+import com.github.se.gomeet.ui.mainscreens.notifications.Notifications
 import com.github.se.gomeet.ui.mainscreens.profile.AddFriend
 import com.github.se.gomeet.ui.mainscreens.profile.EditProfile
 import com.github.se.gomeet.ui.mainscreens.profile.FollowingFollowers
-import com.github.se.gomeet.ui.mainscreens.notifications.Notifications
 import com.github.se.gomeet.ui.mainscreens.profile.OthersProfile
 import com.github.se.gomeet.ui.mainscreens.profile.Profile
 import com.github.se.gomeet.ui.mainscreens.profile.QRCodeScannerScreen

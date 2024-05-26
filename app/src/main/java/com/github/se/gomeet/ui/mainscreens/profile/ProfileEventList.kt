@@ -4,7 +4,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -57,18 +56,20 @@ fun ProfileEventsList(
     currentUID: String
 ) {
   Column(Modifier.fillMaxWidth()) {
-    Row(Modifier.testTag("EventsListHeader"), verticalAlignment = Alignment.CenterVertically) {
-      Text(
-          text = title,
-          color = MaterialTheme.colorScheme.onBackground,
-          style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.W400))
-      Spacer(modifier = Modifier.width(10.dp))
-      ClickableText(
-          style = MaterialTheme.typography.bodyMedium.copy(color = Gray),
-          onClick = { // TODO: Go to List of Events
-          },
-          text = AnnotatedString(text = "View All >"))
-    }
+    Row(
+        Modifier.padding(start = 10.dp).testTag("EventsListHeader"),
+        verticalAlignment = Alignment.CenterVertically) {
+          Text(
+              text = title,
+              color = MaterialTheme.colorScheme.onBackground,
+              style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.W400))
+          Spacer(modifier = Modifier.width(10.dp))
+          ClickableText(
+              style = MaterialTheme.typography.bodyMedium.copy(color = Gray),
+              onClick = { // TODO: Go to List of Events
+              },
+              text = AnnotatedString(text = "View All >"))
+        }
 
     Spacer(modifier = Modifier.height(5.dp))
 
@@ -76,15 +77,11 @@ fun ProfileEventsList(
         state = listState,
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
-        contentPadding = PaddingValues(end = 10.dp),
         modifier = Modifier.heightIn(min = 56.dp).testTag("EventsListItems")) {
           itemsIndexed(eventList) { _, event ->
             Column(
                 modifier =
                     Modifier.width(170.dp).padding(start = 10.dp).clickable {
-                      val dayString = event.getDateString()
-                      val timeString = event.getTimeString()
-
                       nav.navigateToEventInfo(
                           eventId = event.eventID,
                           title = event.title,

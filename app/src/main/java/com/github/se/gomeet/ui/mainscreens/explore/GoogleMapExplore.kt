@@ -20,7 +20,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -54,7 +53,6 @@ import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapType
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.MarkerInfoWindow
-import com.google.maps.android.compose.MarkerInfoWindowContent
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 import java.time.LocalDate
@@ -228,28 +226,28 @@ internal fun GoogleMapView(
                 val customPinBitmapDescriptor =
                     if (isEventThisWeek) stablePins[event.eventID] else scaledPin
 
-                  MarkerInfoWindow(
-                      state = eventStates[index],
-                      title = event.title,
-                      icon =
-                      customPinBitmapDescriptor
-                          ?: BitmapDescriptorFactory.defaultMarker(
-                              BitmapDescriptorFactory.HUE_RED),
-                      onClick = { markerClick() },
-                      onInfoWindowClick = {
-                          nav.navigateToEventInfo(
-                              eventId = event.eventID,
-                              title = event.title,
-                              date = event.getDateString(),
-                              time = event.getTimeString(),
-                              description = event.description,
-                              organizer = event.creator,
-                              loc = LatLng(event.location.latitude, event.location.longitude),
-                              rating = 0L // TODO: replace with actual rating
-                              // TODO: add image
+                MarkerInfoWindow(
+                    state = eventStates[index],
+                    title = event.title,
+                    icon =
+                        customPinBitmapDescriptor
+                            ?: BitmapDescriptorFactory.defaultMarker(
+                                BitmapDescriptorFactory.HUE_RED),
+                    onClick = { markerClick() },
+                    onInfoWindowClick = {
+                      nav.navigateToEventInfo(
+                          eventId = event.eventID,
+                          title = event.title,
+                          date = event.getDateString(),
+                          time = event.getTimeString(),
+                          description = event.description,
+                          organizer = event.creator,
+                          loc = LatLng(event.location.latitude, event.location.longitude),
+                          rating = 0L // TODO: replace with actual rating
+                          // TODO: add image
                           )
-                      },
-                      visible = event.title.contains(query.value, ignoreCase = true)) {
+                    },
+                    visible = event.title.contains(query.value, ignoreCase = true)) {
                       Box(
                           modifier =
                               Modifier.width((LocalConfiguration.current.screenWidthDp * 0.5).dp)

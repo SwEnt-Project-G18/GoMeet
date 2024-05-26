@@ -77,7 +77,8 @@ fun WelcomeScreen(
           val lastName = res.idpResponse!!.user.name?.take(index) ?: ""
           val firstName = res.idpResponse!!.user.name?.drop(index) ?: ""
           userFirebase?.uid?.let { userId ->
-            onSignInSuccess(userId, email, firstName, lastName, phoneNumber, lastName+userId.take(5))
+            onSignInSuccess(
+                userId, email, firstName, lastName, phoneNumber, lastName + userId.take(5))
           }
         } else {
           Log.e(TAG, "Sign-in error")

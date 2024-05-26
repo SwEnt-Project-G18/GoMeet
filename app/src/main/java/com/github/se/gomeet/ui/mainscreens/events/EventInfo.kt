@@ -27,9 +27,12 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -236,7 +239,7 @@ fun EventDescription(text: String) {
  *
  * @param currentUser The currently logged-in user, as a GoMeetUser object.
  * @param organiser The organizer of the event, also a GoMeetUser object.
- * @param eventId The unique identifier of the event.
+ * @param event The event.
  * @param userViewModel An instance of UserViewModel for performing operations like editing user
  *   details.
  * @param nav An instance of NavigationActions for handling navigation events.
@@ -245,94 +248,131 @@ fun EventDescription(text: String) {
 fun EventButtons(
     currentUser: GoMeetUser,
     organiser: GoMeetUser,
-    eventId: String,
+    event: Event,
     userViewModel: UserViewModel,
     eventViewModel: EventViewModel,
     nav: NavigationActions
 ) {
   val coroutineScope = rememberCoroutineScope()
-  val isFavourite = remember { mutableStateOf(currentUser.myFavorites.contains(eventId)) }
+  val isFavourite = remember { mutableStateOf(currentUser.myFavorites.contains(event.eventID)) }
   val currentEvent = remember { mutableStateOf<Event?>(null) }
   val isJoined = remember { mutableStateOf(false) }
 
+  /*
+  if buttons is 0 then the user is the organizer,
+  if buttons is 1 the user has joined the event,
+  if buttons is 2 the user is invited to the event,
+  if buttons is 3 the user hasn't joined the event and is not invited
+  */
+  var buttons by remember { mutableIntStateOf(10) }
+
   LaunchedEffect(Unit) {
     coroutineScope.launch {
-      currentEvent.value = eventViewModel.getEvent(eventId)
+      currentEvent.value = eventViewModel.getEvent(event.eventID)
       isJoined.value =
-          currentUser.joinedEvents.contains(eventId) &&
+          currentUser.joinedEvents.contains(event.eventID) &&
               currentEvent.value!!.participants.contains(currentUser.uid)
+      buttons =
+          if (organiser.uid == currentUser.uid) 0
+          else if (isJoined.value) 1
+          else if (currentUser.pendingRequests.any { invitation ->
+            invitation.eventId == event.eventID
+          })
+              2
+          else 3
     }
   }
+  if (buttons < 10) {
 
-  Row(
-      modifier = Modifier.fillMaxWidth().testTag("EventButton"),
-      horizontalArrangement = Arrangement.SpaceBetween) {
-        TextButton(
-            onClick = {
-              eventAction(
-                  nav,
-                  currentUser,
-                  organiser,
-                  eventId,
-                  userViewModel,
-                  eventViewModel,
-                  isJoined,
-                  currentEvent.value!!)
-            },
-            shape = RoundedCornerShape(10.dp),
-            modifier = Modifier.weight(1f),
-            colors =
-                if (organiser.uid == currentUser.uid || isJoined.value) {
-                  ButtonDefaults.textButtonColors(
-                      containerColor = MaterialTheme.colorScheme.primaryContainer,
-                      contentColor = MaterialTheme.colorScheme.tertiary)
-                } else {
-                  ButtonDefaults.textButtonColors(
-                      containerColor = MaterialTheme.colorScheme.outlineVariant,
-                      contentColor = White)
-                }) {
-              if (organiser.uid == currentUser.uid) {
-                Text("Edit My Event")
-              } else {
-                if (isJoined.value) {
-                  Text("Leave Event")
-                } else {
-                  Text("Join Event")
-                }
-              }
-            }
-        if (organiser.uid == currentUser.uid) {
-          Spacer(modifier = Modifier.width(5.dp))
+    Row(
+        modifier = Modifier.fillMaxWidth().testTag("EventButton"),
+        horizontalArrangement = Arrangement.SpaceBetween) {
           TextButton(
               onClick = {
-                nav.navigateToScreen(Route.MANAGE_INVITES.replace("{eventId}", eventId))
+                eventAction(
+                    nav,
+                    currentUser,
+                    event,
+                    userViewModel,
+                    eventViewModel,
+                    currentEvent.value!!,
+                    buttons) { i ->
+                      buttons = i
+                    }
               },
               shape = RoundedCornerShape(10.dp),
               modifier = Modifier.weight(1f),
               colors =
-                  ButtonDefaults.textButtonColors(
-                      containerColor = MaterialTheme.colorScheme.primaryContainer,
-                      contentColor = MaterialTheme.colorScheme.tertiary)) {
-                Text("Add Participants")
-              }
-        } else {
+                  when (buttons) {
+                    0 ->
+                        ButtonDefaults.textButtonColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                            contentColor = MaterialTheme.colorScheme.tertiary)
+                    1 ->
+                        ButtonDefaults.textButtonColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                            contentColor = MaterialTheme.colorScheme.tertiary)
+                    else ->
+                        ButtonDefaults.textButtonColors(
+                            containerColor = MaterialTheme.colorScheme.outlineVariant,
+                            contentColor = White)
+                  },
+              content = {
+                when (buttons) {
+                  0 -> Text("Edit My Event")
+                  1 -> Text("Leave Event")
+                  2 -> Text("Accept Invite")
+                  3 -> Text("Join Event")
+                }
+              })
+
+          if (buttons == 0 || buttons == 2) {
+            Spacer(modifier = Modifier.width(5.dp))
+            TextButton(
+                onClick = {
+                  if (buttons == 0) {
+                    nav.navigateToScreen(Route.MANAGE_INVITES.replace("{eventId}", event.eventID))
+                  } else {
+                    buttons = 3
+                    userViewModel.userRefusesInvitation(event, currentUser, eventViewModel)
+                    isJoined.value = false
+                  }
+                },
+                shape = RoundedCornerShape(10.dp),
+                modifier = Modifier.weight(1f),
+                colors =
+                    ButtonDefaults.textButtonColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.tertiary)) {
+                  if (buttons == 0) {
+                    Text("Add Participants")
+                  } else {
+                    Text("Decline Invite")
+                  }
+                }
+          }
+          if (buttons != 0) {
+            IconButton(
+                onClick = {
+                  nav.navigateToScreen(Route.MESSAGE.replace("{id}", Uri.encode(organiser.uid)))
+                }) {
+                  Icon(
+                      imageVector =
+                          ImageVector.vectorResource(
+                              id = R.drawable.baseline_chat_bubble_outline_24),
+                      contentDescription = "Chat",
+                      modifier = Modifier.size(24.dp),
+                      tint = MaterialTheme.colorScheme.onBackground)
+                }
+          }
           IconButton(
               onClick = {
-                nav.navigateToScreen(Route.MESSAGE.replace("{id}", Uri.encode(organiser.uid)))
+                favouriteAction(currentUser, event.eventID, userViewModel, isFavourite)
               }) {
-                Icon(
-                    imageVector =
-                        ImageVector.vectorResource(id = R.drawable.baseline_chat_bubble_outline_24),
-                    contentDescription = "Chat",
-                    modifier = Modifier.size(24.dp),
-                    tint = MaterialTheme.colorScheme.onBackground)
+                FavouriteButton(isFavourite.value)
               }
         }
-        IconButton(
-            onClick = { favouriteAction(currentUser, eventId, userViewModel, isFavourite) }) {
-              FavouriteButton(isFavourite.value)
-            }
-      }
+  }
 }
 
 /**
@@ -386,38 +426,39 @@ private fun FavouriteButton(isFavourite: Boolean) {
  * Helper function to perform the appropriate action when clicking the event button.
  *
  * @param currentUser Current user
- * @param organiser Event organiser
  * @param eventId Event ID
  * @param userViewModel UserViewModel
- * @param eventViewModel EventViewModel
- * @param isJoined Whether the user has joined the event
  * @param currentEvent The current event
  */
 private fun eventAction(
     nav: NavigationActions,
     currentUser: GoMeetUser,
-    organiser: GoMeetUser,
-    eventId: String,
+    event: Event,
     userViewModel: UserViewModel,
     eventViewModel: EventViewModel,
-    isJoined: MutableState<Boolean>,
-    currentEvent: Event
+    currentEvent: Event,
+    buttons: Int,
+    callback: (Int) -> Unit
 ) {
-
-  if (organiser.uid == currentUser.uid) {
-    nav.navigateToScreen(Route.EDIT_EVENT.replace("{eventId}", eventId))
-  } else {
-
-    if (!isJoined.value) {
-      currentUser.joinedEvents = currentUser.joinedEvents.plus(eventId)
-      currentEvent.participants = currentEvent.participants.plus(currentUser.uid)
-    } else {
-      currentUser.joinedEvents = currentUser.joinedEvents.minus(eventId)
+  when (buttons) {
+    0 -> nav.navigateToScreen(Route.EDIT_EVENT.replace("{eventId}", event.eventID))
+    1 -> {
+      currentUser.joinedEvents = currentUser.joinedEvents.minus(event.eventID)
       currentEvent.participants = currentEvent.participants.minus(currentUser.uid)
+      userViewModel.editUser(currentUser)
+      eventViewModel.editEvent(currentEvent)
+      callback(3)
     }
-
-    userViewModel.editUser(currentUser)
-    eventViewModel.editEvent(currentEvent)
-    isJoined.value = !isJoined.value
+    2 -> {
+      userViewModel.userAcceptsInvitation(event, currentUser, eventViewModel)
+      callback(1)
+    }
+    3 -> {
+      currentUser.joinedEvents = currentUser.joinedEvents.plus(event.eventID)
+      currentEvent.participants = currentEvent.participants.plus(currentUser.uid)
+      userViewModel.editUser(currentUser)
+      eventViewModel.editEvent(currentEvent)
+      callback(1)
+    }
   }
 }

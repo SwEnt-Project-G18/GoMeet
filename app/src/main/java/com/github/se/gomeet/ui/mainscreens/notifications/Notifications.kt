@@ -1,9 +1,7 @@
 package com.github.se.gomeet.ui.mainscreens.notifications
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
@@ -11,31 +9,19 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.InviteStatus
 import com.github.se.gomeet.model.user.GoMeetUser
@@ -45,8 +31,6 @@ import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
-import java.text.SimpleDateFormat
-import java.time.ZoneId
 import java.util.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -80,22 +64,22 @@ fun Notifications(nav: NavigationActions, userViewModel: UserViewModel) {
       isLoaded = true
     }
   }
+  if (isLoaded) {
 
-  Scaffold(
-      modifier = Modifier.testTag("NotificationsScreen"),
-      topBar = {
-        NotificationsTopBar(
-            pagerState,
-            coroutineScope,
-            screenHeight,
-            nav,
-            currentUserID,
-            eventViewModel,
-            userViewModel,
-            toUpdate)
-      },
-      bottomBar = { BottomNavigation(nav) }) { innerPadding ->
-        if (isLoaded) {
+    Scaffold(
+        modifier = Modifier.testTag("NotificationsScreen"),
+        topBar = {
+          NotificationsTopBar(
+              pagerState,
+              coroutineScope,
+              screenHeight,
+              nav,
+              user.value!!,
+              eventViewModel,
+              userViewModel,
+              toUpdate)
+        },
+        bottomBar = { BottomNavigation(nav) }) { innerPadding ->
           HorizontalPager(state = pagerState, modifier = Modifier.padding(innerPadding)) { page ->
             when (page) {
               0 ->
@@ -112,12 +96,12 @@ fun Notifications(nav: NavigationActions, userViewModel: UserViewModel) {
               }
             }
           }
-        } else {
-          Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            CircularProgressIndicator()
-          }
         }
-      }
+  } else {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+      CircularProgressIndicator()
+    }
+  }
 }
 
 /**
@@ -139,7 +123,6 @@ suspend fun fetchUserAndEvents(
     eventToCreatorMap: SnapshotStateMap<Event, String>
 ) {
   val currentUser = userViewModel.getUser(currentUserID)
-
   currentUser?.let {
     user.value = it
     val events = mutableListOf<Event>()
@@ -182,13 +165,13 @@ fun NotificationsTopBar(
     coroutineScope: CoroutineScope,
     screenHeight: Dp,
     nav: NavigationActions,
-    currentUserID: String,
+    currentUser: GoMeetUser,
     eventViewModel: EventViewModel,
     userViewModel: UserViewModel,
     toUpdate: List<Event>
 ) {
   Column {
-    TopAppBar(nav, currentUserID, eventViewModel, userViewModel, toUpdate)
+    TopAppBar()
     TabRow(pagerState, coroutineScope, screenHeight)
   }
 }
@@ -203,44 +186,16 @@ fun NotificationsTopBar(
  * @param toUpdate the list of events to update
  */
 @Composable
-fun TopAppBar(
-    nav: NavigationActions,
-    currentUserID: String,
-    eventViewModel: EventViewModel,
-    userViewModel: UserViewModel,
-    toUpdate: List<Event>
-) {
-  Box(contentAlignment = Alignment.Center) {
-    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-      IconButton(
-          onClick = {
-            toUpdate.forEach { event ->
-              eventViewModel.editEvent(event)
-
-              if (event.participants.contains(currentUserID)) {
-                userViewModel.userAcceptsInvitation(event.eventID, currentUserID)
-              } else {
-                userViewModel.userRefusesInvitation(event.eventID, currentUserID)
-              }
-            }
-            nav.goBack()
-          }) {
-            Icon(
-                Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                contentDescription = "Go back",
-                tint = MaterialTheme.colorScheme.onBackground)
-          }
-    }
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center) {
-          Text(
-              text = "Notifications",
-              color = MaterialTheme.colorScheme.onBackground,
-              style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold))
-        }
-  }
+fun TopAppBar() {
+  Row(
+      modifier = Modifier.fillMaxWidth(),
+      verticalAlignment = Alignment.CenterVertically,
+      horizontalArrangement = Arrangement.Center) {
+        Text(
+            text = "Notifications",
+            color = MaterialTheme.colorScheme.onBackground,
+            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold))
+      }
 }
 
 /**

@@ -117,11 +117,10 @@ fun SettingsPermissions(
 
             // Center and Align
             modifier =
-            Modifier
-                .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
-                .testTag("Settings")
-                .fillMaxWidth(),
+                Modifier.padding(innerPadding)
+                    .verticalScroll(rememberScrollState())
+                    .testTag("Settings")
+                    .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center)
 
@@ -305,9 +304,7 @@ fun PermissionComposable(
 ) {
 
   Row(
-      modifier = Modifier
-          .padding(start = 15.dp)
-          .clickable(onClick = onClick),
+      modifier = Modifier.padding(start = 15.dp).clickable(onClick = onClick),
       horizontalArrangement = Arrangement.Start,
       verticalAlignment = Alignment.CenterVertically,
   ) {
@@ -372,14 +369,11 @@ fun SettingsDialogue(
       confirmButton = {
         Button(
             shape = RoundedCornerShape(10.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.outlineVariant,
-                contentColor = White
-            ),
-
-            modifier = Modifier
-                .fillMaxWidth()
-                .width(90.dp),
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.outlineVariant,
+                    contentColor = White),
+            modifier = Modifier.fillMaxWidth().width(90.dp),
             onClick = {
               openPermissionSettings(context, settingsLauncher)
               onClose()
@@ -391,13 +385,11 @@ fun SettingsDialogue(
       dismissButton = {
         Button(
             shape = RoundedCornerShape(10.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                contentColor = MaterialTheme.colorScheme.tertiary
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .width(90.dp),
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.tertiary),
+            modifier = Modifier.fillMaxWidth().width(90.dp),
             onClick = {
               onClose()
               updatePermissions(context, permissionsState)
