@@ -50,7 +50,7 @@ fun ContentInRow(
     val screenWidth = configuration.screenWidthDp
     LazyRow(
         horizontalArrangement = Arrangement.Start,
-        modifier = Modifier.padding(bottom = 10.dp, end = (screenWidth/5).dp),
+        modifier = Modifier.padding(bottom = 10.dp, end = (screenWidth / 5).dp),
         state = listState) {
           items(events) { event ->
             val columnShape =
@@ -100,18 +100,19 @@ fun ContentInRow(
                             modifier = Modifier.fillMaxSize().aspectRatio(3f / 1.75f))
                       }
 
-                    Column(modifier = Modifier.padding(start = 10.dp, end = 10.dp, bottom = 10.dp)) {
-                      Text(
-                          text =
-                              if (event.title.length > 37) event.title.take(33) + "...." else event.title,
-                          style = MaterialTheme.typography.titleMedium,
-                          color = MaterialTheme.colorScheme.onBackground)
-                      Text(
-                          text = event.momentToString(),
-                          style = MaterialTheme.typography.bodyMedium, // Smaller text style
-                          color = MaterialTheme.colorScheme.onBackground)
-                    }
-            }
+                  Column(modifier = Modifier.padding(start = 10.dp, end = 10.dp, bottom = 10.dp)) {
+                    Text(
+                        text =
+                            if (event.title.length > 37) event.title.take(33) + "...."
+                            else event.title,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onBackground)
+                    Text(
+                        text = event.momentToString(),
+                        style = MaterialTheme.typography.bodyMedium, // Smaller text style
+                        color = MaterialTheme.colorScheme.onBackground)
+                  }
+                }
           }
         }
   }

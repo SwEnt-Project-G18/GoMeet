@@ -1,26 +1,24 @@
 package com.github.se.gomeet.ui.mainscreens.explore
 
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.util.Log
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -35,12 +33,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
-import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -53,7 +52,6 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapType
 import com.google.maps.android.compose.MapUiSettings
-import com.google.maps.android.compose.MarkerInfoWindow
 import com.google.maps.android.compose.MarkerInfoWindowContent
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
@@ -95,6 +93,7 @@ internal val isButtonVisible = mutableStateOf(true)
 internal fun GoogleMapView(
     modifier: Modifier = Modifier,
     currentPosition: MutableState<LatLng>,
+    moveToCurrentLocation: MutableState<CameraAction>,
     content: @Composable () -> Unit = {},
     allEvents: MutableState<List<Event>>,
     events: MutableState<List<Event>>,
@@ -114,7 +113,12 @@ internal fun GoogleMapView(
   val uiSettings by remember {
     mutableStateOf(
         MapUiSettings(
-            compassEnabled = false, zoomControlsEnabled = false, myLocationButtonEnabled = false))
+            compassEnabled = false,
+            zoomControlsEnabled = false,
+            myLocationButtonEnabled = true, // Enable default location button
+            mapToolbarEnabled =
+                false // Disable default map toolbar (might include the Google Maps button)
+            ))
   }
 
   val isDarkTheme = isSystemInDarkTheme()
@@ -132,6 +136,8 @@ internal fun GoogleMapView(
   val mapVisible by remember { mutableStateOf(true) }
 
   val cameraPositionState = rememberCameraPositionState()
+
+  val selectedLocation = remember { mutableStateOf<LatLng?>(null) }
 
   LaunchedEffect(moveToCurrentLocation.value, Unit) {
     if (moveToCurrentLocation.value == CameraAction.MOVE) {
@@ -182,7 +188,7 @@ internal fun GoogleMapView(
   if (mapVisible) {
     Box(Modifier.fillMaxSize()) {
       if (isLoading) {
-        LoadingText()
+        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
       } else {
         GoogleMap(
             modifier = modifier,
@@ -199,10 +205,10 @@ internal fun GoogleMapView(
                     }
               }
             },
-            onMapClick = { isButtonVisible.value = true },
+            onMapClick = { selectedLocation.value = null },
             onPOIClick = {}) {
-              val markerClick: () -> Boolean = {
-                isButtonVisible.value = false
+              val markerClick: (LatLng) -> Boolean = { location ->
+                selectedLocation.value = location
                 false
               }
               events.value.forEachIndexed { index, event ->
@@ -228,84 +234,99 @@ internal fun GoogleMapView(
                 val customPinBitmapDescriptor =
                     if (isEventThisWeek) stablePins[event.eventID] else scaledPin
 
-                  MarkerInfoWindow(
-                      state = eventStates[index],
-                      title = event.title,
-                      icon =
-                      customPinBitmapDescriptor
-                          ?: BitmapDescriptorFactory.defaultMarker(
-                              BitmapDescriptorFactory.HUE_RED),
-                      onClick = { markerClick() },
-                      onInfoWindowClick = {
-                          nav.navigateToEventInfo(
-                              eventId = event.eventID,
-                              title = event.title,
-                              date = event.getDateString(),
-                              time = event.getTimeString(),
-                              description = event.description,
-                              organizer = event.creator,
-                              loc = LatLng(event.location.latitude, event.location.longitude),
-                              rating = 0L // TODO: replace with actual rating
-                              // TODO: add image
+                MarkerInfoWindowContent(
+                    state = eventStates[index],
+                    title = event.title,
+                    icon =
+                        customPinBitmapDescriptor
+                            ?: BitmapDescriptorFactory.defaultMarker(
+                                BitmapDescriptorFactory.HUE_RED),
+                    onClick = { markerClick(eventLocations[index]) },
+                    onInfoWindowClick = {
+                      nav.navigateToEventInfo(
+                          eventId = event.eventID,
+                          title = event.title,
+                          date = event.getDateString(),
+                          time = event.getTimeString(),
+                          description = event.description,
+                          organizer = event.creator,
+                          loc = LatLng(event.location.latitude, event.location.longitude),
+                          rating = 0L // TODO: replace with actual rating
+                          // TODO: add image
                           )
-                      },
-                      visible = event.title.contains(query.value, ignoreCase = true)) {
-                      Box(
-                          modifier =
-                              Modifier.width((LocalConfiguration.current.screenWidthDp * 0.5).dp)
-                                  .padding(10.dp)
-                                  .clickable {
-                                    nav.navigateToEventInfo(
-                                        eventId = event.eventID,
-                                        title = event.title,
-                                        date = event.getDateString(),
-                                        time = event.getTimeString(),
-                                        description = event.description,
-                                        organizer = event.creator,
-                                        loc =
-                                            LatLng(
-                                                event.location.latitude, event.location.longitude),
-                                        rating = 0L // TODO: replace with actual rating
-                                        // TODO: add image
-                                        )
-                                  }
-                                  .border(
-                                      3.dp,
-                                      MaterialTheme.colorScheme.outlineVariant,
-                                      RoundedCornerShape(10.dp))
-                                  .background(
-                                      MaterialTheme.colorScheme.primaryContainer,
-                                      RoundedCornerShape(10.dp))) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth().padding(15.dp),
-                                verticalAlignment = Alignment.Bottom,
-                                horizontalArrangement = Arrangement.SpaceBetween) {
-                                  Column(horizontalAlignment = Alignment.Start) {
-                                    Text(
-                                        text =
-                                            if (event.title.length > 37)
-                                                event.title.take(33) + "...."
-                                            else event.title,
-                                        style = MaterialTheme.typography.titleMedium,
-                                        color = MaterialTheme.colorScheme.onBackground)
-                                    Text(
-                                        text = event.momentToString(),
-                                        style =
-                                            MaterialTheme.typography
-                                                .bodyMedium, // Smaller text style
-                                        color = MaterialTheme.colorScheme.onBackground)
-                                  }
-                                  Icon(
-                                      Icons.Outlined.Info,
-                                      contentDescription = "",
-                                      tint = MaterialTheme.colorScheme.outlineVariant,
-                                      modifier = Modifier.size(25.dp))
-                                }
-                          }
+                    },
+                    visible = event.title.contains(query.value, ignoreCase = true)) {
+                      Row(verticalAlignment = Alignment.CenterVertically) {
+                        Column(Modifier.padding(20.dp)) {
+                          Text(
+                              event.title,
+                              color = MaterialTheme.colorScheme.secondary,
+                              style = MaterialTheme.typography.titleMedium)
+                          Text(
+                              event.getDateString(),
+                              color = MaterialTheme.colorScheme.secondary,
+                              style = MaterialTheme.typography.bodyMedium)
+                        }
+                        Icon(
+                            imageVector = Icons.Filled.Info,
+                            tint = MaterialTheme.colorScheme.secondary,
+                            contentDescription = "See More",
+                            modifier = Modifier.padding(end = 20.dp))
+                      }
                     }
               }
             }
         content()
+      }
+
+      // Custom button to open Google Maps, visible only when a pin is selected
+      // Custom button to open Google Maps, visible only when a pin is selected
+      selectedLocation.value?.let { location ->
+        Box(
+            modifier = Modifier.fillMaxSize().padding(16.dp),
+            contentAlignment = Alignment.BottomEnd) {
+              FloatingActionButton(
+                  onClick = {
+                    val gmmIntentUri =
+                        Uri.parse("geo:0,0?q=${location.latitude},${location.longitude}")
+                    val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+                    mapIntent.setPackage("com.google.android.apps.maps")
+                    ctx.startActivity(mapIntent)
+                  },
+                  containerColor = MaterialTheme.colorScheme.outlineVariant,
+                  shape = RoundedCornerShape(10.dp),
+                  modifier =
+                      Modifier.offset(
+                          y = (-210).dp) // Adjust this value to position the button higher
+                  ) {
+                    Icon(
+                        ImageVector.vectorResource(R.drawable.direction_icon),
+                        contentDescription = "Open in Google Maps",
+                        tint = Color.White,
+                        modifier = Modifier.size(30.dp))
+                  }
+            }
+      }
+
+      if (selectedLocation.value == null) {
+        Box(
+            modifier = Modifier.fillMaxSize().padding(16.dp),
+            contentAlignment = Alignment.BottomEnd) {
+              FloatingActionButton(
+                  onClick = { moveToCurrentLocation.value = CameraAction.ANIMATE },
+                  containerColor = MaterialTheme.colorScheme.outlineVariant,
+                  shape = RoundedCornerShape(10.dp),
+                  modifier =
+                      Modifier.offset(
+                          y = (-210).dp) // Adjust this value to position the button higher
+                  ) {
+                    Icon(
+                        ImageVector.vectorResource(R.drawable.location_icon),
+                        contentDescription = "Center on Current Location",
+                        tint = Color.White,
+                        modifier = Modifier.size(30.dp))
+                  }
+            }
       }
     }
   }

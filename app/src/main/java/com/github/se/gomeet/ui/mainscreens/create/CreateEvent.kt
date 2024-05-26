@@ -257,13 +257,14 @@ fun CreateEvent(
                   colors = textFieldColors,
                   modifier = Modifier.fillMaxWidth().padding(start = 15.dp, end = 15.dp))
 
-            if (!urlValid) {
+              if (!urlValid) {
                 Text(
-                    text = "Url Not Valid, should be of the form :\n\"" +
+                    text =
+                        "Url Not Valid, should be of the form :\n\"" +
                             "www.example.com, http://example.com, https://example.com\"",
                     style = MaterialTheme.typography.bodyLarge,
                     color = Color.Red)
-            }
+              }
 
               Spacer(modifier = Modifier.height(screenHeight / 80))
 
