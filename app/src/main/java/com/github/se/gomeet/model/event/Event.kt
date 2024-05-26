@@ -4,6 +4,26 @@ import com.github.se.gomeet.model.event.location.Location
 import java.time.LocalDate
 import java.time.LocalTime
 
+// Constants for the keys in the Firestore database
+const val EVENT_ID = "uid"
+const val CREATOR = "creator"
+const val TITLE = "title"
+const val DESCRIPTION = "description"
+const val LOCATION = "location"
+const val DATE = "date"
+const val TIME = "time"
+const val PRICE = "price"
+const val URL = "url"
+const val PENDING_PARTICIPANTS = "pendingParticipants"
+const val PARTICIPANTS = "participants"
+const val VISIBLE_TO_IF_PRIVATE = "visibleToIfPrivate"
+const val MAX_PARTICIPANTS = "maxParticipants"
+const val PUBLIC = "public"
+const val TAGS = "tags"
+const val IMAGES = "images"
+const val RATINGS = "ratings"
+const val POSTS = "posts"
+
 /**
  * This data class represents an event. An event is the main entity of the application.
  *
@@ -21,8 +41,9 @@ import java.time.LocalTime
  * @param maxParticipants Maximum number of Participants of the event
  * @param public True if the event is public, false if it's private
  * @param tags Tags of the event
+ * @param ratings Ratings of the event by each user (i.e. userID -> rating)
  * @param images Images of the event
- * @param posts Posts of the event
+ * @param posts Posts of the event >>>>>>> a0979603ee96764731490b732fddd35bdc089325
  */
 data class Event(
     val eventID: String,
@@ -33,16 +54,24 @@ data class Event(
     val date: LocalDate,
     val time: LocalTime,
     val price: Double,
-    val url: String,
-    val pendingParticipants: List<String>,
+    val url: String = "",
+    val pendingParticipants: List<String> = emptyList(),
     var participants: List<String>,
-    val visibleToIfPrivate: List<String>,
+    val visibleToIfPrivate: List<String> = emptyList(),
     val maxParticipants: Int,
     val public: Boolean,
-    val tags: List<String>,
-    val images: List<String>,
+    val tags: List<String> = emptyList(),
+    val images: List<String> = emptyList(),
+    val ratings: Map<String, Long> = emptyMap(),
     val posts: List<Post> = emptyList()
 ) {
+
+  /**
+   * This function checks if the event matches the search query.
+   *
+   * @param query The search query.
+   * @return true if the event matches the search query, false otherwise.
+   */
   fun doesMatchSearchQuery(query: String): Boolean {
     val matchingCombinations =
         listOf(
@@ -54,54 +83,54 @@ data class Event(
 
     return matchingCombinations.any { it.contains(query, ignoreCase = true) }
   }
-}
+  /**
+   * This function decides whether an event is in the past or not.
+   *
+   * @return true if the event is today or in the future, false otherwise.
+   */
+  fun isPastEvent(): Boolean {
+    return this.date.isBefore(LocalDate.now()) && this.date != LocalDate.now()
+  }
 
-/**
- * This function decides whether an event is in the past or not.
- *
- * @param event The event to check.
- * @return true if the event is today or in the future, false otherwise.
- */
-fun isPastEvent(event: Event): Boolean {
-  return event.date.isBefore(LocalDate.now()) && event.date != LocalDate.now()
-}
+  /**
+   * This function returns whether a user has joined an event or not.
+   *
+   * @param userId The user's id.
+   * @return true if the user has joined the event, false otherwise.
+   */
+  fun hasUserJoined(userId: String): Boolean {
+    return this.participants.contains(userId)
+  }
 
-fun isJoinedEvent(event: Event, userId: String): Boolean {
-  return event.participants.contains(userId)
-}
+  /**
+   * Converts the time of an event to a string.
+   *
+   * @return The string representation of the time.
+   */
+  fun getTimeString(): String {
+    val minutes = if (this.time.minute < 9) "0${this.time.minute}" else this.time.minute
+    val hours = if (this.time.hour < 9) "0${this.time.hour}" else this.time.hour
+    return "${hours}:${minutes}"
+  }
 
-/**
- * Converts the time of an event to a string.
- *
- * @param eventTime The event's time.
- * @return The string representation of the time.
- */
-fun getEventTimeString(eventTime: LocalTime): String {
-  val minutes = if (eventTime.minute < 9) "0${eventTime.minute}" else eventTime.minute
-  val hours = if (eventTime.hour < 9) "0${eventTime.hour}" else eventTime.hour
-  return "${hours}:${minutes}"
-}
+  /**
+   * Converts the date of an event to a string.
+   *
+   * @return The string representation of the date.
+   */
+  fun getDateString(): String {
+    val date =
+        if (this.date == LocalDate.now()) "Today"
+        else "${this.date.dayOfMonth}/${this.date.monthValue}/${this.date.year}"
+    return date
+  }
 
-/**
- * Converts the date of an event to a string.
- *
- * @param eventDate The event's date.
- * @return The string representation of the date.
- */
-fun getEventDateString(eventDate: LocalDate): String {
-  val date =
-      if (eventDate == LocalDate.now()) "Today"
-      else "${eventDate.dayOfMonth}/${eventDate.monthValue}/${eventDate.year}"
-  return date
-}
-
-/**
- * Converts an event's date and time to a string.
- *
- * @param eventDate The event's date.
- * @param eventTime The event's time.
- * @return The string representation of the date and time.
- */
-fun eventMomentToString(eventDate: LocalDate, eventTime: LocalTime): String {
-  return "${getEventDateString(eventDate)} at ${getEventTimeString(eventTime)}"
+  /**
+   * Converts an event's date and time to a string.
+   *
+   * @return The string representation of the date and time.
+   */
+  fun momentToString(): String {
+    return "${this.getDateString()} at ${this.getTimeString()}"
+  }
 }

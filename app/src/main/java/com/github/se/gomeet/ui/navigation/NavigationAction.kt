@@ -22,6 +22,8 @@ import androidx.navigation.NavHostController
 import com.github.se.gomeet.R
 import com.google.android.gms.maps.model.LatLng
 
+private const val TAG = "NavigationAction"
+
 /**
  * Data class representing a top level destination in the app.
  *
@@ -151,7 +153,7 @@ class NavigationActions(val navController: NavHostController) {
    * @param clearBackStack Whether to clear the back stack.
    */
   fun navigateTo(destination: TopLevelDestination, clearBackStack: Boolean = false) {
-    Log.d("Navigation", "Navigating to ${destination.route}, clear back stack: $clearBackStack")
+    Log.d(TAG, "Navigating to ${destination.route}, clear back stack: $clearBackStack")
     navController.navigate(destination.route) {
       if (clearBackStack) {
         popUpTo(navController.graph.findStartDestination().id) { inclusive = true }
@@ -177,7 +179,7 @@ class NavigationActions(val navController: NavHostController) {
    * @param date The date of the event.
    * @param time The time of the event.
    * @param organizer The organizer of the event.
-   * @param rating The rating of the event.
+   * @param rating The rating of the event by the current user (0 if unrated, 1-5 otherwise).
    * @param description The description of the event.
    * @param loc The location of the event.
    */
@@ -187,7 +189,7 @@ class NavigationActions(val navController: NavHostController) {
       date: String,
       time: String,
       organizer: String,
-      rating: Double,
+      rating: Long,
       description: String,
       loc: LatLng
   ) {
@@ -201,7 +203,6 @@ class NavigationActions(val navController: NavHostController) {
             .replace("{description}", Uri.encode(description))
             .replace("{latitude}", loc.latitude.toString())
             .replace("{longitude}", loc.longitude.toString())
-
     navController.navigate(route) { popUpTo(Route.EVENTS) { inclusive = false } }
   }
 

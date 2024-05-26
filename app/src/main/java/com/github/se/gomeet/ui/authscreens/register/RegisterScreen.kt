@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
@@ -39,8 +40,8 @@ import com.github.se.gomeet.viewmodel.AuthViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import io.getstream.chat.android.client.ChatClient
-import io.getstream.chat.android.models.User
+
+private const val TAG = "RegisterScreen"
 
 /**
  * This composable function represents the Register Screen, where users can sign up for a new
@@ -48,7 +49,6 @@ import io.getstream.chat.android.models.User
  * registration process, including entering username, email, password, personal details, and
  * uploading a profile picture.
  *
- * @param client ChatClient instance used for handling user connection.
  * @param nav Navigation actions for handling back navigation and successful registration
  *   completion.
  * @param authViewModel ViewModel to manage and observe authentication related data.
@@ -58,7 +58,6 @@ import io.getstream.chat.android.models.User
  */
 @Composable
 fun RegisterScreen(
-    client: ChatClient,
     nav: NavigationActions,
     authViewModel: AuthViewModel,
     userViewModel: UserViewModel,
@@ -110,7 +109,7 @@ fun RegisterScreen(
           Image(
               painter = painterResource(id = R.drawable.gomeet_text),
               contentDescription = "GoMeet",
-              modifier = Modifier.padding(top = 0.dp),
+              modifier = Modifier.padding(top = 0.dp).width(200.dp),
               alignment = Alignment.Center,
               colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.tertiary))
 
@@ -183,25 +182,12 @@ fun RegisterScreen(
                       userViewModel.createUserIfNew(
                           uid, username, firstName, lastName, email, phoneNumber, country, imageUrl)
                     },
-                    onError = { exception ->
-                      Log.e("ProfileUpdate", "Failed to upload new image: ${exception.message}")
-                    })
+                    onError = { exception -> Log.e(TAG, "Failed to upload new image", exception) })
               } else {
                 userViewModel.createUserIfNew(
                     uid, username, firstName, lastName, email, phoneNumber, country, "")
               }
             }
-
-            val user =
-                User(
-                    id = Firebase.auth.currentUser!!.uid,
-                    name = Firebase.auth.currentUser!!.email!!) // TODO: currently username = email
-            client
-                .connectUser(
-                    user = user,
-                    // TODO: Generate Token, see https://getstream.io/tutorials/android-chat/
-                    token = client.devToken(user.id))
-                .enqueue()
             onNavToExplore()
           }
         }

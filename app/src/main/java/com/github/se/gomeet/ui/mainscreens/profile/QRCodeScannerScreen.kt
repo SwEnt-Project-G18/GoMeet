@@ -1,34 +1,52 @@
 package com.github.se.gomeet.ui.mainscreens.profile
 
 import android.Manifest
-import android.annotation.SuppressLint
+import android.net.Uri
+import android.util.Log
 import android.view.ViewGroup
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.LifecycleOwner
+import com.github.se.gomeet.R
 import com.github.se.gomeet.ui.navigation.NavigationActions
+import com.github.se.gomeet.ui.navigation.Route
+import com.github.se.gomeet.viewmodel.EventViewModel
+import com.github.se.gomeet.viewmodel.QRCodeAnalyzer
+import com.github.se.gomeet.viewmodel.fetchEventAndNavigate
+import com.github.se.gomeet.viewmodel.parseQRCodeContent
+import com.github.se.gomeet.viewmodel.processGalleryImage
 import com.google.accompanist.permissions.*
 import com.google.common.util.concurrent.ListenableFuture
-import com.google.mlkit.vision.barcode.BarcodeScanning
-import com.google.mlkit.vision.common.InputImage
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import java.util.concurrent.Executors
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun QRCodeScannerScreen(onQRCodeScanned: (String) -> Unit, nav: NavigationActions) {
+fun QRCodeScannerScreen(nav: NavigationActions) {
   val context = LocalContext.current
   val lifecycleOwner = LocalLifecycleOwner.current
 
@@ -36,6 +54,30 @@ fun QRCodeScannerScreen(onQRCodeScanned: (String) -> Unit, nav: NavigationAction
   val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
 
   val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
+  val galleryLauncher =
+      rememberLauncherForActivityResult(
+          contract = ActivityResultContracts.GetContent(),
+          onResult = { uri: Uri? ->
+            uri?.let {
+              Log.d("QRCodeScannerScreen", "Selected image URI: $uri")
+              processGalleryImage(context, it) { content ->
+                Log.d("QRCodeScannerScreen", "Scanned content from gallery: $content")
+                val (type, id) = parseQRCodeContent(content)
+                val currentUserId = Firebase.auth.currentUser!!.uid
+                when (type) {
+                  "Profile" -> {
+                    if (id == currentUserId) {
+                      nav.navigateToScreen(Route.PROFILE)
+                    } else {
+                      nav.navigateToScreen(Route.OTHERS_PROFILE.replace("{uid}", id))
+                    }
+                  }
+                  "Event" -> fetchEventAndNavigate(id, nav, EventViewModel())
+                  else -> throw IllegalArgumentException("Unknown QR code type")
+                }
+              }
+            }
+          })
 
   LaunchedEffect(key1 = cameraPermissionState) { cameraPermissionState.launchPermissionRequest() }
 
@@ -50,14 +92,46 @@ fun QRCodeScannerScreen(onQRCodeScanned: (String) -> Unit, nav: NavigationAction
                 contentDescription = "Go back",
                 tint = MaterialTheme.colorScheme.onBackground)
           }
+          Spacer(modifier = Modifier.weight(1f))
+          IconButton(onClick = { galleryLauncher.launch("image/*") }) {
+            Icon(
+                imageVector = ImageVector.vectorResource(R.drawable.upload_icon),
+                contentDescription = "Upload QR code from gallery",
+                tint = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier.padding(end = 16.dp))
+          }
         }
       }) { padding ->
         if (hasCameraPermission) {
           Box(modifier = Modifier.fillMaxSize().padding(padding)) {
+            var scanCompleted by remember { mutableStateOf(false) }
+
             CameraPreviewView(
                 cameraProviderFuture = cameraProviderFuture,
                 lifecycleOwner = lifecycleOwner,
-                onQRCodeScanned = onQRCodeScanned)
+                onQRCodeScanned = { content ->
+                  if (!scanCompleted) {
+                    scanCompleted = true
+                    val (type, id) = parseQRCodeContent(content)
+                    val currentUserId = Firebase.auth.currentUser!!.uid
+                    when (type) {
+                      "Profile" -> {
+                        if (id == currentUserId) {
+                          nav.navigateToScreen(Route.PROFILE)
+                        } else {
+                          nav.navigateToScreen(Route.OTHERS_PROFILE.replace("{uid}", id))
+                        }
+                      }
+                      "Event" -> fetchEventAndNavigate(id, nav, EventViewModel())
+                      else -> throw IllegalArgumentException("Unknown QR code type")
+                    }
+                    // Reset the scanCompleted flag after a delay if necessary
+                    CoroutineScope(Dispatchers.Main).launch {
+                      delay(1000) // Adjust the delay as needed
+                      scanCompleted = false
+                    }
+                  }
+                })
           }
         } else {
           Column(
@@ -80,11 +154,13 @@ fun CameraPreviewView(
     lifecycleOwner: LifecycleOwner,
     onQRCodeScanned: (String) -> Unit
 ) {
-  val context = LocalContext.current
   val executor = remember { Executors.newSingleThreadExecutor() }
 
   AndroidView(
-      modifier = Modifier.fillMaxSize(),
+      modifier =
+          Modifier.fillMaxSize()
+              .padding(16.dp) // Optional padding to create some spacing
+              .clip(RoundedCornerShape(16.dp)), // Apply rounded corners,
       factory = { ctx ->
         val previewView =
             PreviewView(ctx).apply {
@@ -115,25 +191,4 @@ fun CameraPreviewView(
 
         previewView
       })
-}
-
-class QRCodeAnalyzer(private val onQRCodeScanned: (String) -> Unit) : ImageAnalysis.Analyzer {
-  @SuppressLint("UnsafeOptInUsageError")
-  override fun analyze(imageProxy: ImageProxy) {
-    val mediaImage = imageProxy.image ?: return
-    val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
-
-    val scanner = BarcodeScanning.getClient()
-    scanner
-        .process(image)
-        .addOnSuccessListener { barcodes ->
-          for (barcode in barcodes) {
-            barcode.rawValue?.let { onQRCodeScanned(it) }
-          }
-        }
-        .addOnFailureListener {
-          // Handle errors
-        }
-        .addOnCompleteListener { imageProxy.close() }
-  }
 }

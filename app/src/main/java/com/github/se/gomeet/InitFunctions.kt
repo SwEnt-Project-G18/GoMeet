@@ -2,6 +2,7 @@ package com.github.se.gomeet
 
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -15,8 +16,6 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.github.se.gomeet.model.event.getEventDateString
-import com.github.se.gomeet.model.event.getEventTimeString
 import com.github.se.gomeet.ui.authscreens.LoginScreen
 import com.github.se.gomeet.ui.authscreens.WelcomeScreen
 import com.github.se.gomeet.ui.authscreens.register.RegisterScreen
@@ -69,19 +68,18 @@ import io.getstream.chat.android.offline.plugin.factory.StreamOfflinePluginFacto
 import io.getstream.chat.android.state.plugin.config.StatePluginConfig
 import io.getstream.chat.android.state.plugin.factory.StreamStatePluginFactory
 import io.getstream.result.call.doOnResult
-import io.getstream.result.call.launch
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
-private const val chatClientTag = "ChatClient"
+private const val TAG = "InitFunctions"
 
 /** Initialize the cache. */
 fun initCache() {
   val cacheSize = 1024L * 1024L * 100L
 
-  // Initialize Firestore settings
+  // Initialise Firestore settings
   val firestoreSettings =
       FirebaseFirestoreSettings.Builder()
           .setLocalCacheSettings(memoryCacheSettings {})
@@ -135,22 +133,32 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
   val clientInitialisationState by client.clientState.initializationState.collectAsState()
   val authViewModel = AuthViewModel()
   val userViewModel = UserViewModel()
-  val eventCreationViewModel = EventCreationViewModel() // Shared ViewModel
+  val eventCreationViewModel = EventCreationViewModel()
   val startScreen = Route.WELCOME // The screen that gets navigated to when the app starts
   val postLoginScreen =
       Route.EXPLORE // The screen that gets navigated to after logging in/signing up
   val applicationScope = CoroutineScope(Job() + Dispatchers.Default)
 
-  val userIdState = remember { mutableStateOf("") }
   val eventViewModel = remember { mutableStateOf(EventViewModel(null)) }
+  val userViewModel = remember { mutableStateOf(UserViewModel(null)) }
   val startDestination = remember { mutableStateOf(startScreen) }
   val chatDisconnected = remember { mutableStateOf(true) }
 
   if (Firebase.auth.currentUser != null) {
-    userIdState.value = Firebase.auth.currentUser!!.uid
-    eventViewModel.value = EventViewModel(userIdState.value)
-    // If the user is logged in already, the app should start at the post-login screen
+    val uid = Firebase.auth.currentUser!!.uid
+    eventViewModel.value = EventViewModel(uid)
+    userViewModel.value = UserViewModel(uid)
+    // If the user is logged in already, the app should start at the post-login screen and we need
+    // to initialise the chat client
     startDestination.value = postLoginScreen
+    connectChatClient(
+        client,
+        false,
+        navAction,
+        postLoginScreen,
+        eventViewModel,
+        userViewModel,
+        applicationContext)
   }
 
   return NavHost(navController = nav, startDestination = startDestination.value) {
@@ -158,81 +166,76 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
       WelcomeScreen(
           onNavToLogin = { navAction.navigateTo(LOGIN_ITEMS[1]) },
           onNavToRegister = { navAction.navigateTo(LOGIN_ITEMS[2]) },
-          onSignInSuccess = { userId: String, _: String, _: String, _: String, _: String, _: String
-            ->
+          onSignInSuccess = {
+              userId: String,
+              email: String,
+              firstName: String,
+              lastName: String,
+              phone: String,
+              username: String ->
             val currentUser = Firebase.auth.currentUser
             if (currentUser != null) {
-              val uid = currentUser.uid
-              val email = currentUser.email ?: ""
-              val firstName = authViewModel.signInState.value.firstNameRegister
-              val lastName = authViewModel.signInState.value.lastNameRegister
-              val phoneNumber = authViewModel.signInState.value.phoneNumberRegister
               val country = authViewModel.signInState.value.countryRegister
-              val username = authViewModel.signInState.value.usernameRegister
-              userViewModel.createUserIfNew(
-                  uid, username, firstName, lastName, email, phoneNumber, country)
+              userViewModel.value.createUserIfNew(
+                  userId, username, firstName, lastName, email, phone, country)
+              // userViewModel.value.currentUID is null here, but this doesn't matter since
+              // createUserIfNew doesn't use it (this code will be cleaned up later)
             }
-            val user =
-                User(
-                    id = Firebase.auth.currentUser!!.uid,
-                    name = Firebase.auth.currentUser!!.email!!)
-
-            client.connectUser(user = user, token = client.devToken(userId)).enqueue { result ->
-              if (result.isSuccess) {
-                onNavToPostLogin(
-                    eventViewModel,
-                    userIdState,
-                    TOP_LEVEL_DESTINATIONS.first { it.route == postLoginScreen },
-                    navAction)
-              } else {
-                // Handle connection failure
-                Log.e(chatClientTag, "Failed to connect user: $userId")
-              }
-            }
+            connectChatClient(
+                client,
+                true,
+                navAction,
+                postLoginScreen,
+                eventViewModel,
+                userViewModel,
+                applicationContext)
           },
           chatClientDisconnected = chatDisconnected)
     }
     composable(Route.LOGIN) {
       LoginScreen(authViewModel = authViewModel, nav = navAction) {
-        onNavToPostLogin(
+        connectChatClient(
+            client,
+            true,
+            navAction,
+            postLoginScreen,
             eventViewModel,
-            userIdState,
-            TOP_LEVEL_DESTINATIONS.first { it.route == postLoginScreen },
-            navAction)
+            userViewModel,
+            applicationContext)
+        //        onNavToPostLogin(
+        //            eventViewModel,
+        //            userViewModel,
+        //            TOP_LEVEL_DESTINATIONS.first { it.route == postLoginScreen },
+        //            navAction)
       }
     }
     composable(Route.REGISTER) {
-      RegisterScreen(client, navAction, authViewModel, userViewModel) {
-        onNavToPostLogin(
+      RegisterScreen(navAction, authViewModel, userViewModel.value) {
+        connectChatClient(
+            client,
+            true,
+            navAction,
+            postLoginScreen,
             eventViewModel,
-            userIdState,
-            TOP_LEVEL_DESTINATIONS.first { it.route == postLoginScreen },
-            navAction)
+            userViewModel,
+            applicationContext)
       }
     }
     composable(Route.EXPLORE) { Explore(navAction, eventViewModel.value) }
-    composable(Route.EVENTS) {
-      Events(userIdState.value, navAction, userViewModel, eventViewModel.value)
-    }
-    composable(Route.TRENDS) {
-      Trends(userIdState.value, navAction, userViewModel, eventViewModel.value)
-    }
-    composable(Route.CREATE) {
-      userIdState.value = Firebase.auth.currentUser!!.uid
-      Create(navAction)
-    }
-    composable(Route.NOTIFICATIONS) {
-      Notifications(navAction, currentUserID = userIdState.value, userViewModel)
-    }
+    composable(Route.EVENTS) { Events(navAction, userViewModel.value, eventViewModel.value) }
+    composable(Route.TRENDS) { Trends(navAction, userViewModel.value, eventViewModel.value) }
+    composable(Route.CREATE) { Create(navAction) }
+    composable(Route.NOTIFICATIONS) { Notifications(navAction, userViewModel.value) }
 
-    composable(Route.PROFILE) {
-      Profile(navAction, userId = userIdState.value, userViewModel, eventViewModel.value)
-    }
+    composable(Route.PROFILE) { Profile(navAction, userViewModel.value, eventViewModel.value) }
     composable(
         route = Route.OTHERS_PROFILE,
         arguments = listOf(navArgument("uid") { type = NavType.StringType })) {
           OthersProfile(
-              navAction, it.arguments?.getString("uid") ?: "", userViewModel, eventViewModel.value)
+              navAction,
+              it.arguments?.getString("uid") ?: "",
+              userViewModel.value,
+              eventViewModel.value)
         }
     composable(Route.PRIVATE_CREATE) {
       CreateEvent(navAction, eventViewModel.value, true, userViewModel, eventCreationViewModel)
@@ -256,7 +259,7 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
         arguments = listOf(navArgument("eventId") { type = NavType.StringType })) { entry ->
           val eventId = entry.arguments?.getString("eventId") ?: ""
 
-          ManageInvites(userIdState.value, eventId, navAction, userViewModel, eventViewModel.value)
+          ManageInvites(eventId, navAction, userViewModel.value, eventViewModel.value)
         }
 
     composable(
@@ -268,7 +271,7 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
                 navArgument("date") { type = NavType.StringType },
                 navArgument("time") { type = NavType.StringType },
                 navArgument("organizer") { type = NavType.StringType },
-                navArgument("rating") { type = NavType.FloatType },
+                navArgument("rating") { type = NavType.LongType },
                 navArgument("description") { type = NavType.StringType },
                 navArgument("latitude") { type = NavType.FloatType }, // Change to DoubleType
                 navArgument("longitude") { type = NavType.FloatType } // Change to DoubleType
@@ -278,7 +281,7 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
           val date = entry.arguments?.getString("date") ?: ""
           val time = entry.arguments?.getString("time") ?: ""
           val organizer = entry.arguments?.getString("organizer") ?: ""
-          val rating = entry.arguments?.getFloat("rating") ?: 0.0
+          val rating: Long = entry.arguments?.getLong("rating") ?: 0
           val description = entry.arguments?.getString("description") ?: ""
           val latitude = entry.arguments?.getFloat("latitude") ?: 0.0
           val longitude = entry.arguments?.getFloat("longitude") ?: 0.0
@@ -291,10 +294,10 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
               date,
               time,
               organizer,
-              rating.toDouble(),
+              rating,
               description,
               loc,
-              userViewModel,
+              userViewModel.value,
               eventViewModel.value)
         }
 
@@ -308,8 +311,8 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
           when (clientInitialisationState) {
             InitializationState.COMPLETE -> {
               Log.d(
-                  chatClientTag,
-                  "Sign in to chat works, $id, and ${Firebase.auth.currentUser!!.uid}")
+                  TAG,
+                  "ChatClient: Sign in to chat works, $id, and ${userViewModel.value.currentUID}")
               client
                   .createChannel(
                       channelType = "messaging",
@@ -318,10 +321,10 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
                       extraData = emptyMap())
                   .enqueue { res ->
                     res.onError { error ->
-                      Log.e(chatClientTag, "Create channel failed, Error: $error")
+                      Log.e(TAG, "ChatClient: create channel failed, Error: $error")
                     }
                     res.onSuccess { result ->
-                      Log.d(chatClientTag, "Create channel success")
+                      Log.d(TAG, "ChatClient: Create channel success")
                       success.value = true
                       channelId.value =
                           "messaging:${result.id}" // Correct format "channelType:channelId"
@@ -342,12 +345,12 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
               }
             }
             InitializationState.INITIALIZING -> {
-              Log.d(chatClientTag, "Sign in to Chat is initializing")
-              Text(text = "Initializing...")
+              Log.d(TAG, "ChatClient: Sign in to Chat is initialising")
+              Text(text = "Initialising...")
             }
             InitializationState.NOT_INITIALIZED -> {
-              Log.e(chatClientTag, "Sign in to Chat doesn't work, not initialized")
-              Text(text = "Not initialized...")
+              Log.e(TAG, "ChatClient: Sign in to Chat doesn't work, not initialised")
+              Text(text = "Not initialised...")
             }
           }
         }
@@ -358,7 +361,7 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
             navAction,
             LOGIN_ITEMS.first { it.route == startScreen },
             eventViewModel,
-            userIdState,
+            userViewModel,
             authViewModel,
             client,
             chatDisconnected,
@@ -368,26 +371,18 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
     composable(Route.ABOUT) { SettingsAbout(navAction) }
     composable(Route.HELP) { SettingsHelp(navAction) }
     composable(Route.PERMISSIONS) { SettingsPermissions(navAction) }
-    composable(Route.EDIT_PROFILE) { EditProfile(nav = navAction) }
+    composable(Route.EDIT_PROFILE) { EditProfile(nav = navAction, userViewModel.value) }
     composable(
         route = Route.FOLLOWERS,
         arguments = listOf(navArgument("uid") { type = NavType.StringType })) {
           FollowingFollowers(
-              navAction,
-              it.arguments?.getString("uid") ?: "",
-              userIdState.value,
-              userViewModel,
-              false)
+              navAction, it.arguments?.getString("uid") ?: "", userViewModel.value, false)
         }
     composable(
         route = Route.FOLLOWING,
         arguments = listOf(navArgument("uid") { type = NavType.StringType })) {
           FollowingFollowers(
-              navAction,
-              it.arguments?.getString("uid") ?: "",
-              userIdState.value,
-              userViewModel,
-              true)
+              navAction, it.arguments?.getString("uid") ?: "", userViewModel.value, true)
         }
     composable(Route.MESSAGE_CHANNELS) {
       ChatTheme {
@@ -395,7 +390,8 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
             onBackPressed = { navAction.goBack() },
             onHeaderAvatarClick = { navAction.navigateToScreen(Route.PROFILE) },
             onHeaderActionClick = {
-              navAction.navigateToScreen(Route.FOLLOWING.replace("{uid}", userIdState.value))
+              navAction.navigateToScreen(
+                  Route.FOLLOWING.replace("{uid}", userViewModel.value.currentUID ?: ""))
             },
             onItemClick = { c -> navAction.navigateToScreen(Route.CHANNEL.replace("{id}", c.id)) })
       }
@@ -405,7 +401,7 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
         arguments = listOf(navArgument("id") { type = NavType.StringType })) {
           val id = it.arguments?.getString("id") ?: ""
           ChatTheme {
-            Log.d(chatClientTag, "ID is: $id")
+            Log.d(TAG, "ChatClient: ID is $id")
             MessagesScreen(
                 viewModelFactory =
                     MessagesViewModelFactory(
@@ -415,14 +411,8 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
                 onBackPressed = { navAction.goBack() })
           }
         }
-    composable(route = Route.ADD_FRIEND) { AddFriend(navAction, userViewModel) }
-    composable(route = Route.SCAN) { backStackEntry ->
-      QRCodeScannerScreen(
-          onQRCodeScanned = { uid ->
-            navAction.navigateToScreen(Route.OTHERS_PROFILE.replace("{uid}", uid))
-          },
-          nav = navAction)
-    }
+    composable(route = Route.ADD_FRIEND) { AddFriend(navAction, userViewModel.value) }
+    composable(route = Route.SCAN) { backStackEntry -> QRCodeScannerScreen(nav = navAction) }
 
     composable(
         route = Route.EDIT_EVENT,
@@ -435,10 +425,10 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
             navAction.navigateToEventInfo(
                 eventId = updatedEvent.eventID,
                 title = updatedEvent.title,
-                date = getEventDateString(updatedEvent.date),
-                time = getEventTimeString(updatedEvent.time),
+                date = updatedEvent.getDateString(),
+                time = updatedEvent.getTimeString(),
                 organizer = updatedEvent.creator,
-                rating = 0.0,
+                rating = updatedEvent.ratings[eventViewModel.value.currentUID ?: ""] ?: 0,
                 description = updatedEvent.description,
                 loc = LatLng(updatedEvent.location.latitude, updatedEvent.location.longitude))
           }
@@ -450,18 +440,19 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
  * Function to be called upon a successful sign in/register
  *
  * @param eventViewModel The event view model state.
- * @param userIdState The user ID state.
+ * @param userViewModel The user view model state.
  * @param postLogin The screen that will be navigated to upon logging in/signing up.
  * @param navigationActions The navigation actions.
  */
 private fun onNavToPostLogin(
     eventViewModel: MutableState<EventViewModel>,
-    userIdState: MutableState<String>,
+    userViewModel: MutableState<UserViewModel>,
     postLogin: TopLevelDestination,
     navigationActions: NavigationActions
 ) {
-  userIdState.value = Firebase.auth.currentUser!!.uid
-  eventViewModel.value = EventViewModel(userIdState.value)
+  val uid = Firebase.auth.currentUser!!.uid
+  eventViewModel.value = EventViewModel(uid)
+  userViewModel.value = UserViewModel(uid)
   navigationActions.navigateTo(postLogin)
 }
 
@@ -471,7 +462,7 @@ private fun onNavToPostLogin(
  * @param navigationActions The navigation actions.
  * @param startScreen The screen that will be navigated to after logging out.
  * @param eventViewModel The event view model state.
- * @param userIdState The user ID state.
+ * @param userViewModel The user view model state.
  * @param authViewModel The authentication view model.
  * @param client The chat client.
  * @param chatDisconnected Whether the chat is disconnected fully or not.
@@ -481,29 +472,73 @@ private fun logOut(
     navigationActions: NavigationActions,
     startScreen: TopLevelDestination,
     eventViewModel: MutableState<EventViewModel>,
-    userIdState: MutableState<String>,
+    userViewModel: MutableState<UserViewModel>,
     authViewModel: AuthViewModel,
     client: ChatClient,
     chatDisconnected: MutableState<Boolean>,
     scope: CoroutineScope
 ) {
   navigationActions.navigateTo(startScreen)
-  userIdState.value = ""
   eventViewModel.value = EventViewModel()
+  userViewModel.value = UserViewModel()
   authViewModel.signOut()
   chatDisconnected.value = false
-  Log.d(chatClientTag, "Starting full disconnect")
+  Log.d(TAG, "ChatClient: Starting full disconnect")
   scope.launch {
     try {
       client
           .disconnect(false)
           .doOnResult(scope) {
-            Log.d(chatClientTag, "Full disconnect complete")
+            Log.d(TAG, "ChatClient: Full disconnect complete")
             chatDisconnected.value = true
           }
           .await()
     } catch (e: Exception) {
-      Log.e(chatClientTag, "Error during disconnect: ${e.message}")
+      Log.e(TAG, "ChatClient: Error during disconnect", e)
+    }
+  }
+}
+
+/**
+ * Connect the chat client to the user.
+ *
+ * @param client The chat client.
+ * @param navToPostLogin Whether to navigate to the post-login screen.
+ * @param navAction The navigation actions.
+ * @param postLoginScreen The post-login screen.
+ * @param eventViewModel The event view model state.
+ * @param userViewModel The user view model state.
+ * @param applicationContext The application context.
+ */
+private fun connectChatClient(
+    client: ChatClient,
+    navToPostLogin: Boolean,
+    navAction: NavigationActions,
+    postLoginScreen: String,
+    eventViewModel: MutableState<EventViewModel>,
+    userViewModel: MutableState<UserViewModel>,
+    applicationContext: Context
+) {
+
+  val uid = Firebase.auth.currentUser!!.uid
+  val user = User(id = uid, name = Firebase.auth.currentUser!!.email!!)
+  // TODO: currently username = email
+
+  client.connectUser(user = user, token = client.devToken(uid)).enqueue { result ->
+    // TODO: Generate Token, see https://getstream.io/tutorials/android-chat/
+    if (navToPostLogin) {
+      if (result.isSuccess) {
+        Log.d(TAG, "ChatClient: Successfully connected user ${userViewModel.value.currentUID}")
+      } else {
+        Toast.makeText(applicationContext, "Failed to connect to chat client", Toast.LENGTH_SHORT)
+            .show()
+        Log.e(TAG, "ChatClient: Failed to connect user ${userViewModel.value.currentUID}")
+      }
+      onNavToPostLogin(
+          eventViewModel,
+          userViewModel,
+          TOP_LEVEL_DESTINATIONS.first { it.route == postLoginScreen },
+          navAction)
     }
   }
 }
@@ -514,6 +549,10 @@ private fun logOut(
  */
 fun debug() {
   val androidLocalhost = "10.0.2.2"
+  //  Firebase.auth.signOut() // Uncomment this if the app crashes when you're already signed in
+  Firebase.firestore.clearPersistence()
+  // It's best to sign out and clear cache at each run if you're testing. Avoids
+  // unexpected Firebase issues.
   Firebase.firestore.useEmulator(androidLocalhost, 8080)
   Firebase.auth.useEmulator(androidLocalhost, 9099)
   Firebase.storage.useEmulator(androidLocalhost, 9199)

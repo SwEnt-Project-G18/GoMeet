@@ -1,7 +1,9 @@
 package com.github.se.gomeet.ui.mainscreens.profile
 
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,15 +22,15 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -47,7 +49,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.model.event.Event
-import com.github.se.gomeet.model.event.isPastEvent
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
@@ -56,24 +57,22 @@ import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 
-private var user: GoMeetUser? = null
-private var currentUser = Firebase.auth.currentUser?.uid ?: ""
+private const val TAG = "OthersProfile"
 
 /**
  * Composable function for the OthersProfile screen.
  *
  * @param nav The navigation actions for the OthersProfile screen.
- * @param uid The user id of the user whose profile is being viewed.
- * @param userViewModel userViewModel
+ * @param viewedUID The user id of the user whose profile is being viewed.
+ * @param userViewModel The user view model.
+ * @param eventViewModel The event view model.
  */
 @Composable
 fun OthersProfile(
     nav: NavigationActions,
-    uid: String,
+    viewedUID: String,
     userViewModel: UserViewModel,
     eventViewModel: EventViewModel
 ) { // TODO Add parameters to the function
@@ -85,19 +84,23 @@ fun OthersProfile(
   val myHistoryList = remember { mutableListOf<Event>() }
   val screenWidth = LocalConfiguration.current.screenWidthDp.dp
   val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+  val viewedUser = remember { mutableStateOf<GoMeetUser?>(null) }
+  val currentUID = userViewModel.currentUID!!
 
   LaunchedEffect(Unit) {
     coroutineScope.launch {
-      user = userViewModel.getUser(uid)
-      isFollowing = user?.followers?.contains(currentUser) ?: false
-      followerCount = user?.followers?.size ?: 0
+      viewedUser.value = userViewModel.getUser(viewedUID)
+      if (viewedUser.value == null) Log.e(TAG, "User $viewedUID not found")
+      else Log.d(TAG, "Found user: $viewedUser")
+      isFollowing = viewedUser.value?.followers?.contains(currentUID) ?: false
+      followerCount = viewedUser.value?.followers?.size ?: 0
 
       val allEvents =
           (eventViewModel.getAllEvents() ?: emptyList()).filter { e ->
-            user!!.joinedEvents.contains(e.eventID) && e.public
+            viewedUser.value!!.joinedEvents.contains(e.eventID) && e.public
           }
       allEvents.forEach {
-        if (!isPastEvent(it)) {
+        if (!it.isPastEvent()) {
           joinedEventsList.add(it)
         } else {
           myHistoryList.add(it)
@@ -126,7 +129,7 @@ fun OthersProfile(
                 tint = MaterialTheme.colorScheme.onBackground)
           }
           Spacer(modifier = Modifier.weight(1F))
-          MoreActionsButton()
+          MoreActionsButton(currentUID, true)
         }
       }) { innerPadding ->
         if (isProfileLoaded) {
@@ -143,20 +146,23 @@ fun OthersProfile(
                             .padding(start = screenWidth / 20)
                             .testTag("UserInfo")) {
                       ProfileImage(
-                          userId = uid,
+                          userId = viewedUID,
                           modifier = Modifier.testTag("Profile Picture"),
                           size = 101.dp)
                       Column(modifier = Modifier.padding(start = screenWidth / 20)) {
                         Text(
-                            (user?.firstName ?: "First") + " " + (user?.lastName ?: " Last"),
+                            "${(viewedUser.value?.firstName ?: "First")} ${(viewedUser.value?.lastName ?: "Last")}",
                             textAlign = TextAlign.Center,
                             color = MaterialTheme.colorScheme.onBackground,
                             style = MaterialTheme.typography.titleLarge)
 
                         Text(
-                            text = "@" + (user?.username ?: "username"),
+                            text = "@${(viewedUser.value?.username ?: "username")}",
                             color = MaterialTheme.colorScheme.onBackground,
                             style = MaterialTheme.typography.bodyLarge)
+
+                        Spacer(modifier = Modifier.height(screenHeight / 180))
+                        RatingStarWithText(rating = viewedUser.value!!.rating)
                       }
                     }
 
@@ -170,7 +176,7 @@ fun OthersProfile(
                             onClick = {
                               isFollowing = false
                               followerCount -= 1
-                              userViewModel.unfollow(uid)
+                              userViewModel.unfollow(viewedUID)
                             },
                             modifier = Modifier.height(40.dp).width(180.dp),
                             shape = RoundedCornerShape(10.dp),
@@ -184,7 +190,7 @@ fun OthersProfile(
                             onClick = {
                               isFollowing = true
                               followerCount += 1
-                              userViewModel.follow(uid)
+                              userViewModel.follow(viewedUID)
                             },
                             modifier = Modifier.height(40.dp).width(180.dp),
                             shape = RoundedCornerShape(10.dp),
@@ -199,7 +205,8 @@ fun OthersProfile(
 
                       Button(
                           onClick = {
-                            nav.navigateToScreen(Route.MESSAGE.replace("{id}", Uri.encode(uid)))
+                            nav.navigateToScreen(
+                                Route.MESSAGE.replace("{id}", Uri.encode(viewedUID)))
                           },
                           modifier = Modifier.height(40.dp).width(180.dp),
                           shape = RoundedCornerShape(10.dp),
@@ -222,7 +229,7 @@ fun OthersProfile(
                                 // TODO
                               }) {
                             Text(
-                                text = user?.myEvents?.size.toString(),
+                                text = viewedUser.value?.myEvents?.size.toString(),
                                 color = MaterialTheme.colorScheme.onBackground,
                                 style = MaterialTheme.typography.titleLarge,
                                 modifier = Modifier.align(Alignment.CenterHorizontally))
@@ -235,10 +242,11 @@ fun OthersProfile(
                       Column(
                           modifier =
                               Modifier.clickable {
-                                nav.navigateToScreen(Route.FOLLOWERS.replace("{uid}", user!!.uid))
+                                nav.navigateToScreen(
+                                    Route.FOLLOWERS.replace("{uid}", viewedUser.value!!.uid))
                               }) {
                             Text(
-                                text = user?.followers?.size.toString(),
+                                text = viewedUser.value?.followers?.size.toString(),
                                 color = MaterialTheme.colorScheme.onBackground,
                                 style = MaterialTheme.typography.titleLarge,
                                 modifier = Modifier.align(Alignment.CenterHorizontally))
@@ -251,10 +259,11 @@ fun OthersProfile(
                       Column(
                           modifier =
                               Modifier.clickable {
-                                nav.navigateToScreen(Route.FOLLOWING.replace("{uid}", user!!.uid))
+                                nav.navigateToScreen(
+                                    Route.FOLLOWING.replace("{uid}", viewedUser.value!!.uid))
                               }) {
                             Text(
-                                text = user?.following?.size.toString(),
+                                text = viewedUser.value?.following?.size.toString(),
                                 color = MaterialTheme.colorScheme.onBackground,
                                 style = MaterialTheme.typography.titleLarge,
                                 modifier = Modifier.align(Alignment.CenterHorizontally))
@@ -273,12 +282,12 @@ fun OthersProfile(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Start,
                     contentPadding = PaddingValues(start = 15.dp, end = 15.dp)) {
-                      items(user!!.tags.size) { index ->
+                      items(viewedUser.value!!.tags.size) { index ->
                         Button(
                             onClick = {},
                             content = {
                               Text(
-                                  text = user!!.tags[index],
+                                  text = viewedUser.value!!.tags[index],
                                   style = MaterialTheme.typography.labelLarge)
                             },
                             colors =
@@ -291,13 +300,18 @@ fun OthersProfile(
                     }
                 Spacer(modifier = Modifier.height(screenHeight / 40))
                 ProfileEventsList(
-                    (user!!.firstName) + "'s joined Events",
+                    (viewedUser.value!!.firstName) + "'s joined Events",
                     rememberLazyListState(),
                     joinedEventsList,
-                    nav)
+                    nav,
+                    currentUID)
                 Spacer(modifier = Modifier.height(screenHeight / 40))
                 ProfileEventsList(
-                    (user!!.firstName) + "'s History", rememberLazyListState(), myHistoryList, nav)
+                    (viewedUser.value!!.firstName) + "'s History",
+                    rememberLazyListState(),
+                    myHistoryList,
+                    nav,
+                    currentUID)
               }
         } else {
           LoadingText()
@@ -307,36 +321,73 @@ fun OthersProfile(
 
 /** Composable function for the MoreActionsButton. */
 @Composable
-fun MoreActionsButton() {
-  var showMenu by remember { mutableStateOf(false) }
+fun MoreActionsButton(uid: String, isProfile: Boolean) {
+  var showOptionsDialog by remember { mutableStateOf(false) }
+  var showShareDialog by remember { mutableStateOf(false) }
 
-  IconButton(onClick = { showMenu = true }) {
+  IconButton(onClick = { showOptionsDialog = true }) {
     Icon(
         imageVector = Icons.Default.MoreVert,
         contentDescription = "More",
-        modifier = Modifier.rotate(90f), // Rotates the icon by 90 degrees
-        tint = MaterialTheme.colorScheme.tertiary)
+        modifier = Modifier.rotate(90f),
+        tint = MaterialTheme.colorScheme.onBackground)
   }
 
-  DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
-    DropdownMenuItem(
-        text = { Text("Share Profile") },
-        onClick = {
-          // Handle Share Profile logic here
-          showMenu = false
-        })
-    DropdownMenuItem(
-        text = { Text("Block") },
-        onClick = {
-          // Handle Block logic here
-          showMenu = false
+  if (showOptionsDialog) {
+    AlertDialog(
+        containerColor = MaterialTheme.colorScheme.background,
+        onDismissRequest = { showOptionsDialog = false },
+        title = { Text(text = "Options") },
+        text = {
+          Column {
+            StyledTextButton(
+                text = "Share Profile",
+                onClick = {
+                  showOptionsDialog = false
+                  showShareDialog = true
+                })
+            StyledTextButton(
+                text = "Block",
+                onClick = {
+                  // Handle Block logic here
+                  showOptionsDialog = false
+                })
+          }
+        },
+        confirmButton = {
+          StyledTextButton(text = "Cancel", onClick = { showOptionsDialog = false })
         })
   }
+
+  if (showShareDialog) {
+    ShareDialog(
+        type = if (isProfile) "Profile" else "Event",
+        uid = uid,
+        onDismiss = { showShareDialog = false })
+  }
+}
+
+@Composable
+fun StyledTextButton(text: String, onClick: () -> Unit) {
+  TextButton(
+      onClick = onClick,
+      modifier =
+          Modifier.padding(top = 10.dp)
+              .background(
+                  color = MaterialTheme.colorScheme.primaryContainer,
+                  shape = RoundedCornerShape(10.dp))
+              .height(50.dp)
+              .fillMaxWidth()) {
+        Text(
+            text = text,
+            color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
+      }
 }
 
 @Preview
 @Composable
 fun OthersProfilePreview() {
   OthersProfile(
-      nav = NavigationActions(rememberNavController()), "", UserViewModel(), EventViewModel(null))
+      nav = NavigationActions(rememberNavController()), "", UserViewModel(""), EventViewModel(null))
 }

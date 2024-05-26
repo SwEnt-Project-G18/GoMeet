@@ -3,6 +3,7 @@ package com.github.se.gomeet.ui.authscreens
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.BorderStroke
@@ -41,6 +42,8 @@ import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.github.se.gomeet.R
 import com.google.firebase.auth.FirebaseAuth
 
+private const val TAG = "WelcomeScreen"
+
 /**
  * Composable function for the Welcome Screen.
  *
@@ -74,10 +77,10 @@ fun WelcomeScreen(
           val lastName = res.idpResponse!!.user.name?.take(index) ?: ""
           val firstName = res.idpResponse!!.user.name?.drop(index) ?: ""
           userFirebase?.uid?.let { userId ->
-            onSignInSuccess(
-                userId, "user" + userId.take(6), email, firstName, lastName, phoneNumber)
+            onSignInSuccess(userId, email, firstName, lastName, phoneNumber, name)
           }
         } else {
+          Log.e(TAG, "Sign-in error")
           // Sign-in error
         }
       }

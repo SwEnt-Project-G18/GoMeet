@@ -61,8 +61,7 @@ import kotlinx.coroutines.launch
  * This composable function represents the screen where the user can manage the invitations for one
  * of his event.
  *
- * @param currentUser The current user.
- * @param currentEvent The current event.
+ * @param currentEvent The event for which the user wants to manage the invitations.
  * @param nav The navigation actions.
  * @param userViewModel The user view model.
  * @param eventViewModel The event view model.
@@ -70,7 +69,6 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ManageInvites(
-    currentUser: String,
     currentEvent: String,
     nav: NavigationActions,
     userViewModel: UserViewModel,
@@ -85,6 +83,7 @@ fun ManageInvites(
   val event = remember { mutableStateOf<Event?>(null) }
   val followersFollowingList = remember { mutableListOf<GoMeetUser>() }
   val toUpdate = remember { mutableListOf<GoMeetUser>() }
+  val currentUser = userViewModel.currentUID!!
 
   LaunchedEffect(Unit) {
     coroutineScope.launch {

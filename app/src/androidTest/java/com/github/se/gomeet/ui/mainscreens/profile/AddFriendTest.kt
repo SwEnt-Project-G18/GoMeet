@@ -18,6 +18,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.tasks.await
 import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.junit.Rule
@@ -39,48 +40,37 @@ class AddFriendTest {
     private const val lastName2 = "w"
     private const val username2 = "qwe"
 
-    private val userVM = UserViewModel()
+    private lateinit var userVM: UserViewModel
 
     @BeforeClass
     @JvmStatic
     fun setup() {
       runBlocking {
         // Create user1
-        var result = Firebase.auth.createUserWithEmailAndPassword(email1, pwd1)
-        while (!result.isComplete) {
-          TimeUnit.SECONDS.sleep(1)
-        }
-        uid1 = result.result.user!!.uid
+        Firebase.auth.createUserWithEmailAndPassword(email1, pwd1).await()
+        uid1 = Firebase.auth.currentUser!!.uid
+        userVM = UserViewModel(uid1)
 
         // Add the users to the view model
         userVM.createUserIfNew(
             uid1, "username1", "firstName1", "lastName1", email1, "testphonenumber", "testcountry")
-        while (userVM.getUser(uid1) == null) {
-          TimeUnit.SECONDS.sleep(1)
-        }
         userVM.createUserIfNew(
             uid2, username2, firstName2, lastName2, email2, "testphonenumber", "testcountry")
-        while (userVM.getUser(uid2) == null) {
-          TimeUnit.SECONDS.sleep(1)
-        }
 
         // Sign in with user1
-        result = Firebase.auth.signInWithEmailAndPassword(email1, pwd1)
-        while (!result.isComplete) {
-          TimeUnit.SECONDS.sleep(1)
-        }
+        Firebase.auth.signInWithEmailAndPassword(email1, pwd1)
+        TimeUnit.SECONDS.sleep(1)
       }
     }
 
     @AfterClass
     @JvmStatic
-    fun tearDown() {
-      runBlocking {
-        // Clean up the users
-        Firebase.auth.currentUser?.delete()
-        userVM.deleteUser(uid1)
-        userVM.deleteUser(uid2)
-      }
+    fun tearDown() = runBlocking {
+
+      // Clean up the users
+      Firebase.auth.currentUser?.delete()
+      userVM.deleteUser(uid1)
+      userVM.deleteUser(uid2)
     }
   }
 

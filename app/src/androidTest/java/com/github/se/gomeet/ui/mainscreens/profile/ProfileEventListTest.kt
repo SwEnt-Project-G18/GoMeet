@@ -21,6 +21,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.tasks.await
 import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.junit.Rule
@@ -40,7 +41,7 @@ class ProfileEventListTest {
     private const val eventId = "ProfileEventListEvent"
     private lateinit var event: Event
 
-    private val userVM = UserViewModel()
+    private lateinit var userVM: UserViewModel
     private lateinit var eventVM: EventViewModel
 
     @JvmStatic
@@ -48,24 +49,17 @@ class ProfileEventListTest {
     fun setup() {
       runBlocking {
         // Create a new user
-        var result = Firebase.auth.createUserWithEmailAndPassword(email, pwd)
-        while (!result.isComplete) {
-          TimeUnit.SECONDS.sleep(1)
-        }
-        uid = result.result.user!!.uid
+        Firebase.auth.createUserWithEmailAndPassword(email, pwd).await()
+        uid = Firebase.auth.currentUser!!.uid
+
+        userVM = UserViewModel(uid)
 
         // Add the user to view model
         userVM.createUserIfNew(
             uid, username, "testfirstname", "testlastname", email, "testphonenumber", "testcountry")
-        while (userVM.getUser(uid) == null) {
-          TimeUnit.SECONDS.sleep(1)
-        }
 
         // Sign in
-        result = Firebase.auth.signInWithEmailAndPassword(email, pwd)
-        while (!result.isComplete) {
-          TimeUnit.SECONDS.sleep(1)
-        }
+        Firebase.auth.signInWithEmailAndPassword(email, pwd).await()
 
         // Create an Event
         eventVM = EventViewModel(uid)
@@ -87,10 +81,8 @@ class ProfileEventListTest {
             null,
             userVM,
             eventId)
-        while (eventVM.getEvent(eventId) == null) {
-          TimeUnit.SECONDS.sleep(1)
-        }
         event = eventVM.getEvent(eventId)!!
+        TimeUnit.SECONDS.sleep(1)
       }
     }
 
@@ -117,7 +109,8 @@ class ProfileEventListTest {
           "title",
           rememberLazyListState(),
           mutableListOf(event),
-          NavigationActions(rememberNavController()))
+          NavigationActions(rememberNavController()),
+          userVM.currentUID!!)
     }
 
     // Wait for the page to load

@@ -2,6 +2,23 @@ package com.github.se.gomeet.model.user
 
 import com.github.se.gomeet.model.event.Invitation
 
+const val UID = "uid"
+const val USERNAME = "username"
+const val FIRST_NAME = "firstName"
+const val LAST_NAME = "lastName"
+const val EMAIL = "email"
+const val PHONE_NUMBER = "phoneNumber"
+const val COUNTRY = "country"
+const val FOLLOWING = "following"
+const val FOLLOWERS = "followers"
+const val PENDING_REQUESTS = "pendingRequests"
+const val JOINED_EVENTS = "joinedEvents"
+const val MY_EVENTS = "myEvents"
+const val MY_FAVORITES = "myFavorites"
+const val PROFILE_PICTURE = "profilePicture"
+const val TAGS = "tags"
+const val RATING = "rating"
+
 /**
  * This data class represents the user of the application. It contains the user's information.
  *
@@ -20,6 +37,7 @@ import com.github.se.gomeet.model.event.Invitation
  * @param myFavorites The list of events that the user added to favorites
  * @param profilePicture The profile picture of the user
  * @param tags The list of tags that the user is interested in
+ * @param rating The average rating of the user (total rating, number of ratings)
  */
 data class GoMeetUser(
     val uid: String,
@@ -31,14 +49,21 @@ data class GoMeetUser(
     val country: String,
     val following: List<String>,
     val followers: List<String>,
-    val pendingRequests: Set<Invitation>, // For now, the requests are just invitations
+    val pendingRequests: Set<Invitation>,
     var joinedEvents: List<String>,
     var myEvents: List<String>,
     var myFavorites: List<String>,
     var profilePicture: String = "",
-    var tags: List<String>
-    // can add more things later
+    var tags: List<String>,
+    var rating: Pair<Long, Long> = Pair(0, 0),
 ) {
+
+  /**
+   * This function checks if the user matches the search query.
+   *
+   * @param query The search query
+   * @return true if the user matches the search query, false otherwise
+   */
   fun doesMatchSearchQuery(query: String): Boolean {
     val matchingCombinations =
         listOf(

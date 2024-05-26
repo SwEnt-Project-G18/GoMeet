@@ -67,7 +67,7 @@ import kotlinx.coroutines.launch
 fun AddParticipants(
     nav: NavigationActions,
     userViewModel: UserViewModel,
-    eventCreationViewModel: EventCreationViewModel // Use the shared ViewModel
+    eventCreationViewModel: EventCreationViewModel
 ) {
   val screenHeight = LocalConfiguration.current.screenHeightDp.dp
   val query = remember { mutableStateOf("") }
