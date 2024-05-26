@@ -103,7 +103,7 @@ fun Notifications(nav: NavigationActions, userViewModel: UserViewModel) {
   if (isLoaded) {
 
     Scaffold(
-        modifier = Modifier.testTag("NotificationsScreen"),
+        modifier = Modifier.fillMaxSize().testTag("NotificationsScreen"),
         topBar = { NotificationsTopBar(pagerState, coroutineScope, screenHeight, screenWidth) },
         bottomBar = { BottomNavigation(nav) }) { innerPadding ->
           HorizontalPager(state = pagerState, modifier = Modifier.padding(innerPadding)) { page ->
@@ -147,7 +147,9 @@ fun NotificationsTopBar(
   Column {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(start = screenWidth / 15, top = screenHeight / 30)) {
+        modifier =
+            Modifier.testTag("NotificationsScreen")
+                .padding(start = screenWidth / 15, top = screenHeight / 30)) {
           Text(
               text = "Notifications",
               color = MaterialTheme.colorScheme.onBackground,

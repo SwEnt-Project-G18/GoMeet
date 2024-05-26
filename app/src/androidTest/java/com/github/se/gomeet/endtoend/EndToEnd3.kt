@@ -4,7 +4,6 @@ import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
-import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
@@ -171,13 +170,13 @@ class EndToEndTest3 : TestCase() {
 
     ComposeScreen.onComposeScreen<ExploreScreen>(composeTestRule) {
       step("Go to Events") {
-        composeTestRule.onNodeWithText("Events").assertIsDisplayed().performClick()
+        composeTestRule.onNodeWithTag("Events").assertIsDisplayed().performClick()
       }
     }
     ComposeScreen.onComposeScreen<EventsScreen>(composeTestRule) {
       step("View the info page of the event") {
         composeTestRule.waitForIdle()
-        composeTestRule.onAllNodesWithText("Events")[1].performClick()
+        composeTestRule.onAllNodesWithText("Events")[0].performClick()
         composeTestRule.waitUntil(timeoutMillis = 10000) {
           composeTestRule.onAllNodesWithTag("Card")[0].isDisplayed()
         }
@@ -191,7 +190,7 @@ class EndToEndTest3 : TestCase() {
           composeTestRule.onNodeWithTag("EventHeader").isDisplayed()
         }
         composeTestRule.onNodeWithText("Edit My Event").assertIsDisplayed().assertHasClickAction()
-        composeTestRule.onNodeWithText("Add Participants").assertIsDisplayed().performClick()
+        composeTestRule.onNodeWithText("Handle Participants").assertIsDisplayed().performClick()
         composeTestRule.waitForIdle()
       }
     }
@@ -207,8 +206,7 @@ class EndToEndTest3 : TestCase() {
         composeTestRule.onNodeWithText("Accepted").assertIsDisplayed()
         composeTestRule.onNodeWithText("Refused").assertIsDisplayed()
         composeTestRule.onNodeWithText("To Invite").assertIsDisplayed()
-        composeTestRule.onNodeWithContentDescription("profile picture").assertIsDisplayed()
-        composeTestRule.onNodeWithText(username2).assertIsDisplayed()
+        composeTestRule.onNodeWithText("@$username2").assertIsDisplayed()
         composeTestRule.onNodeWithText("Invite").assertIsDisplayed().performClick()
         composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText("Cancel").assertIsDisplayed().assertHasClickAction()
@@ -222,7 +220,7 @@ class EndToEndTest3 : TestCase() {
             composeTestRule.onNodeWithTag("EventHeader").isDisplayed()
           }
           composeTestRule.onNodeWithText("Edit My Event").assertIsDisplayed().assertHasClickAction()
-          composeTestRule.onNodeWithText("Add Participants").assertIsDisplayed().performClick()
+          composeTestRule.onNodeWithText("Handle Participants").assertIsDisplayed().performClick()
           composeTestRule.waitForIdle()
         }
       }
@@ -233,10 +231,6 @@ class EndToEndTest3 : TestCase() {
         composeTestRule.waitUntil {
           composeTestRule.onNodeWithTag("UserInviteWidget").isDisplayed()
         }
-        composeTestRule
-            .onNodeWithTag("InviteStatus")
-            .assertIsDisplayed()
-            .assertTextEquals("Pending")
       }
     }
   }

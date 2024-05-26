@@ -191,14 +191,14 @@ class EndToEndTest2 : TestCase() {
 
     ComposeScreen.onComposeScreen<ExploreScreen>(composeTestRule) {
       step("Go to Trends") {
-        composeTestRule.onNodeWithText("Trends").assertIsDisplayed().performClick()
+        composeTestRule.onNodeWithTag("Trends").assertIsDisplayed().performClick()
       }
     }
 
     ComposeScreen.onComposeScreen<TrendsScreen>(composeTestRule) {
       step("View the info page of an event by clicking on it") {
         composeTestRule.waitForIdle()
-        composeTestRule.onAllNodesWithText("Trends")[1].performClick()
+        composeTestRule.onAllNodesWithText("Trends")[0].performClick()
         composeTestRule.waitUntil(timeoutMillis = 10000) {
           composeTestRule.onAllNodesWithTag("Card")[0].isDisplayed()
         }
@@ -238,7 +238,7 @@ class EndToEndTest2 : TestCase() {
         }
         composeTestRule.onNodeWithText(username2, substring = true).assertIsDisplayed()
         composeTestRule.onNodeWithTag("GoBackFollower").assertIsDisplayed().performClick()
-        composeTestRule.onNodeWithText("Profile").performClick()
+        composeTestRule.onNodeWithTag("Profile").performClick()
       }
     }
 

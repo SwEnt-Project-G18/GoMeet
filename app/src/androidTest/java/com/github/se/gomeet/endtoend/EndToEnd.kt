@@ -20,6 +20,7 @@ import com.github.se.gomeet.screens.EventsScreen
 import com.github.se.gomeet.screens.ExploreScreen
 import com.github.se.gomeet.screens.LoginScreenScreen
 import com.github.se.gomeet.screens.WelcomeScreenScreen
+import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.viewmodel.AuthViewModel
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
@@ -111,7 +112,7 @@ class EndToEndTest : TestCase() {
 
     ComposeScreen.onComposeScreen<ExploreScreen>(composeTestRule) {
       step("Go to Events") {
-        composeTestRule.onNodeWithText("Events").assertIsDisplayed().performClick()
+        composeTestRule.onNodeWithTag(Route.EVENTS).assertIsDisplayed().performClick()
       }
     }
 
@@ -148,10 +149,10 @@ class EndToEndTest : TestCase() {
         TimeUnit.SECONDS.sleep(3)
       }
     }
-    composeTestRule.onNodeWithText("Events").performClick()
+    composeTestRule.onNodeWithTag(Route.EVENTS).performClick()
     ComposeScreen.onComposeScreen<EventsScreen>(composeTestRule) {
       composeTestRule.waitForIdle()
-      composeTestRule.onAllNodesWithText("Events")[1].performClick()
+      composeTestRule.onAllNodesWithText("Events")[0].performClick()
       composeTestRule.waitUntil(timeoutMillis = 5000) {
         composeTestRule.onAllNodesWithTag("Card")[0].isDisplayed()
       }

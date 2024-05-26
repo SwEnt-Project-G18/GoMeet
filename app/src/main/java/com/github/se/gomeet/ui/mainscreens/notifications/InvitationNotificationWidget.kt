@@ -38,11 +38,12 @@ import com.google.android.gms.maps.model.LatLng
 /**
  * This composable is used to display the invitations notifications widgets.
  *
+ * @param user the user that invited
  * @param event the event to display
  * @param userViewModel the user view model
- * @param currentUserId the user receiving the notifications
+ * @param eventViewModel the event view model
  * @param initialClicked the initial state of the buttons
- * @param callback the callback to update the event
+ * @param nav the navigation action
  */
 @Composable
 fun InvitationsNotificationsWidget(

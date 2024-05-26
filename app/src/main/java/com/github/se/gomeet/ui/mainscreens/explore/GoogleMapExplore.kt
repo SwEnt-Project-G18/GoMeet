@@ -41,6 +41,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import com.github.se.gomeet.R
@@ -354,10 +355,7 @@ internal fun GoogleMapView(
                   onClick = { moveToCurrentLocation.value = CameraAction.ANIMATE },
                   containerColor = MaterialTheme.colorScheme.outlineVariant,
                   shape = RoundedCornerShape(10.dp),
-                  modifier =
-                      Modifier.offset(
-                          y = (-210).dp) // Adjust this value to position the button higher
-                  ) {
+                  modifier = Modifier.offset(y = (-210).dp).testTag("CurrentLocationButton")) {
                     Icon(
                         ImageVector.vectorResource(R.drawable.location_icon),
                         contentDescription = "Center on Current Location",

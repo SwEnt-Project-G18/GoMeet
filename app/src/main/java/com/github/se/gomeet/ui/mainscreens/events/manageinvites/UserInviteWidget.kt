@@ -59,13 +59,11 @@ fun UserInviteWidget(
             Modifier.fillMaxWidth()
                 .padding(start = 15.dp, end = 15.dp, bottom = 10.dp)
                 .clickable { nav.navigateToScreen(Route.OTHERS_PROFILE.replace("{uid}", user.uid)) }
-                .testTag("FollowingUser"),
+                .testTag(TAG),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically) {
           ProfileImage(
-              userId = user.uid,
-              modifier = Modifier.testTag("Event Post Profile Picture"),
-              size = 50.dp)
+              userId = user.uid, modifier = Modifier.testTag("UserInvitePfp"), size = 50.dp)
           Column(modifier = Modifier.padding(start = 15.dp).weight(1f)) {
             Text(
                 text = "${user.firstName} ${user.lastName}",
