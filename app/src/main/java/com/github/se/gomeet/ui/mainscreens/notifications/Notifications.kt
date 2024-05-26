@@ -76,8 +76,28 @@ fun Notifications(nav: NavigationActions, userViewModel: UserViewModel) {
 
   LaunchedEffect(Unit) {
     coroutineScope.launch {
-      fetchUserAndEvents(
-          userViewModel, eventViewModel, currentUserID, user, eventsList, eventToCreatorMap)
+        val currentUser = userViewModel.getUser(currentUserID)
+        currentUser?.let {
+            user.value = it
+            val events = mutableListOf<Event>()
+            val creatorMap = mutableMapOf<Event, String>()
+
+            it.pendingRequests
+                .filter { invitation -> invitation.status == InviteStatus.PENDING }
+                .forEach { request ->
+                    val invitedEvent = eventViewModel.getEvent(request.eventId)
+                    invitedEvent?.let { event ->
+                        events.add(event)
+                        val creatorName = userViewModel.getUser(event.creator)?.username ?: "GoMeetUser"
+                        creatorMap[event] = creatorName
+                    }
+                }
+
+            eventsList.clear()
+            eventsList.addAll(events)
+            eventToCreatorMap.clear()
+            eventToCreatorMap.putAll(creatorMap)
+        }
       isLoaded = true
     }
   }
@@ -107,48 +127,6 @@ fun Notifications(nav: NavigationActions, userViewModel: UserViewModel) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
       CircularProgressIndicator()
     }
-  }
-}
-
-/**
- * This function is used to fetch the user and events needed for the notifications.
- *
- * @param userViewModel the user view model
- * @param eventViewModel the event view model
- * @param currentUserID the userID of the user receiving the notifications
- * @param user the user to update
- * @param eventsList the list of events to update
- * @param eventToCreatorMap the map of events to creators to update
- */
-suspend fun fetchUserAndEvents(
-    userViewModel: UserViewModel,
-    eventViewModel: EventViewModel,
-    currentUserID: String,
-    user: MutableState<GoMeetUser?>,
-    eventsList: SnapshotStateList<Event>,
-    eventToCreatorMap: SnapshotStateMap<Event, String>
-) {
-  val currentUser = userViewModel.getUser(currentUserID)
-  currentUser?.let {
-    user.value = it
-    val events = mutableListOf<Event>()
-    val creatorMap = mutableMapOf<Event, String>()
-
-    it.pendingRequests
-        .filter { invitation -> invitation.status == InviteStatus.PENDING }
-        .forEach { request ->
-          val invitedEvent = eventViewModel.getEvent(request.eventId)
-          invitedEvent?.let { event ->
-            events.add(event)
-            val creatorName = userViewModel.getUser(event.creator)?.username ?: "GoMeetUser"
-            creatorMap[event] = creatorName
-          }
-        }
-
-    eventsList.clear()
-    eventsList.addAll(events)
-    eventToCreatorMap.clear()
-    eventToCreatorMap.putAll(creatorMap)
   }
 }
 
