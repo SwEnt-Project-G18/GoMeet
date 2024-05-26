@@ -34,8 +34,9 @@ fun BottomNavigationMenu(
     selectedItem: String,
     containerColor: Color = MaterialTheme.colorScheme.background,
 ) {
+
   NavigationBar(
-      modifier = Modifier.navigationBarsPadding().height(80.dp),
+      modifier = Modifier.navigationBarsPadding().height(50.dp),
       containerColor = containerColor,
       tonalElevation = 0.dp,
   ) {
@@ -51,16 +52,7 @@ fun BottomNavigationMenu(
                 contentDescription = destination.textId,
                 modifier = Modifier.size(24.dp))
           },
-          label = {
-            Text(
-                text = destination.textId,
-                maxLines = 1,
-                style =
-                    if (selected)
-                        MaterialTheme.typography.labelLarge.copy(
-                            fontWeight = FontWeight.Bold, fontSize = 12.sp)
-                    else MaterialTheme.typography.labelLarge.copy(fontSize = 12.sp))
-          },
+          label = {},
           selected = selected,
           onClick = { onTabSelect(destination.route) },
           colors =
