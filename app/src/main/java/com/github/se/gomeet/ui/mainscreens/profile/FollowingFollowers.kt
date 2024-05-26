@@ -68,7 +68,6 @@ private var currentUser: GoMeetUser? = null
  *
  * @param nav The navigation actions
  * @param uidOfFollowList the uid of the user whose "following" list is displayed
- * @param currentUid The uid of the current user
  * @param userViewModel The user view model
  * @param followingScreen A boolean indicating whether the "following" list is displayed. If false,
  *   the "followers" list is displayed
@@ -78,7 +77,6 @@ private var currentUser: GoMeetUser? = null
 fun FollowingFollowers(
     nav: NavigationActions,
     uidOfFollowList: String,
-    currentUid: String,
     userViewModel: UserViewModel,
     followingScreen: Boolean
 ) {
@@ -211,10 +209,8 @@ fun FollowingFollowers(
       HorizontalPager(
           state = pagerState, modifier = Modifier.fillMaxSize().padding(innerPadding)) { page ->
             when (page) {
-              FOLLOWING.ordinal ->
-                  PageUsers(following, nav, userViewModel, uidOfFollowList, currentUid)
-              FOLLOWERS.ordinal ->
-                  PageUsers(followers, nav, userViewModel, uidOfFollowList, currentUid)
+              FOLLOWING.ordinal -> PageUsers(following, nav, userViewModel, uidOfFollowList)
+              FOLLOWERS.ordinal -> PageUsers(followers, nav, userViewModel, uidOfFollowList)
               else -> Text("Page not found")
             }
           }
@@ -231,7 +227,6 @@ fun FollowingFollowers(
  * @param nav The navigation actions
  * @param userViewModel The user view model
  * @param uidOfFollowList The uid of the user whose followers/following are displayed
- * @param currentUid The uid of the current user
  */
 @Composable
 fun PageUsers(
@@ -239,11 +234,12 @@ fun PageUsers(
     nav: NavigationActions,
     userViewModel: UserViewModel,
     uidOfFollowList: String,
-    currentUid: String
 ) {
   Column(modifier = Modifier.fillMaxSize()) {
     users.forEach { user ->
-      var isFollowing by remember { mutableStateOf(user.followers.contains(currentUid)) }
+      var isFollowing by remember {
+        mutableStateOf(user.followers.contains(userViewModel.currentUID!!))
+      }
       Row(
           modifier =
               Modifier.fillMaxWidth()
@@ -268,7 +264,7 @@ fun PageUsers(
                   color = MaterialTheme.colorScheme.onBackground,
               )
             }
-            if (uidOfFollowList == currentUid) {
+            if (uidOfFollowList == userViewModel.currentUID!!) {
               if (isFollowing) {
                 Button(
                     shape = RoundedCornerShape(10.dp),
@@ -312,7 +308,7 @@ fun PageUsers(
 @Preview
 @Composable
 fun FollowingPreview() {
-  FollowingFollowers(NavigationActions(rememberNavController()), "", "", UserViewModel(), true)
+  FollowingFollowers(NavigationActions(rememberNavController()), "", UserViewModel(""), true)
 }
 
 private enum class FollowingFollowerPage(val str: String) {

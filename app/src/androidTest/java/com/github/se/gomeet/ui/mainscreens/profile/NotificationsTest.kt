@@ -30,79 +30,75 @@ class NotificationsTest {
   @get:Rule val composeTestRule = createComposeRule()
 
   companion object {
-    private const val uid = "NotificationsTestUser"
-    private val userVM = UserViewModel()
+
+    private const val pwd = "123456"
+    private const val email = "notifications@test.com"
+
+    private val uid = "userNotificationsTest"
+    private const val otherUid = "AnotherUser"
+    private val userVM = UserViewModel(uid)
 
     private const val eventId = "NotificationsTestEvent"
-    private val eventVM = EventViewModel("AnotherUser")
+    private val eventVM = EventViewModel(otherUid)
     private const val eventTitle = "title"
 
     @BeforeClass
     @JvmStatic
-    fun setup() {
-      runBlocking {
-        // Create a new user
-        userVM.createUserIfNew(
-            uid,
-            "NotificationsTest",
-            "firstname",
-            "lastname",
-            "notifications@test.com",
-            "+1234567890",
-            "fakecountry")
-        while (userVM.getUser(uid) == null) {
-          TimeUnit.SECONDS.sleep(1)
-        }
+    fun setup() = runBlocking {
 
-        // Create a new event
-        eventVM.createEvent(
-            eventTitle,
-            "description",
-            Location(0.0, 0.0, "location"),
-            LocalDate.of(2026, 3, 30),
-            LocalTime.now(),
-            0.0,
-            "url",
-            emptyList(),
-            emptyList(),
-            emptyList(),
-            1,
-            false,
-            emptyList(),
-            emptyList(),
-            null,
-            userVM,
-            eventId)
-        while (eventVM.getEvent(eventId) == null) {
-          TimeUnit.SECONDS.sleep(1)
-        }
+      // Create a new user
+      userVM.createUserIfNew(
+          uid, "NotificationsTest", "firstname", "lastname", email, "+1234567890", "fakecountry")
 
-        // Invite the user to the event
-        userVM.gotInvitation(eventId, uid)
-        eventVM.sendInvitation(eventVM.getEvent(eventId)!!, uid)
-        while (userVM.getUser(uid)!!.pendingRequests.isEmpty() ||
-            eventVM.getEvent(eventId)!!.pendingParticipants.isEmpty()) {
-          TimeUnit.SECONDS.sleep(1)
-        }
-      }
+      userVM.createUserIfNew(
+          otherUid, "AnotherUser", "firstname", "lastname", "", "+1234567890", "fakecountry2")
+
+      // Create a new event
+      eventVM.createEvent(
+          eventTitle,
+          "description",
+          Location(0.0, 0.0, "location"),
+          LocalDate.of(2026, 3, 30),
+          LocalTime.now(),
+          0.0,
+          "url",
+          emptyList(),
+          emptyList(),
+          emptyList(),
+          10,
+          false,
+          emptyList(),
+          emptyList(),
+          null,
+          userVM,
+          eventId)
+
+      TimeUnit.SECONDS.sleep(1L)
+
+      val event = eventVM.getEvent(eventId)!!
+
+      TimeUnit.SECONDS.sleep(1L)
+
+      // Invite the user to the event
+      userVM.gotInvitation(eventId, uid)
+      eventVM.sendInvitation(event, uid)
+      TimeUnit.SECONDS.sleep(1L)
     }
 
     @AfterClass
     @JvmStatic
-    fun tearDown() {
-      runBlocking {
-        // Clean up the user and the event
-        userVM.deleteUser(uid)
-        eventVM.removeEvent(eventId)
-      }
+    fun tearDown() = runBlocking {
+
+      // Clean up the user and the event
+      userVM.deleteUser(uid)
+      userVM.deleteUser(otherUid)
+      eventVM.removeEvent(eventId)
     }
   }
 
   @Test
   fun testNotifications() {
-    composeTestRule.setContent {
-      Notifications(NavigationActions(rememberNavController()), uid, userVM)
-    }
+    composeTestRule.setContent { Notifications(NavigationActions(rememberNavController()), userVM) }
 
     composeTestRule.waitForIdle()
 
@@ -126,9 +122,7 @@ class NotificationsTest {
 
   @Test
   fun testAcceptButton() {
-    composeTestRule.setContent {
-      Notifications(NavigationActions(rememberNavController()), uid, userVM)
-    }
+    composeTestRule.setContent { Notifications(NavigationActions(rememberNavController()), userVM) }
     composeTestRule.waitUntil(timeoutMillis = 10000) {
       composeTestRule.onNodeWithText("Accept").isDisplayed()
     }

@@ -29,6 +29,7 @@ import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.tasks.await
 import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.junit.Rule
@@ -52,47 +53,38 @@ class EndToEndTest : TestCase() {
     private lateinit var uid: String
     private const val username = "EndToEndTestuser"
 
-    private val userVM = UserViewModel()
+    private lateinit var userVM: UserViewModel
     private lateinit var eventVM: EventViewModel
     private val authViewModel = AuthViewModel()
 
     @JvmStatic
     @BeforeClass
-    fun setup() {
-      runBlocking {
-        // create a new user
-        var result = Firebase.auth.createUserWithEmailAndPassword(email, pwd)
-        while (!result.isComplete) {
-          TimeUnit.SECONDS.sleep(1)
-        }
-        uid = result.result.user!!.uid
+    fun setup() = runBlocking {
+      // create a new user
+      Firebase.auth.createUserWithEmailAndPassword(email, pwd).await()
+      uid = Firebase.auth.currentUser!!.uid
 
-        // Add the user to the view model
-        userVM.createUserIfNew(
-            uid, username, "testfirstname", "testlastname", email, "testphonenumber", "testcountry")
-        while (userVM.getUser(uid) == null) {
-          TimeUnit.SECONDS.sleep(1)
-        }
-        // Sign in
-        result = Firebase.auth.signInWithEmailAndPassword(email, pwd)
-        while (!result.isComplete) {
-          TimeUnit.SECONDS.sleep(1)
-        }
-        eventVM = EventViewModel(uid)
-        authViewModel.signOut()
-      }
+      userVM = UserViewModel(uid)
+
+      // Add the user to the view model
+      userVM.createUserIfNew(
+          uid, username, "testfirstname", "testlastname", email, "testphonenumber", "testcountry")
+      // Sign in
+      Firebase.auth.signInWithEmailAndPassword(email, pwd).await()
+      eventVM = EventViewModel(uid)
+      authViewModel.signOut()
+      TimeUnit.SECONDS.sleep(1)
     }
 
     @AfterClass
     @JvmStatic
-    fun tearDown() {
-      runBlocking {
-        // Clean up the event
-        eventVM.getAllEvents()?.forEach { eventVM.removeEvent(it.eventID) }
-        // Clean up the user
-        Firebase.auth.currentUser?.delete()
-        userVM.deleteUser(uid)
-      }
+    fun tearDown() = runBlocking {
+
+      // Clean up the event
+      eventVM.getAllEvents()?.forEach { eventVM.removeEvent(it.eventID) }
+      // Clean up the user
+      Firebase.auth.currentUser?.delete()?.await()
+      userVM.deleteUser(uid)
     }
   }
 

@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -25,7 +24,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -36,7 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
-import com.github.se.gomeet.model.event.isPastEvent
+import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.mainscreens.SearchModule
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
@@ -101,7 +99,8 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
 
     val allEvents = eventViewModel.getAllEvents()
     if (allEvents != null) {
-      nonFilteredEvents.value = allEvents.filter { e -> !isPastEvent(e) }
+      eventList.value = allEvents.filter { e -> !e.isPastEvent() }
+      nonFilteredEvents.value = allEvents.filter { e -> !e.isPastEvent() }
     }
 
     // wait for user input
@@ -131,7 +130,6 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
       delay(5000) // map is updated every 5s
     }
   }
-
   Scaffold(
       bottomBar = { BottomNavigationFun(nav) },
       modifier = Modifier.fillMaxSize().testTag("ExploreUI"),
@@ -164,19 +162,22 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
                 modifier = Modifier.fillMaxHeight().testTag("MapSlider"),
                 verticalArrangement = Arrangement.Bottom) {
                   ContentInRow(
-                      listState = rememberLazyListState(), eventList = eventList, nav = nav)
+                      listState = rememberLazyListState(),
+                      eventList = eventList,
+                      nav = nav,
+                  )
                 }
           }
         } else {
-          Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            CircularProgressIndicator()
-          }
+          LoadingText()
         }
 
         SearchModule(
             nav = nav,
             backgroundColor = MaterialTheme.colorScheme.background,
-            contentColor = MaterialTheme.colorScheme.tertiary)
+            contentColor = MaterialTheme.colorScheme.tertiary,
+            currentUID = eventViewModel.currentUID!!,
+        )
       }
 }
 

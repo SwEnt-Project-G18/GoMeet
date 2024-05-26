@@ -3,7 +3,6 @@ package com.github.se.gomeet
 import android.os.Bundle
 import androidx.test.runner.AndroidJUnitRunner
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.database.ktx.database
 import com.google.firebase.firestore.firestoreSettings
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.memoryCacheSettings
@@ -30,7 +29,6 @@ class InstrTestRunner : AndroidJUnitRunner() {
     Firebase.auth.useEmulator("10.0.2.2", 9099)
     Firebase.storage.useEmulator("10.0.2.2.", 9199)
     Firebase.firestore.useEmulator("10.0.2.2", 8080)
-    Firebase.database.useEmulator("10.0.2.2", 9000)
     Firebase.firestore.firestoreSettings = firestoreSettings {
       setLocalCacheSettings(memoryCacheSettings {})
       setLocalCacheSettings(

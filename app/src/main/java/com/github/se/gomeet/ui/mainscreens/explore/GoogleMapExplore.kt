@@ -40,9 +40,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
-import com.github.se.gomeet.model.event.eventMomentToString
-import com.github.se.gomeet.model.event.getEventDateString
-import com.github.se.gomeet.model.event.getEventTimeString
+import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -184,7 +182,7 @@ internal fun GoogleMapView(
   if (mapVisible) {
     Box(Modifier.fillMaxSize()) {
       if (isLoading) {
-        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+        LoadingText()
       } else {
         GoogleMap(
             modifier = modifier,
@@ -242,12 +240,12 @@ internal fun GoogleMapView(
                           nav.navigateToEventInfo(
                               eventId = event.eventID,
                               title = event.title,
-                              date = getEventDateString(event.date),
-                              time = getEventTimeString(event.time),
+                              date = event.getDateString(),
+                              time = event.getTimeString(),
                               description = event.description,
                               organizer = event.creator,
                               loc = LatLng(event.location.latitude, event.location.longitude),
-                              rating = 0.0 // TODO: replace with actual rating
+                              rating = 0L // TODO: replace with actual rating
                               // TODO: add image
                           )
                       },
@@ -260,14 +258,14 @@ internal fun GoogleMapView(
                                     nav.navigateToEventInfo(
                                         eventId = event.eventID,
                                         title = event.title,
-                                        date = getEventDateString(event.date),
-                                        time = getEventTimeString(event.time),
+                                        date = event.getDateString(),
+                                        time = event.getTimeString(),
                                         description = event.description,
                                         organizer = event.creator,
                                         loc =
                                             LatLng(
                                                 event.location.latitude, event.location.longitude),
-                                        rating = 0.0 // TODO: replace with actual rating
+                                        rating = 0L // TODO: replace with actual rating
                                         // TODO: add image
                                         )
                                   }
@@ -291,7 +289,7 @@ internal fun GoogleMapView(
                                         style = MaterialTheme.typography.titleMedium,
                                         color = MaterialTheme.colorScheme.onBackground)
                                     Text(
-                                        text = eventMomentToString(event.date, event.time),
+                                        text = event.momentToString(),
                                         style =
                                             MaterialTheme.typography
                                                 .bodyMedium, // Smaller text style

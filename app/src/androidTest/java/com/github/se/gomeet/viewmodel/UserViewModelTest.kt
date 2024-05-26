@@ -21,26 +21,20 @@ class UserViewModelTest {
     private const val phonenumber = "testphonenumber"
     private const val country = "testcountry"
 
-    private val userVM = UserViewModel()
+    private val userVM = UserViewModel(uid)
 
     @BeforeClass
     @JvmStatic
-    fun setup() {
-      // Assumes that getUser works...
-      runBlocking {
-        userVM.createUserIfNew(uid, username, firstname, lastname, email, phonenumber, country, "")
-        while (userVM.getUser(uid) == null) {
-          TimeUnit.SECONDS.sleep(1)
-        }
-      }
+    fun setup() = runBlocking {
+      userVM.createUserIfNew(uid, username, firstname, lastname, email, phonenumber, country, "")
+      TimeUnit.SECONDS.sleep(1)
     }
 
     @AfterClass
     @JvmStatic
-    fun tearDown() {
+    fun tearDown() = runBlocking {
       // Clean up the user
-      runBlocking { userVM.deleteUser(uid) }
-      runBlocking { assert(userVM.getUser(uid) == null) }
+      userVM.deleteUser(uid)
     }
   }
 

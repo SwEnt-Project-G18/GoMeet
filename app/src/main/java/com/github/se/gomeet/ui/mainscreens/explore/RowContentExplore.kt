@@ -32,9 +32,6 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
-import com.github.se.gomeet.model.event.eventMomentToString
-import com.github.se.gomeet.model.event.getEventDateString
-import com.github.se.gomeet.model.event.getEventTimeString
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.google.android.gms.maps.model.LatLng
 
@@ -43,7 +40,7 @@ import com.google.android.gms.maps.model.LatLng
 fun ContentInRow(
     listState: LazyListState,
     eventList: MutableState<List<Event>>,
-    nav: NavigationActions
+    nav: NavigationActions,
 ) {
 
   val events = eventList.value
@@ -73,12 +70,12 @@ fun ContentInRow(
                                 nav.navigateToEventInfo(
                                     eventId = event.eventID,
                                     title = event.title,
-                                    date = getEventDateString(event.date),
-                                    time = getEventTimeString(event.time),
+                                    date = event.getDateString(),
+                                    time = event.getTimeString(),
                                     description = event.description,
                                     organizer = event.creator,
                                     loc = LatLng(event.location.latitude, event.location.longitude),
-                                    rating = 0.0 // TODO: replace with actual rating
+                                    rating = 0L // TODO: replace with actual rating
                                     // TODO: add image
                                     )
                               }) {
@@ -102,19 +99,19 @@ fun ContentInRow(
                             contentScale = ContentScale.Crop,
                             modifier = Modifier.fillMaxSize().aspectRatio(3f / 1.75f))
                       }
-                  Column(modifier = Modifier.padding(start = 20.dp, end = 5.dp, bottom = 10.dp)) {
-                    Text(
-                        text =
-                            if (event.title.length > 37) event.title.take(33) + "...."
-                            else event.title,
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onBackground)
-                    Text(
-                        text = eventMomentToString(event.date, event.time),
-                        style = MaterialTheme.typography.bodyMedium, // Smaller text style
-                        color = MaterialTheme.colorScheme.onBackground)
-                  }
-                }
+
+                    Column(modifier = Modifier.padding(start = 10.dp, end = 10.dp, bottom = 10.dp)) {
+                      Text(
+                          text =
+                              if (event.title.length > 37) event.title.take(33) + "...." else event.title,
+                          style = MaterialTheme.typography.titleMedium,
+                          color = MaterialTheme.colorScheme.onBackground)
+                      Text(
+                          text = event.momentToString(),
+                          style = MaterialTheme.typography.bodyMedium, // Smaller text style
+                          color = MaterialTheme.colorScheme.onBackground)
+                    }
+            }
           }
         }
   }

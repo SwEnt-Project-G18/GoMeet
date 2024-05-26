@@ -1,6 +1,7 @@
 package com.github.se.gomeet.ui.mainscreens.events
 
 import EventWidget
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -53,7 +54,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
-import com.github.se.gomeet.model.event.isPastEvent
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.mainscreens.events.Filter.*
@@ -66,6 +66,8 @@ import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import kotlinx.coroutines.launch
 
+private const val TAG = "Events"
+
 /**
  * Composable function to display the Events screen.
  *
@@ -76,12 +78,7 @@ import kotlinx.coroutines.launch
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Events(
-    currentUser: String,
-    nav: NavigationActions,
-    userViewModel: UserViewModel,
-    eventViewModel: EventViewModel
-) {
+fun Events(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel: EventViewModel) {
   val screenWidth = LocalConfiguration.current.screenWidthDp.dp
   val screenHeight = LocalConfiguration.current.screenHeightDp.dp
   // State management for event filters and list
@@ -91,20 +88,22 @@ fun Events(
   val query = remember { mutableStateOf("") }
   val user = remember { mutableStateOf<GoMeetUser?>(null) }
   val eventsLoaded = remember { mutableStateOf(false) }
+  val currentUID = userViewModel.currentUID!!
 
   // Initial data loading using LaunchedEffect
   LaunchedEffect(Unit) {
     coroutineScope.launch {
-      user.value = userViewModel.getUser(currentUser)
-      val allEvents =
-          (eventViewModel.getAllEvents() ?: emptyList()).filter { e ->
+      user.value = userViewModel.getUser(currentUID)
+      Log.d(TAG, "User is ${user.value!!.username} with ${user.value!!.myEvents.size} events")
+      val allEvents = (eventViewModel.getAllEvents() ?: emptyList())
+      eventList.addAll(
+          allEvents.filter { e ->
             (user.value!!.myEvents.contains(e.eventID) ||
                 user.value!!.myFavorites.contains(e.eventID) ||
-                user.value!!.joinedEvents.contains(e.eventID)) && !isPastEvent(e)
-          }
-      if (allEvents.isNotEmpty()) {
-        eventList.addAll(allEvents)
-      }
+                user.value!!.joinedEvents.contains(e.eventID)) && !e.isPastEvent()
+          })
+
+      Log.d(TAG, "Displaying ${eventList.size} events out of ${allEvents.size} total events")
       eventsLoaded.value = true
     }
   }

@@ -51,8 +51,6 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
-import com.github.se.gomeet.model.event.getEventDateString
-import com.github.se.gomeet.model.event.getEventTimeString
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.viewmodel.EventViewModel
@@ -94,10 +92,10 @@ fun InvitationsNotificationsWidget(
         nav.navigateToEventInfo(
             event.eventID,
             event.title,
-            getEventDateString(event.date),
-            getEventTimeString(event.time),
+           event.getDateString(),
+            event.getTimeString(),
             event.creator,
-            0.0,
+            0L,
             event.description,
             LatLng(event.location.latitude, event.location.longitude)
         )
@@ -134,7 +132,7 @@ fun InvitationsNotificationsWidget(
                 }
 
                 Text(
-                    getEventDateString(event.date) + ", " + getEventTimeString(event.time),
+                    event.momentToString(),
                     color = MaterialTheme.colorScheme.tertiary,
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.testTag("EventDate")

@@ -40,11 +40,11 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
-import com.github.se.gomeet.model.event.getEventDateString
-import com.github.se.gomeet.model.event.getEventTimeString
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.android.gms.maps.model.LatLng
+
+private const val TAG = "EventWidget"
 
 /**
  * A composable function that displays detailed information about an event in a card layout. This
@@ -66,8 +66,8 @@ fun EventWidget(event: Event, verified: Boolean, nav: NavigationActions, userVM:
   val smallTextSize = with(density) { screenWidth.toPx() / 85 }
   val bigTextSize = with(density) { screenWidth.toPx() / 60 }
 
-  val dayString = getEventDateString(event.date)
-  val timeString = getEventTimeString(event.time)
+  val dayString = event.getDateString()
+  val timeString = event.getTimeString()
 
   val painter: Painter =
       if (event.images.isNotEmpty()) {
@@ -97,8 +97,8 @@ fun EventWidget(event: Event, verified: Boolean, nav: NavigationActions, userVM:
                     description = event.description,
                     organizer = event.creator,
                     loc = LatLng(event.location.latitude, event.location.longitude),
-                    rating = 0.0 // TODO: replace with actual rating
-                    )
+                    rating = event.ratings[userVM.currentUID!!] ?: 0,
+                )
               },
       colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
   ) {
