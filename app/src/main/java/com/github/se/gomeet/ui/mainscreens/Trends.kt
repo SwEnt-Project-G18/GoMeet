@@ -300,10 +300,11 @@ fun SortButton(eventList: MutableList<Event>, userTags: List<Tag>) {
       contentAlignment = Alignment.Center,
       modifier = Modifier.fillMaxWidth().padding(top = 10.dp, start = 10.dp, end = 10.dp)) {
         Button(
-            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(10.dp),
+            modifier = Modifier.fillMaxWidth(0.6f),
             colors =
                 ButtonDefaults.buttonColors(
-                    MaterialTheme.colorScheme.primaryContainer, MaterialTheme.colorScheme.tertiary),
+                    MaterialTheme.colorScheme.secondaryContainer, MaterialTheme.colorScheme.tertiary),
             onClick = { expanded = true }) {
               Text("Sort")
             }
@@ -314,7 +315,7 @@ fun SortButton(eventList: MutableList<Event>, userTags: List<Tag>) {
             modifier =
                 Modifier.align(Alignment.Center)
                     .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.primaryContainer)) {
+                    .background(MaterialTheme.colorScheme.secondaryContainer)) {
               DropdownMenuItem(
                   text = { Text("Popularity") },
                   onClick = {

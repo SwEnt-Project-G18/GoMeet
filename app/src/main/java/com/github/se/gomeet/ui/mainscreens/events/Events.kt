@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DockedSearchBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -295,37 +296,28 @@ fun GoMeetSearchBar(
   val customTextSelectionColors =
       TextSelectionColors(handleColor = DarkCyan, backgroundColor = DarkCyan.copy(alpha = 0.4f))
   CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
-    SearchBar(
+      DockedSearchBar(
         shape = RoundedCornerShape(10.dp),
         query = query.value,
         onQueryChange = { query.value = it },
         active = false,
         modifier = Modifier
             .fillMaxWidth()
-            .height(45.dp)
             .padding(horizontal = 10.dp),
-        placeholder = { Text("Search", color = contentColor, style = MaterialTheme.typography.bodySmall) },
+        placeholder = { Text("Search", color = contentColor) },
         leadingIcon = {
-          IconButton(onClick = { nav.navigateToScreen(Route.MESSAGE_CHANNELS) }) {
             Icon(
-                ImageVector.vectorResource(R.drawable.gomeet_icon),
+                ImageVector.vectorResource(R.drawable.mic_icon),
                 contentDescription = null,
                 tint = contentColor,
-                modifier = Modifier.size(15.dp))
-          }
+                modifier =
+                Modifier
+                    .size(20.dp)
+                    .clickable {
+                        // TODO: handle voice search
+                    })
         },
-        trailingIcon = {
-          Icon(
-              ImageVector.vectorResource(R.drawable.mic_icon),
-              contentDescription = null,
-              tint = contentColor,
-              modifier =
-              Modifier
-                  .size(15.dp)
-                  .clickable {
-                      // TODO: handle voice search
-                  })
-        },
+        trailingIcon = {},
         colors =
             SearchBarDefaults.colors(
                 containerColor = backgroundColor,
@@ -380,7 +372,7 @@ private fun eventsButtonColour(clicked: Filter, button: Filter): ButtonColors {
 
   val unselectedButtonColour =
       ButtonDefaults.buttonColors(
-          containerColor = MaterialTheme.colorScheme.primaryContainer,
+          containerColor = MaterialTheme.colorScheme.secondaryContainer,
           contentColor = MaterialTheme.colorScheme.tertiary)
 
   return if (clicked == button) selectedButtonColour else unselectedButtonColour

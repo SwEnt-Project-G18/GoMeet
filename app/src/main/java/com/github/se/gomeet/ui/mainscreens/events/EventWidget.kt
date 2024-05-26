@@ -109,7 +109,7 @@ fun EventWidget(event: Event, verified: Boolean, nav: NavigationActions, userVM:
                             lineHeight = 20.sp,
                             fontFamily = FontFamily(Font(R.font.roboto)),
                             fontWeight = FontWeight(700),
-                            color = MaterialTheme.colorScheme.onBackground,
+                            color = MaterialTheme.colorScheme.tertiary,
                             letterSpacing = 0.25.sp,
                         ),
                     modifier = Modifier.testTag("EventName"))
