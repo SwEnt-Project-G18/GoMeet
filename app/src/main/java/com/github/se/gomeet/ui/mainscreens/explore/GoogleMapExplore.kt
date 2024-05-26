@@ -60,8 +60,8 @@ import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.MarkerInfoWindow
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
-import kotlinx.coroutines.launch
 import java.time.LocalDate
+import kotlinx.coroutines.launch
 
 internal val defaultPosition = LatLng(46.51912357457158, 6.568023741881372)
 internal const val defaultZoom = 16f
@@ -79,7 +79,6 @@ internal enum class CameraAction {
 }
 
 internal val moveToCurrentLocation = mutableStateOf(CameraAction.NO_ACTION)
-
 
 /**
  * The GoogleMapView composable displays a Google Map with custom pins for events.

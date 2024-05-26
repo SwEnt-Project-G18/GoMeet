@@ -1,20 +1,13 @@
 package com.github.se.gomeet.ui.mainscreens.events.manageinvites
 
-import android.util.Log
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
@@ -27,26 +20,15 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.Gray
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
-import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.InviteStatus
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.profile.ProfileImage
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
-import com.github.se.gomeet.ui.theme.DarkerGreen
 
 private const val TAG = "UserInviteWidget"
 
@@ -67,65 +49,62 @@ fun UserInviteWidget(
     status: InviteStatus?,
     initialClicked: Boolean,
     callback: (GoMeetUser) -> Unit,
-    nav : NavigationActions
+    nav: NavigationActions
 ) {
 
   var clicked by rememberSaveable { mutableStateOf(initialClicked) }
-    Column {
-        Row(
-            modifier =
-            Modifier
-                .fillMaxWidth()
+  Column {
+    Row(
+        modifier =
+            Modifier.fillMaxWidth()
                 .padding(start = 15.dp, end = 15.dp, bottom = 10.dp)
                 .clickable { nav.navigateToScreen(Route.OTHERS_PROFILE.replace("{uid}", user.uid)) }
                 .testTag("FollowingUser"),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically) {
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically) {
+          ProfileImage(
+              userId = user.uid,
+              modifier = Modifier.testTag("Event Post Profile Picture"),
+              size = 50.dp)
+          Column(modifier = Modifier.padding(start = 15.dp).weight(1f)) {
+            Text(
+                text = "${user.firstName} ${user.lastName}",
+                color = MaterialTheme.colorScheme.onBackground)
+            Text(
+                "@${user.username}",
+                color = MaterialTheme.colorScheme.onBackground,
+            )
+          }
 
-            ProfileImage(
-                userId = user.uid,
-                modifier = Modifier.testTag("Event Post Profile Picture"),
-                size = 50.dp)
-            Column(modifier = Modifier
-                .padding(start = 15.dp)
-                .weight(1f)) {
-                Text(
-                    text = "${user.firstName} ${user.lastName}",
-                    color = MaterialTheme.colorScheme.onBackground)
-                Text(
-                    "@${user.username}",
-                    color = MaterialTheme.colorScheme.onBackground,
-                )
-            }
-
-            if (status == InviteStatus.PENDING || status == InviteStatus.TO_INVITE || status == null){
-                Button(
-                    onClick = {
-                        clicked = !clicked
-                        val toAdd = (!clicked && status == InviteStatus.PENDING || status == null)
-                        callback(user.copy(pendingRequests = pendingRequests(user, event, status, toAdd)))
-                    },
-                    modifier = Modifier
-                        .padding(start = 15.dp)
-                        .width(110.dp),
-                    shape = RoundedCornerShape(10.dp),
-                    colors = manageInvitesButtonColour(status, clicked)) {
-                    Text(
-                        text =
-                        when (status) {
+          if (status == InviteStatus.PENDING ||
+              status == InviteStatus.TO_INVITE ||
+              status == null) {
+            Button(
+                onClick = {
+                  clicked = !clicked
+                  val toAdd = (!clicked && status == InviteStatus.PENDING || status == null)
+                  callback(user.copy(pendingRequests = pendingRequests(user, event, status, toAdd)))
+                },
+                modifier = Modifier.padding(start = 15.dp).width(110.dp),
+                shape = RoundedCornerShape(10.dp),
+                colors = manageInvitesButtonColour(status, clicked)) {
+                  Text(
+                      text =
+                          when (status) {
                             InviteStatus.PENDING -> if (clicked) "Invite" else "Cancel"
                             else -> if (!clicked) "Invite" else "Cancel"
-                        },
-                        color =
-                        when (status) {
+                          },
+                      color =
+                          when (status) {
                             InviteStatus.PENDING -> if (clicked) Color.White else Color.DarkGray
                             else -> if (!clicked) Color.White else Color.DarkGray
-                        },
-                        style = MaterialTheme.typography.labelLarge)
+                          },
+                      style = MaterialTheme.typography.labelLarge)
                 }
-            }
-
+          }
         }
-        HorizontalDivider(color = MaterialTheme.colorScheme.primaryContainer, modifier = Modifier.padding(bottom = 10.dp))
-    }
+    HorizontalDivider(
+        color = MaterialTheme.colorScheme.primaryContainer,
+        modifier = Modifier.padding(bottom = 10.dp))
+  }
 }

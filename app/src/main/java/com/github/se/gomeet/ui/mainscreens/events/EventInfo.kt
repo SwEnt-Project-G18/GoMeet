@@ -73,12 +73,12 @@ fun EventHeader(
     rating: MutableState<Long>,
     organiser: GoMeetUser
 ) {
-    val screenWidth = LocalConfiguration.current.screenWidthDp
+  val screenWidth = LocalConfiguration.current.screenWidthDp
   Row(
       modifier = Modifier.fillMaxWidth().testTag("EventHeader").padding(10.dp),
       verticalAlignment = Alignment.Top,
       horizontalArrangement = Arrangement.SpaceBetween) {
-        Column (Modifier.width((screenWidth *0.6).dp)){
+        Column(Modifier.width((screenWidth * 0.6).dp)) {
           Text(
               text = event.title,
               style =
@@ -295,11 +295,11 @@ fun EventButtons(
               modifier = Modifier.weight(1f),
               colors =
                   when (buttons) {
-                    0, 1 ->
+                    0,
+                    1 ->
                         ButtonDefaults.textButtonColors(
                             containerColor = MaterialTheme.colorScheme.primaryContainer,
                             contentColor = MaterialTheme.colorScheme.tertiary)
-
                     else ->
                         ButtonDefaults.textButtonColors(
                             containerColor = MaterialTheme.colorScheme.outlineVariant,
@@ -447,7 +447,6 @@ private fun eventAction(
       currentEvent.participants = currentEvent.participants.plus(currentUser.uid)
       userViewModel.editUser(currentUser)
       eventViewModel.editEvent(currentEvent)
-
     }
   }
 }

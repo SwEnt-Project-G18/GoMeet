@@ -121,8 +121,8 @@ fun InvitationsNotificationsWidget(
 
           Button(
               onClick = {
-                  clicked = true
-                  userViewModel.userRefusesInvitation(event, user, eventViewModel)
+                clicked = true
+                userViewModel.userRefusesInvitation(event, user, eventViewModel)
               },
               shape = RoundedCornerShape(10.dp),
               colors =

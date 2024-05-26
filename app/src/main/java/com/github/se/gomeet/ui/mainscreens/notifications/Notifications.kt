@@ -85,12 +85,7 @@ fun Notifications(nav: NavigationActions, userViewModel: UserViewModel) {
 
     Scaffold(
         modifier = Modifier.testTag("NotificationsScreen"),
-        topBar = {
-          NotificationsTopBar(
-              pagerState,
-              coroutineScope,
-              screenHeight)
-        },
+        topBar = { NotificationsTopBar(pagerState, coroutineScope, screenHeight) },
         bottomBar = { BottomNavigation(nav) }) { innerPadding ->
           HorizontalPager(state = pagerState, modifier = Modifier.padding(innerPadding)) { page ->
             when (page) {
@@ -177,10 +172,7 @@ fun NotificationsTopBar(
   }
 }
 
-/**
- * This composable is used to display the top app bar.
- *
- */
+/** This composable is used to display the top app bar. */
 @Composable
 fun TopAppBar() {
   Row(
