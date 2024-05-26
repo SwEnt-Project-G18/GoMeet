@@ -45,7 +45,8 @@ class UserViewModel(val currentUID: String? = null) : ViewModel() {
       email: String,
       phoneNumber: String,
       country: String,
-      pfp: String = ""
+      pfp: String = "",
+      favorites: List<String> = emptyList()
   ): GoMeetUser? {
     var user: GoMeetUser? = null
     CoroutineScope(Dispatchers.IO).launch {
@@ -65,7 +66,7 @@ class UserViewModel(val currentUID: String? = null) : ViewModel() {
                   country = country,
                   joinedEvents = emptyList(),
                   myEvents = emptyList(),
-                  myFavorites = emptyList(),
+                  myFavorites = favorites,
                   profilePicture = pfp,
                   tags = emptyList())
           _currentUser.value = user
