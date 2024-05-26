@@ -9,9 +9,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.material3.Icon
@@ -71,6 +73,8 @@ fun EventPost(
   val coroutineScope = rememberCoroutineScope()
   val screenHeight = LocalConfiguration.current.screenHeightDp.dp
 
+    var showDeletePostDialog by remember { mutableStateOf(false) }
+
   LaunchedEffect(Unit) {
     coroutineScope.launch {
       poster = userViewModel.getUser(post.userId)
@@ -85,14 +89,15 @@ fun EventPost(
           horizontalArrangement = Arrangement.Start,
           verticalAlignment = Alignment.CenterVertically,
           modifier =
-              Modifier.clickable {
-                    if (currentUser == post.userId) {
+          Modifier
+              .clickable {
+                  if (currentUser == post.userId) {
                       nav.navigateToScreen(Route.PROFILE)
-                    } else {
+                  } else {
                       nav.navigateToScreen(Route.OTHERS_PROFILE.replace("{uid}", post.userId))
-                    }
                   }
-                  .testTag("EventPostUserInfo")) {
+              }
+              .testTag("EventPostUserInfo")) {
             ProfileImage(
                 userId = poster!!.uid,
                 modifier = Modifier.testTag("Event Post Profile Picture"),
@@ -129,9 +134,10 @@ fun EventPost(
             contentDescription = "Post Image",
             contentScale = ContentScale.Crop,
             modifier =
-                Modifier.padding(horizontal = 10.dp)
-                    .aspectRatio(2f)
-                    .clip(RoundedCornerShape(20.dp)))
+            Modifier
+                .padding(horizontal = 10.dp)
+                .aspectRatio(2f)
+                .clip(RoundedCornerShape(20.dp)))
       }
       Row(verticalAlignment = Alignment.CenterVertically) {
         IconButton(
@@ -173,6 +179,16 @@ fun EventPost(
               }
             }
 
+          if (currentUser == post.userId) {
+              IconButton(onClick = { showDeletePostDialog = true }) {
+                  Icon(
+                      imageVector = Icons.Default.Delete,
+                      contentDescription = "Delete",
+                      tint = MaterialTheme.colorScheme.onBackground
+                  )
+              }
+          }
+
         Spacer(modifier = Modifier.weight(1f))
         Text(
             text = "${event.getDateString()}, ${event.getTimeString()}",
@@ -181,4 +197,14 @@ fun EventPost(
       }
     }
   }
+
+    if (showDeletePostDialog) {
+        DeletePostDialog()
+    }
+}
+
+
+@Composable
+private fun DeletePostDialog() {
+
 }

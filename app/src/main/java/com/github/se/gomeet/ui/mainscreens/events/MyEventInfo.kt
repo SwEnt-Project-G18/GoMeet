@@ -281,7 +281,6 @@ fun MyEventInfo(
 
     if (showDeleteEventDialog) {
         DeleteEventDialog()
-
     }
 }
 
