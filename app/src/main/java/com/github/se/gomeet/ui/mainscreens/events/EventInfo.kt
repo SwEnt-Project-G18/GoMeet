@@ -443,22 +443,23 @@ private fun eventAction(
   when (buttons) {
     0 -> nav.navigateToScreen(Route.EDIT_EVENT.replace("{eventId}", event.eventID))
     1 -> {
+      callback(3)
       currentUser.joinedEvents = currentUser.joinedEvents.minus(event.eventID)
       currentEvent.participants = currentEvent.participants.minus(currentUser.uid)
       userViewModel.editUser(currentUser)
       eventViewModel.editEvent(currentEvent)
-      callback(3)
     }
     2 -> {
-      userViewModel.userAcceptsInvitation(event, currentUser, eventViewModel)
       callback(1)
+      userViewModel.userAcceptsInvitation(event, currentUser, eventViewModel)
     }
     3 -> {
+      callback(1)
       currentUser.joinedEvents = currentUser.joinedEvents.plus(event.eventID)
       currentEvent.participants = currentEvent.participants.plus(currentUser.uid)
       userViewModel.editUser(currentUser)
       eventViewModel.editEvent(currentEvent)
-      callback(1)
+
     }
   }
 }

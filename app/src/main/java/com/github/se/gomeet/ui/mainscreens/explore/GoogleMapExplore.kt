@@ -79,7 +79,7 @@ internal enum class CameraAction {
 }
 
 internal val moveToCurrentLocation = mutableStateOf(CameraAction.NO_ACTION)
-internal val isButtonVisible = mutableStateOf(true)
+
 
 /**
  * The GoogleMapView composable displays a Google Map with custom pins for events.
