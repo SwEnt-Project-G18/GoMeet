@@ -428,6 +428,16 @@ class EventViewModel(val currentUID: String? = null) : ViewModel() {
         event.copy(pendingParticipants = event.pendingParticipants.minus(userId)))
   }
 
+    fun deletePost(event: Event, post: Post) {
+        if (!event.posts.contains(post)) {
+            Log.w(TAG, "Event ${event.eventID} doesn't have post ${post.title}")
+            return
+        }
+
+        val updatedPosts = event.posts.minus(post)
+        editEvent(event.copy(posts = updatedPosts))
+    }
+
   /**
    * Get the location of an event.
    *

@@ -16,6 +16,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material.icons.outlined.ThumbUp
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -199,12 +202,44 @@ fun EventPost(
   }
 
     if (showDeletePostDialog) {
-        DeletePostDialog()
+        DeletePostDialog(
+            onConfirm = {
+                coroutineScope.launch {
+                    eventViewModel.deletePost(event, post)
+                    showDeletePostDialog = false
+                }
+            },
+            onDismiss = { showDeletePostDialog = false }
+        )
     }
 }
 
 
 @Composable
-private fun DeletePostDialog() {
-
+private fun DeletePostDialog(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            Button(onClick = onConfirm,
+                colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.outlineVariant)) {
+                Text("Confirm")
+            }
+        },
+        dismissButton = {
+            Button(onClick = onDismiss,
+                colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.onErrorContainer)) {
+                Text("Cancel")
+            }
+        },
+        title = { Text("Delete Post") },
+        text = { Text("Are you sure you want to delete this post?") },
+        containerColor = MaterialTheme.colorScheme.background,
+    )
 }
