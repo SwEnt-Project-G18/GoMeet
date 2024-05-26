@@ -116,7 +116,8 @@ internal fun GoogleMapView(
             compassEnabled = false,
             zoomControlsEnabled = false,
             myLocationButtonEnabled = false, // Enable default location button
-            mapToolbarEnabled = false // Disable default map toolbar (might include the Google Maps button)
+            mapToolbarEnabled =
+                false // Disable default map toolbar (might include the Google Maps button)
             ))
   }
 
