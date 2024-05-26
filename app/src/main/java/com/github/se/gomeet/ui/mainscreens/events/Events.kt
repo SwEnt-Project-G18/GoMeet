@@ -165,19 +165,19 @@ fun Events(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel:
                   horizontalArrangement = Arrangement.SpaceEvenly,
                   modifier = Modifier.fillMaxWidth()) {
                     Button(
-                        modifier = Modifier.fillMaxWidth(0.25f).testTag("JoinedButton"),
+                        modifier = Modifier.testTag("JoinedButton"),
                         onClick = { onFilterButtonClick(JOINED) },
                         content = { Text(JOINED.formattedName) },
                         shape = RoundedCornerShape(10.dp),
                         colors = eventsButtonColour(selectedFilter, JOINED))
                     Button(
-                        modifier = Modifier.fillMaxWidth(0.25f).testTag("FavouritesButton"),
+                        modifier = Modifier.testTag("FavouritesButton"),
                         onClick = { onFilterButtonClick(FAVOURITES) },
                         content = { Text(FAVOURITES.formattedName) },
                         shape = RoundedCornerShape(10.dp),
                         colors = eventsButtonColour(selectedFilter, FAVOURITES))
                     Button(
-                        modifier = Modifier.fillMaxWidth(0.25f).testTag("MyEventsButton"),
+                        modifier = Modifier.testTag("MyEventsButton"),
                         onClick = { onFilterButtonClick(MY_EVENTS) },
                         content = { Text(MY_EVENTS.formattedName) },
                         shape = RoundedCornerShape(10.dp),
