@@ -3,14 +3,33 @@ package com.github.se.gomeet.ui.mainscreens.notifications
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
@@ -31,7 +50,6 @@ import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
-import java.util.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -51,7 +69,6 @@ fun Notifications(nav: NavigationActions, userViewModel: UserViewModel) {
   var isLoaded by remember { mutableStateOf(false) }
   val coroutineScope = rememberCoroutineScope()
 
-  val toUpdate = remember { mutableListOf<Event>() }
   val user = remember { mutableStateOf<GoMeetUser?>(null) }
   val eventsList = remember { mutableStateListOf<Event>() }
   val eventToCreatorMap = remember { mutableStateMapOf<Event, String>() }
@@ -72,12 +89,7 @@ fun Notifications(nav: NavigationActions, userViewModel: UserViewModel) {
           NotificationsTopBar(
               pagerState,
               coroutineScope,
-              screenHeight,
-              nav,
-              user.value!!,
-              eventViewModel,
-              userViewModel,
-              toUpdate)
+              screenHeight)
         },
         bottomBar = { BottomNavigation(nav) }) { innerPadding ->
           HorizontalPager(state = pagerState, modifier = Modifier.padding(innerPadding)) { page ->
@@ -86,9 +98,8 @@ fun Notifications(nav: NavigationActions, userViewModel: UserViewModel) {
                   PageInvitationsNotifications(
                       listEvent = eventsList,
                       userViewModel = userViewModel,
-                      currentUserId = currentUserID,
+                      user = user.value!!,
                       initialClicked = false,
-                      callback = { event -> toUpdate.add(event) },
                       eventViewModel = eventViewModel,
                       nav = nav)
               1 -> {
@@ -152,11 +163,6 @@ suspend fun fetchUserAndEvents(
  * @param pagerState the pager state
  * @param coroutineScope the coroutine scope
  * @param screenHeight the screen height
- * @param nav the navigation actions
- * @param currentUserID the userID of the user receiving the notifications
- * @param eventViewModel the event view model
- * @param userViewModel the user view model
- * @param toUpdate the list of events to update
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -164,11 +170,6 @@ fun NotificationsTopBar(
     pagerState: PagerState,
     coroutineScope: CoroutineScope,
     screenHeight: Dp,
-    nav: NavigationActions,
-    currentUser: GoMeetUser,
-    eventViewModel: EventViewModel,
-    userViewModel: UserViewModel,
-    toUpdate: List<Event>
 ) {
   Column {
     TopAppBar()
@@ -179,11 +180,6 @@ fun NotificationsTopBar(
 /**
  * This composable is used to display the top app bar.
  *
- * @param nav the navigation actions
- * @param currentUserID the userID of the user receiving the notifications
- * @param eventViewModel the event view model
- * @param userViewModel the user view model
- * @param toUpdate the list of events to update
  */
 @Composable
 fun TopAppBar() {
@@ -278,18 +274,18 @@ fun BottomNavigation(nav: NavigationActions) {
  *
  * @param listEvent the list of events to display
  * @param userViewModel the user view model
- * @param currentUserId the user receiving the notifications
+ * @param eventViewModel the event view model
+ * @param user the user receiving the notifications
  * @param initialClicked the initial state of the buttons
- * @param callback the callback to update the event
+ * @param nav the navigation controller
  */
 @Composable
 fun PageInvitationsNotifications(
     listEvent: List<Event>,
     userViewModel: UserViewModel,
     eventViewModel: EventViewModel,
-    currentUserId: String,
+    user: GoMeetUser,
     initialClicked: Boolean,
-    callback: (Event) -> Unit,
     nav: NavigationActions
 ) {
   Column(
@@ -298,11 +294,10 @@ fun PageInvitationsNotifications(
       modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
         listEvent.forEach { event ->
           InvitationsNotificationsWidget(
+              user,
               event = event,
               userViewModel = userViewModel,
-              currentUserId = currentUserId,
               initialClicked = initialClicked,
-              callback = callback,
               eventViewModel = eventViewModel,
               nav = nav)
         }

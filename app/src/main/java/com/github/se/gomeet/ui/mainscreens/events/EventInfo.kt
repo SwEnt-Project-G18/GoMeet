@@ -304,14 +304,11 @@ fun EventButtons(
               modifier = Modifier.weight(1f),
               colors =
                   when (buttons) {
-                    0 ->
+                    0, 1 ->
                         ButtonDefaults.textButtonColors(
                             containerColor = MaterialTheme.colorScheme.primaryContainer,
                             contentColor = MaterialTheme.colorScheme.tertiary)
-                    1 ->
-                        ButtonDefaults.textButtonColors(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer,
-                            contentColor = MaterialTheme.colorScheme.tertiary)
+
                     else ->
                         ButtonDefaults.textButtonColors(
                             containerColor = MaterialTheme.colorScheme.outlineVariant,
@@ -345,7 +342,7 @@ fun EventButtons(
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
                         contentColor = MaterialTheme.colorScheme.tertiary)) {
                   if (buttons == 0) {
-                    Text("Add Participants")
+                    Text("Participants")
                   } else {
                     Text("Decline Invite")
                   }
@@ -426,7 +423,7 @@ private fun FavouriteButton(isFavourite: Boolean) {
  * Helper function to perform the appropriate action when clicking the event button.
  *
  * @param currentUser Current user
- * @param eventId Event ID
+ * @param event Event
  * @param userViewModel UserViewModel
  * @param currentEvent The current event
  */

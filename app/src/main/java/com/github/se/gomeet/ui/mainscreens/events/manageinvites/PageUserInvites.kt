@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.InviteStatus
 import com.github.se.gomeet.model.user.GoMeetUser
+import com.github.se.gomeet.ui.navigation.NavigationActions
 
 /**
  * This composable function represents the list of users that can be invited to an event.
@@ -25,7 +26,8 @@ fun PageUserInvites(
     currentEvent: Event,
     status: InviteStatus?,
     callback: (GoMeetUser) -> Unit,
-    initialClicked: Boolean
+    initialClicked: Boolean,
+    nav: NavigationActions
 ) {
 
   Column(
@@ -33,7 +35,7 @@ fun PageUserInvites(
       horizontalAlignment = Alignment.CenterHorizontally,
       modifier = Modifier.fillMaxSize()) {
         list.forEach { follower ->
-          UserInviteWidget(follower, currentEvent, status, initialClicked, callback)
+          UserInviteWidget(follower, currentEvent, status, initialClicked, callback, nav)
         }
       }
 }

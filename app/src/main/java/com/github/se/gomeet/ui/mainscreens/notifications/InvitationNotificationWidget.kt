@@ -29,6 +29,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.github.se.gomeet.model.event.Event
+import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
@@ -45,12 +46,11 @@ import com.google.android.gms.maps.model.LatLng
  */
 @Composable
 fun InvitationsNotificationsWidget(
+    user: GoMeetUser,
     event: Event,
     userViewModel: UserViewModel,
     eventViewModel: EventViewModel,
-    currentUserId: String,
     initialClicked: Boolean,
-    callback: (Event) -> Unit,
     nav: NavigationActions
 ) {
   var clicked by rememberSaveable { mutableStateOf(initialClicked) }
@@ -106,10 +106,7 @@ fun InvitationsNotificationsWidget(
           Button(
               onClick = {
                 clicked = true
-                callback(
-                    event.copy(
-                        pendingParticipants = event.pendingParticipants.minus(currentUserId),
-                        participants = event.participants.plus(currentUserId)))
+                userViewModel.userAcceptsInvitation(event, user, eventViewModel)
               },
               shape = RoundedCornerShape(10.dp),
               colors =
@@ -125,10 +122,7 @@ fun InvitationsNotificationsWidget(
 
           Button(
               onClick = {
-                clicked = true
-                callback(
-                    event.copy(
-                        pendingParticipants = event.pendingParticipants.minus(currentUserId)))
+                userViewModel.userRefusesInvitation(event, user, eventViewModel)
               },
               shape = RoundedCornerShape(10.dp),
               colors =
@@ -137,6 +131,7 @@ fun InvitationsNotificationsWidget(
                       contentColor = MaterialTheme.colorScheme.tertiary),
               enabled = !clicked,
               modifier = Modifier.width((screenWidth / 3).dp).testTag("DeclineButton")) {
+                clicked = true
                 Text("Decline")
               }
         }
