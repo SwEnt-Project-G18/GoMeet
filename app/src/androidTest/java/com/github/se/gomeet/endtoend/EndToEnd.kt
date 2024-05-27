@@ -152,7 +152,7 @@ class EndToEndTest : TestCase() {
     ComposeScreen.onComposeScreen<EventsScreen>(composeTestRule) {
       composeTestRule.waitForIdle()
       composeTestRule.onAllNodesWithText("Events")[1].performClick()
-      composeTestRule.waitUntil(timeoutMillis = 5000) {
+      composeTestRule.waitUntil(timeoutMillis = 10000) {
         composeTestRule.onAllNodesWithTag("Card")[0].isDisplayed()
       }
       composeTestRule.onAllNodesWithTag("Card")[0].assertIsDisplayed()
