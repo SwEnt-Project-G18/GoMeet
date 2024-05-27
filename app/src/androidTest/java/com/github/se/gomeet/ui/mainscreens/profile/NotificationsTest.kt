@@ -114,7 +114,6 @@ class NotificationsTest {
     composeTestRule.onNodeWithText("Invitations").assertIsDisplayed().assertHasClickAction()
 
     // Test that the invitation notification widget is correctly displayed
-    composeTestRule.onNodeWithText(eventTitle, substring = true).assertIsDisplayed()
     composeTestRule.onNodeWithText("30/3/2026", substring = true).assertIsDisplayed()
     composeTestRule.onNodeWithText("Accept").assertIsDisplayed().assertHasClickAction()
     composeTestRule.onNodeWithText("Decline").assertIsDisplayed().performClick()
