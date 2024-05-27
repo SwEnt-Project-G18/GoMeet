@@ -259,9 +259,10 @@ fun CreateEvent(
 
               if (!urlValid) {
                 Text(
+                    modifier = Modifier.fillMaxWidth(),
                     text =
                         "Url Not Valid, should be of the form :\n\"" +
-                            "www.example.com, http://example.com, https://example.com\"",
+                            "http://example.com, https://example.com\"",
                     style = MaterialTheme.typography.bodyLarge,
                     color = Color.Red)
               }
@@ -375,7 +376,7 @@ fun CreateEvent(
               Button(
                   modifier = Modifier.width((screenWidth / 1.5.dp).dp).height(screenHeight / 17),
                   onClick = {
-                    urlValid = URLUtil.isValidUrl(url.value)
+                    urlValid = URLUtil.isValidUrl(url.value) || url.value.isEmpty()
                     titleState.value = titleState.value.trimEnd()
                     descriptionState.value = descriptionState.value.trimEnd()
                     url.value = url.value.trimEnd()

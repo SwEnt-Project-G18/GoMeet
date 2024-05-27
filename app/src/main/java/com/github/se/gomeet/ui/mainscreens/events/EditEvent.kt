@@ -160,7 +160,7 @@ fun EditEvent(
                 style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
                 modifier =
                     Modifier.padding(end = 15.dp).clickable {
-                      urlValid = URLUtil.isValidUrl(url.value)
+                      urlValid = URLUtil.isValidUrl(url.value) || url.value.isEmpty()
                       if (urlValid &&
                           titleState.value.isNotEmpty() &&
                           descriptionState.value.isNotEmpty() &&
@@ -303,9 +303,10 @@ fun EditEvent(
 
                   if (!urlValid) {
                     Text(
+                        modifier = Modifier.fillMaxWidth(),
                         text =
                             "Url Not Valid, should be of the form :\n\"" +
-                                "www.example.com, http://example.com, https://example.com\"",
+                                "http://example.com, https://example.com\"",
                         style = MaterialTheme.typography.bodyLarge,
                         color = Color.Red)
                   }
