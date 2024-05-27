@@ -100,9 +100,9 @@ fun SettingsScreen(nav: NavigationActions, /*userViewModel: UserViewModel*/ logO
               SettingsSubtitle(
                   "Who can see your content", Modifier.padding(15.dp).align(Alignment.Start))
 
-              SettingsComposable(R.drawable.indeterminate_check_box, "Account privacy")
+              SettingsComposable(R.drawable.privacy_icon, "Account privacy")
               SettingsComposable(R.drawable.star, "Close friends")
-              SettingsComposable(R.drawable.location_icon, "Blocked")
+              SettingsComposable(R.drawable.blocked_icon, "Blocked")
               SettingsComposable(R.drawable.mail, "Messages")
 
               SettingsSubtitle("Your app and media", Modifier.padding(15.dp).align(Alignment.Start))
@@ -113,7 +113,7 @@ fun SettingsScreen(nav: NavigationActions, /*userViewModel: UserViewModel*/ logO
                   "Device permissions",
                   true,
                   { nav.navigateToScreen(Route.PERMISSIONS) })
-              SettingsComposable(R.drawable.check_icon, "Accessibility")
+              SettingsComposable(R.drawable.accessibility_icon, "Accessibility")
               SettingsComposable(R.drawable.language, "Language")
 
               SettingsSubtitle(
