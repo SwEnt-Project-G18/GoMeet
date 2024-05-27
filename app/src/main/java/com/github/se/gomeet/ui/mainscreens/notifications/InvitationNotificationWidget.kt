@@ -97,8 +97,7 @@ fun InvitationsNotificationsWidget(
                     Text(
                         event.momentToString(),
                         color = MaterialTheme.colorScheme.tertiary,
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.testTag("EventDate"))
+                        style = MaterialTheme.typography.bodyMedium)
                   }
             }
 

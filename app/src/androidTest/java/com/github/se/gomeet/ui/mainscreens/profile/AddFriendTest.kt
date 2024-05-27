@@ -44,23 +44,28 @@ class AddFriendTest {
 
     @BeforeClass
     @JvmStatic
-    fun setup() {
-      runBlocking {
-        // Create user1
-        Firebase.auth.createUserWithEmailAndPassword(email1, pwd1).await()
-        uid1 = Firebase.auth.currentUser!!.uid
-        userVM = UserViewModel(uid1)
+    fun setup() = runBlocking {
+      // Create user1
+      Firebase.auth.createUserWithEmailAndPassword(email1, pwd1).await()
+      uid1 = Firebase.auth.currentUser!!.uid
+      userVM = UserViewModel(uid1)
 
-        // Add the users to the view model
-        userVM.createUserIfNew(
-            uid1, "username1", "firstName1", "lastName1", email1, "testphonenumber", "testcountry")
-        userVM.createUserIfNew(
-            uid2, username2, firstName2, lastName2, email2, "testphonenumber", "testcountry")
-
-        // Sign in with user1
-        Firebase.auth.signInWithEmailAndPassword(email1, pwd1)
+      // Add the users to the view model
+      userVM.createUserIfNew(
+          uid1, "username1", "firstName1", "lastName1", email1, "testphonenumber", "testcountry")
+      while (userVM.getUser(uid1) == null) {
         TimeUnit.SECONDS.sleep(1)
       }
+
+      userVM.createUserIfNew(
+          uid2, username2, firstName2, lastName2, email2, "testphonenumber", "testcountry")
+      while (userVM.getUser(uid2) == null) {
+        TimeUnit.SECONDS.sleep(1)
+      }
+
+      // Sign in with user1
+      Firebase.auth.signInWithEmailAndPassword(email1, pwd1)
+      TimeUnit.SECONDS.sleep(1)
     }
 
     @AfterClass
@@ -71,6 +76,8 @@ class AddFriendTest {
       Firebase.auth.currentUser?.delete()
       userVM.deleteUser(uid1)
       userVM.deleteUser(uid2)
+
+      return@runBlocking
     }
   }
 

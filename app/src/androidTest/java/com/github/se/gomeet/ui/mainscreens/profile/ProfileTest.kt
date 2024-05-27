@@ -15,6 +15,7 @@ import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
 import org.junit.AfterClass
@@ -45,7 +46,9 @@ class ProfileTest {
 
       // Add the user to the view model
       userVM.createUserIfNew(uid, "a", "b", "c", usr, "4567", "Angola", "")
-      return@runBlocking
+      while (userVM.getUser(uid) == null) {
+        TimeUnit.SECONDS.sleep(1)
+      }
     }
 
     @AfterClass
@@ -54,6 +57,8 @@ class ProfileTest {
       // Clean up the user
       Firebase.auth.currentUser!!.delete().await()
       userVM.deleteUser(uid)
+
+      return@runBlocking
     }
   }
 

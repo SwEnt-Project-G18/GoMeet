@@ -21,8 +21,10 @@ class AuthRepositoryTest {
   private val invPwd = "123"
 
   @After
-  fun tearDown() {
+  fun tearDown() = runBlocking {
     Firebase.auth.currentUser?.delete()
+
+    return@runBlocking
   }
 
   @Test

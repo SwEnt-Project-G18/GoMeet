@@ -11,6 +11,7 @@ import androidx.compose.ui.test.performTextInput
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.ui.navigation.NavigationActions
+import com.github.se.gomeet.viewmodel.EventCreationViewModel
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import kotlinx.coroutines.runBlocking
@@ -27,6 +28,7 @@ class CreateEventTest {
     private val uid = "CreateEventTestUser"
     private val eventVM = EventViewModel(uid)
     private val userVM = UserViewModel(uid)
+    private val eventCreationVM = EventCreationViewModel()
 
     @AfterClass
     @JvmStatic
@@ -34,6 +36,7 @@ class CreateEventTest {
 
       // Clean up the events
       eventVM.getAllEvents()?.forEach { eventVM.removeEvent(it.eventID) }
+
       return@runBlocking
     }
   }
@@ -43,7 +46,12 @@ class CreateEventTest {
     val eventVM = EventViewModel(uid)
 
     composeTestRule.setContent {
-      CreateEvent(NavigationActions(rememberNavController()), eventVM, isPrivate = true, userVM)
+      CreateEvent(
+          NavigationActions(rememberNavController()),
+          eventVM,
+          isPrivate = true,
+          userVM,
+          eventCreationVM)
     }
 
     composeTestRule.waitForIdle()
@@ -86,7 +94,12 @@ class CreateEventTest {
   @Test
   fun testCreatePublicEvent() {
     composeTestRule.setContent {
-      CreateEvent(NavigationActions(rememberNavController()), eventVM, isPrivate = false, userVM)
+      CreateEvent(
+          NavigationActions(rememberNavController()),
+          eventVM,
+          isPrivate = false,
+          userVM,
+          eventCreationVM)
     }
 
     composeTestRule.waitForIdle()

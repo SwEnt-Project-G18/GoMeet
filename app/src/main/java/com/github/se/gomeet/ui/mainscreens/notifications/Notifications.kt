@@ -147,9 +147,7 @@ fun NotificationsTopBar(
   Column {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier =
-            Modifier.testTag("NotificationsScreen")
-                .padding(start = screenWidth / 15, top = screenHeight / 30)) {
+        modifier = Modifier.padding(start = screenWidth / 15, top = screenHeight / 30)) {
           Text(
               text = "Notifications",
               color = MaterialTheme.colorScheme.onBackground,
