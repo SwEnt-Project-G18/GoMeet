@@ -158,7 +158,7 @@ fun RateEvent(rating: MutableState<Long>, eventViewModel: EventViewModel, event:
  */
 @Composable
 fun EventDateTime(day: String, time: String) {
-  Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(end = 15.dp)) {
+  Box(contentAlignment = Alignment.Center) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
