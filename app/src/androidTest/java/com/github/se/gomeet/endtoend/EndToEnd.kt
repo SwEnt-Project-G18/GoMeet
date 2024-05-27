@@ -70,10 +70,15 @@ class EndToEndTest : TestCase() {
       // Add the user to the view model
       userVM.createUserIfNew(
           uid, username, "testfirstname", "testlastname", email, "testphonenumber", "testcountry")
+      while (userVM.getUser(uid) == null) {
+        TimeUnit.SECONDS.sleep(1)
+      }
+
       // Sign in
       Firebase.auth.signInWithEmailAndPassword(email, pwd).await()
       eventVM = EventViewModel(uid)
       authViewModel.signOut()
+
       TimeUnit.SECONDS.sleep(1)
     }
 
@@ -86,6 +91,8 @@ class EndToEndTest : TestCase() {
       // Clean up the user
       Firebase.auth.currentUser?.delete()?.await()
       userVM.deleteUser(uid)
+
+      return@runBlocking
     }
   }
 

@@ -84,6 +84,9 @@ class EndToEndTest3 : TestCase() {
           email1,
           "testphonenumber",
           "testcountry")
+      while (userVM.getUser(uid1) == null) {
+        TimeUnit.SECONDS.sleep(1)
+      }
 
       userVM.createUserIfNew(
           uid2,
@@ -94,17 +97,23 @@ class EndToEndTest3 : TestCase() {
           "testphonenumber2",
           "testcountry2")
 
-      TimeUnit.SECONDS.sleep(1)
-
+      while (userVM.getUser(uid2) == null) {
+        TimeUnit.SECONDS.sleep(1)
+      }
       // user2 follows user1
       userVM.follow(uid1)
-
-      TimeUnit.SECONDS.sleep(1)
+      while (userVM.getUser(uid1)!!.followers.isEmpty()) {
+        TimeUnit.SECONDS.sleep(1)
+      }
 
       // user1 creates an event and follows user2
       Firebase.auth.signInWithEmailAndPassword(email1, pwd1).await()
       userVM = UserViewModel(uid1)
       userVM.follow(uid2)
+      while (userVM.getUser(uid1)!!.following.isEmpty()) {
+        TimeUnit.SECONDS.sleep(1)
+      }
+
       eventVM = EventViewModel(uid1)
       eventVM.createEvent(
           "title",
@@ -124,6 +133,10 @@ class EndToEndTest3 : TestCase() {
           null,
           userVM,
           "eventuid1")
+      while (userVM.getUser(uid1)!!.myEvents.isEmpty()) {
+        TimeUnit.SECONDS.sleep(1)
+      }
+
       authViewModel.signOut()
 
       TimeUnit.SECONDS.sleep(1)
@@ -140,9 +153,9 @@ class EndToEndTest3 : TestCase() {
       Firebase.auth.currentUser?.delete()?.await()
       userVM.deleteUser(uid1)
       userVM.deleteUser(uid2)
-
       Firebase.auth.signInWithEmailAndPassword(email2, pwd2).await()
       Firebase.auth.currentUser?.delete()?.await()
+
       return@runBlocking
     }
   }

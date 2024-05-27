@@ -90,8 +90,15 @@ class EndToEndTest2 : TestCase() {
           email1,
           "testphonenumber",
           "testcountry")
+      while (userVM.getUser(uid1) == null) {
+        TimeUnit.SECONDS.sleep(1)
+      }
+
       userVM.createUserIfNew(
           uid2, username2, firstname2, lastname2, email2, "testphonenumber2", "testcountry2")
+      while (userVM.getUser(uid2) == null) {
+        TimeUnit.SECONDS.sleep(1)
+      }
 
       // user1 is used to create an event
       Firebase.auth.signInWithEmailAndPassword(email1, pwd1).await()
@@ -115,6 +122,9 @@ class EndToEndTest2 : TestCase() {
           null,
           userVM,
           "eventuid1")
+      while (eventVM.getEvent("eventuid1") == null) {
+        TimeUnit.SECONDS.sleep(1)
+      }
 
       Firebase.auth.signOut()
 
@@ -140,6 +150,9 @@ class EndToEndTest2 : TestCase() {
           null,
           userVM,
           "eventuid2")
+      while (eventVM.getEvent("eventuid2") == null) {
+        TimeUnit.SECONDS.sleep(1)
+      }
 
       Firebase.auth.signOut()
 
@@ -161,9 +174,9 @@ class EndToEndTest2 : TestCase() {
       Firebase.auth.currentUser?.delete()?.await()
       userVM.deleteUser(uid1)
       userVM.deleteUser(uid2)
-
       Firebase.auth.signInWithEmailAndPassword(email1, pwd1).await()
       Firebase.auth.currentUser?.delete()?.await()
+
       return@runBlocking
     }
   }
@@ -211,6 +224,12 @@ class EndToEndTest2 : TestCase() {
         composeTestRule.waitUntil(timeoutMillis = 10000) {
           composeTestRule.onNodeWithTag("EventHeader").isDisplayed()
         }
+        composeTestRule.onNodeWithTag("TopBar").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("EventHeader").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("EventDescription").assertIsDisplayed()
+
+        composeTestRule.onNodeWithTag("EventButton").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("MapView").assertIsDisplayed()
         eventHeader { composeTestRule.onNodeWithTag("Username").assertIsDisplayed().performClick() }
       }
     }

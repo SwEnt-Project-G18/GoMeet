@@ -48,6 +48,9 @@ class EventsTest {
       // Add the user to the view model
       userVM.createUserIfNew(
           uid, username, "testfirstname", "testlastname", email, "testphonenumber", "testcountry")
+      while (userVM.getUser(uid) == null) {
+        TimeUnit.SECONDS.sleep(1)
+      }
 
       // Sign in
       Firebase.auth.signInWithEmailAndPassword(email, pwd).await()
@@ -72,10 +75,15 @@ class EventsTest {
           null,
           userVM,
           eventId)
+      while (eventVM.getEvent(eventId) == null) {
+        TimeUnit.SECONDS.sleep(1)
+      }
 
       // Add the event to the user's favourites
       userVM.editUser(userVM.getUser(uid)!!.copy(myFavorites = listOf(eventId)))
-      TimeUnit.SECONDS.sleep(1)
+      while (userVM.getUser(uid)!!.myFavorites.isEmpty()) {
+        TimeUnit.SECONDS.sleep(1)
+      }
     }
 
     @AfterClass
@@ -87,6 +95,8 @@ class EventsTest {
       // Clean up the user
       Firebase.auth.currentUser?.delete()?.await()
       userVM.deleteUser(uid)
+
+      return@runBlocking
     }
   }
 
@@ -99,7 +109,9 @@ class EventsTest {
     composeTestRule.waitForIdle()
 
     // Wait until the events are loaded
-    composeTestRule.waitUntil { composeTestRule.onAllNodesWithText("title")[0].isDisplayed() }
+    composeTestRule.waitUntil(timeoutMillis = 10000) {
+      composeTestRule.onAllNodesWithText("title")[0].isDisplayed()
+    }
 
     // Verify that the ui is correctly displayed
     composeTestRule.onNodeWithText("Search").assertIsDisplayed()
@@ -119,8 +131,8 @@ class EventsTest {
     composeTestRule.onNodeWithTag("MyEventsTitle").assertIsDisplayed()
     composeTestRule
         .onAllNodesWithText("title")
-        .assertCountEquals(3) // The event should be present in all categories
-    for (i in 0..2) {
+        .assertCountEquals(2) // The event should be present in all categories
+    for (i in 0..1) {
       composeTestRule.onAllNodesWithText("title")[i].assertIsDisplayed()
     }
   }

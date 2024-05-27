@@ -47,7 +47,9 @@ class EditProfileTest {
       uid = Firebase.auth.currentUser!!.uid
       userVM = UserViewModel(uid)
       userVM.createUserIfNew(uid, "a", "b", "c", usr, "4567", "Angola")
-      TimeUnit.SECONDS.sleep(1)
+      while (userVM.getUser(uid) == null) {
+        TimeUnit.SECONDS.sleep(1)
+      }
     }
 
     @AfterClass
@@ -56,6 +58,8 @@ class EditProfileTest {
       // Clean up the user
       Firebase.auth.currentUser!!.delete().await()
       userVM.deleteUser(uid)
+
+      return@runBlocking
     }
   }
 

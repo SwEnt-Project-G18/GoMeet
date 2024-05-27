@@ -46,59 +46,62 @@ class ProfileEventListTest {
 
     @JvmStatic
     @BeforeClass
-    fun setup() {
-      runBlocking {
-        // Create a new user
-        Firebase.auth.createUserWithEmailAndPassword(email, pwd).await()
-        uid = Firebase.auth.currentUser!!.uid
+    fun setup() = runBlocking {
+      // Create a new user
+      Firebase.auth.createUserWithEmailAndPassword(email, pwd).await()
+      uid = Firebase.auth.currentUser!!.uid
 
-        userVM = UserViewModel(uid)
+      userVM = UserViewModel(uid)
 
-        // Add the user to view model
-        userVM.createUserIfNew(
-            uid, username, "testfirstname", "testlastname", email, "testphonenumber", "testcountry")
-
-        // Sign in
-        Firebase.auth.signInWithEmailAndPassword(email, pwd).await()
-
-        // Create an Event
-        eventVM = EventViewModel(uid)
-        eventVM.createEvent(
-            "title",
-            "description",
-            Location(0.0, 0.0, "location"),
-            LocalDate.of(2026, 1, 1),
-            LocalTime.now(),
-            0.0,
-            "url",
-            emptyList(),
-            emptyList(),
-            emptyList(),
-            1,
-            true,
-            emptyList(),
-            emptyList(),
-            null,
-            userVM,
-            eventId)
-        event = eventVM.getEvent(eventId)!!
+      // Add the user to view model
+      userVM.createUserIfNew(
+          uid, username, "testfirstname", "testlastname", email, "testphonenumber", "testcountry")
+      while (userVM.getUser(uid) == null) {
         TimeUnit.SECONDS.sleep(1)
       }
+
+      // Sign in
+      Firebase.auth.signInWithEmailAndPassword(email, pwd).await()
+
+      // Create an Event
+      eventVM = EventViewModel(uid)
+      eventVM.createEvent(
+          "title",
+          "description",
+          Location(0.0, 0.0, "location"),
+          LocalDate.of(2026, 1, 1),
+          LocalTime.now(),
+          0.0,
+          "url",
+          emptyList(),
+          emptyList(),
+          emptyList(),
+          1,
+          true,
+          emptyList(),
+          emptyList(),
+          null,
+          userVM,
+          eventId)
+      while (eventVM.getEvent(eventId) == null) {
+        TimeUnit.SECONDS.sleep(1)
+      }
+      event = eventVM.getEvent(eventId)!!
+      TimeUnit.SECONDS.sleep(1)
     }
 
     @AfterClass
     @JvmStatic
-    fun tearDown() {
-      runBlocking {
-        // Clean up the event
-        eventVM.getAllEvents()?.forEach {
-          eventVM.removeEvent(it.eventID)
+    fun tearDown() = runBlocking {
+      // Clean up the event
+      eventVM.getAllEvents()?.forEach {
+        eventVM.removeEvent(it.eventID)
 
-          // Clean up the user
-          Firebase.auth.currentUser?.delete()
-          userVM.deleteUser(uid)
-        }
+        // Clean up the user
+        Firebase.auth.currentUser?.delete()
+        userVM.deleteUser(uid)
       }
+      return@runBlocking
     }
   }
 
