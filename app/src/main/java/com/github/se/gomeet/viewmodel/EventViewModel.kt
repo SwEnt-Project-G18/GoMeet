@@ -5,7 +5,12 @@ import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.util.Log
 import android.widget.ImageView
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -14,6 +19,7 @@ import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.Post
 import com.github.se.gomeet.model.event.location.Location
 import com.github.se.gomeet.model.repository.EventRepository
+import com.github.se.gomeet.model.user.GoMeetUser
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.firebase.firestore.FirebaseFirestore
@@ -443,6 +449,22 @@ class EventViewModel(val currentUID: String? = null) : ViewModel() {
   }
 
   /**
+   * Update the posts field of the event by removing the given post to the list.
+   *
+   * @param event the event to update
+   * @param post the post to remove from the event
+   */
+  fun deletePost(event: Event, post: Post) {
+    if (!event.posts.contains(post)) {
+      Log.w(TAG, "Event ${event.eventID} doesn't have post ${post.title}")
+      return
+    }
+
+    val updatedPosts = event.posts.minus(post)
+    editEvent(event.copy(posts = updatedPosts))
+  }
+
+  /**
    * Get the location of an event.
    *
    * @param locationName the name of the location
@@ -533,4 +555,22 @@ class EventViewModel(val currentUID: String? = null) : ViewModel() {
     ALPHABETICAL,
     DATE
   }
+}
+
+/**
+ * ViewModel for the creation of an event. This viewModel is useful to store the participants that
+ * are invited to an event that is in creation (i.e. not created yet).
+ */
+class EventCreationViewModel : ViewModel() {
+  val title: MutableState<String> = mutableStateOf("")
+  val description: MutableState<String> = mutableStateOf("")
+  val location: MutableState<String> = mutableStateOf("")
+  val price: MutableState<Double> = mutableDoubleStateOf(0.0)
+  val url: MutableState<String> = mutableStateOf("")
+  val pickedTime: MutableState<LocalTime> = mutableStateOf(LocalTime.now())
+  val pickedDate: MutableState<LocalDate> = mutableStateOf(LocalDate.now())
+  val invitedParticipants = mutableStateListOf<GoMeetUser>()
+  val tags: MutableState<List<String>> = mutableStateOf(emptyList())
+  val imageUri: MutableState<Uri?> = mutableStateOf(null)
+  val imageBitmap: MutableState<ImageBitmap?> = mutableStateOf(null)
 }
