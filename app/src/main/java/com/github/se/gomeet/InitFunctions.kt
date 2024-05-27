@@ -45,6 +45,7 @@ import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.navigation.TopLevelDestination
 import com.github.se.gomeet.viewmodel.AuthViewModel
+import com.github.se.gomeet.viewmodel.EventCreationViewModel
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.android.gms.maps.model.LatLng
@@ -131,6 +132,7 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
   val navAction = NavigationActions(nav)
   val clientInitialisationState by client.clientState.initializationState.collectAsState()
   val authViewModel = AuthViewModel()
+  val eventCreationViewModel = EventCreationViewModel()
   val startScreen = Route.WELCOME // The screen that gets navigated to when the app starts
   val postLoginScreen =
       Route.EXPLORE // The screen that gets navigated to after logging in/signing up
@@ -233,17 +235,22 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
               eventViewModel.value)
         }
     composable(Route.PRIVATE_CREATE) {
-      CreateEvent(navAction, eventViewModel.value, true, userViewModel.value)
+      CreateEvent(
+          navAction, eventViewModel.value, true, userViewModel.value, eventCreationViewModel)
     }
     composable(Route.PUBLIC_CREATE) {
-      CreateEvent(navAction, eventViewModel.value, false, userViewModel.value)
+      CreateEvent(
+          navAction, eventViewModel.value, false, userViewModel.value, eventCreationViewModel)
     }
 
     composable(
         route = Route.ADD_PARTICIPANTS,
         arguments = listOf(navArgument("eventId") { type = NavType.StringType })) { entry ->
           val eventId = entry.arguments?.getString("eventId") ?: ""
-          AddParticipants(nav = navAction, userViewModel = userViewModel.value, eventId = eventId)
+          AddParticipants(
+              nav = navAction,
+              userViewModel = userViewModel.value,
+              eventCreationViewModel = eventCreationViewModel)
         }
 
     composable(
