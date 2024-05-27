@@ -43,14 +43,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -67,6 +66,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.Popup
+import androidx.lifecycle.viewModelScope
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.TagsSelector
 import com.github.se.gomeet.model.event.location.Location
@@ -76,12 +76,12 @@ import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
+import com.github.se.gomeet.viewmodel.EventCreationViewModel
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import java.io.InputStream
-import java.time.LocalDate
-import java.time.LocalTime
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 private const val NUMBER_OF_SUGGESTIONS = 3
 
@@ -92,39 +92,44 @@ private const val NUMBER_OF_SUGGESTIONS = 3
  * @param eventViewModel The event view model.
  * @param isPrivate The boolean value to determine if the event is private or not.
  * @param userViewModel The user view model.
+ * @param eventCreationViewModel The event creation view model.
  */
 @Composable
 fun CreateEvent(
     nav: NavigationActions,
     eventViewModel: EventViewModel,
     isPrivate: Boolean,
-    userViewModel: UserViewModel
+    userViewModel: UserViewModel,
+    eventCreationViewModel: EventCreationViewModel
 ) {
   val screenHeight = LocalConfiguration.current.screenHeightDp.dp
   val screenWidth = LocalConfiguration.current.screenWidthDp.dp
 
   val uid = EventRepository.getNewId()
-  val titleState = remember { mutableStateOf("") }
-  val descriptionState = remember { mutableStateOf("") }
-  val locationState = remember { mutableStateOf("") }
-  var price by remember { mutableDoubleStateOf(0.0) }
-  var priceText by remember { mutableStateOf("0.0") }
-  val url = remember { mutableStateOf("") }
-  var urlValid by remember { mutableStateOf(true) }
 
-  val pickedTime = remember { mutableStateOf(LocalTime.now()) }
-  val pickedDate = remember { mutableStateOf(LocalDate.now()) }
+  val titleState = eventCreationViewModel.title
+  val descriptionState = eventCreationViewModel.description
+  val locationState = eventCreationViewModel.location
+  val price by remember { eventCreationViewModel.price }
+  var priceText by remember { mutableStateOf(price.toString()) }
+  val urlState = eventCreationViewModel.url
+  val pickedTime = eventCreationViewModel.pickedTime
+  val pickedDate = eventCreationViewModel.pickedDate
+  var invitedParticipants = eventCreationViewModel.invitedParticipants
+  val tagsState = eventCreationViewModel.tags
+  val imageUriState = eventCreationViewModel.imageUri
+  val imageBitmapState = eventCreationViewModel.imageBitmap
+
+  var urlValid by remember { mutableStateOf(true) }
 
   val customPins = remember { CustomPins() }
 
   val context = LocalContext.current
 
-  var imageUri by remember { mutableStateOf<android.net.Uri?>(null) }
-  var imageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
   val imagePickerLauncher =
       rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) {
           uri: android.net.Uri? ->
-        imageUri = uri
+        imageUriState.value = uri
         uri?.let { uriNonNull ->
           val inputStream: InputStream? =
               try {
@@ -135,13 +140,12 @@ fun CreateEvent(
               }
           inputStream?.let {
             val bitmap = BitmapFactory.decodeStream(it)
-            imageBitmap = bitmap.asImageBitmap()
+            imageBitmapState.value = bitmap.asImageBitmap()
           }
         }
       }
 
   val selectedLocation: MutableState<Location?> = remember { mutableStateOf(null) }
-  val tags = remember { mutableStateOf(emptyList<String>()) }
   val showPopup = remember { mutableStateOf(false) }
   var tagsButtonText by remember { mutableStateOf("Add Tags") }
 
@@ -168,12 +172,16 @@ fun CreateEvent(
                 // Empty title since we're placing our own components
               },
               navigationIcon = {
-                IconButton(onClick = { nav.goBack() }) {
-                  Icon(
-                      imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                      contentDescription = "Back",
-                      tint = MaterialTheme.colorScheme.onBackground)
-                }
+                IconButton(
+                    onClick = {
+                      invitedParticipants = mutableStateListOf()
+                      nav.goBack()
+                    }) {
+                      Icon(
+                          imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                          contentDescription = "Back",
+                          tint = MaterialTheme.colorScheme.onBackground)
+                    }
               })
 
           Row(
@@ -236,7 +244,7 @@ fun CreateEvent(
                   onValueChange = { newVal ->
                     if (newVal.isEmpty() || isValidPrice(newVal)) {
                       priceText = newVal
-                      newVal.toDoubleOrNull()?.let { price = it }
+                      newVal.toDoubleOrNull()?.let { eventCreationViewModel.price.value = it }
                     }
                   },
                   label = { Text("Price") },
@@ -249,8 +257,8 @@ fun CreateEvent(
                   modifier = Modifier.fillMaxWidth().padding(start = 15.dp, end = 15.dp))
 
               TextField(
-                  value = url.value,
-                  onValueChange = { newVal -> url.value = newVal },
+                  value = urlState.value,
+                  onValueChange = { newVal -> urlState.value = newVal },
                   label = { Text("Link") },
                   placeholder = { Text("Enter a link") },
                   singleLine = true,
@@ -316,7 +324,7 @@ fun CreateEvent(
                   modifier = Modifier.fillMaxWidth().padding(start = 15.dp),
                   verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = if (imageUri != null) "Delete Image" else "Add Image",
+                        text = if (imageUriState.value != null) "Delete Image" else "Add Image",
                         color = MaterialTheme.colorScheme.onBackground,
                         fontStyle = FontStyle.Normal,
                         fontWeight = FontWeight.Normal,
@@ -329,8 +337,9 @@ fun CreateEvent(
                         tint = MaterialTheme.colorScheme.onBackground,
                         modifier =
                             Modifier.clickable {
-                                  if (imageUri != null) {
-                                    imageUri = null
+                                  if (imageUriState.value != null) {
+                                    imageUriState.value = null
+                                    imageBitmapState.value = null
                                   } else {
                                     imagePickerLauncher.launch("image/*")
                                   }
@@ -341,7 +350,7 @@ fun CreateEvent(
               Spacer(modifier = Modifier.height(screenHeight / 80))
 
               var showDialog by remember { mutableStateOf(false) }
-              imageUri?.let {
+              imageUriState.value?.let {
                 Text(
                     text = "View Selected Image",
                     modifier = Modifier.clickable { showDialog = true },
@@ -359,7 +368,7 @@ fun CreateEvent(
 
               if (showDialog) {
                 Dialog(onDismissRequest = { showDialog = false }) {
-                  imageBitmap?.let { bitmap ->
+                  imageBitmapState.value?.let { bitmap ->
                     Image(
                         bitmap = bitmap,
                         contentDescription = "Selected Image",
@@ -373,10 +382,10 @@ fun CreateEvent(
               Button(
                   modifier = Modifier.width((screenWidth / 1.5.dp).dp).height(screenHeight / 17),
                   onClick = {
-                    urlValid = URLUtil.isValidUrl(url.value)
+                    urlValid = URLUtil.isValidUrl(urlState.value)
                     titleState.value = titleState.value.trimEnd()
                     descriptionState.value = descriptionState.value.trimEnd()
-                    url.value = url.value.trimEnd()
+                    urlState.value = urlState.value.trimEnd()
 
                     if (titleState.value.isNotEmpty() && urlValid) {
                       when (selectedLocation.value == null) {
@@ -390,15 +399,15 @@ fun CreateEvent(
                                     pickedDate.value,
                                     pickedTime.value,
                                     price,
-                                    url.value,
-                                    listOf(),
+                                    urlState.value,
+                                    invitedParticipants.map { it.uid },
                                     listOf(),
                                     listOf(),
                                     0,
                                     !isPrivate,
                                     listOf(),
                                     listOf(),
-                                    imageUri,
+                                    imageUriState.value,
                                     userViewModel,
                                     uid)
 
@@ -413,18 +422,25 @@ fun CreateEvent(
                               pickedDate.value,
                               pickedTime.value,
                               price,
-                              url.value,
-                              listOf(),
+                              urlState.value,
+                              invitedParticipants.map { it.uid },
                               listOf(),
                               listOf(),
                               0,
                               !isPrivate,
-                              tags.value,
+                              tagsState.value,
                               listOf(),
-                              imageUri,
+                              imageUriState.value,
                               userViewModel,
                               uid)
                           nav.goBack()
+                        }
+                      }
+
+                      // Update pending requests for invited participants
+                      invitedParticipants.forEach { participant ->
+                        userViewModel.viewModelScope.launch {
+                          userViewModel.gotInvitation(uid, participant.uid)
                         }
                       }
                     }
@@ -444,7 +460,7 @@ fun CreateEvent(
                           descriptionState.value,
                           locationState.value,
                           priceText,
-                          url.value),
+                          urlState.value),
                   colors =
                       ButtonDefaults.buttonColors(
                           containerColor = MaterialTheme.colorScheme.outlineVariant,
@@ -459,9 +475,9 @@ fun CreateEvent(
           Popup(
               alignment = Alignment.Center,
               onDismissRequest = { showPopup.value = !showPopup.value }) {
-                TagsSelector(tagsButtonText, tags) {
+                TagsSelector(tagsButtonText, tagsState) {
                   showPopup.value = false
-                  if (tags.value.isNotEmpty()) {
+                  if (tagsState.value.isNotEmpty()) {
                     tagsButtonText = "Edit Tags"
                   }
                 }

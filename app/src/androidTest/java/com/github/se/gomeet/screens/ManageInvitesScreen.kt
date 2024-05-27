@@ -6,4 +6,4 @@ import io.github.kakaocup.compose.node.element.ComposeScreen
 class ManageInvitesScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
     ComposeScreen<ManageInvitesScreen>(
         semanticsProvider = semanticsProvider,
-        viewBuilderAction = { hasTestTag("ManageInvitesScreen") }) {}
+        viewBuilderAction = { hasTestTag("ManageInvitesScreen") })
