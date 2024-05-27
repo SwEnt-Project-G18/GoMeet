@@ -24,11 +24,10 @@ class WelcomeScreenTest {
   @get:Rule val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
   @Before
-  fun setup() =
-    runBlocking {
-      // Initialize Intents before each test
-      Intents.init()
-    }
+  fun setup() = runBlocking {
+    // Initialize Intents before each test
+    Intents.init()
+  }
 
   @Test
   fun testWelcomeScreen() {
@@ -50,11 +49,10 @@ class WelcomeScreenTest {
   }
 
   @After
-  fun tearDown() =
-    runBlocking {
-      // Release Intents after each test
-      Intents.release()
+  fun tearDown() = runBlocking {
+    // Release Intents after each test
+    Intents.release()
 
-      return@runBlocking
-    }
+    return@runBlocking
+  }
 }

@@ -93,7 +93,7 @@ fun Events(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel:
   LaunchedEffect(Unit) {
     coroutineScope.launch {
       user.value = userViewModel.getUser(currentUID)
-      //Log.d(TAG, "User is ${user.value!!.username} with ${user.value!!.myEvents.size} events")
+      // Log.d(TAG, "User is ${user.value!!.username} with ${user.value!!.myEvents.size} events")
       val allEvents = (eventViewModel.getAllEvents() ?: emptyList())
       eventList.addAll(
           allEvents.filter { e ->
