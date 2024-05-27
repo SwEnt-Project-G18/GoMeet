@@ -6,7 +6,6 @@ import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
-import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -20,6 +19,7 @@ import com.github.se.gomeet.screens.EventsScreen
 import com.github.se.gomeet.screens.ExploreScreen
 import com.github.se.gomeet.screens.LoginScreenScreen
 import com.github.se.gomeet.screens.WelcomeScreenScreen
+import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.viewmodel.AuthViewModel
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
@@ -69,10 +69,15 @@ class EndToEndTest : TestCase() {
       // Add the user to the view model
       userVM.createUserIfNew(
           uid, username, "testfirstname", "testlastname", email, "testphonenumber", "testcountry")
+      while (userVM.getUser(uid) == null) {
+        TimeUnit.SECONDS.sleep(1)
+      }
+
       // Sign in
       Firebase.auth.signInWithEmailAndPassword(email, pwd).await()
       eventVM = EventViewModel(uid)
       authViewModel.signOut()
+
       TimeUnit.SECONDS.sleep(1)
     }
 
@@ -85,6 +90,8 @@ class EndToEndTest : TestCase() {
       // Clean up the user
       Firebase.auth.currentUser?.delete()?.await()
       userVM.deleteUser(uid)
+
+      return@runBlocking
     }
   }
 
@@ -111,7 +118,7 @@ class EndToEndTest : TestCase() {
 
     ComposeScreen.onComposeScreen<ExploreScreen>(composeTestRule) {
       step("Go to Events") {
-        composeTestRule.onNodeWithText("Events").assertIsDisplayed().performClick()
+        composeTestRule.onNodeWithTag(Route.EVENTS).assertIsDisplayed().performClick()
       }
     }
 
@@ -145,13 +152,17 @@ class EndToEndTest : TestCase() {
             .assertIsDisplayed()
             .performTextInput("https://example.com")
         composeTestRule.onNodeWithText("Post").assertIsEnabled().performClick()
-        TimeUnit.SECONDS.sleep(3)
+        runBlocking {
+          while (userVM.getUser(uid)!!.myEvents.isEmpty()) {
+            TimeUnit.SECONDS.sleep(1)
+          }
+        }
       }
     }
-    composeTestRule.onNodeWithText("Events").performClick()
+    composeTestRule.onNodeWithTag(Route.EVENTS).performClick()
     ComposeScreen.onComposeScreen<EventsScreen>(composeTestRule) {
       composeTestRule.waitForIdle()
-      composeTestRule.onAllNodesWithText("Events")[1].performClick()
+      composeTestRule.onNodeWithTag("Events").performClick()
       composeTestRule.waitUntil(timeoutMillis = 10000) {
         composeTestRule.onAllNodesWithTag("Card")[0].isDisplayed()
       }

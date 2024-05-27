@@ -28,10 +28,10 @@ import com.github.se.gomeet.ui.mainscreens.events.Events
 import com.github.se.gomeet.ui.mainscreens.events.MyEventInfo
 import com.github.se.gomeet.ui.mainscreens.events.manageinvites.ManageInvites
 import com.github.se.gomeet.ui.mainscreens.explore.Explore
+import com.github.se.gomeet.ui.mainscreens.notifications.Notifications
 import com.github.se.gomeet.ui.mainscreens.profile.AddFriend
 import com.github.se.gomeet.ui.mainscreens.profile.EditProfile
 import com.github.se.gomeet.ui.mainscreens.profile.FollowingFollowers
-import com.github.se.gomeet.ui.mainscreens.profile.Notifications
 import com.github.se.gomeet.ui.mainscreens.profile.OthersProfile
 import com.github.se.gomeet.ui.mainscreens.profile.Profile
 import com.github.se.gomeet.ui.mainscreens.profile.QRCodeScannerScreen
@@ -177,8 +177,6 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
               val country = authViewModel.signInState.value.countryRegister
               userViewModel.value.createUserIfNew(
                   userId, username, firstName, lastName, email, phone, country)
-              // userViewModel.value.currentUID is null here, but this doesn't matter since
-              // createUserIfNew doesn't use it (this code will be cleaned up later)
             }
             connectChatClient(
                 client,
@@ -413,7 +411,9 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
           }
         }
     composable(route = Route.ADD_FRIEND) { AddFriend(navAction, userViewModel.value) }
-    composable(route = Route.SCAN) { backStackEntry -> QRCodeScannerScreen(nav = navAction) }
+    composable(route = Route.SCAN) { backStackEntry ->
+      QRCodeScannerScreen(nav = navAction, eventViewModel.value)
+    }
 
     composable(
         route = Route.EDIT_EVENT,

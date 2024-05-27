@@ -267,7 +267,10 @@ fun CreateEvent(
 
               if (!urlValid) {
                 Text(
-                    text = "Url Not Valid",
+                    modifier = Modifier.fillMaxWidth(),
+                    text =
+                        "Url Not Valid, should be of the form :\n\"" +
+                            "http://example.com, https://example.com\"",
                     style = MaterialTheme.typography.bodyLarge,
                     color = Color.Red)
               }
@@ -382,7 +385,8 @@ fun CreateEvent(
               Button(
                   modifier = Modifier.width((screenWidth / 1.5.dp).dp).height(screenHeight / 17),
                   onClick = {
-                    urlValid = URLUtil.isValidUrl(urlState.value)
+                    urlValid = URLUtil.isValidUrl(urlState.value) || urlState.value.isEmpty()
+
                     titleState.value = titleState.value.trimEnd()
                     descriptionState.value = descriptionState.value.trimEnd()
                     urlState.value = urlState.value.trimEnd()
@@ -455,12 +459,7 @@ fun CreateEvent(
                   },
                   shape = RoundedCornerShape(10.dp),
                   enabled =
-                      fieldsAreFull(
-                          titleState.value,
-                          descriptionState.value,
-                          locationState.value,
-                          priceText,
-                          urlState.value),
+                      fieldsAreFull(titleState.value, descriptionState.value, locationState.value),
                   colors =
                       ButtonDefaults.buttonColors(
                           containerColor = MaterialTheme.colorScheme.outlineVariant,
@@ -590,8 +589,6 @@ private fun fieldsAreFull(
     title: String,
     desc: String,
     loc: String,
-    price: String,
-    url: String
 ): Boolean {
   return title.isNotEmpty() && desc.isNotEmpty() && loc.isNotEmpty()
 }

@@ -2,8 +2,6 @@ package com.github.se.gomeet.ui.mainscreens.profile
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,7 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
@@ -37,22 +34,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
-import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
-import com.github.se.gomeet.R
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.mainscreens.profile.FollowingFollowerPage.*
@@ -250,28 +239,10 @@ fun PageUsers(
                   .testTag("FollowingUser"),
           horizontalArrangement = Arrangement.SpaceBetween,
           verticalAlignment = Alignment.CenterVertically) {
-            val painter: Painter =
-                if (user.profilePicture.isNotEmpty()) {
-                  rememberAsyncImagePainter(
-                      ImageRequest.Builder(LocalContext.current)
-                          .data(data = user.profilePicture)
-                          .apply {
-                            crossfade(true)
-                            placeholder(R.drawable.gomeet_logo)
-                          }
-                          .build())
-                } else {
-                  painterResource(id = R.drawable.gomeet_logo)
-                }
-            Image(
-                modifier =
-                    Modifier.width(60.dp)
-                        .height(60.dp)
-                        .clip(CircleShape)
-                        .background(color = MaterialTheme.colorScheme.background),
-                painter = painter,
-                contentDescription = "Profile picture",
-                contentScale = ContentScale.FillBounds)
+            ProfileImage(
+                userId = user.uid,
+                modifier = Modifier.testTag("Event Post Profile Picture"),
+                size = 50.dp)
             Column(modifier = Modifier.padding(start = 15.dp).weight(1f)) {
               Text(
                   text = "${user.firstName} ${user.lastName}",

@@ -8,15 +8,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.github.se.gomeet.ui.theme.TranslucentCyan
 
 /**
@@ -30,11 +28,14 @@ import com.github.se.gomeet.ui.theme.TranslucentCyan
 fun BottomNavigationMenu(
     onTabSelect: (String) -> Unit,
     tabList: List<TopLevelDestination>,
-    selectedItem: String
+    selectedItem: String,
+    containerColor: Color = MaterialTheme.colorScheme.background,
+    selectedColor: Color = MaterialTheme.colorScheme.outlineVariant
 ) {
+
   NavigationBar(
-      modifier = Modifier.navigationBarsPadding().height(80.dp),
-      containerColor = MaterialTheme.colorScheme.background,
+      modifier = Modifier.navigationBarsPadding().height(50.dp),
+      containerColor = containerColor,
       tonalElevation = 0.dp,
   ) {
     tabList.forEach { destination ->
@@ -49,24 +50,15 @@ fun BottomNavigationMenu(
                 contentDescription = destination.textId,
                 modifier = Modifier.size(24.dp))
           },
-          label = {
-            Text(
-                text = destination.textId,
-                maxLines = 1,
-                style =
-                    if (selected)
-                        MaterialTheme.typography.labelLarge.copy(
-                            fontWeight = FontWeight.Bold, fontSize = 12.sp)
-                    else MaterialTheme.typography.labelLarge.copy(fontSize = 12.sp))
-          },
+          label = {},
           selected = selected,
           onClick = { onTabSelect(destination.route) },
           colors =
               NavigationBarItemDefaults.colors(
                   unselectedIconColor = Gray,
                   unselectedTextColor = Gray,
-                  selectedTextColor = MaterialTheme.colorScheme.tertiary,
-                  selectedIconColor = MaterialTheme.colorScheme.tertiary,
+                  selectedTextColor = selectedColor,
+                  selectedIconColor = selectedColor,
                   indicatorColor = TranslucentCyan))
     }
   }

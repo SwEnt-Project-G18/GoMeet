@@ -41,6 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
@@ -119,12 +120,16 @@ fun AddPost(
                   RoundedCornerShape(10.dp))
               .background(MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(10.dp))) {
         IconButton(onClick = { callbackCancel() }) {
-          Icon(Icons.Filled.Close, contentDescription = "Cancel")
+          Icon(
+              Icons.Filled.Close,
+              contentDescription = "Cancel",
+              tint = MaterialTheme.colorScheme.tertiary)
         }
         Column(modifier = Modifier.padding(top = 10.dp)) {
           Text(
               modifier = Modifier.align(Alignment.CenterHorizontally),
               text = "Add a Post",
+              color = MaterialTheme.colorScheme.tertiary,
               style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.SemiBold))
 
           Spacer(modifier = Modifier.height(screenHeight / 40))
@@ -161,6 +166,7 @@ fun AddPost(
               placeholder = { Text("What's new ?") },
               colors =
                   OutlinedTextFieldDefaults.colors(
+                      cursorColor = Gray,
                       focusedBorderColor = Color.Transparent,
                       unfocusedBorderColor = Color.Transparent),
               modifier = Modifier.fillMaxWidth())

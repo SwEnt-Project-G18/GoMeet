@@ -77,23 +77,29 @@ fun SearchModule(
 
   Column(modifier = Modifier.padding(16.dp)) {
     TextField(
+        textStyle = MaterialTheme.typography.bodySmall,
         value = searchText,
         leadingIcon = {
-          IconButton(onClick = { nav.navigateToScreen(Route.MESSAGE_CHANNELS) }) {
-            Icon(
-                ImageVector.vectorResource(R.drawable.gomeet_icon),
-                contentDescription = null,
-                tint = contentColor,
-                modifier = Modifier.size(24.dp))
-          }
+          IconButton(
+              onClick = { // TODO: Handle Voice Search
+              }) {
+                Icon(
+                    ImageVector.vectorResource(R.drawable.mic_icon),
+                    contentDescription = null,
+                    tint = contentColor,
+                    modifier = Modifier.size(20.dp))
+              }
         },
         onValueChange = viewModel::onSearchTextChange,
         modifier =
             Modifier.fillMaxWidth()
+                .height(45.dp)
                 .focusRequester(focusRequester)
                 .clip(RoundedCornerShape(10.dp))
                 .background(backgroundColor),
-        placeholder = { Text(text = "Search") },
+        placeholder = {
+          Text("Search", color = contentColor, style = MaterialTheme.typography.bodySmall)
+        },
         keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
         keyboardActions =
             KeyboardActions(

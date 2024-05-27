@@ -46,7 +46,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun QRCodeScannerScreen(nav: NavigationActions) {
+fun QRCodeScannerScreen(nav: NavigationActions, eventViewModel: EventViewModel) {
   val context = LocalContext.current
   val lifecycleOwner = LocalLifecycleOwner.current
 
@@ -72,7 +72,7 @@ fun QRCodeScannerScreen(nav: NavigationActions) {
                       nav.navigateToScreen(Route.OTHERS_PROFILE.replace("{uid}", id))
                     }
                   }
-                  "Event" -> fetchEventAndNavigate(id, nav, EventViewModel())
+                  "Event" -> fetchEventAndNavigate(id, nav, eventViewModel)
                   else -> throw IllegalArgumentException("Unknown QR code type")
                 }
               }

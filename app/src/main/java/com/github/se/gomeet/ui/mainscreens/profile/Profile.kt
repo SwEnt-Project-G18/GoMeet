@@ -24,7 +24,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.twotone.Star
 import androidx.compose.material3.AlertDialog
@@ -32,6 +31,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItemDefaults.contentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -144,9 +144,9 @@ fun Profile(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel
       topBar = {
         Row(
             verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
             modifier =
-                Modifier.padding(start = screenWidth / 15, top = screenHeight / 30)
-                    .testTag("TopBar")) {
+                Modifier.padding(start = 30.dp, top = 20.dp, end = 10.dp).testTag("TopBar")) {
               Text(
                   text = "My Profile",
                   color = MaterialTheme.colorScheme.onBackground,
@@ -154,29 +154,27 @@ fun Profile(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel
                       MaterialTheme.typography.headlineMedium.copy(
                           fontWeight = FontWeight.SemiBold))
               Spacer(Modifier.weight(1f))
-              IconButton(
-                  modifier = Modifier.align(Alignment.CenterVertically),
-                  onClick = { nav.navigateToScreen(Route.NOTIFICATIONS) }) {
-                    Icon(
-                        Icons.Outlined.Notifications,
-                        contentDescription = "Notifications",
-                        modifier =
-                            Modifier.size(screenHeight / 28).align(Alignment.CenterVertically),
-                        tint = MaterialTheme.colorScheme.onBackground)
-                  }
 
-              IconButton(
-                  modifier = Modifier.align(Alignment.CenterVertically).padding(end = 15.dp),
-                  onClick = {
-                    nav.navigateTo(SECOND_LEVEL_DESTINATION.first { it.route == Route.SETTINGS })
-                  }) {
-                    Icon(
-                        Icons.Outlined.Settings,
-                        contentDescription = "Settings",
-                        modifier =
-                            Modifier.size(screenHeight / 28).align(Alignment.CenterVertically),
-                        tint = MaterialTheme.colorScheme.onBackground)
-                  }
+              Row(horizontalArrangement = Arrangement.Center) {
+                IconButton(onClick = { nav.navigateToScreen(Route.MESSAGE_CHANNELS) }) {
+                  Icon(
+                      ImageVector.vectorResource(R.drawable.baseline_chat_bubble_outline_24),
+                      contentDescription = null,
+                      modifier = Modifier.size(24.dp),
+                      tint = MaterialTheme.colorScheme.tertiary)
+                }
+
+                IconButton(
+                    onClick = {
+                      nav.navigateTo(SECOND_LEVEL_DESTINATION.first { it.route == Route.SETTINGS })
+                    }) {
+                      Icon(
+                          Icons.Outlined.Settings,
+                          contentDescription = "Settings",
+                          modifier = Modifier.size(24.dp),
+                          tint = MaterialTheme.colorScheme.onBackground)
+                    }
+              }
             }
       }) { innerPadding ->
         if (isProfileLoaded) {
@@ -264,7 +262,7 @@ fun Profile(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel
                                 // TODO
                               }) {
                             Text(
-                                text = currentUser?.myEvents?.size.toString(),
+                                text = joinedEventsList.size.toString(),
                                 color = MaterialTheme.colorScheme.onBackground,
                                 style = MaterialTheme.typography.titleLarge,
                                 modifier = Modifier.align(Alignment.CenterHorizontally))

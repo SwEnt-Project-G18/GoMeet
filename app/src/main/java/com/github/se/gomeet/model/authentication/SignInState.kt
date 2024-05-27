@@ -78,5 +78,6 @@ fun getCountries(): ArrayList<String> {
     val flag = (String(Character.toChars(firstChar)) + String(Character.toChars(secondChar)))
     countriesWithEmojis.add("$countryName $flag")
   }
+  countriesWithEmojis.sortBy { it.lowercase() }
   return countriesWithEmojis
 }

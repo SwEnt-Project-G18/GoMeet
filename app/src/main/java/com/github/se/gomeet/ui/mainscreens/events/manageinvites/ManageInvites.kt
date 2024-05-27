@@ -253,7 +253,8 @@ fun ManageInvites(
                     event.value!!,
                     null,
                     callback = { toUpdate.add(it) },
-                    initialClicked = false)
+                    initialClicked = false,
+                    nav)
               }
               PENDING.ordinal -> {
                 PageUserInvites(
@@ -266,7 +267,8 @@ fun ManageInvites(
                     event.value!!,
                     PENDING,
                     callback = { toUpdate.add(it) },
-                    initialClicked = false)
+                    initialClicked = false,
+                    nav)
               }
               ACCEPTED.ordinal -> {
                 PageUserInvites(
@@ -276,7 +278,8 @@ fun ManageInvites(
                     event.value!!,
                     ACCEPTED,
                     callback = { toUpdate.add(it) },
-                    initialClicked = false)
+                    initialClicked = false,
+                    nav)
               }
               REFUSED.ordinal -> {
                 PageUserInvites(
@@ -289,7 +292,8 @@ fun ManageInvites(
                     event.value!!,
                     REFUSED,
                     callback = { toUpdate.add(it) },
-                    initialClicked = false)
+                    initialClicked = false,
+                    nav)
               }
             }
           }
