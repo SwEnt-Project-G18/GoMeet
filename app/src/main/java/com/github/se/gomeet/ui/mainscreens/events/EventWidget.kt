@@ -85,6 +85,7 @@ fun EventWidget(event: Event, verified: Boolean, nav: NavigationActions, userVM:
                     date = dayString,
                     time = timeString,
                     description = event.description,
+                    url = event.url,
                     organizer = event.creator,
                     loc = LatLng(event.location.latitude, event.location.longitude),
                     rating = event.ratings[userVM.currentUID!!] ?: 0,

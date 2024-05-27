@@ -249,6 +249,7 @@ fun EventCarousel(events: List<Event>, nav: NavigationActions, currentUserId: St
                         title = event.title,
                         date = dayString,
                         time = timeString,
+                        url = event.url,
                         organizer = event.creator,
                         rating = event.ratings[currentUserId] ?: 0,
                         description = event.description,

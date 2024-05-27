@@ -54,7 +54,7 @@ object Route {
   const val ADD_PARTICIPANTS = "Add Participants/{eventId}"
   const val MANAGE_INVITES = "ManageInvites/{eventId}"
   const val EVENT_INFO =
-      "eventInfo/{eventId}/{title}/{date}/{time}/{organizer}/{rating}/{description}/{latitude}/{longitude}"
+      "eventInfo/{eventId}/{title}/{date}/{time}/{url}/{organizer}/{rating}/{description}/{latitude}/{longitude}"
   const val NOTIFICATIONS = "Notifications"
   const val SETTINGS = "Settings"
   const val ABOUT = "About"
@@ -188,6 +188,7 @@ class NavigationActions(val navController: NavHostController) {
       title: String,
       date: String,
       time: String,
+      url: String,
       organizer: String,
       rating: Long,
       description: String,
@@ -198,6 +199,7 @@ class NavigationActions(val navController: NavHostController) {
             .replace("{title}", Uri.encode(title))
             .replace("{date}", Uri.encode(date))
             .replace("{time}", Uri.encode(time))
+            .replace("{url}", Uri.encode(url))
             .replace("{organizer}", Uri.encode(organizer))
             .replace("{rating}", rating.toString())
             .replace("{description}", Uri.encode(description))
