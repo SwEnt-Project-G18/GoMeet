@@ -435,6 +435,22 @@ class EventViewModel(val currentUID: String? = null) : ViewModel() {
   }
 
   /**
+   * Update the posts field of the event by removing the given post to the list.
+   *
+   * @param event the event to update
+   * @param post the post to remove from the event
+   */
+  fun deletePost(event: Event, post: Post) {
+    if (!event.posts.contains(post)) {
+      Log.w(TAG, "Event ${event.eventID} doesn't have post ${post.title}")
+      return
+    }
+
+    val updatedPosts = event.posts.minus(post)
+    editEvent(event.copy(posts = updatedPosts))
+  }
+
+  /**
    * Get the location of an event.
    *
    * @param locationName the name of the location

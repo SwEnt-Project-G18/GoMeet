@@ -45,7 +45,8 @@ class UserViewModel(val currentUID: String? = null) : ViewModel() {
       email: String,
       phoneNumber: String,
       country: String,
-      pfp: String = ""
+      pfp: String = "",
+      favorites: List<String> = emptyList()
   ): GoMeetUser? {
     var user: GoMeetUser? = null
     CoroutineScope(Dispatchers.IO).launch {
@@ -63,9 +64,9 @@ class UserViewModel(val currentUID: String? = null) : ViewModel() {
                   email = email,
                   phoneNumber = phoneNumber,
                   country = country,
-                  joinedEvents = emptyList(),
+                  joinedEvents = favorites,
                   myEvents = emptyList(),
-                  myFavorites = emptyList(),
+                  myFavorites = favorites,
                   profilePicture = pfp,
                   tags = emptyList())
           _currentUser.value = user
@@ -193,6 +194,37 @@ class UserViewModel(val currentUID: String? = null) : ViewModel() {
       editUser(goMeetUser.copy(myEvents = goMeetUser.myEvents.plus(eventId)))
     } catch (e: Exception) {
       Log.w(TAG, "Couldn't create the event", e)
+    }
+  }
+
+  /**
+   * User deletes an event and removes it from their list of myEvents. It is used when a user
+   * deletes an event.
+   *
+   * @param eventId The id of the event to delete.
+   * @param userId The id of the user deleting the event.
+   */
+  suspend fun userDeletesEvent(eventId: String, userId: String = currentUID!!) {
+    try {
+      val goMeetUser = getUser(userId)!!
+      editUser(goMeetUser.copy(myEvents = goMeetUser.myEvents.minus(eventId)))
+    } catch (e: Exception) {
+      Log.w(TAG, "Couldn't delete the event", e)
+    }
+  }
+
+  /**
+   * Removes the given event from the user's list of favorites.
+   *
+   * @param eventId The id of the event to remove from favorites.
+   * @param userId The id of the user for which we remove the event from favorites.
+   */
+  suspend fun removeFavoriteEvent(eventId: String, userId: String = currentUID!!) {
+    try {
+      val goMeetUser = getUser(userId)!!
+      editUser(goMeetUser.copy(myFavorites = goMeetUser.myFavorites.minus(eventId)))
+    } catch (e: Exception) {
+      Log.w(TAG, "Couldn't remove the event from favorites", e)
     }
   }
 

@@ -9,11 +9,16 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material.icons.outlined.ThumbUp
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -55,6 +60,7 @@ import kotlinx.coroutines.launch
  * @param userViewModel UserViewModel object to interact with user data
  * @param eventViewModel EventViewModel object to interact with event data
  * @param currentUser The ID of the current user
+ * @param onPostDeleted Callback function to be called when the post is deleted
  */
 @Composable
 fun EventPost(
@@ -63,13 +69,16 @@ fun EventPost(
     post: Post,
     userViewModel: UserViewModel,
     eventViewModel: EventViewModel,
-    currentUser: String
+    currentUser: String,
+    onPostDeleted: (Post) -> Unit
 ) {
   var poster by remember { mutableStateOf<GoMeetUser?>(null) }
   var liked by remember { mutableStateOf(false) }
   var likes by remember { mutableIntStateOf(0) }
   val coroutineScope = rememberCoroutineScope()
   val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+
+  var showDeletePostDialog by remember { mutableStateOf(false) }
 
   LaunchedEffect(Unit) {
     coroutineScope.launch {
@@ -173,6 +182,15 @@ fun EventPost(
               }
             }
 
+        if (currentUser == post.userId) {
+          IconButton(onClick = { showDeletePostDialog = true }) {
+            Icon(
+                imageVector = Icons.Default.Delete,
+                contentDescription = "Delete",
+                tint = MaterialTheme.colorScheme.onBackground)
+          }
+        }
+
         Spacer(modifier = Modifier.weight(1f))
         Text(
             text = "${event.getDateString()}, ${event.getTimeString()}",
@@ -181,4 +199,50 @@ fun EventPost(
       }
     }
   }
+
+  if (showDeletePostDialog) {
+    DeletePostDialog(
+        onConfirm = {
+          coroutineScope.launch {
+            eventViewModel.deletePost(event, post)
+            onPostDeleted(post)
+            showDeletePostDialog = false
+          }
+        },
+        onDismiss = { showDeletePostDialog = false })
+  }
+}
+
+/**
+ * Composable function to display a dialog to confirm the deletion of a post.
+ *
+ * @param onConfirm Callback function to be called when the deletion is confirmed
+ * @param onDismiss Callback function to be called when the dialog is dismissed
+ */
+@Composable
+private fun DeletePostDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
+  AlertDialog(
+      onDismissRequest = onDismiss,
+      confirmButton = {
+        Button(
+            onClick = onConfirm,
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.outlineVariant)) {
+              Text("Confirm")
+            }
+      },
+      dismissButton = {
+        Button(
+            onClick = onDismiss,
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.onErrorContainer)) {
+              Text("Cancel")
+            }
+      },
+      title = { Text("Delete Post") },
+      text = { Text("Are you sure you want to delete this post?") },
+      containerColor = MaterialTheme.colorScheme.background,
+  )
 }

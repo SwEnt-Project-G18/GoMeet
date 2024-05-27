@@ -21,6 +21,8 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -38,6 +40,7 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,6 +54,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
+import com.github.se.gomeet.model.event.Post
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.mainscreens.events.posts.AddPost
@@ -116,12 +120,15 @@ fun MyEventInfo(
   val screenHeight = LocalConfiguration.current.screenHeightDp.dp
   var expanded by remember { mutableStateOf(false) }
   var showShareEventDialog by remember { mutableStateOf(false) }
+  var showDeleteEventDialog by remember { mutableStateOf(false) }
+  var posts by rememberSaveable { mutableStateOf<List<Post>>(emptyList()) }
 
   LaunchedEffect(Unit) {
     coroutineScope.launch {
       organiser.value = userViewModel.getUser(organiserId)
       currentUser.value = userViewModel.getUser(Firebase.auth.currentUser!!.uid)
       myEvent.value = eventViewModel.getEvent(eventId)
+      posts = myEvent.value!!.posts.reversed()
     }
   }
 
@@ -144,6 +151,14 @@ fun MyEventInfo(
               }
             },
             actions = {
+              IconButton(onClick = { showDeleteEventDialog = true }) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Delete",
+                    tint = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.size(24.dp))
+              }
+
               IconButton(onClick = { showShareEventDialog = true }) {
                 Icon(
                     imageVector = ImageVector.vectorResource(R.drawable.upload_icon),
@@ -198,10 +213,11 @@ fun MyEventInfo(
                       callbackPost = { post ->
                         addPost = false
                         coroutineScope.launch {
-                          eventViewModel.editEvent(
-                              myEvent.value!!.copy(
-                                  posts = myEvent.value!!.posts.reversed().plus(post).reversed()))
-                          myEvent.value = eventViewModel.getEvent(eventId)
+                          val updatedEvent =
+                              myEvent.value!!.copy(posts = listOf(post) + myEvent.value!!.posts)
+                          eventViewModel.editEvent(updatedEvent)
+                          myEvent.value = updatedEvent
+                          posts = updatedEvent.posts.reversed()
                         }
                       },
                       user = currentUser.value!!,
@@ -234,7 +250,7 @@ fun MyEventInfo(
                       }
                     }
 
-                if (myEvent.value!!.posts.isEmpty()) {
+                if (posts.isEmpty()) {
                   Spacer(Modifier.height(10.dp))
                   Text(
                       text = "No updates about this event at the moment.",
@@ -244,7 +260,7 @@ fun MyEventInfo(
                   Spacer(Modifier.height(screenHeight / 50))
                 } else {
                   Spacer(Modifier.height(10.dp))
-                  myEvent.value!!.posts.forEach { post ->
+                  posts.reversed().forEach { post ->
                     key(post.date.toString() + post.time.toString()) {
                       EventPost(
                           nav = nav,
@@ -252,7 +268,17 @@ fun MyEventInfo(
                           post = post,
                           userViewModel = userViewModel,
                           eventViewModel = eventViewModel,
-                          currentUser = currentUser.value!!.uid)
+                          currentUser = currentUser.value!!.uid,
+                          onPostDeleted = { deletedPost ->
+                            coroutineScope.launch {
+                              val updatedEvent =
+                                  myEvent.value!!.copy(
+                                      posts = myEvent.value!!.posts.minus(deletedPost))
+                              eventViewModel.editEvent(updatedEvent)
+                              myEvent.value = updatedEvent
+                              posts = updatedEvent.posts.reversed()
+                            }
+                          })
                       HorizontalDivider(color = MaterialTheme.colorScheme.primaryContainer)
                       Spacer(Modifier.height(10.dp))
                     }
@@ -265,6 +291,37 @@ fun MyEventInfo(
 
   if (showShareEventDialog) {
     ShareDialog("Event", eventId, onDismiss = { showShareEventDialog = false })
+  }
+
+  if (showDeleteEventDialog) {
+    DeleteEventDialog(
+        onConfirm = {
+          coroutineScope.launch {
+            myEvent.value!!.participants.forEach { participant ->
+              userViewModel.gotKickedFromEvent(eventId, participant)
+
+              if (participant == currentUser.value!!.uid) {
+                userViewModel.userDeletesEvent(eventId, participant)
+              }
+            }
+
+            myEvent.value!!.pendingParticipants.forEach { pendingParticipant ->
+              userViewModel.invitationCanceled(eventId, pendingParticipant)
+            }
+
+            val allUsers = userViewModel.getAllUsers()
+
+            allUsers!!.forEach { user ->
+              if (user.myFavorites.contains(eventId)) {
+                userViewModel.removeFavoriteEvent(eventId, user.uid)
+              }
+            }
+
+            eventViewModel.removeEvent(eventId)
+            nav.goBack()
+          }
+        },
+        onDismiss = { showDeleteEventDialog = false })
   }
 }
 
@@ -327,4 +384,38 @@ private fun MapViewComposable(
     markerState.position = loc
     onDispose {}
   }
+}
+
+/**
+ * Helper function to display the dialog window when a user wants to delete an event.
+ *
+ * @param onConfirm Callback function to be called when the user confirms the deletion
+ * @param onDismiss Callback function to be called when the user dismisses the dialog
+ */
+@Composable
+fun DeleteEventDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
+  AlertDialog(
+      onDismissRequest = onDismiss,
+      confirmButton = {
+        Button(
+            onClick = onConfirm,
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.outlineVariant)) {
+              Text("Confirm")
+            }
+      },
+      dismissButton = {
+        Button(
+            onClick = onDismiss,
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.onErrorContainer)) {
+              Text("Cancel")
+            }
+      },
+      title = { Text("Delete Event") },
+      text = { Text("Are you sure you want to delete this event?") },
+      containerColor = MaterialTheme.colorScheme.background,
+  )
 }
