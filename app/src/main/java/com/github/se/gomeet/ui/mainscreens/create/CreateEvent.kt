@@ -459,10 +459,7 @@ fun CreateEvent(
                   },
                   shape = RoundedCornerShape(10.dp),
                   enabled =
-                      fieldsAreFull(
-                          titleState.value,
-                          descriptionState.value,
-                          locationState.value),
+                      fieldsAreFull(titleState.value, descriptionState.value, locationState.value),
                   colors =
                       ButtonDefaults.buttonColors(
                           containerColor = MaterialTheme.colorScheme.outlineVariant,
