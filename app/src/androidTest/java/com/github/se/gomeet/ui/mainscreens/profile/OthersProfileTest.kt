@@ -65,6 +65,9 @@ class OthersProfileTest {
           email1,
           "testphonenumber",
           "testcountry")
+      while (userVM.getUser(uid1) == null) {
+        TimeUnit.SECONDS.sleep(1)
+      }
 
       userVM.createUserIfNew(
           uid2,
@@ -74,6 +77,9 @@ class OthersProfileTest {
           email2,
           "testphonenumber2",
           "testcountry2")
+      while (userVM.getUser(uid2) == null) {
+        TimeUnit.SECONDS.sleep(1)
+      }
 
       // Sign in with user1,
       Firebase.auth.signInWithEmailAndPassword(email1, pwd1).await()

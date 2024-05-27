@@ -190,7 +190,7 @@ fun MyEventInfo(
                 EventButtons(
                     currentUser.value!!,
                     organiser.value!!,
-                    eventId,
+                    myEvent.value!!,
                     userViewModel,
                     eventViewModel,
                     nav)

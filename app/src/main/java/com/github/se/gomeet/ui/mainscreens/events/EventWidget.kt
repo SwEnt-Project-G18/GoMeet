@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -21,11 +20,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -36,7 +35,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.ui.navigation.NavigationActions
@@ -70,14 +68,7 @@ fun EventWidget(event: Event, verified: Boolean, nav: NavigationActions, userVM:
 
   val painter: Painter =
       if (event.images.isNotEmpty()) {
-        rememberAsyncImagePainter(
-            ImageRequest.Builder(LocalContext.current)
-                .data(data = event.images[0])
-                .apply {
-                  crossfade(true)
-                  placeholder(R.drawable.gomeet_logo)
-                }
-                .build())
+        rememberAsyncImagePainter(event.images[0])
       } else {
         painterResource(id = R.drawable.gomeet_logo)
       }
@@ -110,6 +101,7 @@ fun EventWidget(event: Event, verified: Boolean, nav: NavigationActions, userVM:
               horizontalAlignment = Alignment.Start, // Align text horizontally to center
               verticalArrangement = Arrangement.Center) {
                 Text(
+                    maxLines = 1,
                     text = event.title,
                     style =
                         TextStyle(
@@ -117,7 +109,7 @@ fun EventWidget(event: Event, verified: Boolean, nav: NavigationActions, userVM:
                             lineHeight = 20.sp,
                             fontFamily = FontFamily(Font(R.font.roboto)),
                             fontWeight = FontWeight(700),
-                            color = MaterialTheme.colorScheme.onBackground,
+                            color = MaterialTheme.colorScheme.tertiary,
                             letterSpacing = 0.25.sp,
                         ),
                     modifier = Modifier.testTag("EventName"))
@@ -172,10 +164,8 @@ fun EventWidget(event: Event, verified: Boolean, nav: NavigationActions, userVM:
               contentDescription = "Event Picture",
               modifier =
                   Modifier.weight(3f)
-                      .fillMaxHeight()
+                      .clip(RectangleShape)
                       .aspectRatio(3f / 1.75f)
-                      .clipToBounds()
-                      .padding(0.dp) // Clip the image if it overflows its bounds
                       .testTag("EventPicture"),
               contentScale = ContentScale.Crop, // Crop the image to fit the aspect ratio
           )

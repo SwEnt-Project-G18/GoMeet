@@ -36,6 +36,7 @@ class CreateEventTest {
 
       // Clean up the events
       eventVM.getAllEvents()?.forEach { eventVM.removeEvent(it.eventID) }
+
       return@runBlocking
     }
   }

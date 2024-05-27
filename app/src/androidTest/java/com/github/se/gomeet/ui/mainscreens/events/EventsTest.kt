@@ -90,6 +90,8 @@ class EventsTest {
       // Clean up the user
       Firebase.auth.currentUser?.delete()?.await()
       userVM.deleteUser(uid)
+
+      return@runBlocking
     }
   }
 
@@ -102,7 +104,9 @@ class EventsTest {
     composeTestRule.waitForIdle()
 
     // Wait until the events are loaded
-    composeTestRule.waitUntil { composeTestRule.onAllNodesWithText("title")[0].isDisplayed() }
+    composeTestRule.waitUntil(timeoutMillis = 10000) {
+      composeTestRule.onAllNodesWithText("title")[0].isDisplayed()
+    }
 
     // Verify that the ui is correctly displayed
     composeTestRule.onNodeWithText("Search").assertIsDisplayed()

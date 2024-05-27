@@ -10,10 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -25,14 +22,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
-import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.mainscreens.SearchModule
@@ -133,53 +125,42 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
   Scaffold(
       bottomBar = { BottomNavigationFun(nav) },
       modifier = Modifier.fillMaxSize().testTag("ExploreUI"),
-      floatingActionButton = {
-        if (locationPermitted.value == true && isButtonVisible.value) {
-          FloatingActionButton(
-              onClick = { moveToCurrentLocation.value = CameraAction.ANIMATE },
-              modifier = Modifier.size(45.dp).testTag("CurrentLocationButton"),
-              containerColor = MaterialTheme.colorScheme.outlineVariant) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.location_icon),
-                    contentDescription = null,
-                    tint = Color.White)
-              }
-        }
-      }) { innerPadding ->
-        if (isMapLoaded) {
-          moveToCurrentLocation.value = CameraAction.MOVE
-          Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
-            GoogleMapView(
-                currentPosition = currentPosition,
-                allEvents = nonFilteredEvents,
-                events = eventList,
-                modifier = Modifier.testTag("Map"),
-                query = query,
-                locationPermitted = locationPermitted.value!!,
-                eventViewModel = eventViewModel,
-                nav = nav)
-            Column(
-                modifier = Modifier.fillMaxHeight().testTag("MapSlider"),
-                verticalArrangement = Arrangement.Bottom) {
-                  ContentInRow(
-                      listState = rememberLazyListState(),
-                      eventList = eventList,
-                      nav = nav,
-                      currentUID = eventViewModel.currentUID!!,
-                  )
-                }
-          }
-        } else {
-          LoadingText()
-        }
-
-        SearchModule(
-            nav = nav,
-            backgroundColor = MaterialTheme.colorScheme.background,
-            contentColor = MaterialTheme.colorScheme.tertiary,
-            currentUID = eventViewModel.currentUID!!,
-        )
+  ) { innerPadding ->
+    if (isMapLoaded) {
+      moveToCurrentLocation.value = CameraAction.MOVE
+      Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
+        val moveToCurrentLocation = remember { mutableStateOf(CameraAction.NO_ACTION) }
+        GoogleMapView(
+            currentPosition = currentPosition,
+            allEvents = nonFilteredEvents,
+            moveToCurrentLocation = moveToCurrentLocation,
+            events = eventList,
+            modifier = Modifier.testTag("Map"),
+            query = query,
+            locationPermitted = locationPermitted.value!!,
+            eventViewModel = eventViewModel,
+            nav = nav)
+        Column(
+            modifier = Modifier.fillMaxHeight().testTag("MapSlider"),
+            verticalArrangement = Arrangement.Bottom) {
+              ContentInRow(
+                  listState = rememberLazyListState(),
+                  eventList = eventList,
+                  nav = nav,
+              )
+            }
       }
+    } else {
+      LoadingText()
+    }
+
+    SearchModule(
+        nav = nav,
+        backgroundColor = MaterialTheme.colorScheme.background,
+        contentColor = MaterialTheme.colorScheme.tertiary,
+        currentUID = eventViewModel.currentUID!!,
+    )
+  }
 }
 
 @Composable

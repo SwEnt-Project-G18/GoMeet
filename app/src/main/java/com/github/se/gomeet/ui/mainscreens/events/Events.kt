@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -25,12 +24,12 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DockedSearchBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
@@ -94,7 +93,7 @@ fun Events(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel:
   LaunchedEffect(Unit) {
     coroutineScope.launch {
       user.value = userViewModel.getUser(currentUID)
-      Log.d(TAG, "User is ${user.value!!.username} with ${user.value!!.myEvents.size} events")
+      // Log.d(TAG, "User is ${user.value!!.username} with ${user.value!!.myEvents.size} events")
       val allEvents = (eventViewModel.getAllEvents() ?: emptyList())
       eventList.addAll(
           allEvents.filter { e ->
@@ -158,13 +157,13 @@ fun Events(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel:
               GoMeetSearchBar(
                   nav,
                   query,
-                  MaterialTheme.colorScheme.primaryContainer,
+                  MaterialTheme.colorScheme.secondaryContainer,
                   MaterialTheme.colorScheme.tertiary)
               Spacer(modifier = Modifier.height(5.dp))
-              Row( // Row to display filter buttons
+              Row(
                   verticalAlignment = Alignment.CenterVertically,
                   horizontalArrangement = Arrangement.SpaceEvenly,
-                  modifier = Modifier.heightIn(min = 56.dp).fillMaxWidth()) {
+                  modifier = Modifier.fillMaxWidth()) {
                     Button(
                         modifier = Modifier.testTag("JoinedButton"),
                         onClick = { onFilterButtonClick(JOINED) },
@@ -286,7 +285,7 @@ fun GoMeetSearchBar(
   val customTextSelectionColors =
       TextSelectionColors(handleColor = DarkCyan, backgroundColor = DarkCyan.copy(alpha = 0.4f))
   CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
-    SearchBar(
+    DockedSearchBar(
         shape = RoundedCornerShape(10.dp),
         query = query.value,
         onQueryChange = { query.value = it },
@@ -294,24 +293,16 @@ fun GoMeetSearchBar(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
         placeholder = { Text("Search", color = contentColor) },
         leadingIcon = {
-          IconButton(onClick = { nav.navigateToScreen(Route.MESSAGE_CHANNELS) }) {
-            Icon(
-                ImageVector.vectorResource(R.drawable.gomeet_icon),
-                contentDescription = null,
-                tint = contentColor,
-                modifier = Modifier.size(24.dp))
-          }
-        },
-        trailingIcon = {
           Icon(
               ImageVector.vectorResource(R.drawable.mic_icon),
               contentDescription = null,
               tint = contentColor,
               modifier =
-                  Modifier.clickable {
+                  Modifier.size(20.dp).clickable {
                     // TODO: handle voice search
                   })
         },
+        trailingIcon = {},
         colors =
             SearchBarDefaults.colors(
                 containerColor = backgroundColor,
@@ -366,7 +357,7 @@ private fun eventsButtonColour(clicked: Filter, button: Filter): ButtonColors {
 
   val unselectedButtonColour =
       ButtonDefaults.buttonColors(
-          containerColor = MaterialTheme.colorScheme.primaryContainer,
+          containerColor = MaterialTheme.colorScheme.secondaryContainer,
           contentColor = MaterialTheme.colorScheme.tertiary)
 
   return if (clicked == button) selectedButtonColour else unselectedButtonColour

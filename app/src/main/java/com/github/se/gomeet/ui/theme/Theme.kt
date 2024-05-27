@@ -21,7 +21,7 @@ private val DarkColorScheme =
         background = Color.Black,
         outline = DarkCyan,
         primaryContainer = DarkModeBackground,
-        secondaryContainer = DarkerBlue,
+        secondaryContainer = DarkModeBackground,
         tertiaryContainer = Color(0xFFEEEEEE),
         outlineVariant = DodgerBlue,
         onBackground = Color.White,
@@ -29,12 +29,12 @@ private val DarkColorScheme =
 
 private val LightColorScheme =
     lightColorScheme(
-        primary = Color.White,
+        primary = White,
         secondary = DarkGrey,
         tertiary = DarkGrey,
         background = White,
-        primaryContainer = LightGray,
-        secondaryContainer = VeryLightBlue,
+        primaryContainer = AliceBlue,
+        secondaryContainer = LightGray,
         tertiaryContainer = Color(0xFFEEEEEE),
         outline = Cyan,
         outlineVariant = DodgerBlue,
