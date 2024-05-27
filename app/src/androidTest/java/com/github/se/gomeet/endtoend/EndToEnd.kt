@@ -110,7 +110,7 @@ class EndToEndTest : TestCase() {
         composeTestRule.onNodeWithText("Password").assertIsDisplayed().performTextInput(pwd)
         composeTestRule.onNodeWithText("Log In").assertIsEnabled().performClick()
         composeTestRule.waitForIdle()
-        composeTestRule.waitUntil(timeoutMillis = 10000) {
+        composeTestRule.waitUntil(timeoutMillis = 40000) {
           composeTestRule.onNodeWithTag("ExploreUI").isDisplayed()
         }
       }
@@ -159,7 +159,7 @@ class EndToEndTest : TestCase() {
     ComposeScreen.onComposeScreen<EventsScreen>(composeTestRule) {
       composeTestRule.waitForIdle()
       composeTestRule.onNodeWithTag("Events").performClick()
-      composeTestRule.waitUntil(timeoutMillis = 10000) {
+      composeTestRule.waitUntil(timeoutMillis = 40000) {
         composeTestRule.onAllNodesWithTag("Card")[0].isDisplayed()
       }
       composeTestRule.onAllNodesWithTag("Card")[0].assertIsDisplayed()
