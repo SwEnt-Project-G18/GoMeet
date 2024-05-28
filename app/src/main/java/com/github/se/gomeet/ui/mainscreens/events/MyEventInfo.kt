@@ -60,7 +60,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.Post
@@ -134,15 +133,6 @@ fun MyEventInfo(
   var posts by rememberSaveable { mutableStateOf<List<Post>>(emptyList()) }
   val uriHandler = LocalUriHandler.current
   val context = LocalContext.current
-  val urlString = buildAnnotatedString {
-    withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onBackground)) {
-      append("More info at : ")
-    }
-    pushStringAnnotation(tag = "URL", annotation = url)
-    withStyle(style = SpanStyle(color = Color.Blue, textDecoration = TextDecoration.Underline)) {
-      append(url)
-    }
-  }
   var isLoading by remember { mutableStateOf(true) }
 
   LaunchedEffect(Unit) {
@@ -232,44 +222,40 @@ fun MyEventInfo(
                   EventDescription(text = description)
                   Spacer(modifier = Modifier.height(10.dp))
 
-                  val annotatedString = buildAnnotatedString {
-                    withStyle(
-                        style =
-                            SpanStyle(
-                                color = MaterialTheme.colorScheme.onBackground, fontSize = 16.sp)) {
-                          append("More info at: ")
-                        }
-                    withStyle(
-                        style =
-                            SpanStyle(
-                                color = MaterialTheme.colorScheme.outlineVariant,
-                                fontSize = 16.sp)) {
-                          append(url)
-                        }
-                    addStringAnnotation(
-                        tag = "URL",
-                        annotation = url,
-                        start = "More info at: ".length,
-                        end = urlString.length)
+                  if (url != "https://no_url.com") {
+                    val urlString = buildAnnotatedString {
+                      withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onBackground)) {
+                        append("More info at : ")
+                      }
+                      pushStringAnnotation(tag = "URL", annotation = url)
+                      withStyle(
+                          style =
+                              SpanStyle(
+                                  color = Color.Blue, textDecoration = TextDecoration.Underline)) {
+                            append(url)
+                          }
+                    }
+
+                    ClickableText(
+                        text = urlString,
+                        modifier = Modifier.padding(horizontal = 10.dp).wrapContentSize(),
+                        style = MaterialTheme.typography.bodyLarge,
+                        onClick = { offset ->
+                          urlString
+                              .getStringAnnotations(tag = "URL", start = offset, end = offset)
+                              .firstOrNull()
+                              ?.let {
+                                try {
+                                  uriHandler.openUri(url)
+                                } catch (e: Exception) {
+                                  Log.e(TAG, "Failed to open URL: $url")
+                                }
+                              }
+                        })
+
+                    Spacer(modifier = Modifier.height(20.dp))
                   }
 
-                  ClickableText(
-                      text = annotatedString,
-                      modifier = Modifier.padding(horizontal = 10.dp).wrapContentSize(),
-                      onClick = { offset ->
-                        annotatedString
-                            .getStringAnnotations(tag = "URL", start = offset, end = offset)
-                            .firstOrNull()
-                            ?.let {
-                              try {
-                                uriHandler.openUri(it.item)
-                              } catch (e: Exception) {
-                                Log.e("ClickableText", "Failed to open URL: ${it.item}")
-                              }
-                            }
-                      })
-
-                  Spacer(modifier = Modifier.height(20.dp))
                   MapViewComposable(loc = loc)
                   if (addPost) {
                     Spacer(modifier = Modifier.height(screenHeight / 80))
