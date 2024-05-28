@@ -40,6 +40,7 @@ import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
+import com.github.se.gomeet.ui.theme.GoMeetTheme
 
 /**
  * Composable function for the profile Settings screen.
@@ -52,121 +53,123 @@ import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 fun SettingsScreen(nav: NavigationActions, /*userViewModel: UserViewModel*/ logOut: () -> Unit) {
   val screenHeight = LocalConfiguration.current.screenHeightDp.dp
   val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+  GoMeetTheme {
+    Scaffold(
+        modifier = Modifier.testTag("SettingsScreen"),
+        topBar = {
+          Column(modifier = Modifier.padding(bottom = screenHeight / 90)) {
+            TopAppBar(
+                modifier = Modifier.testTag("TopBar"),
+                backgroundColor = MaterialTheme.colorScheme.background,
+                elevation = 0.dp,
+                title = {
+                  // Empty title since we're placing our own components
+                },
+                navigationIcon = {
+                  IconButton(onClick = { nav.goBack() }) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Back",
+                        tint = MaterialTheme.colorScheme.onBackground)
+                  }
+                })
 
-  Scaffold(
-      modifier = Modifier.testTag("SettingsScreen"),
-      topBar = {
-        Column(modifier = Modifier.padding(bottom = screenHeight / 90)) {
-          TopAppBar(
-              modifier = Modifier.testTag("TopBar"),
-              backgroundColor = MaterialTheme.colorScheme.background,
-              elevation = 0.dp,
-              title = {
-                // Empty title since we're placing our own components
-              },
-              navigationIcon = {
-                IconButton(onClick = { nav.goBack() }) {
-                  Icon(
-                      imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                      contentDescription = "Back",
-                      tint = MaterialTheme.colorScheme.onBackground)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(start = 18.dp)) {
+                  Text(
+                      text = "Settings",
+                      color = MaterialTheme.colorScheme.onBackground,
+                      style =
+                          MaterialTheme.typography.headlineSmall.copy(
+                              fontWeight = FontWeight.SemiBold))
                 }
-              })
+          }
+        },
+        bottomBar = {
+          BottomNavigationMenu(
+              onTabSelect = { selectedTab ->
+                nav.navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == selectedTab })
+              },
+              tabList = TOP_LEVEL_DESTINATIONS,
+              selectedItem = Route.PROFILE)
+        }) { innerPadding ->
+          Column(
+              modifier =
+                  Modifier.padding(innerPadding)
+                      .verticalScroll(rememberScrollState())
+                      .testTag("Settings"),
+              horizontalAlignment = Alignment.CenterHorizontally,
+              verticalArrangement = Arrangement.Center) {
+                SettingsSubtitle(
+                    "Who can see your content", Modifier.padding(15.dp).align(Alignment.Start))
 
-          Row(
-              verticalAlignment = Alignment.CenterVertically,
-              modifier = Modifier.padding(start = 18.dp)) {
-                Text(
-                    text = "Settings",
-                    color = MaterialTheme.colorScheme.onBackground,
-                    style =
-                        MaterialTheme.typography.headlineSmall.copy(
-                            fontWeight = FontWeight.SemiBold))
+                SettingsComposable(R.drawable.privacy_icon, "Account privacy")
+                SettingsComposable(R.drawable.star, "Close friends")
+                SettingsComposable(R.drawable.blocked_icon, "Blocked")
+                SettingsComposable(R.drawable.mail, "Messages")
+
+                SettingsSubtitle(
+                    "Your app and media", Modifier.padding(15.dp).align(Alignment.Start))
+
+                SettingsComposable(R.drawable.folder, "Suggested content")
+                SettingsComposable(
+                    R.drawable.mobile_friendly,
+                    "Device permissions",
+                    true,
+                    { nav.navigateToScreen(Route.PERMISSIONS) })
+                SettingsComposable(R.drawable.accessibility_icon, "Accessibility")
+                SettingsComposable(R.drawable.language, "Language")
+
+                SettingsSubtitle(
+                    "More info and support", Modifier.padding(15.dp).align(Alignment.Start))
+
+                SettingsComposable(
+                    R.drawable.baseline_chat_bubble_outline_24,
+                    "Help",
+                    true,
+                    { nav.navigateToScreen(Route.HELP) })
+                SettingsComposable(
+                    R.drawable.gomeet_icon, "About", true, { nav.navigateToScreen(Route.ABOUT) })
+
+                Button(
+                    onClick = { logOut() },
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier.fillMaxWidth(0.5f),
+                    colors =
+                        ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                            contentColor = MaterialTheme.colorScheme.tertiary)) {
+                      Text(
+                          text = "Log out",
+                          color = Color.Red,
+                          fontStyle = FontStyle.Normal,
+                          fontWeight = FontWeight.SemiBold,
+                          fontFamily = FontFamily.Default,
+                          textAlign = TextAlign.Start,
+                          style = MaterialTheme.typography.bodySmall)
+                    }
+
+                Button(
+                    onClick = { /* TODO */},
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier.fillMaxWidth(0.5f),
+                    colors =
+                        ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                            contentColor = MaterialTheme.colorScheme.tertiary)) {
+                      Text(
+                          text = "Delete account",
+                          color = Color.Red,
+                          fontStyle = FontStyle.Normal,
+                          fontWeight = FontWeight.SemiBold,
+                          fontFamily = FontFamily.Default,
+                          textAlign = TextAlign.Start,
+                          style = MaterialTheme.typography.bodySmall)
+                    }
               }
         }
-      },
-      bottomBar = {
-        BottomNavigationMenu(
-            onTabSelect = { selectedTab ->
-              nav.navigateTo(TOP_LEVEL_DESTINATIONS.first { it.route == selectedTab })
-            },
-            tabList = TOP_LEVEL_DESTINATIONS,
-            selectedItem = Route.PROFILE)
-      }) { innerPadding ->
-        Column(
-            modifier =
-                Modifier.padding(innerPadding)
-                    .verticalScroll(rememberScrollState())
-                    .testTag("Settings"),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center) {
-              SettingsSubtitle(
-                  "Who can see your content", Modifier.padding(15.dp).align(Alignment.Start))
-
-              SettingsComposable(R.drawable.privacy_icon, "Account privacy")
-              SettingsComposable(R.drawable.star, "Close friends")
-              SettingsComposable(R.drawable.blocked_icon, "Blocked")
-              SettingsComposable(R.drawable.mail, "Messages")
-
-              SettingsSubtitle("Your app and media", Modifier.padding(15.dp).align(Alignment.Start))
-
-              SettingsComposable(R.drawable.folder, "Suggested content")
-              SettingsComposable(
-                  R.drawable.mobile_friendly,
-                  "Device permissions",
-                  true,
-                  { nav.navigateToScreen(Route.PERMISSIONS) })
-              SettingsComposable(R.drawable.accessibility_icon, "Accessibility")
-              SettingsComposable(R.drawable.language, "Language")
-
-              SettingsSubtitle(
-                  "More info and support", Modifier.padding(15.dp).align(Alignment.Start))
-
-              SettingsComposable(
-                  R.drawable.baseline_chat_bubble_outline_24,
-                  "Help",
-                  true,
-                  { nav.navigateToScreen(Route.HELP) })
-              SettingsComposable(
-                  R.drawable.gomeet_icon, "About", true, { nav.navigateToScreen(Route.ABOUT) })
-
-              Button(
-                  onClick = { logOut() },
-                  shape = RoundedCornerShape(10.dp),
-                  modifier = Modifier.fillMaxWidth(0.5f),
-                  colors =
-                      ButtonDefaults.buttonColors(
-                          containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                          contentColor = MaterialTheme.colorScheme.tertiary)) {
-                    Text(
-                        text = "Log out",
-                        color = Color.Red,
-                        fontStyle = FontStyle.Normal,
-                        fontWeight = FontWeight.SemiBold,
-                        fontFamily = FontFamily.Default,
-                        textAlign = TextAlign.Start,
-                        style = MaterialTheme.typography.bodySmall)
-                  }
-
-              Button(
-                  onClick = { /* TODO */},
-                  shape = RoundedCornerShape(10.dp),
-                  modifier = Modifier.fillMaxWidth(0.5f),
-                  colors =
-                      ButtonDefaults.buttonColors(
-                          containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                          contentColor = MaterialTheme.colorScheme.tertiary)) {
-                    Text(
-                        text = "Delete account",
-                        color = Color.Red,
-                        fontStyle = FontStyle.Normal,
-                        fontWeight = FontWeight.SemiBold,
-                        fontFamily = FontFamily.Default,
-                        textAlign = TextAlign.Start,
-                        style = MaterialTheme.typography.bodySmall)
-                  }
-            }
-      }
+  }
 }
 
 /**
