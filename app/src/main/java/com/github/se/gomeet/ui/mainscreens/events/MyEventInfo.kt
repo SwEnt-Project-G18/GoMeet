@@ -113,6 +113,7 @@ fun MyEventInfo(
     date: String = "",
     time: String = "",
     url: String = "",
+    tags: String,
     organiserId: String,
     rating: Long,
     description: String = "",
@@ -246,7 +247,12 @@ fun MyEventInfo(
                               }
                             }
                       })
-                  Spacer(modifier = Modifier.height(20.dp))
+                  Spacer(modifier = Modifier.height(10.dp))
+                  Text(
+                      text = tags,
+                      color = MaterialTheme.colorScheme.onBackground,
+                      modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp))
+                  Spacer(modifier = Modifier.height(10.dp))
                   MapViewComposable(loc = loc)
                   if (addPost) {
                     Spacer(modifier = Modifier.height(screenHeight / 80))

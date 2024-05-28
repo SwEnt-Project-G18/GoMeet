@@ -98,6 +98,7 @@ fun fetchEventAndNavigate(eventId: String, nav: NavigationActions, eventVM: Even
               rating = event.ratings[eventVM.currentUID!!] ?: 0L,
               description = event.description,
               url = event.url,
+              tags = event.tags,
               loc = LatLng(event.location.latitude, event.location.longitude))
         } else {
           Log.e("Event", "Event not found")

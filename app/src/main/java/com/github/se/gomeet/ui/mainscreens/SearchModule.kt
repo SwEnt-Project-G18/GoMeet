@@ -211,6 +211,7 @@ fun SearchModuleSnippet(
                         time = item.event.time.toString(),
                         description = item.event.description,
                         url = item.event.url,
+                        tags = item.event.tags,
                         organizer = item.event.creator,
                         loc = LatLng(item.event.location.latitude, item.event.location.longitude),
                         rating = item.event.ratings[currentUID] ?: 0)

@@ -270,6 +270,7 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
                 navArgument("date") { type = NavType.StringType },
                 navArgument("time") { type = NavType.StringType },
                 navArgument("url") { type = NavType.StringType },
+                navArgument("tags") { type = NavType.StringType },
                 navArgument("organizer") { type = NavType.StringType },
                 navArgument("rating") { type = NavType.LongType },
                 navArgument("description") { type = NavType.StringType },
@@ -281,6 +282,7 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
           val date = entry.arguments?.getString("date") ?: ""
           val time = entry.arguments?.getString("time") ?: ""
           val url = entry.arguments?.getString("url") ?: ""
+          val tags = entry.arguments?.getString("tags") ?: ""
           val organizer = entry.arguments?.getString("organizer") ?: ""
           val rating: Long = entry.arguments?.getLong("rating") ?: 0
           val description = entry.arguments?.getString("description") ?: ""
@@ -295,6 +297,7 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
               date,
               time,
               url,
+              tags,
               organizer,
               rating,
               description,
@@ -432,6 +435,7 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
                 date = updatedEvent.getDateString(),
                 time = updatedEvent.getTimeString(),
                 url = updatedEvent.url,
+                tags = updatedEvent.tags,
                 organizer = updatedEvent.creator,
                 rating = updatedEvent.ratings[eventViewModel.value.currentUID ?: ""] ?: 0,
                 description = updatedEvent.description,

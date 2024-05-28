@@ -54,7 +54,7 @@ object Route {
   const val ADD_PARTICIPANTS = "Add Participants/{eventId}"
   const val MANAGE_INVITES = "ManageInvites/{eventId}"
   const val EVENT_INFO =
-      "eventInfo/{eventId}/{title}/{date}/{time}/{url}/{organizer}/{rating}/{description}/{latitude}/{longitude}"
+      "eventInfo/{eventId}/{title}/{date}/{time}/{url}/{tags}/{organizer}/{rating}/{description}/{latitude}/{longitude}"
   const val NOTIFICATIONS = "Notifications"
   const val SETTINGS = "Settings"
   const val ABOUT = "About"
@@ -189,17 +189,27 @@ class NavigationActions(val navController: NavHostController) {
       date: String,
       time: String,
       url: String,
+      tags: List<String>,
       organizer: String,
       rating: Long,
       description: String,
       loc: LatLng
   ) {
+    var tagsString = "Tags : "
+    tags.forEachIndexed { index, tag ->
+      if (index != tags.size - 1) {
+        tagsString = tagsString.plus("$tag, ")
+      } else {
+        tagsString = tagsString.plus(tag)
+      }
+    }
     val route =
         Route.EVENT_INFO.replace("{eventId}", Uri.encode(eventId))
             .replace("{title}", Uri.encode(title))
             .replace("{date}", Uri.encode(date))
             .replace("{time}", Uri.encode(time))
             .replace("{url}", Uri.encode(url))
+            .replace("{tags}", Uri.encode(tagsString))
             .replace("{organizer}", Uri.encode(organizer))
             .replace("{rating}", rating.toString())
             .replace("{description}", Uri.encode(description))
