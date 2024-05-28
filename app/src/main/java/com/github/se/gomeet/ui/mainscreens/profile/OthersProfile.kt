@@ -129,7 +129,7 @@ fun OthersProfile(
                 tint = MaterialTheme.colorScheme.onBackground)
           }
           Spacer(modifier = Modifier.weight(1F))
-          MoreActionsButton(currentUID, true)
+          MoreActionsButton(viewedUID, true)
         }
       }) { innerPadding ->
         if (isProfileLoaded) {
@@ -360,10 +360,8 @@ fun MoreActionsButton(uid: String, isProfile: Boolean) {
   }
 
   if (showShareDialog) {
-    ShareDialog(
-        type = if (isProfile) "Profile" else "Event",
-        uid = uid,
-        onDismiss = { showShareDialog = false })
+    Log.d("OthersProfile", uid)
+    ShareDialog(type = "Profile", uid = uid, onDismiss = { showShareDialog = false })
   }
 }
 
