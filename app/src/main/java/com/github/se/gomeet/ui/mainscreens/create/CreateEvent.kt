@@ -426,7 +426,7 @@ fun CreateEvent(
                               pickedDate.value,
                               pickedTime.value,
                               price,
-                              urlState.value,
+                              urlState.value.ifEmpty { "https://no_url.com" },
                               invitedParticipants.map { it.uid },
                               listOf(),
                               listOf(),

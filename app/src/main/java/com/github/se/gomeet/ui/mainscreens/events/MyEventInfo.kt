@@ -133,15 +133,6 @@ fun MyEventInfo(
   var posts by rememberSaveable { mutableStateOf<List<Post>>(emptyList()) }
   val uriHandler = LocalUriHandler.current
   val context = LocalContext.current
-  val urlString = buildAnnotatedString {
-    withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onBackground)) {
-      append("More info at : ")
-    }
-    pushStringAnnotation(tag = "URL", annotation = url)
-    withStyle(style = SpanStyle(color = Color.Blue, textDecoration = TextDecoration.Underline)) {
-      append(url)
-    }
-  }
   var isLoading by remember { mutableStateOf(true) }
 
   LaunchedEffect(Unit) {
@@ -230,23 +221,39 @@ fun MyEventInfo(
 
                   EventDescription(text = description)
                   Spacer(modifier = Modifier.height(10.dp))
-                  ClickableText(
-                      text = urlString,
-                      modifier = Modifier.padding(horizontal = 10.dp).wrapContentSize(),
-                      style = MaterialTheme.typography.bodyLarge,
-                      onClick = { offset ->
-                        urlString
-                            .getStringAnnotations(tag = "URL", start = offset, end = offset)
-                            .firstOrNull()
-                            ?.let {
-                              try {
-                                uriHandler.openUri(url)
-                              } catch (e: Exception) {
-                                Log.e(TAG, "Failed to open URL: $url")
+                  if (url != "https://no_url.com") {
+                    val urlString = buildAnnotatedString {
+                      withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onBackground)) {
+                        append("More info at : ")
+                      }
+                      pushStringAnnotation(tag = "URL", annotation = url)
+                      withStyle(
+                          style =
+                              SpanStyle(
+                                  color = Color.Blue, textDecoration = TextDecoration.Underline)) {
+                            append(url)
+                          }
+                    }
+
+                    ClickableText(
+                        text = urlString,
+                        modifier = Modifier.padding(horizontal = 10.dp).wrapContentSize(),
+                        style = MaterialTheme.typography.bodyLarge,
+                        onClick = { offset ->
+                          urlString
+                              .getStringAnnotations(tag = "URL", start = offset, end = offset)
+                              .firstOrNull()
+                              ?.let {
+                                try {
+                                  uriHandler.openUri(url)
+                                } catch (e: Exception) {
+                                  Log.e(TAG, "Failed to open URL: $url")
+                                }
                               }
-                            }
-                      })
-                  Spacer(modifier = Modifier.height(20.dp))
+                        })
+
+                    Spacer(modifier = Modifier.height(20.dp))
+                  }
                   MapViewComposable(loc = loc)
                   if (addPost) {
                     Spacer(modifier = Modifier.height(screenHeight / 80))
