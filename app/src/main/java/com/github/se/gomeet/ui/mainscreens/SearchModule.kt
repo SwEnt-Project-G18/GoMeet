@@ -153,11 +153,11 @@ fun SearchModuleSnippet(
                         block =
                             fun ImageRequest.Builder.() {
                               crossfade(true)
-                              placeholder(R.drawable.gomeet_icon)
+                              placeholder(R.drawable.gomeet_logo)
                             })
                     .build())
           } else {
-            painterResource(id = R.drawable.gomeet_icon)
+            painterResource(id = R.drawable.gomeet_logo)
           }
       Row(
           verticalAlignment = Alignment.CenterVertically,

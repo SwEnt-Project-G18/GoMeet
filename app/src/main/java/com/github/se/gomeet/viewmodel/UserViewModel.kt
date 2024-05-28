@@ -10,6 +10,7 @@ import com.github.se.gomeet.model.event.Invitation
 import com.github.se.gomeet.model.event.InviteStatus
 import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.model.user.GoMeetUser
+import java.util.UUID
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -100,7 +101,10 @@ class UserViewModel(val currentUID: String? = null) : ViewModel() {
   ) {
     viewModelScope.launch {
       try {
-        val imageUrl = UserRepository.uploadUserProfileImageAndGetUrl(userId, imageUri)
+
+        val uniqueFilename = "$userId-${System.currentTimeMillis()}-${UUID.randomUUID()}.jpg"
+        val imageUrl =
+            UserRepository.uploadUserProfileImageAndGetUrl(userId, imageUri, uniqueFilename)
         onSuccess(imageUrl)
       } catch (e: Exception) {
         onError(e)

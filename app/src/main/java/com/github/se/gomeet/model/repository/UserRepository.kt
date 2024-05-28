@@ -102,11 +102,16 @@ class UserRepository private constructor() {
      *
      * @param userId the user ID
      * @param imageUri the URI of the image to upload
+     * @param uniqueFilename the unique filename for the image
      * @return the download URL of the uploaded image
      */
-    suspend fun uploadUserProfileImageAndGetUrl(userId: String, imageUri: Uri): String {
+    suspend fun uploadUserProfileImageAndGetUrl(
+        userId: String,
+        imageUri: Uri,
+        uniqueFilename: String
+    ): String {
       val storageReference = FirebaseStorage.getInstance().reference
-      val imageRef = storageReference.child("user_images/$userId/${imageUri.lastPathSegment}")
+      val imageRef = storageReference.child("user_images/$userId/$uniqueFilename")
 
       // Upload the file and await the completion
       val uploadTaskSnapshot = imageRef.putFile(imageUri).await()

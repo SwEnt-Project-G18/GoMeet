@@ -60,6 +60,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.Post
@@ -221,6 +222,7 @@ fun MyEventInfo(
 
                   EventDescription(text = description)
                   Spacer(modifier = Modifier.height(10.dp))
+<<<<<<< S10-FixNavigation
                   if (url != "https://no_url.com") {
                     val urlString = buildAnnotatedString {
                       withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onBackground)) {
@@ -254,6 +256,47 @@ fun MyEventInfo(
 
                     Spacer(modifier = Modifier.height(20.dp))
                   }
+=======
+
+                  val annotatedString = buildAnnotatedString {
+                    withStyle(
+                        style =
+                            SpanStyle(
+                                color = MaterialTheme.colorScheme.onBackground, fontSize = 16.sp)) {
+                          append("More info at: ")
+                        }
+                    withStyle(
+                        style =
+                            SpanStyle(
+                                color = MaterialTheme.colorScheme.outlineVariant,
+                                fontSize = 16.sp)) {
+                          append(url)
+                        }
+                    addStringAnnotation(
+                        tag = "URL",
+                        annotation = url,
+                        start = "More info at: ".length,
+                        end = urlString.length)
+                  }
+
+                  ClickableText(
+                      text = annotatedString,
+                      modifier = Modifier.padding(horizontal = 10.dp).wrapContentSize(),
+                      onClick = { offset ->
+                        annotatedString
+                            .getStringAnnotations(tag = "URL", start = offset, end = offset)
+                            .firstOrNull()
+                            ?.let {
+                              try {
+                                uriHandler.openUri(it.item)
+                              } catch (e: Exception) {
+                                Log.e("ClickableText", "Failed to open URL: ${it.item}")
+                              }
+                            }
+                      })
+
+                  Spacer(modifier = Modifier.height(20.dp))
+>>>>>>> main
                   MapViewComposable(loc = loc)
                   if (addPost) {
                     Spacer(modifier = Modifier.height(screenHeight / 80))
