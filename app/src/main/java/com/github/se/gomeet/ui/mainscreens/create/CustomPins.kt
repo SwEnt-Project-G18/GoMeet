@@ -32,6 +32,8 @@ class CustomPins {
       context: Context,
       date: LocalDate,
       time: LocalTime,
+      width: Int,
+      height: Int,
       callback: (BitmapDescriptor, Bitmap) -> Unit
   ) {
     val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
@@ -44,12 +46,13 @@ class CustomPins {
     eventDate.text = dayOfWeek.uppercase(Locale.getDefault())
     eventTime.text = time.format(DateTimeFormatter.ofPattern("HH:mm"))
 
-    customPinView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
-    customPinView.layout(0, 0, customPinView.measuredWidth, customPinView.measuredHeight)
+    // Measure and layout with specified width and height
+    val widthMeasureSpec = View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY)
+    val heightMeasureSpec = View.MeasureSpec.makeMeasureSpec(height, View.MeasureSpec.EXACTLY)
+    customPinView.measure(widthMeasureSpec, heightMeasureSpec)
+    customPinView.layout(0, 0, width, height)
 
-    val bitmap =
-        Bitmap.createBitmap(
-            customPinView.measuredWidth, customPinView.measuredHeight, Bitmap.Config.ARGB_8888)
+    val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
     val canvas = Canvas(bitmap)
     customPinView.draw(canvas)
 

@@ -449,13 +449,12 @@ fun CreateEvent(
                       }
                     }
 
-                    customPins.createCustomPin(context, pickedDate.value, pickedTime.value) {
-                        _,
-                        bitmap ->
-                      // Handle the bitmap descriptor and bitmap as needed
-                      val byteArray = customPins.bitmapToByteArray(bitmap)
-                      customPins.uploadEventIcon(byteArray, uid)
-                    }
+                    customPins.createCustomPin(
+                        context, pickedDate.value, pickedTime.value, 144, 213) { _, bitmap ->
+                          // Handle the bitmap descriptor and bitmap as needed
+                          val byteArray = customPins.bitmapToByteArray(bitmap)
+                          customPins.uploadEventIcon(byteArray, uid)
+                        }
                   },
                   shape = RoundedCornerShape(10.dp),
                   enabled =
