@@ -88,6 +88,7 @@ fun ProfileEventsList(
                           date = event.getDateString(),
                           time = event.getTimeString(),
                           description = event.description,
+                          url = event.url,
                           organizer = event.creator,
                           loc = LatLng(event.location.latitude, event.location.longitude),
                           rating = event.ratings[currentUID] ?: 0,

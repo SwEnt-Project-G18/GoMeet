@@ -253,6 +253,7 @@ internal fun GoogleMapView(
                           date = event.getDateString(),
                           time = event.getTimeString(),
                           description = event.description,
+                          url = event.url,
                           organizer = event.creator,
                           loc = LatLng(event.location.latitude, event.location.longitude),
                           rating = 0L // TODO: replace with actual rating
@@ -271,6 +272,7 @@ internal fun GoogleMapView(
                                         date = event.getDateString(),
                                         time = event.getTimeString(),
                                         description = event.description,
+                                        url = event.url,
                                         organizer = event.creator,
                                         loc =
                                             LatLng(

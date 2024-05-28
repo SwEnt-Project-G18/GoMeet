@@ -14,8 +14,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
@@ -45,12 +47,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
@@ -104,6 +112,7 @@ fun MyEventInfo(
     eventId: String = "",
     date: String = "",
     time: String = "",
+    url: String = "",
     organiserId: String,
     rating: Long,
     description: String = "",
@@ -122,6 +131,17 @@ fun MyEventInfo(
   var showShareEventDialog by remember { mutableStateOf(false) }
   var showDeleteEventDialog by remember { mutableStateOf(false) }
   var posts by rememberSaveable { mutableStateOf<List<Post>>(emptyList()) }
+  val uriHandler = LocalUriHandler.current
+  val context = LocalContext.current
+  val urlString = buildAnnotatedString {
+    withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onBackground)) {
+      append("More info at : ")
+    }
+    pushStringAnnotation(tag = "URL", annotation = url)
+    withStyle(style = SpanStyle(color = Color.Blue, textDecoration = TextDecoration.Underline)) {
+      append(url)
+    }
+  }
   var isLoading by remember { mutableStateOf(true) }
 
   LaunchedEffect(Unit) {
@@ -209,6 +229,23 @@ fun MyEventInfo(
                   Spacer(modifier = Modifier.height(20.dp))
 
                   EventDescription(text = description)
+                  Spacer(modifier = Modifier.height(10.dp))
+                  ClickableText(
+                      text = urlString,
+                      modifier = Modifier.padding(horizontal = 10.dp).wrapContentSize(),
+                      style = MaterialTheme.typography.bodyLarge,
+                      onClick = { offset ->
+                        urlString
+                            .getStringAnnotations(tag = "URL", start = offset, end = offset)
+                            .firstOrNull()
+                            ?.let {
+                              try {
+                                uriHandler.openUri(url)
+                              } catch (e: Exception) {
+                                Log.e(TAG, "Failed to open URL: $url")
+                              }
+                            }
+                      })
                   Spacer(modifier = Modifier.height(20.dp))
                   MapViewComposable(loc = loc)
                   if (addPost) {
@@ -412,7 +449,7 @@ fun DeleteEventDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
             colors =
                 ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.outlineVariant)) {
-              Text("Confirm")
+              Text("Confirm", color = Color.White)
             }
       },
       dismissButton = {
@@ -420,8 +457,8 @@ fun DeleteEventDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
             onClick = onDismiss,
             colors =
                 ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.onErrorContainer)) {
-              Text("Cancel")
+                    containerColor = MaterialTheme.colorScheme.primaryContainer)) {
+              Text("Cancel", color = MaterialTheme.colorScheme.onBackground)
             }
       },
       title = { Text("Delete Event") },

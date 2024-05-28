@@ -67,6 +67,7 @@ fun InvitationsNotificationsWidget(
                     event.title,
                     event.getDateString(),
                     event.getTimeString(),
+                    event.url,
                     event.creator,
                     0L,
                     event.description,
