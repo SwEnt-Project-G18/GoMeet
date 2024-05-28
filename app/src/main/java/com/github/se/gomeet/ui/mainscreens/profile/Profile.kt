@@ -1,5 +1,6 @@
 package com.github.se.gomeet.ui.mainscreens.profile
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -344,6 +345,7 @@ fun Profile(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel
 
   // Show the QR code dialog if the state is true
   if (showShareProfileDialog) {
+    currentUser?.uid?.let { Log.d("OthersProfile", it) }
     ShareDialog("Profile", currentUser?.uid ?: "", onDismiss = { showShareProfileDialog = false })
   }
 }
