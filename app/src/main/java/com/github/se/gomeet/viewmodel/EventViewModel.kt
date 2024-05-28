@@ -30,6 +30,7 @@ import com.squareup.picasso.Picasso
 import java.io.IOException
 import java.time.LocalDate
 import java.time.LocalTime
+import java.util.UUID
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlinx.coroutines.CompletableDeferred
@@ -198,9 +199,16 @@ class EventViewModel(val currentUID: String? = null) : ViewModel() {
    * @return the download URL of the uploaded image
    */
   suspend fun uploadImageAndGetUrl(imageUri: Uri): String {
-    val imageRef = Firebase.storage.reference.child("images/${imageUri.lastPathSegment}")
+    // Generate a unique filename using a timestamp and UUID
+    val uniqueFilename = "images/${System.currentTimeMillis()}-${UUID.randomUUID()}.jpg"
+    val imageRef = Firebase.storage.reference.child(uniqueFilename)
+
+    // Upload the file and await the completion
     val uploadTaskSnapshot = imageRef.putFile(imageUri).await()
-    return uploadTaskSnapshot.metadata?.reference?.downloadUrl?.await().toString()
+
+    // Retrieve and return the download URL
+    return uploadTaskSnapshot.metadata?.reference?.downloadUrl?.await()?.toString()
+        ?: throw Exception("Failed to upload image and retrieve URL")
   }
 
   /** Get all events that exist in the database. */
