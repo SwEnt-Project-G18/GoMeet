@@ -5,15 +5,18 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.TextButton
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -127,29 +130,41 @@ fun SettingsScreen(nav: NavigationActions, /*userViewModel: UserViewModel*/ logO
               SettingsComposable(
                   R.drawable.gomeet_icon, "About", true, { nav.navigateToScreen(Route.ABOUT) })
 
-              TextButton(onClick = { logOut() }) {
-                Text(
-                    text = "Log out",
-                    modifier = Modifier.padding(start = 15.dp),
-                    color = Color.Red,
-                    fontStyle = FontStyle.Normal,
-                    fontWeight = FontWeight.SemiBold,
-                    fontFamily = FontFamily.Default,
-                    textAlign = TextAlign.Start,
-                    style = MaterialTheme.typography.bodySmall)
-              }
+              Button(
+                  onClick = { logOut() },
+                  shape = RoundedCornerShape(10.dp),
+                  modifier = Modifier.fillMaxWidth(0.5f),
+                  colors =
+                      ButtonDefaults.buttonColors(
+                          containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                          contentColor = MaterialTheme.colorScheme.tertiary)) {
+                    Text(
+                        text = "Log out",
+                        color = Color.Red,
+                        fontStyle = FontStyle.Normal,
+                        fontWeight = FontWeight.SemiBold,
+                        fontFamily = FontFamily.Default,
+                        textAlign = TextAlign.Start,
+                        style = MaterialTheme.typography.bodySmall)
+                  }
 
-              TextButton(onClick = { /* TODO */}) {
-                Text(
-                    text = "Delete account",
-                    modifier = Modifier.padding(start = 15.dp),
-                    color = Color.Red,
-                    fontStyle = FontStyle.Normal,
-                    fontWeight = FontWeight.SemiBold,
-                    fontFamily = FontFamily.Default,
-                    textAlign = TextAlign.Start,
-                    style = MaterialTheme.typography.bodySmall)
-              }
+              Button(
+                  onClick = { /* TODO */},
+                  shape = RoundedCornerShape(10.dp),
+                  modifier = Modifier.fillMaxWidth(0.5f),
+                  colors =
+                      ButtonDefaults.buttonColors(
+                          containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                          contentColor = MaterialTheme.colorScheme.tertiary)) {
+                    Text(
+                        text = "Delete account",
+                        color = Color.Red,
+                        fontStyle = FontStyle.Normal,
+                        fontWeight = FontWeight.SemiBold,
+                        fontFamily = FontFamily.Default,
+                        textAlign = TextAlign.Start,
+                        style = MaterialTheme.typography.bodySmall)
+                  }
             }
       }
 }
