@@ -449,7 +449,7 @@ fun DeleteEventDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
             colors =
                 ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.outlineVariant)) {
-              Text("Confirm")
+              Text("Confirm", color = Color.White)
             }
       },
       dismissButton = {
@@ -457,8 +457,8 @@ fun DeleteEventDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
             onClick = onDismiss,
             colors =
                 ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.onErrorContainer)) {
-              Text("Cancel")
+                    containerColor = MaterialTheme.colorScheme.primaryContainer)) {
+              Text("Cancel", color = MaterialTheme.colorScheme.onBackground)
             }
       },
       title = { Text("Delete Event") },
