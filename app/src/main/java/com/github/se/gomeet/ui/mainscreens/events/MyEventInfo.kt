@@ -133,7 +133,6 @@ fun MyEventInfo(
   var posts by rememberSaveable { mutableStateOf<List<Post>>(emptyList()) }
   val uriHandler = LocalUriHandler.current
   val context = LocalContext.current
-
   val urlString = buildAnnotatedString {
     withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onBackground)) {
       append("More info at : ")
@@ -143,6 +142,7 @@ fun MyEventInfo(
       append(url)
     }
   }
+  var isLoading by remember { mutableStateOf(true) }
 
   LaunchedEffect(Unit) {
     coroutineScope.launch {
@@ -150,215 +150,225 @@ fun MyEventInfo(
       currentUser.value = userViewModel.getUser(Firebase.auth.currentUser!!.uid)
       myEvent.value = eventViewModel.getEvent(eventId)
       posts = myEvent.value!!.posts.reversed()
+
+      isLoading = false
     }
   }
 
-  Log.d(TAG, "Organiser is $organiserId")
-  Scaffold(
-      topBar = {
-        TopAppBar(
-            modifier = Modifier.testTag("TopBar"),
-            backgroundColor = MaterialTheme.colorScheme.background,
-            elevation = 0.dp,
-            title = {
-              // Empty title since we're placing our own components
-            },
-            navigationIcon = {
-              IconButton(onClick = { nav.goBack() }) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
-                    tint = MaterialTheme.colorScheme.onBackground)
-              }
-            },
-            actions = {
-              IconButton(onClick = { showDeleteEventDialog = true }) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = "Delete",
-                    tint = MaterialTheme.colorScheme.onBackground,
-                    modifier = Modifier.size(24.dp))
-              }
-
-              IconButton(onClick = { showShareEventDialog = true }) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.upload_icon),
-                    contentDescription = "Share",
-                    tint = MaterialTheme.colorScheme.onBackground,
-                    modifier = Modifier.size(24.dp))
-              }
-            })
-      },
-      bottomBar = {
-        // Your bottom bar content
-      }) { innerPadding ->
-        if (organiser.value == null || currentUser.value == null || myEvent.value == null) {
-          LoadingText()
-        } else {
-          Column(
-              modifier =
-                  Modifier.padding(innerPadding)
-                      .padding(horizontal = 10.dp)
-                      .fillMaxSize()
-                      .verticalScroll(state = rememberScrollState())) {
-                EventHeader(
-                    eventViewModel = eventViewModel,
-                    event = myEvent.value!!,
-                    rating = ratingState,
-                    nav = nav,
-                    organiser = organiser.value!!)
-                Spacer(modifier = Modifier.height(20.dp))
-                EventButtons(
-                    currentUser.value!!,
-                    organiser.value!!,
-                    myEvent.value!!,
-                    userViewModel,
-                    eventViewModel,
-                    nav)
-
-                var imageUrl by remember { mutableStateOf<String?>(null) }
-                LaunchedEffect(eventId) { imageUrl = eventViewModel.getEventImageUrl(eventId) }
-                EventImage(imageUrl = imageUrl)
-                Spacer(modifier = Modifier.height(20.dp))
-                EventDescription(text = description)
-                Spacer(modifier = Modifier.height(10.dp))
-                ClickableText(
-                    text = urlString,
-                    modifier = Modifier.padding(horizontal = 10.dp).wrapContentSize(),
-                    style = MaterialTheme.typography.bodyLarge,
-                    onClick = { offset ->
-                      urlString
-                          .getStringAnnotations(tag = "URL", start = offset, end = offset)
-                          .firstOrNull()
-                          ?.let {
-                            try {
-                              uriHandler.openUri(url)
-                            } catch (e: Exception) {
-                              Log.e(TAG, "Failed to open URL: $url")
-                            }
-                          }
-                    })
-                Spacer(modifier = Modifier.height(20.dp))
-                MapViewComposable(loc = loc)
-                if (addPost) {
-                  Spacer(modifier = Modifier.height(screenHeight / 80))
-                  HorizontalDivider(
-                      thickness = 5.dp, color = MaterialTheme.colorScheme.primaryContainer)
-                  Spacer(modifier = Modifier.height(screenHeight / 80))
-                  AddPost(
-                      callbackCancel = { addPost = false },
-                      callbackPost = { post ->
-                        addPost = false
-                        coroutineScope.launch {
-                          val updatedEvent =
-                              myEvent.value!!.copy(posts = listOf(post) + myEvent.value!!.posts)
-                          eventViewModel.editEvent(updatedEvent)
-                          myEvent.value = updatedEvent
-                          posts = updatedEvent.posts.reversed()
-                        }
-                      },
-                      user = currentUser.value!!,
-                      userViewModel = userViewModel)
+  if (isLoading) {
+    LoadingText()
+  } else {
+    Log.d(TAG, "Organiser is $organiserId")
+    Scaffold(
+        topBar = {
+          TopAppBar(
+              modifier = Modifier.testTag("TopBar"),
+              backgroundColor = MaterialTheme.colorScheme.background,
+              elevation = 0.dp,
+              title = {
+                // Empty title since we're placing our own components
+              },
+              navigationIcon = {
+                IconButton(onClick = { nav.goBack() }) {
+                  Icon(
+                      imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                      contentDescription = "Back",
+                      tint = MaterialTheme.colorScheme.onBackground)
                 }
-                Spacer(Modifier.height(screenHeight / 80))
-                HorizontalDivider(
-                    thickness = 5.dp, color = MaterialTheme.colorScheme.primaryContainer)
-                Spacer(Modifier.height(screenHeight / 80))
-                Row(
-                    horizontalArrangement = Arrangement.SpaceAround,
-                    verticalAlignment = Alignment.Top) {
-                      Text(
-                          text = "Posts",
-                          color = MaterialTheme.colorScheme.tertiary,
-                          style =
-                              MaterialTheme.typography.headlineSmall.copy(
-                                  fontWeight = FontWeight.SemiBold))
-
-                      Spacer(modifier = Modifier.weight(1f))
-                      if (!addPost && organiser.value!!.uid == currentUser.value!!.uid) {
-                        Button(
-                            onClick = { addPost = true },
-                            shape = RoundedCornerShape(10.dp),
-                            colors =
-                                ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.outlineVariant)) {
-                              Icon(Icons.Filled.Add, contentDescription = "Add Post", tint = White)
-                            }
-                      }
-                    }
-
-                if (posts.isEmpty()) {
-                  Spacer(Modifier.height(10.dp))
-                  Text(
-                      text = "No updates about this event at the moment.",
-                      color = MaterialTheme.colorScheme.tertiary,
-                      modifier = Modifier.align(Alignment.CenterHorizontally),
-                      style = MaterialTheme.typography.bodyLarge)
-                  Spacer(Modifier.height(screenHeight / 50))
-                } else {
-                  Spacer(Modifier.height(10.dp))
-                  posts.reversed().forEach { post ->
-                    key(post.date.toString() + post.time.toString()) {
-                      EventPost(
-                          nav = nav,
-                          event = myEvent.value!!,
-                          post = post,
-                          userViewModel = userViewModel,
-                          eventViewModel = eventViewModel,
-                          currentUser = currentUser.value!!.uid,
-                          onPostDeleted = { deletedPost ->
-                            coroutineScope.launch {
-                              val updatedEvent =
-                                  myEvent.value!!.copy(
-                                      posts = myEvent.value!!.posts.minus(deletedPost))
-                              eventViewModel.editEvent(updatedEvent)
-                              myEvent.value = updatedEvent
-                              posts = updatedEvent.posts.reversed()
-                            }
-                          })
-                      HorizontalDivider(color = MaterialTheme.colorScheme.primaryContainer)
-                      Spacer(Modifier.height(10.dp))
-                    }
+              },
+              actions = {
+                if (organiser.value!!.uid == currentUser.value!!.uid) {
+                  IconButton(onClick = { showDeleteEventDialog = true }) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Delete",
+                        tint = MaterialTheme.colorScheme.onBackground,
+                        modifier = Modifier.size(24.dp))
                   }
                 }
-                Spacer(Modifier.height(screenHeight / 10))
-              }
-        }
-      }
 
-  if (showShareEventDialog) {
-    ShareDialog("Event", eventId, onDismiss = { showShareEventDialog = false })
-  }
-
-  if (showDeleteEventDialog) {
-    DeleteEventDialog(
-        onConfirm = {
-          coroutineScope.launch {
-            myEvent.value!!.participants.forEach { participant ->
-              userViewModel.gotKickedFromEvent(eventId, participant)
-
-              if (participant == currentUser.value!!.uid) {
-                userViewModel.userDeletesEvent(eventId, participant)
-              }
-            }
-
-            myEvent.value!!.pendingParticipants.forEach { pendingParticipant ->
-              userViewModel.invitationCanceled(eventId, pendingParticipant)
-            }
-
-            val allUsers = userViewModel.getAllUsers()
-
-            allUsers!!.forEach { user ->
-              if (user.myFavorites.contains(eventId)) {
-                userViewModel.removeFavoriteEvent(eventId, user.uid)
-              }
-            }
-
-            eventViewModel.removeEvent(eventId)
-            nav.goBack()
-          }
+                IconButton(onClick = { showShareEventDialog = true }) {
+                  Icon(
+                      imageVector = ImageVector.vectorResource(R.drawable.upload_icon),
+                      contentDescription = "Share",
+                      tint = MaterialTheme.colorScheme.onBackground,
+                      modifier = Modifier.size(24.dp))
+                }
+              })
         },
-        onDismiss = { showDeleteEventDialog = false })
+        bottomBar = {
+          // Your bottom bar content
+        }) { innerPadding ->
+          if (organiser.value == null || currentUser.value == null || myEvent.value == null) {
+            LoadingText()
+          } else {
+            Column(
+                modifier =
+                    Modifier.padding(innerPadding)
+                        .padding(horizontal = 10.dp)
+                        .fillMaxSize()
+                        .verticalScroll(state = rememberScrollState())) {
+                  EventHeader(
+                      eventViewModel = eventViewModel,
+                      event = myEvent.value!!,
+                      rating = ratingState,
+                      nav = nav,
+                      organiser = organiser.value!!)
+                  Spacer(modifier = Modifier.height(20.dp))
+                  EventButtons(
+                      currentUser.value!!,
+                      organiser.value!!,
+                      myEvent.value!!,
+                      userViewModel,
+                      eventViewModel,
+                      nav)
+
+                  var imageUrl by remember { mutableStateOf<String?>(null) }
+                  LaunchedEffect(eventId) { imageUrl = eventViewModel.getEventImageUrl(eventId) }
+                  EventImage(imageUrl = imageUrl)
+                  Spacer(modifier = Modifier.height(20.dp))
+
+                  EventDescription(text = description)
+                  Spacer(modifier = Modifier.height(10.dp))
+                  ClickableText(
+                      text = urlString,
+                      modifier = Modifier.padding(horizontal = 10.dp).wrapContentSize(),
+                      style = MaterialTheme.typography.bodyLarge,
+                      onClick = { offset ->
+                        urlString
+                            .getStringAnnotations(tag = "URL", start = offset, end = offset)
+                            .firstOrNull()
+                            ?.let {
+                              try {
+                                uriHandler.openUri(url)
+                              } catch (e: Exception) {
+                                Log.e(TAG, "Failed to open URL: $url")
+                              }
+                            }
+                      })
+                  Spacer(modifier = Modifier.height(20.dp))
+                  MapViewComposable(loc = loc)
+                  if (addPost) {
+                    Spacer(modifier = Modifier.height(screenHeight / 80))
+                    HorizontalDivider(
+                        thickness = 5.dp, color = MaterialTheme.colorScheme.primaryContainer)
+                    Spacer(modifier = Modifier.height(screenHeight / 80))
+                    AddPost(
+                        callbackCancel = { addPost = false },
+                        callbackPost = { post ->
+                          addPost = false
+                          coroutineScope.launch {
+                            val updatedEvent =
+                                myEvent.value!!.copy(posts = listOf(post) + myEvent.value!!.posts)
+                            eventViewModel.editEvent(updatedEvent)
+                            myEvent.value = updatedEvent
+                            posts = updatedEvent.posts.reversed()
+                          }
+                        },
+                        user = currentUser.value!!,
+                        userViewModel = userViewModel)
+                  }
+                  Spacer(Modifier.height(screenHeight / 80))
+                  HorizontalDivider(
+                      thickness = 5.dp, color = MaterialTheme.colorScheme.primaryContainer)
+                  Spacer(Modifier.height(screenHeight / 80))
+                  Row(
+                      horizontalArrangement = Arrangement.SpaceAround,
+                      verticalAlignment = Alignment.Top) {
+                        Text(
+                            text = "Posts",
+                            color = MaterialTheme.colorScheme.tertiary,
+                            style =
+                                MaterialTheme.typography.headlineSmall.copy(
+                                    fontWeight = FontWeight.SemiBold))
+
+                        Spacer(modifier = Modifier.weight(1f))
+                        if (!addPost && organiser.value!!.uid == currentUser.value!!.uid) {
+                          Button(
+                              onClick = { addPost = true },
+                              shape = RoundedCornerShape(10.dp),
+                              colors =
+                                  ButtonDefaults.buttonColors(
+                                      containerColor = MaterialTheme.colorScheme.outlineVariant)) {
+                                Icon(
+                                    Icons.Filled.Add, contentDescription = "Add Post", tint = White)
+                              }
+                        }
+                      }
+
+                  if (posts.isEmpty()) {
+                    Spacer(Modifier.height(10.dp))
+                    Text(
+                        text = "No updates about this event at the moment.",
+                        color = MaterialTheme.colorScheme.tertiary,
+                        modifier = Modifier.align(Alignment.CenterHorizontally),
+                        style = MaterialTheme.typography.bodyLarge)
+                    Spacer(Modifier.height(screenHeight / 50))
+                  } else {
+                    Spacer(Modifier.height(10.dp))
+                    posts.reversed().forEach { post ->
+                      key(post.date.toString() + post.time.toString()) {
+                        EventPost(
+                            nav = nav,
+                            event = myEvent.value!!,
+                            post = post,
+                            userViewModel = userViewModel,
+                            eventViewModel = eventViewModel,
+                            currentUser = currentUser.value!!.uid,
+                            onPostDeleted = { deletedPost ->
+                              coroutineScope.launch {
+                                val updatedEvent =
+                                    myEvent.value!!.copy(
+                                        posts = myEvent.value!!.posts.minus(deletedPost))
+                                eventViewModel.editEvent(updatedEvent)
+                                myEvent.value = updatedEvent
+                                posts = updatedEvent.posts.reversed()
+                              }
+                            })
+                        HorizontalDivider(color = MaterialTheme.colorScheme.primaryContainer)
+                        Spacer(Modifier.height(10.dp))
+                      }
+                    }
+                  }
+                  Spacer(Modifier.height(screenHeight / 10))
+                }
+          }
+        }
+
+    if (showShareEventDialog) {
+      ShareDialog("Event", eventId, onDismiss = { showShareEventDialog = false })
+    }
+
+    if (showDeleteEventDialog) {
+      DeleteEventDialog(
+          onConfirm = {
+            coroutineScope.launch {
+              myEvent.value!!.participants.forEach { participant ->
+                userViewModel.gotKickedFromEvent(eventId, participant)
+
+                if (participant == currentUser.value!!.uid) {
+                  userViewModel.userDeletesEvent(eventId, participant)
+                }
+              }
+
+              myEvent.value!!.pendingParticipants.forEach { pendingParticipant ->
+                userViewModel.invitationCanceled(eventId, pendingParticipant)
+              }
+
+              val allUsers = userViewModel.getAllUsers()
+
+              allUsers!!.forEach { user ->
+                if (user.myFavorites.contains(eventId)) {
+                  userViewModel.removeFavoriteEvent(eventId, user.uid)
+                }
+              }
+
+              eventViewModel.removeEvent(eventId)
+              nav.goBack()
+            }
+          },
+          onDismiss = { showDeleteEventDialog = false })
+    }
   }
 }
 
