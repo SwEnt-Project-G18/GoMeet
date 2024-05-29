@@ -327,6 +327,7 @@ fun EventButtons(
                     isJoined.value = false
                   }
                 },
+                enabled = !event.isPastEvent(),
                 shape = RoundedCornerShape(10.dp),
                 modifier = Modifier.weight(1f),
                 colors =
