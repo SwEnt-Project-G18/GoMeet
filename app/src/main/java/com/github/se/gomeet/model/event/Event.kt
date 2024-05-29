@@ -119,9 +119,9 @@ data class Event(
    * @return The string representation of the date.
    */
   fun getDateString(): String {
-    val date =
-        if (this.date == LocalDate.now()) "Today"
-        else "${this.date.dayOfMonth}/${this.date.monthValue}/${this.date.year}"
+    val day = if (this.date.dayOfMonth < 9) "0${this.date.dayOfMonth}" else this.date.dayOfMonth
+    val month = if (this.date.monthValue < 9) "0${this.date.monthValue}" else this.date.monthValue
+    val date = if (this.date == LocalDate.now()) "Today" else "$day/$month/${this.date.year}"
     return date
   }
 
