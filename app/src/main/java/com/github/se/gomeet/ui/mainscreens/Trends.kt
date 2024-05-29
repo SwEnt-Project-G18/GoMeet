@@ -116,7 +116,7 @@ fun Trends(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(start = screenWidth / 15, top = screenHeight / 30)) {
               Text(
-                  text = "Trends",
+                  text = "Recommended",
                   color = MaterialTheme.colorScheme.onBackground,
                   style =
                       MaterialTheme.typography.headlineMedium.copy(
