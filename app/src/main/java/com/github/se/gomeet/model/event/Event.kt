@@ -108,8 +108,8 @@ data class Event(
    * @return The string representation of the time.
    */
   fun getTimeString(): String {
-    val minutes = if (this.time.minute < 9) "0${this.time.minute}" else this.time.minute
-    val hours = if (this.time.hour < 9) "0${this.time.hour}" else this.time.hour
+    val minutes = if (this.time.minute <= 9) "0${this.time.minute}" else this.time.minute
+    val hours = if (this.time.hour <= 9) "0${this.time.hour}" else this.time.hour
     return "${hours}:${minutes}"
   }
 
@@ -119,8 +119,8 @@ data class Event(
    * @return The string representation of the date.
    */
   fun getDateString(): String {
-    val day = if (this.date.dayOfMonth < 9) "0${this.date.dayOfMonth}" else this.date.dayOfMonth
-    val month = if (this.date.monthValue < 9) "0${this.date.monthValue}" else this.date.monthValue
+    val day = if (this.date.dayOfMonth <= 9) "0${this.date.dayOfMonth}" else this.date.dayOfMonth
+    val month = if (this.date.monthValue <= 9) "0${this.date.monthValue}" else this.date.monthValue
     val date = if (this.date == LocalDate.now()) "Today" else "$day/$month/${this.date.year}"
     return date
   }
