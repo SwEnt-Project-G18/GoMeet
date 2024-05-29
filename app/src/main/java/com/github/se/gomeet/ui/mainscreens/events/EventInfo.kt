@@ -279,6 +279,7 @@ fun EventButtons(
         modifier = Modifier.fillMaxWidth().testTag("EventButton"),
         horizontalArrangement = Arrangement.SpaceBetween) {
           TextButton(
+              enabled = !event.isPastEvent(),
               onClick = {
                 eventAction(
                     nav,
@@ -333,7 +334,7 @@ fun EventButtons(
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
                         contentColor = MaterialTheme.colorScheme.tertiary)) {
                   if (buttons == 0) {
-                    Text("Handle Participants")
+                    Text("Manage Participants")
                   } else {
                     Text("Decline Invite")
                   }

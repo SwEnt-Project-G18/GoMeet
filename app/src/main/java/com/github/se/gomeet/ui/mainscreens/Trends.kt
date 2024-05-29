@@ -104,10 +104,8 @@ fun Trends(
       } else {
         Log.e(TAG, "Current user is null")
       }
-      val allEvents = eventViewModel.getAllEvents()!!.filter { !it.isPastEvent() }
-      if (allEvents.isNotEmpty()) {
-        eventList.addAll(allEvents)
-      }
+      eventList.addAll(eventViewModel.getAllEvents()!!.filter { it.display(currentUserId) })
+
       eventsLoaded.value = true
     }
   }

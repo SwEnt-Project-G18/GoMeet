@@ -133,4 +133,20 @@ data class Event(
   fun momentToString(): String {
     return "${this.getDateString()} at ${this.getTimeString()}"
   }
+
+  fun display(userId: String): Boolean {
+    return !this.isPastEvent() &&
+        (this.creator == userId ||
+            this.public ||
+            this.pendingParticipants.contains(userId) ||
+            this.participants.contains(userId))
+  }
+
+  fun historyDisplay(userId: String): Boolean {
+    return this.isPastEvent() &&
+        (this.creator == userId ||
+            this.public ||
+            this.pendingParticipants.contains(userId) ||
+            this.participants.contains(userId))
+  }
 }

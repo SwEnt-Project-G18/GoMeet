@@ -88,11 +88,11 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
     } else {
       locationPermissionLauncher.launch(locationPermissions)
     }
-
+    val currentUser = eventViewModel.currentUID!!
     val allEvents = eventViewModel.getAllEvents()
     if (allEvents != null) {
-      eventList.value = allEvents.filter { e -> !e.isPastEvent() }
-      nonFilteredEvents.value = allEvents.filter { e -> !e.isPastEvent() }
+      eventList.value = allEvents.filter { e -> e.display(currentUser) }
+      nonFilteredEvents.value = allEvents.filter { e -> e.display(currentUser) }
     }
 
     // wait for user input
