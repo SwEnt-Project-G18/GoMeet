@@ -317,7 +317,7 @@ fun SortButton(eventList: MutableList<Event>, userTags: List<Tag>) {
                     .fillMaxWidth()
                     .background(MaterialTheme.colorScheme.secondaryContainer)) {
               DropdownMenuItem(
-                  text = { Text("Popularity") },
+                  text = { Text("By common tags") },
                   onClick = {
                     EventViewModel.sortEvents(Tag.tagListToString(userTags), eventList)
                     selectedOption = DEFAULT
