@@ -35,23 +35,19 @@ class SearchViewModel : ViewModel() {
 
   fun performSearch(query: String) {
     val filteredUsers = allUsersList?.filter { it.doesMatchSearchQuery(query) } ?: emptyList()
-    println("For query $query, found ${filteredUsers.size} users")
     val filteredEvents =
         allPublicEventsList?.filter { it.doesMatchSearchQuery(query) } ?: emptyList()
-    // updateSearchQuery()
     _searchQuery.value =
         filteredUsers.map { SearchableItem.User(it) } +
             filteredEvents.map { SearchableItem.Event(it) }
   }
 
   fun getAllUsers() {
-    // viewModelScope.launch { userRepository.getAllUsers { users -> allUsersList = users }}
     UserRepository.getAllUsers { users: List<GoMeetUser> ->
       allUsersList = users
       // updateSearchQuery()
     }
   }
-
   private fun updateSearchQuery() {
     _searchQuery.value =
         (allUsersList?.map { SearchableItem.User(it) } ?: emptyList()) +
@@ -59,9 +55,6 @@ class SearchViewModel : ViewModel() {
   }
 
   fun getAllEvents() {
-    // viewModelScope.launch {
-    //    eventsRepository.getAllEvents { events -> allPublicEventsList = events }
-    // }
     EventRepository.getAllEvents { events ->
       allPublicEventsList = events
       // updateSearchQuery()
@@ -73,13 +66,13 @@ class SearchViewModel : ViewModel() {
 
   val searchQuery =
       searchText
-          .debounce(1000L)
+          .debounce(500L)
           .onEach { _isSearching.update { true } }
           .combine(_searchQuery) { text, query ->
             if (text.isBlank()) {
               query
             } else {
-              delay(1000L)
+              delay(500L)
               query.filter { it.doesMatchSearchQuery(text) }
             }
           }

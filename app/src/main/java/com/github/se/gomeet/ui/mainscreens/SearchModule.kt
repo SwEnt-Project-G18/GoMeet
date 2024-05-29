@@ -90,13 +90,15 @@ fun SearchModule(
                     modifier = Modifier.size(20.dp))
               }
         },
-        onValueChange = viewModel::onSearchTextChange,
+        onValueChange = viewModel::onSearchTextChange
+        ,
         modifier =
-            Modifier.fillMaxWidth()
-                .height(45.dp)
-                .focusRequester(focusRequester)
-                .clip(RoundedCornerShape(10.dp))
-                .background(backgroundColor),
+        Modifier
+            .fillMaxWidth()
+            .height(45.dp)
+            .focusRequester(focusRequester)
+            .clip(RoundedCornerShape(10.dp))
+            .background(backgroundColor),
         placeholder = {
           Text("Search", color = contentColor, style = MaterialTheme.typography.bodySmall)
         },
@@ -126,7 +128,9 @@ fun SearchModule(
         CircularProgressIndicator(modifier = Modifier.align(Alignment.Center), color = contentColor)
       }
     } else if (persons.isNotEmpty() && searchText.isNotEmpty()) {
-      LazyColumn(modifier = Modifier.fillMaxWidth().weight(1f)) {
+      LazyColumn(modifier = Modifier
+          .fillMaxWidth()
+          .weight(1f)) {
         items(persons) { item ->
           SearchModuleSnippet(item, nav = nav, backgroundColor = backgroundColor, currentUID)
         }
@@ -162,19 +166,24 @@ fun SearchModuleSnippet(
       Row(
           verticalAlignment = Alignment.CenterVertically,
           modifier =
-              Modifier.padding(8.dp)
-                  .clickable {
-                    nav.navigateToScreen(Route.OTHERS_PROFILE.replace("{uid}", item.user.uid))
-                  }
-                  .background(color = backgroundColor, shape = RoundedCornerShape(10.dp))) {
+          Modifier
+              .padding(8.dp)
+              .clickable {
+                  nav.navigateToScreen(Route.OTHERS_PROFILE.replace("{uid}", item.user.uid))
+              }
+              .background(color = backgroundColor, shape = RoundedCornerShape(10.dp))) {
             Spacer(modifier = Modifier.width(8.dp))
             Image(
                 painter = painter,
                 contentDescription = "User Icon",
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.size(55.dp).clip(CircleShape))
+                modifier = Modifier
+                    .size(55.dp)
+                    .clip(CircleShape))
             Spacer(modifier = Modifier.width(16.dp))
-            Column(modifier = Modifier.fillMaxWidth().padding(10.dp)) {
+            Column(modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp)) {
               Text(
                   text = "${item.user.firstName} ${item.user.lastName}",
                   color = MaterialTheme.colorScheme.onBackground)
@@ -201,33 +210,37 @@ fun SearchModuleSnippet(
       Row(
           verticalAlignment = Alignment.CenterVertically,
           modifier =
-              Modifier.padding(vertical = 8.dp)
-                  .background(color = backgroundColor, shape = RoundedCornerShape(10.dp))
-                  .clickable {
-                    nav.navigateToEventInfo(
-                        eventId = item.event.eventID,
-                        title = item.event.title,
-                        date = item.event.date.toString(),
-                        time = item.event.time.toString(),
-                        description = item.event.description,
-                        url = item.event.url,
-                        organizer = item.event.creator,
-                        loc = LatLng(item.event.location.latitude, item.event.location.longitude),
-                        rating = item.event.ratings[currentUID] ?: 0)
-                  }) {
+          Modifier
+              .padding(vertical = 8.dp)
+              .background(color = backgroundColor, shape = RoundedCornerShape(10.dp))
+              .clickable {
+                  nav.navigateToEventInfo(
+                      eventId = item.event.eventID,
+                      title = item.event.title,
+                      date = item.event.date.toString(),
+                      time = item.event.time.toString(),
+                      description = item.event.description,
+                      url = item.event.url,
+                      organizer = item.event.creator,
+                      loc = LatLng(item.event.location.latitude, item.event.location.longitude),
+                      rating = item.event.ratings[currentUID] ?: 0
+                  )
+              }) {
             Image(
                 painter = painter,
                 contentDescription = "Event Icon",
                 modifier =
-                    Modifier.size(100.dp) // Make the image bigger
-                        .padding(8.dp)
-                        .clip(RoundedCornerShape(16.dp)),
+                Modifier
+                    .size(100.dp) // Make the image bigger
+                    .padding(8.dp)
+                    .clip(RoundedCornerShape(16.dp)),
                 contentScale = ContentScale.Crop)
             Spacer(modifier = Modifier.width(16.dp))
             Column(
                 modifier =
-                    Modifier.fillMaxWidth()
-                        .padding(vertical = 8.dp) // Add vertical padding around the texts
+                Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp) // Add vertical padding around the texts
                 ) {
                   Text(
                       text = item.event.title,
