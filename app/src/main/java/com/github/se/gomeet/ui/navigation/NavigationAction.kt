@@ -206,7 +206,7 @@ class NavigationActions(val navController: NavHostController) {
             .replace("{latitude}", loc.latitude.toString())
             .replace("{longitude}", loc.longitude.toString())
     navController.navigate(route) {
-        //popUpTo(Route.EVENTS) { inclusive = false }
+      // popUpTo(Route.EVENTS) { inclusive = false }
     }
   }
 

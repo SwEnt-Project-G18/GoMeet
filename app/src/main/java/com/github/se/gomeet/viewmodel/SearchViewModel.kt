@@ -44,14 +44,11 @@ class SearchViewModel : ViewModel() {
   }
 
   fun getAllUsers() {
-    UserRepository.getAllUsers { users: List<GoMeetUser> ->
-      allUsersList = users
-    }
+    UserRepository.getAllUsers { users: List<GoMeetUser> -> allUsersList = users }
   }
+
   fun getAllEvents() {
-    EventRepository.getAllEvents { events ->
-      allPublicEventsList = events
-    }
+    EventRepository.getAllEvents { events -> allPublicEventsList = events }
   }
 
   private val _isSearching = MutableStateFlow(false)
