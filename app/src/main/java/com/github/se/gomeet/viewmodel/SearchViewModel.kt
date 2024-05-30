@@ -34,6 +34,7 @@ class SearchViewModel : ViewModel() {
   }
 
   fun performSearch(query: String) {
+    _searchText.value = query
     val filteredUsers = allUsersList?.filter { it.doesMatchSearchQuery(query) } ?: emptyList()
     val filteredEvents =
         allPublicEventsList?.filter { it.doesMatchSearchQuery(query) } ?: emptyList()
@@ -45,19 +46,11 @@ class SearchViewModel : ViewModel() {
   fun getAllUsers() {
     UserRepository.getAllUsers { users: List<GoMeetUser> ->
       allUsersList = users
-      // updateSearchQuery()
     }
   }
-  private fun updateSearchQuery() {
-    _searchQuery.value =
-        (allUsersList?.map { SearchableItem.User(it) } ?: emptyList()) +
-            (allPublicEventsList?.map { SearchableItem.Event(it) } ?: emptyList())
-  }
-
   fun getAllEvents() {
     EventRepository.getAllEvents { events ->
       allPublicEventsList = events
-      // updateSearchQuery()
     }
   }
 
@@ -66,22 +59,18 @@ class SearchViewModel : ViewModel() {
 
   val searchQuery =
       searchText
-          .debounce(500L)
+          .debounce(1000L)
           .onEach { _isSearching.update { true } }
           .combine(_searchQuery) { text, query ->
             if (text.isBlank()) {
               query
             } else {
-              delay(500L)
+              delay(1000L)
               query.filter { it.doesMatchSearchQuery(text) }
             }
           }
           .onEach { _isSearching.update { false } }
           .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), _searchQuery.value)
-
-  fun onSearchTextChange(text: String) {
-    _searchText.value = text
-  }
 
   sealed class SearchableItem {
     data class User(val user: GoMeetUser) : SearchableItem()

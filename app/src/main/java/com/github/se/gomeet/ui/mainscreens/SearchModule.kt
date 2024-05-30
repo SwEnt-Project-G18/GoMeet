@@ -90,7 +90,7 @@ fun SearchModule(
                     modifier = Modifier.size(20.dp))
               }
         },
-        onValueChange = viewModel::onSearchTextChange
+        onValueChange = viewModel::performSearch
         ,
         modifier =
         Modifier
