@@ -64,7 +64,7 @@ fun RegisterNameCountryPhone(
   var firstName by remember { mutableStateOf("") }
   var lastName by remember { mutableStateOf("") }
   var phoneNumber by remember { mutableStateOf("") }
-  val country by remember { mutableStateOf("") }
+  var country by remember { mutableStateOf("") }
   val countries = remember { mutableStateOf(getCountries()) }
 
   var firstClick by remember { mutableStateOf(true) }
@@ -132,7 +132,9 @@ fun RegisterNameCountryPhone(
         }
 
         Spacer(modifier = Modifier.size(screenHeight / 60))
-        CountrySuggestionTextField(countries.value, textFieldColors, countries.value[0]) {}
+        CountrySuggestionTextField(countries.value, textFieldColors, countries.value[0]) {
+            selectedCountry -> country = selectedCountry
+        }
 
         if (!countryValid && !firstClick) {
           Text(text = "Country is not valid", color = Color.Red)
