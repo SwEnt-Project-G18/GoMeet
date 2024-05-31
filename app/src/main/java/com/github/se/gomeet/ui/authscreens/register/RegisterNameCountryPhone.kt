@@ -51,8 +51,8 @@ import com.github.se.gomeet.model.authentication.getCountries
 /**
  * A visual transformation for formatting phone numbers in the international format.
  *
- * This class formats phone numbers to insert spaces at appropriate positions.
- * For example, a phone number like `+41227676111` will be transformed to `+41 22 767 6111`.
+ * This class formats phone numbers to insert spaces at appropriate positions. For example, a phone
+ * number like `+41227676111` will be transformed to `+41 22 767 6111`.
  *
  * This transformation is designed to handle the following format:
  * - The first 3 characters, including the `+` sign and country code, are grouped together.
@@ -83,44 +83,44 @@ import com.github.se.gomeet.model.authentication.getCountries
  * @see VisualTransformation
  */
 class PhoneNumberVisualTransformation : VisualTransformation {
-    override fun filter(text: AnnotatedString): TransformedText {
-        val trimmed = if (text.text.length >= 15) text.text.substring(0..14) else text.text
-        val formatted = buildAnnotatedString {
-            append(trimmed.take(3)) // +41
-            if (trimmed.length > 3) append(" ")
-            if (trimmed.length > 3) append(trimmed.substring(3, minOf(5, trimmed.length))) // 22
-            if (trimmed.length > 5) append(" ")
-            if (trimmed.length > 5) append(trimmed.substring(5, minOf(8, trimmed.length))) // 767
-            if (trimmed.length > 8) append(" ")
-            if (trimmed.length > 8) append(trimmed.substring(8, minOf(12, trimmed.length))) // 6111
-        }
-
-        val offsetMapping = object : OffsetMapping {
-            override fun originalToTransformed(offset: Int): Int {
-                return when {
-                    offset <= 3 -> offset
-                    offset <= 5 -> offset + 1
-                    offset <= 8 -> offset + 2
-                    offset <= 12 -> offset + 3
-                    else -> offset + 3
-                }
-            }
-
-            override fun transformedToOriginal(offset: Int): Int {
-                return when {
-                    offset <= 4 -> offset
-                    offset <= 7 -> offset - 1
-                    offset <= 11 -> offset - 2
-                    offset <= 15 -> offset - 3
-                    else -> offset - 3
-                }
-            }
-        }
-
-        return TransformedText(formatted, offsetMapping)
+  override fun filter(text: AnnotatedString): TransformedText {
+    val trimmed = if (text.text.length >= 15) text.text.substring(0..14) else text.text
+    val formatted = buildAnnotatedString {
+      append(trimmed.take(3)) // +41
+      if (trimmed.length > 3) append(" ")
+      if (trimmed.length > 3) append(trimmed.substring(3, minOf(5, trimmed.length))) // 22
+      if (trimmed.length > 5) append(" ")
+      if (trimmed.length > 5) append(trimmed.substring(5, minOf(8, trimmed.length))) // 767
+      if (trimmed.length > 8) append(" ")
+      if (trimmed.length > 8) append(trimmed.substring(8, minOf(12, trimmed.length))) // 6111
     }
-}
 
+    val offsetMapping =
+        object : OffsetMapping {
+          override fun originalToTransformed(offset: Int): Int {
+            return when {
+              offset <= 3 -> offset
+              offset <= 5 -> offset + 1
+              offset <= 8 -> offset + 2
+              offset <= 12 -> offset + 3
+              else -> offset + 3
+            }
+          }
+
+          override fun transformedToOriginal(offset: Int): Int {
+            return when {
+              offset <= 4 -> offset
+              offset <= 7 -> offset - 1
+              offset <= 11 -> offset - 2
+              offset <= 15 -> offset - 3
+              else -> offset - 3
+            }
+          }
+        }
+
+    return TransformedText(formatted, offsetMapping)
+  }
+}
 
 /**
  * This composable function collects personal details such as first name, last name, country, and
@@ -213,7 +213,8 @@ fun RegisterNameCountryPhone(
 
         Spacer(modifier = Modifier.size(screenHeight / 60))
         CountrySuggestionTextField(countries.value, textFieldColors, countries.value[0]) {
-            selectedCountry -> country = selectedCountry
+            selectedCountry ->
+          country = selectedCountry
         }
 
         if (!countryValid && !firstClick) {
