@@ -1,6 +1,5 @@
 package com.github.se.gomeet.ui.mainscreens.profile
 
-import android.util.Log
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.isDisplayed
@@ -84,7 +83,6 @@ class NotificationsTest {
       while (userVM.getUser(uid1)!!.pendingRequests.isEmpty() ||
           eventVM.getEvent(eventId)!!.pendingParticipants.isEmpty()) {
         TimeUnit.SECONDS.sleep(1)
-        Log.e("Qwe", "qwe")
       }
     }
 

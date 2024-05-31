@@ -17,6 +17,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
 import com.github.se.gomeet.MainActivity
 import com.github.se.gomeet.model.event.location.Location
+import com.github.se.gomeet.screens.AddParticipantsScreen
+import com.github.se.gomeet.screens.CreateEventScreen
+import com.github.se.gomeet.screens.CreateScreen
 import com.github.se.gomeet.screens.EventInfoScreen
 import com.github.se.gomeet.screens.EventsScreen
 import com.github.se.gomeet.screens.ExploreScreen
@@ -41,7 +44,10 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-/** This end to end test tests that a user can add participants to an event they created. */
+/**
+ * This end to end test tests that a user can add participants to an event they created as well as
+ * when they create a new private event.
+ */
 @RunWith(AndroidJUnit4::class)
 class EndToEndTest3 : TestCase() {
   @get:Rule val composeTestRule = createAndroidComposeRule<MainActivity>()
@@ -244,6 +250,56 @@ class EndToEndTest3 : TestCase() {
         composeTestRule.waitUntil {
           composeTestRule.onNodeWithTag("UserInviteWidget").isDisplayed()
         }
+        composeTestRule.onNodeWithTag("UserInviteWidget").assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescription("Go back").performClick()
+        composeTestRule.waitForIdle()
+      }
+    }
+
+    ComposeScreen.onComposeScreen<EventInfoScreen>(composeTestRule) {
+      step("Go back to Events") {
+        composeTestRule.waitUntil(timeoutMillis = 10000) {
+          composeTestRule.onNodeWithTag("EventHeader").isDisplayed()
+        }
+        composeTestRule.onNodeWithContentDescription("Back").performClick()
+        composeTestRule.waitForIdle()
+      }
+    }
+
+    ComposeScreen.onComposeScreen<EventsScreen>(composeTestRule) {
+      step("Create a new Event") {
+        composeTestRule.onNodeWithTag("CreateEventButton").performClick()
+        composeTestRule.waitForIdle()
+      }
+    }
+
+    ComposeScreen.onComposeScreen<CreateScreen>(composeTestRule) {
+      step("Create a private event") {
+        composeTestRule.onNodeWithText("Private").performClick()
+        composeTestRule.waitForIdle()
+      }
+    }
+
+    ComposeScreen.onComposeScreen<CreateEventScreen>(composeTestRule) {
+      step("Add Participants") {
+        composeTestRule.onNodeWithContentDescription("Add Participants").performClick()
+        composeTestRule.waitForIdle()
+      }
+    }
+
+    ComposeScreen.onComposeScreen<AddParticipantsScreen>(composeTestRule) {
+      step("Check that the ui of AddParticipants is correctly displayed and invite a user") {
+        composeTestRule.waitUntil(timeoutMillis = 10000) {
+          composeTestRule.onNodeWithText("Search").isDisplayed()
+        }
+
+        composeTestRule.onNodeWithContentDescription("Back").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Add Participants").assertExists()
+        composeTestRule.onNodeWithText("Search").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("InviteUserWidget").assertIsDisplayed()
+        composeTestRule.onNodeWithText("testfirstname2", substring = true).assertIsDisplayed()
+        composeTestRule.onNodeWithText(username2, substring = true).assertIsDisplayed()
+        composeTestRule.onNodeWithText("Invite").assertExists().performClick()
       }
     }
   }

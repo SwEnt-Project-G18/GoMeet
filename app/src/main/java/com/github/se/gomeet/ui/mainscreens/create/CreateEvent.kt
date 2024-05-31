@@ -312,7 +312,7 @@ fun CreateEvent(
                           style = MaterialTheme.typography.bodyMedium)
                       Icon(
                           Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                          null,
+                          "Add Participants",
                           tint = MaterialTheme.colorScheme.onBackground,
                           modifier =
                               Modifier.clickable {
