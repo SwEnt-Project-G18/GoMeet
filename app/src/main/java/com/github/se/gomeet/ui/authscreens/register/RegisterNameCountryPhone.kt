@@ -197,7 +197,11 @@ fun RegisterNameCountryPhone(
 
         TextField(
             value = phoneNumber,
-            onValueChange = { phoneNumber = it },
+            onValueChange = {
+              if (it.length < 13) {
+                phoneNumber = it
+              }
+            },
             label = { Text("Phone Number") },
             singleLine = true,
             colors = textFieldColors,
