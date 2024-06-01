@@ -199,7 +199,6 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
             eventViewModel,
             userViewModel,
             applicationContext)
-
       }
     }
     composable(Route.REGISTER) {

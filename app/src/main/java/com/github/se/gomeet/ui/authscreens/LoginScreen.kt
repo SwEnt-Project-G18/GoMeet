@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
@@ -24,6 +23,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
@@ -50,7 +50,6 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import io.getstream.chat.android.client.ChatClient
 import io.getstream.chat.android.models.User
-import kotlin.math.sign
 
 private const val TAG = "LoginScreen"
 
@@ -88,11 +87,13 @@ fun LoginScreen(
   Column(modifier = Modifier.fillMaxSize()) {
     TopAppBar(
         modifier = Modifier.testTag("TopBar"),
-        colors = TopAppBarColors(containerColor = MaterialTheme.colorScheme.background,
-            navigationIconContentColor = MaterialTheme.colorScheme.onBackground,
-            actionIconContentColor = MaterialTheme.colorScheme.onBackground,
-            scrolledContainerColor = MaterialTheme.colorScheme.background,
-            titleContentColor = MaterialTheme.colorScheme.onBackground),
+        colors =
+            TopAppBarColors(
+                containerColor = MaterialTheme.colorScheme.background,
+                navigationIconContentColor = MaterialTheme.colorScheme.onBackground,
+                actionIconContentColor = MaterialTheme.colorScheme.onBackground,
+                scrolledContainerColor = MaterialTheme.colorScheme.background,
+                titleContentColor = MaterialTheme.colorScheme.onBackground),
         title = {},
         navigationIcon = {
           IconButton(onClick = { nav.goBack() }) {
@@ -167,8 +168,7 @@ fun LoginScreen(
                       contentColor = Color.White,
                       disabledContainerColor = MaterialTheme.colorScheme.primaryContainer,
                       disabledContentColor = MaterialTheme.colorScheme.onBackground),
-              enabled =
-                  isLoginEnabled(signInState)) {
+              enabled = isLoginEnabled(signInState)) {
                 Text("Log In")
               }
 
@@ -195,14 +195,13 @@ fun LoginScreen(
 
 @Composable
 fun ErrorMessage(errorText: String) {
-    Text(
-        text = errorText,
-        modifier = Modifier.padding(bottom = 16.dp),
-        color = Color.Red,
-        textAlign = TextAlign.Center
-    )
+  Text(
+      text = errorText,
+      modifier = Modifier.padding(bottom = 16.dp),
+      color = Color.Red,
+      textAlign = TextAlign.Center)
 }
 
 fun isLoginEnabled(signInState: State<SignInState>): Boolean {
-    return signInState.value.email.isNotEmpty() && signInState.value.password.isNotEmpty()
+  return signInState.value.email.isNotEmpty() && signInState.value.password.isNotEmpty()
 }
