@@ -12,6 +12,7 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
@@ -253,6 +254,7 @@ class EndToEndTest3 : TestCase() {
         composeTestRule.onNodeWithTag("AddPostUserInfo").assertIsDisplayed()
         composeTestRule
             .onNodeWithContentDescription("Add Image")
+            .performScrollTo()
             .assertIsDisplayed()
             .assertHasClickAction()
         composeTestRule
@@ -261,6 +263,7 @@ class EndToEndTest3 : TestCase() {
             .performTextInput("test")
         composeTestRule
             .onNodeWithText(getResourceString(R.string.post_button))
+            .performScrollTo()
             .assertIsDisplayed()
             .performClick()
         composeTestRule.waitForIdle()
