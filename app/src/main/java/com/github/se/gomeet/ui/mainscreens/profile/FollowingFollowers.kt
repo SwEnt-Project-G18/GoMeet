@@ -39,9 +39,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.mainscreens.profile.FollowingFollowerPage.*
@@ -291,12 +289,6 @@ fun PageUsers(
           }
     }
   }
-}
-
-@Preview
-@Composable
-fun FollowingPreview() {
-  FollowingFollowers(NavigationActions(rememberNavController()), "", UserViewModel(""), true)
 }
 
 private enum class FollowingFollowerPage(val str: String) {

@@ -9,11 +9,13 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.location.Location
 import com.github.se.gomeet.ui.mainscreens.notifications.Notifications
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
+import io.github.kakaocup.kakao.common.utilities.getResourceString
 import java.time.LocalDate
 import java.time.LocalTime
 import java.util.concurrent.TimeUnit
@@ -102,18 +104,30 @@ class NotificationsTest {
     composeTestRule.setContent { Notifications(NavigationActions(rememberNavController()), userVM) }
 
     composeTestRule.waitUntil(timeoutMillis = 10000) {
-      composeTestRule.onNodeWithText("Accept").isDisplayed()
+      composeTestRule.onNodeWithText(getResourceString(R.string.accept)).isDisplayed()
     }
 
     // Test the ui of the screen
     composeTestRule.onNodeWithTag("NotificationsScreen").assertExists()
     // composeTestRule.onNodeWithContentDescription("Go back").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Messages").assertIsDisplayed().assertHasClickAction()
-    composeTestRule.onNodeWithText("Invitations").assertIsDisplayed().assertHasClickAction()
+    composeTestRule
+        .onNodeWithText(getResourceString(R.string.messages))
+        .assertIsDisplayed()
+        .assertHasClickAction()
+    composeTestRule
+        .onNodeWithText(getResourceString(R.string.invitations))
+        .assertIsDisplayed()
+        .assertHasClickAction()
 
     // Test that the invitation notification widget is correctly displayed
     composeTestRule.onNodeWithText("30/03/2026", substring = true).assertIsDisplayed()
-    composeTestRule.onNodeWithText("Accept").assertIsDisplayed().assertHasClickAction()
-    composeTestRule.onNodeWithText("Decline").assertIsDisplayed().performClick()
+    composeTestRule
+        .onNodeWithText(getResourceString(R.string.accept))
+        .assertIsDisplayed()
+        .assertHasClickAction()
+    composeTestRule
+        .onNodeWithText(getResourceString(R.string.decline))
+        .assertIsDisplayed()
+        .performClick()
   }
 }

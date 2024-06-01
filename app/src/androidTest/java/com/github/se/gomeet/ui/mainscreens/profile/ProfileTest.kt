@@ -12,11 +12,13 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.se.gomeet.R
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import io.github.kakaocup.kakao.common.utilities.getResourceString
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
@@ -77,13 +79,22 @@ class ProfileTest {
     composeTestRule.onNodeWithTag("Profile Picture").assertIsDisplayed()
     composeTestRule.onNodeWithTag("TopBar").assertIsDisplayed()
     composeTestRule.onNodeWithTag("UserInfo").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Edit Profile").assertIsDisplayed().assertHasClickAction()
+    composeTestRule
+        .onNodeWithText(getResourceString(R.string.edit_profile_button))
+        .assertIsDisplayed()
+        .assertHasClickAction()
     composeTestRule.onAllNodesWithTag("EventsListHeader").assertCountEquals(2)
-    composeTestRule.onNodeWithText("Share Profile").assertIsDisplayed().performClick()
+    composeTestRule
+        .onNodeWithText(getResourceString(R.string.share_profile))
+        .assertIsDisplayed()
+        .performClick()
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithContentDescription("Save").assertIsDisplayed().assertHasClickAction()
     composeTestRule.onNodeWithContentDescription("Close").assertIsDisplayed().assertHasClickAction()
     composeTestRule.onNodeWithContentDescription("QR Code").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Share").assertIsDisplayed().performClick()
+    composeTestRule
+        .onNodeWithText(getResourceString(R.string.share))
+        .assertIsDisplayed()
+        .performClick()
   }
 }

@@ -10,10 +10,12 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.location.Location
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
+import io.github.kakaocup.kakao.common.utilities.getResourceString
 import java.time.LocalDate
 import java.time.LocalTime
 import java.util.concurrent.TimeUnit
@@ -79,22 +81,49 @@ class EditEventTest {
     }
 
     composeTestRule.waitUntil(timeoutMillis = 10000) {
-      composeTestRule.onNodeWithText("Title").isDisplayed()
+      composeTestRule.onNodeWithText(getResourceString(R.string.title_text_field)).isDisplayed()
     }
 
-    composeTestRule.onNodeWithText("Edit Tags").performScrollTo().assertIsDisplayed()
-    composeTestRule.onNodeWithText("Link").performScrollTo().assertIsDisplayed()
-    composeTestRule.onNodeWithText("Price").performScrollTo().assertIsDisplayed()
-    composeTestRule.onNodeWithText("Pick time").performScrollTo().assertIsDisplayed()
-    composeTestRule.onNodeWithText("Pick date").performScrollTo().assertIsDisplayed()
-    composeTestRule.onNodeWithText("Location").performScrollTo().assertIsDisplayed()
-    composeTestRule.onNodeWithText("Description").performScrollTo().assertIsDisplayed()
-    composeTestRule.onNodeWithText("Title").performScrollTo().assertIsDisplayed()
+    composeTestRule
+        .onNodeWithText(getResourceString(R.string.edit_tags))
+        .performScrollTo()
+        .assertIsDisplayed()
+    composeTestRule
+        .onNodeWithText(getResourceString(R.string.link_text_field))
+        .performScrollTo()
+        .assertIsDisplayed()
+    composeTestRule
+        .onNodeWithText(getResourceString(R.string.price_text_field))
+        .performScrollTo()
+        .assertIsDisplayed()
+    composeTestRule
+        .onNodeWithText(getResourceString(R.string.pick_time))
+        .performScrollTo()
+        .assertIsDisplayed()
+    composeTestRule
+        .onNodeWithText(getResourceString(R.string.pick_date))
+        .performScrollTo()
+        .assertIsDisplayed()
+    composeTestRule
+        .onNodeWithText(getResourceString(R.string.location_text_field))
+        .performScrollTo()
+        .assertIsDisplayed()
+    composeTestRule
+        .onNodeWithText(getResourceString(R.string.description_text_field))
+        .performScrollTo()
+        .assertIsDisplayed()
+    composeTestRule
+        .onNodeWithText(getResourceString(R.string.title_text_field))
+        .performScrollTo()
+        .assertIsDisplayed()
     composeTestRule
         .onNodeWithContentDescription("Event picture")
         .performScrollTo()
         .assertIsDisplayed()
     composeTestRule.onNodeWithContentDescription("Go back").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Done").assertIsDisplayed().performClick()
+    composeTestRule
+        .onNodeWithText(getResourceString(R.string.done))
+        .assertIsDisplayed()
+        .performClick()
   }
 }
