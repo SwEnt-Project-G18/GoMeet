@@ -37,11 +37,90 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.OffsetMapping
+import androidx.compose.ui.text.input.TransformedText
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.github.se.gomeet.model.authentication.getCountries
+
+/**
+ * A visual transformation for formatting phone numbers in the international format.
+ *
+ * This class formats phone numbers to insert spaces at appropriate positions. For example, a phone
+ * number like `+41227676111` will be transformed to `+41 22 767 6111`.
+ *
+ * This transformation is designed to handle the following format:
+ * - The first 3 characters, including the `+` sign and country code, are grouped together.
+ * - A space follows the country code.
+ * - The next 2 characters form the area code.
+ * - A space follows the area code.
+ * - The next 3 characters form the prefix.
+ * - A space follows the prefix.
+ * - The remaining characters form the subscriber number.
+ *
+ * Example usage:
+ * ```
+ * TextField(
+ *     value = phoneNumber,
+ *     onValueChange = { phoneNumber = it },
+ *     label = { Text("Phone Number") },
+ *     singleLine = true,
+ *     colors = textFieldColors,
+ *     keyboardOptions = KeyboardOptions.Default.copy(
+ *         imeAction = ImeAction.Done,
+ *         keyboardType = KeyboardType.Phone
+ *     ),
+ *     visualTransformation = PhoneNumberVisualTransformation(),
+ *     modifier = Modifier.fillMaxWidth()
+ * )
+ * ```
+ *
+ * @see VisualTransformation
+ */
+class PhoneNumberVisualTransformation : VisualTransformation {
+  override fun filter(text: AnnotatedString): TransformedText {
+    val trimmed = if (text.text.length >= 15) text.text.substring(0..14) else text.text
+    val formatted = buildAnnotatedString {
+      append(trimmed.take(3)) // +41
+      if (trimmed.length > 3) append(" ")
+      if (trimmed.length > 3) append(trimmed.substring(3, minOf(5, trimmed.length))) // 22
+      if (trimmed.length > 5) append(" ")
+      if (trimmed.length > 5) append(trimmed.substring(5, minOf(8, trimmed.length))) // 767
+      if (trimmed.length > 8) append(" ")
+      if (trimmed.length > 8) append(trimmed.substring(8, minOf(12, trimmed.length))) // 6111
+    }
+
+    val offsetMapping =
+        object : OffsetMapping {
+          override fun originalToTransformed(offset: Int): Int {
+            return when {
+              offset <= 3 -> offset
+              offset <= 5 -> offset + 1
+              offset <= 8 -> offset + 2
+              offset <= 12 -> offset + 3
+              else -> offset + 3
+            }
+          }
+
+          override fun transformedToOriginal(offset: Int): Int {
+            return when {
+              offset <= 4 -> offset
+              offset <= 7 -> offset - 1
+              offset <= 11 -> offset - 2
+              offset <= 15 -> offset - 3
+              else -> offset - 3
+            }
+          }
+        }
+
+    return TransformedText(formatted, offsetMapping)
+  }
+}
 
 /**
  * This composable function collects personal details such as first name, last name, country, and
@@ -64,7 +143,7 @@ fun RegisterNameCountryPhone(
   var firstName by remember { mutableStateOf("") }
   var lastName by remember { mutableStateOf("") }
   var phoneNumber by remember { mutableStateOf("") }
-  val country by remember { mutableStateOf("") }
+  var country by remember { mutableStateOf("") }
   val countries = remember { mutableStateOf(getCountries()) }
 
   var firstClick by remember { mutableStateOf(true) }
@@ -118,21 +197,30 @@ fun RegisterNameCountryPhone(
 
         TextField(
             value = phoneNumber,
-            onValueChange = { phoneNumber = it },
+            onValueChange = {
+              // fixes phone number length bug
+              if (it.length < 13) {
+                phoneNumber = it
+              }
+            },
             label = { Text("Phone Number") },
             singleLine = true,
             colors = textFieldColors,
             keyboardOptions =
                 KeyboardOptions.Default.copy(
                     imeAction = ImeAction.Done, keyboardType = KeyboardType.Phone),
-            modifier = Modifier.fillMaxWidth())
+            modifier = Modifier.fillMaxWidth(),
+            visualTransformation = PhoneNumberVisualTransformation())
 
         if (!validPhoneNumber && !firstClick) {
           Text(text = "Phone Number is not valid", color = Color.Red)
         }
 
         Spacer(modifier = Modifier.size(screenHeight / 60))
-        CountrySuggestionTextField(countries.value, textFieldColors, countries.value[0]) {}
+        CountrySuggestionTextField(countries.value, textFieldColors, countries.value[0]) {
+            selectedCountry ->
+          country = selectedCountry
+        }
 
         if (!countryValid && !firstClick) {
           Text(text = "Country is not valid", color = Color.Red)
