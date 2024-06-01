@@ -50,6 +50,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat.getString
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.github.se.gomeet.R
@@ -335,7 +336,7 @@ fun EventButtons(
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
                         contentColor = MaterialTheme.colorScheme.tertiary)) {
                   if (buttons == 0) {
-                    Text("Manage Participants")
+                    Text(getString(LocalContext.current, R.string.participants_button))
                   } else {
                     Text("Decline Invite")
                   }

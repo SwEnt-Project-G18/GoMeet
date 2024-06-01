@@ -14,6 +14,7 @@ import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
 import com.github.se.gomeet.MainActivity
+import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.location.Location
 import com.github.se.gomeet.screens.EventInfoScreen
 import com.github.se.gomeet.screens.ExploreScreen
@@ -30,6 +31,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen
+import io.github.kakaocup.kakao.common.utilities.getResourceString
 import java.time.LocalDate
 import java.time.LocalTime
 import java.util.concurrent.TimeUnit
@@ -211,7 +213,9 @@ class EndToEndTest2 : TestCase() {
     ComposeScreen.onComposeScreen<TrendsScreen>(composeTestRule) {
       step("View the info page of an event by clicking on it") {
         composeTestRule.waitForIdle()
-        composeTestRule.onAllNodesWithText("Trends")[0].performClick()
+        composeTestRule
+            .onAllNodesWithText(getResourceString(R.string.recommended))[0]
+            .performClick()
         composeTestRule.waitUntil(timeoutMillis = 10000) {
           composeTestRule.onAllNodesWithTag("Card")[0].isDisplayed()
         }

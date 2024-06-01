@@ -2,4 +2,7 @@
     <string name="app_name">GoMeet</string>
     <string name ="chat_api_key">e43k9kfvgyze</string>
     <string name="title_activity_channel">ChannelActivity</string>
+    <string name="recommended">Recommended</string>
+    <string name="participants_button">"Manage Participants"</string>
+    <string name="tag_sort">By common tags</string>
 </resources>
