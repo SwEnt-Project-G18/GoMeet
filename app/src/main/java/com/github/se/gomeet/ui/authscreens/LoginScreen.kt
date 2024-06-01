@@ -12,18 +12,21 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.TopAppBar
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,6 +42,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.github.se.gomeet.R
+import com.github.se.gomeet.model.authentication.SignInState
 import com.github.se.gomeet.ui.mainscreens.LoadingText
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.AuthViewModel
@@ -46,6 +50,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import io.getstream.chat.android.client.ChatClient
 import io.getstream.chat.android.models.User
+import kotlin.math.sign
 
 private const val TAG = "LoginScreen"
 
@@ -55,6 +60,7 @@ private const val TAG = "LoginScreen"
  * @param authViewModel The ViewModel for the authentication.
  * @param onNavToExplore The navigation function to navigate to the Explore Screen.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
     authViewModel: AuthViewModel,
@@ -82,8 +88,11 @@ fun LoginScreen(
   Column(modifier = Modifier.fillMaxSize()) {
     TopAppBar(
         modifier = Modifier.testTag("TopBar"),
-        backgroundColor = MaterialTheme.colorScheme.background,
-        elevation = 0.dp,
+        colors = TopAppBarColors(containerColor = MaterialTheme.colorScheme.background,
+            navigationIconContentColor = MaterialTheme.colorScheme.onBackground,
+            actionIconContentColor = MaterialTheme.colorScheme.onBackground,
+            scrolledContainerColor = MaterialTheme.colorScheme.background,
+            titleContentColor = MaterialTheme.colorScheme.onBackground),
         title = {},
         navigationIcon = {
           IconButton(onClick = { nav.goBack() }) {
@@ -119,11 +128,7 @@ fun LoginScreen(
           Spacer(modifier = Modifier.size(110.dp))
 
           if (isError) {
-            Text(
-                text = signInState.value.signInError!!,
-                modifier = Modifier.padding(bottom = 16.dp),
-                color = Color.Red,
-                textAlign = TextAlign.Center)
+            ErrorMessage(signInState.value.signInError!!)
           }
 
           TextField(
@@ -163,29 +168,41 @@ fun LoginScreen(
                       disabledContainerColor = MaterialTheme.colorScheme.primaryContainer,
                       disabledContentColor = MaterialTheme.colorScheme.onBackground),
               enabled =
-                  signInState.value.email.isNotEmpty() && signInState.value.password.isNotEmpty()) {
+                  isLoginEnabled(signInState)) {
                 Text("Log In")
               }
 
           if (signInState.value.isLoading) {
             LoadingText()
           }
-
           if (signInState.value.isSignInSuccessful) {
             val user =
                 User(
                     id = Firebase.auth.currentUser!!.uid,
-                    name = Firebase.auth.currentUser!!.email!!) // TODO: Add Profile Picture to User
+                    name = Firebase.auth.currentUser!!.email!!)
             val client = ChatClient.instance()
             client.connectUser(user = user, token = client.devToken(user.id)).enqueue { result ->
               if (result.isSuccess) {
                 onNavToExplore()
               } else {
-                // Handle connection failure
                 Log.e(TAG, "ChatClient failed to connect user: ${user.id}")
               }
             }
           }
         }
   }
+}
+
+@Composable
+fun ErrorMessage(errorText: String) {
+    Text(
+        text = errorText,
+        modifier = Modifier.padding(bottom = 16.dp),
+        color = Color.Red,
+        textAlign = TextAlign.Center
+    )
+}
+
+fun isLoginEnabled(signInState: State<SignInState>): Boolean {
+    return signInState.value.email.isNotEmpty() && signInState.value.password.isNotEmpty()
 }

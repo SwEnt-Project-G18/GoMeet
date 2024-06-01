@@ -199,11 +199,7 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
             eventViewModel,
             userViewModel,
             applicationContext)
-        //        onNavToPostLogin(
-        //            eventViewModel,
-        //            userViewModel,
-        //            TOP_LEVEL_DESTINATIONS.first { it.route == postLoginScreen },
-        //            navAction)
+
       }
     }
     composable(Route.REGISTER) {
@@ -246,7 +242,6 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
     composable(
         route = Route.ADD_PARTICIPANTS,
         arguments = listOf(navArgument("eventId") { type = NavType.StringType })) { entry ->
-          val eventId = entry.arguments?.getString("eventId") ?: ""
           AddParticipants(
               nav = navAction,
               userViewModel = userViewModel.value,
@@ -414,7 +409,7 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
           }
         }
     composable(route = Route.ADD_FRIEND) { AddFriend(navAction, userViewModel.value) }
-    composable(route = Route.SCAN) { backStackEntry ->
+    composable(route = Route.SCAN) { _ ->
       QRCodeScannerScreen(nav = navAction, eventViewModel.value)
     }
 

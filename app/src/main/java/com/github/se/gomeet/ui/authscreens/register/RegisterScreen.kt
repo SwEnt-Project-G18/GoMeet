@@ -11,13 +11,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.TopAppBar
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -56,6 +58,7 @@ private const val TAG = "RegisterScreen"
  * @param onNavToExplore Function to execute once registration completes successfully and user
  *   navigates to Explore Screen.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(
     nav: NavigationActions,
@@ -82,8 +85,11 @@ fun RegisterScreen(
   Column(modifier = Modifier.fillMaxSize().testTag("RegisterScreen")) {
     TopAppBar(
         modifier = Modifier.testTag("TopBar"),
-        backgroundColor = MaterialTheme.colorScheme.background,
-        elevation = 0.dp,
+        colors = TopAppBarColors(containerColor = MaterialTheme.colorScheme.background,
+            navigationIconContentColor = MaterialTheme.colorScheme.onBackground,
+            actionIconContentColor = MaterialTheme.colorScheme.onBackground,
+            scrolledContainerColor = MaterialTheme.colorScheme.background,
+            titleContentColor = MaterialTheme.colorScheme.onBackground),
         title = {},
         navigationIcon = {
           IconButton(
