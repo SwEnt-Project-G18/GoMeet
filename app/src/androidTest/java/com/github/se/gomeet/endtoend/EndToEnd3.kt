@@ -16,6 +16,7 @@ import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
 import com.github.se.gomeet.MainActivity
+import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.location.Location
 import com.github.se.gomeet.screens.AddParticipantsScreen
 import com.github.se.gomeet.screens.CreateEventScreen
@@ -33,6 +34,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen
+import io.github.kakaocup.kakao.common.utilities.getResourceString
 import java.time.LocalDate
 import java.time.LocalTime
 import java.util.concurrent.TimeUnit
@@ -254,7 +256,10 @@ class EndToEndTest3 : TestCase() {
 
       step("Go to ManageInvites by clicking on Handle Participants") {
         composeTestRule.onNodeWithText("Edit My Event").assertIsDisplayed().assertHasClickAction()
-        composeTestRule.onNodeWithText("Handle Participants").assertIsDisplayed().performClick()
+        composeTestRule
+            .onNodeWithText(getResourceString(R.string.participants_button))
+            .assertIsDisplayed()
+            .performClick()
         composeTestRule.waitForIdle()
       }
     }
@@ -284,7 +289,10 @@ class EndToEndTest3 : TestCase() {
             composeTestRule.onNodeWithTag("EventHeader").isDisplayed()
           }
           composeTestRule.onNodeWithText("Edit My Event").assertIsDisplayed().assertHasClickAction()
-          composeTestRule.onNodeWithText("Handle Participants").assertIsDisplayed().performClick()
+          composeTestRule
+              .onNodeWithText(getResourceString(R.string.participants_button))
+              .assertIsDisplayed()
+              .performClick()
           composeTestRule.waitForIdle()
         }
       }

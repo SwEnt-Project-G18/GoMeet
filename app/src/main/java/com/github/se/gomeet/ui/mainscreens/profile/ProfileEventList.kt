@@ -125,7 +125,7 @@ fun ProfileEventsList(
                       color = MaterialTheme.colorScheme.onBackground,
                       style = MaterialTheme.typography.bodyLarge)
                   Text(
-                      text = event.date.toString(),
+                      text = event.getDateString(),
                       color = MaterialTheme.colorScheme.onBackground,
                       style =
                           MaterialTheme.typography.bodyLarge.copy(
