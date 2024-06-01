@@ -198,6 +198,7 @@ fun RegisterNameCountryPhone(
         TextField(
             value = phoneNumber,
             onValueChange = {
+              // fixes phone number length bug
               if (it.length < 13) {
                 phoneNumber = it
               }
