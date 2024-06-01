@@ -104,4 +104,6 @@
     <string name="invalid_email_error">The Email is not valid or already taken</string>
     <string name="create">Create</string>
     <string name="title_text_field_placeholder">Create</string>
+    <string name="join_event_button">Join Event</string>
+    <string name="leave_event_button">Leave Event</string>
 </resources>
