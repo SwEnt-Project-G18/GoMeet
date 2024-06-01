@@ -50,6 +50,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat.getString
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.github.se.gomeet.R
@@ -279,6 +280,7 @@ fun EventButtons(
         modifier = Modifier.fillMaxWidth().testTag("EventButton"),
         horizontalArrangement = Arrangement.SpaceBetween) {
           TextButton(
+              enabled = !event.isPastEvent(),
               onClick = {
                 eventAction(
                     nav,
@@ -326,6 +328,7 @@ fun EventButtons(
                     isJoined.value = false
                   }
                 },
+                enabled = !event.isPastEvent(),
                 shape = RoundedCornerShape(10.dp),
                 modifier = Modifier.weight(1f),
                 colors =
@@ -333,7 +336,7 @@ fun EventButtons(
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
                         contentColor = MaterialTheme.colorScheme.tertiary)) {
                   if (buttons == 0) {
-                    Text("Handle Participants")
+                    Text(getString(LocalContext.current, R.string.participants_button))
                   } else {
                     Text("Decline Invite")
                   }

@@ -39,10 +39,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat.getString
 import coil.compose.rememberAsyncImagePainter
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.Tag
@@ -104,10 +106,8 @@ fun Trends(
       } else {
         Log.e(TAG, "Current user is null")
       }
-      val allEvents = eventViewModel.getAllEvents()!!.filter { !it.isPastEvent() }
-      if (allEvents.isNotEmpty()) {
-        eventList.addAll(allEvents)
-      }
+      eventList.addAll(eventViewModel.getAllEvents()!!.filter { it.display(currentUserId) })
+
       eventsLoaded.value = true
     }
   }
@@ -118,7 +118,7 @@ fun Trends(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(start = screenWidth / 15, top = screenHeight / 30)) {
               Text(
-                  text = "Trends",
+                  text = getString(LocalContext.current, R.string.recommended),
                   color = MaterialTheme.colorScheme.onBackground,
                   style =
                       MaterialTheme.typography.headlineMedium.copy(
@@ -319,7 +319,7 @@ fun SortButton(eventList: MutableList<Event>, userTags: List<Tag>) {
                     .fillMaxWidth()
                     .background(MaterialTheme.colorScheme.secondaryContainer)) {
               DropdownMenuItem(
-                  text = { Text("Popularity") },
+                  text = { Text(getString(LocalContext.current, R.string.tag_sort)) },
                   onClick = {
                     EventViewModel.sortEvents(Tag.tagListToString(userTags), eventList)
                     selectedOption = DEFAULT

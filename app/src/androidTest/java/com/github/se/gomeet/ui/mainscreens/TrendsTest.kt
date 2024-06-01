@@ -8,9 +8,11 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.se.gomeet.R
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
+import io.github.kakaocup.kakao.common.utilities.getResourceString
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -37,7 +39,10 @@ class TrendsTest {
 
     // Verify that the ui is correctly displayed
     composeTestRule.onNodeWithText("Sort").assertIsDisplayed().performClick()
-    composeTestRule.onNodeWithText("Popularity").assertIsDisplayed().performClick()
+    composeTestRule
+        .onNodeWithText(getResourceString(R.string.tag_sort))
+        .assertIsDisplayed()
+        .performClick()
     composeTestRule.onNodeWithText("Sort").performClick()
     composeTestRule.onNodeWithText("Name").assertIsDisplayed().performClick()
     composeTestRule.onNodeWithText("Sort").performClick()

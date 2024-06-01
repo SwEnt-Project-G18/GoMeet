@@ -124,7 +124,7 @@ class ProfileEventListTest {
     // Test that the ui is correctly displayed
     composeTestRule.onNodeWithTag("EventsListItems").assertIsDisplayed()
     composeTestRule.onNodeWithTag("EventsListHeader").assertIsDisplayed()
-    composeTestRule.onNodeWithText("2026-01-01").assertIsDisplayed()
+    composeTestRule.onNodeWithText(event.getDateString()).assertIsDisplayed()
     composeTestRule.onNodeWithContentDescription("description").assertIsDisplayed()
   }
 }
