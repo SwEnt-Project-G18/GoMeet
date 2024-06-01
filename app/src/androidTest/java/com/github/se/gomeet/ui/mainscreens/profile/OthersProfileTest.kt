@@ -7,8 +7,10 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.ui.navigation.NavigationActions
@@ -115,5 +117,11 @@ class OthersProfileTest {
     composeTestRule.onNodeWithText("Follow").assertIsDisplayed().assertHasClickAction()
     composeTestRule.onNodeWithText("Message").assertIsDisplayed().assertHasClickAction()
     composeTestRule.onAllNodesWithTag("EventsListHeader").assertCountEquals(2)
+    composeTestRule.onNodeWithContentDescription("More").assertIsDisplayed().performClick()
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithText("Options").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Share Profile").assertIsDisplayed().assertHasClickAction()
+    composeTestRule.onNodeWithText("Block").assertIsDisplayed().assertHasClickAction()
+    composeTestRule.onNodeWithText("Cancel").assertIsDisplayed().assertHasClickAction()
   }
 }

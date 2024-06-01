@@ -45,8 +45,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
- * This end to end test tests that a user can add participants to an event they created as well as
- * when they create a new private event.
+ * This end to end test tests that a user can create/delete a post and add participants to an event
+ * they created as well as adding participants when they create a new private event.
  */
 @RunWith(AndroidJUnit4::class)
 class EndToEndTest3 : TestCase() {
@@ -204,10 +204,55 @@ class EndToEndTest3 : TestCase() {
     }
 
     ComposeScreen.onComposeScreen<EventInfoScreen>(composeTestRule) {
-      step("Go to ManageInvites by clicking on the Add Participants button") {
-        composeTestRule.waitUntil(timeoutMillis = 10000) {
-          composeTestRule.onNodeWithTag("EventHeader").isDisplayed()
-        }
+      composeTestRule.waitUntil(timeoutMillis = 10000) {
+        composeTestRule.onNodeWithTag("EventHeader").isDisplayed()
+      }
+
+      step("Test that the dialog that appears when deleting an event is displayed properly") {
+        composeTestRule.onNodeWithContentDescription("Delete").assertIsDisplayed().performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Delete Event").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("DeleteEventConfirmationText").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Confirm").assertIsDisplayed().assertHasClickAction()
+        composeTestRule.onNodeWithText("Cancel").assertIsDisplayed().performClick()
+        composeTestRule.waitForIdle()
+      }
+      step("Create a post and then delete it") {
+        composeTestRule.onNodeWithText("Posts").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("NoPostsText").assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescription("Add Post").assertIsDisplayed().performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule
+            .onNodeWithContentDescription("Cancel")
+            .assertIsDisplayed()
+            .assertHasClickAction()
+        composeTestRule.onNodeWithText("Add a Post").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("AddPostUserInfo").assertIsDisplayed()
+        composeTestRule
+            .onNodeWithContentDescription("Add Image")
+            .assertIsDisplayed()
+            .assertHasClickAction()
+        composeTestRule.onNodeWithText("What's new ?").assertIsDisplayed().performTextInput("test")
+        composeTestRule.onNodeWithText("Post").assertIsDisplayed().performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithTag("EventPostUserInfo").assertIsDisplayed()
+        composeTestRule.onNodeWithText("test").assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescription("Like").assertIsDisplayed().performClick()
+        composeTestRule.onNodeWithTag("PostDate").assertIsDisplayed()
+        composeTestRule
+            .onNodeWithContentDescription("Delete Post")
+            .assertIsDisplayed()
+            .performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Delete Post").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("DeletePostConfirmationText").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Cancel").assertIsDisplayed().assertHasClickAction()
+        composeTestRule.onNodeWithText("Confirm").assertIsDisplayed().performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithTag("NoPostsText").assertIsDisplayed()
+      }
+
+      step("Go to ManageInvites by clicking on Handle Participants") {
         composeTestRule.onNodeWithText("Edit My Event").assertIsDisplayed().assertHasClickAction()
         composeTestRule.onNodeWithText("Handle Participants").assertIsDisplayed().performClick()
         composeTestRule.waitForIdle()
