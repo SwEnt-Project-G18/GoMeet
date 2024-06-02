@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.foundation.verticalScroll
@@ -49,7 +50,11 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.Event
@@ -80,7 +85,6 @@ private const val TAG = "Events"
 fun Events(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel: EventViewModel) {
   val screenWidth = LocalConfiguration.current.screenWidthDp.dp
   val screenHeight = LocalConfiguration.current.screenHeightDp.dp
-  // State management for event filters and list
   var selectedFilter by remember { mutableStateOf(ALL) }
   val eventList = remember { mutableListOf<Event>() }
   val coroutineScope = rememberCoroutineScope()
@@ -89,31 +93,25 @@ fun Events(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel:
   val eventsLoaded = remember { mutableStateOf(false) }
   val currentUID = userViewModel.currentUID!!
 
-  // Initial data loading using LaunchedEffect
   LaunchedEffect(Unit) {
     coroutineScope.launch {
       user.value = userViewModel.getUser(currentUID)
-      // Log.d(TAG, "User is ${user.value!!.username} with ${user.value!!.myEvents.size} events")
-      val allEvents = (eventViewModel.getAllEvents() ?: emptyList())
+      val allEvents = eventViewModel.getAllEvents() ?: emptyList()
       eventList.addAll(
           allEvents.filter { e ->
             (user.value!!.myEvents.contains(e.eventID) ||
                 user.value!!.myFavorites.contains(e.eventID) ||
                 user.value!!.joinedEvents.contains(e.eventID)) && !e.isPastEvent()
           })
-
       Log.d(TAG, "Displaying ${eventList.size} events out of ${allEvents.size} total events")
       eventsLoaded.value = true
     }
   }
 
-  // Event filtering functionality
-
   fun onFilterButtonClick(filterType: Filter) {
     selectedFilter = if (selectedFilter == filterType) ALL else filterType
   }
 
-  // Scaffold is a structure that supports top bar, content area, and bottom navigation
   Scaffold(
       floatingActionButton = {
         Box(modifier = Modifier.padding(8.dp)) {
@@ -187,81 +185,110 @@ fun Events(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel:
               if (!eventsLoaded.value) {
                 LoadingText()
               } else {
+                val joinedEvents =
+                    eventList.filter { e -> user.value!!.joinedEvents.contains(e.eventID) }
+                val favouriteEvents =
+                    eventList.filter { e -> user.value!!.myFavorites.contains(e.eventID) }
+                val myEvents = eventList.filter { e -> e.creator == user.value!!.uid }
 
-                // Display events based on the selected filter
-                Column(
-                    modifier = Modifier.verticalScroll(rememberScrollState()).fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally) {
-
-                      // Display joined events if 'All' or 'Joined' is selected
-                      if (selectedFilter == ALL || selectedFilter == JOINED) {
-                        Spacer(modifier = Modifier.height(screenHeight / 40))
-                        Text(
-                            text = JOINED.formattedName,
-                            style = MaterialTheme.typography.titleLarge,
-                            color = MaterialTheme.colorScheme.onBackground,
-                            modifier =
-                                Modifier.padding(horizontal = screenWidth / 15)
-                                    .testTag("JoinedTitle"))
-
-                        // Loop through and display events that match the joined events criteria
-                        eventList
-                            .filter { e -> user.value!!.joinedEvents.contains(e.eventID) }
-                            .forEach { event ->
-                              ShowWidgets(
-                                  event = event,
-                                  query = query.value,
-                                  nav = nav,
-                                  userVM = userViewModel)
-                            }
+                if (joinedEvents.isEmpty() && favouriteEvents.isEmpty() && myEvents.isEmpty()) {
+                  Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                    val annotatedText = buildAnnotatedString {
+                      withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onBackground)) {
+                        append("You don't have any events yet, explore ")
                       }
-
-                      // Display favourite events if 'All' or 'Favourites' is selected
-                      if (selectedFilter == ALL || selectedFilter == FAVOURITES) {
-                        Spacer(modifier = Modifier.height(screenHeight / 40))
-                        Text(
-                            text = FAVOURITES.formattedName,
-                            style = MaterialTheme.typography.titleLarge,
-                            color = MaterialTheme.colorScheme.onBackground,
-                            modifier =
-                                Modifier.padding(horizontal = screenWidth / 15)
-                                    .testTag("FavouritesTitle"))
-
-                        // Loop through and display events are marked favourites by the currentUser
-                        eventList
-                            .filter { e -> user.value!!.myFavorites.contains(e.eventID) }
-                            .forEach { event ->
-                              ShowWidgets(
-                                  event = event,
-                                  query = query.value,
-                                  nav = nav,
-                                  userVM = userViewModel)
-                            }
-                      }
-
-                      // Display user's own events if 'All' or 'MyEvents' is selected
-                      if (selectedFilter == ALL || selectedFilter == MY_EVENTS) {
-                        Spacer(modifier = Modifier.height(screenHeight / 40))
-                        Text(
-                            text = MY_EVENTS.formattedName,
-                            style = MaterialTheme.typography.titleLarge,
-                            color = MaterialTheme.colorScheme.onBackground,
-                            modifier =
-                                Modifier.padding(horizontal = screenWidth / 15)
-                                    .testTag("MyEventsTitle"))
-
-                        // Loop through and display events created by currentUser
-                        eventList
-                            .filter { e -> e.creator == user.value!!.uid }
-                            .forEach { event ->
-                              ShowWidgets(
-                                  event = event,
-                                  query = query.value,
-                                  nav = nav,
-                                  userVM = userViewModel)
-                            }
+                      pushStringAnnotation(tag = "explore", annotation = "explore_link")
+                      withStyle(
+                          style =
+                              SpanStyle(
+                                  color = MaterialTheme.colorScheme.outlineVariant,
+                                  textDecoration = TextDecoration.Underline)) {
+                            append("here")
+                          }
+                      pop()
+                      withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onBackground)) {
+                        append(" !")
                       }
                     }
+
+                    ClickableText(
+                        text = annotatedText,
+                        onClick = { offset ->
+                          annotatedText
+                              .getStringAnnotations("explore", offset, offset)
+                              .firstOrNull()
+                              ?.let { annotation ->
+                                // Handle the click on "here"
+                                nav.navigateToScreen(Route.EXPLORE)
+                              }
+                        },
+                        style = MaterialTheme.typography.bodyLarge)
+                  }
+                } else {
+                  Column(
+                      modifier = Modifier.verticalScroll(rememberScrollState()).fillMaxSize(),
+                      horizontalAlignment = Alignment.CenterHorizontally) {
+                        if (selectedFilter == ALL || selectedFilter == JOINED) {
+                          if (joinedEvents.isNotEmpty()) {
+                            Spacer(modifier = Modifier.height(screenHeight / 40))
+                            Text(
+                                text = JOINED.formattedName,
+                                style = MaterialTheme.typography.titleLarge,
+                                color = MaterialTheme.colorScheme.onBackground,
+                                modifier =
+                                    Modifier.padding(horizontal = screenWidth / 15)
+                                        .testTag("JoinedTitle"))
+                            joinedEvents.forEach { event ->
+                              ShowWidgets(
+                                  event = event,
+                                  query = query.value,
+                                  nav = nav,
+                                  userVM = userViewModel)
+                            }
+                          }
+                        }
+
+                        if (selectedFilter == ALL || selectedFilter == FAVOURITES) {
+                          if (favouriteEvents.isNotEmpty()) {
+                            Spacer(modifier = Modifier.height(screenHeight / 40))
+                            Text(
+                                text = FAVOURITES.formattedName,
+                                style = MaterialTheme.typography.titleLarge,
+                                color = MaterialTheme.colorScheme.onBackground,
+                                modifier =
+                                    Modifier.padding(horizontal = screenWidth / 15)
+                                        .testTag("FavouritesTitle"))
+                            favouriteEvents.forEach { event ->
+                              ShowWidgets(
+                                  event = event,
+                                  query = query.value,
+                                  nav = nav,
+                                  userVM = userViewModel)
+                            }
+                          }
+                        }
+
+                        if (selectedFilter == ALL || selectedFilter == MY_EVENTS) {
+                          if (myEvents.isNotEmpty()) {
+                            Spacer(modifier = Modifier.height(screenHeight / 40))
+                            Text(
+                                text = MY_EVENTS.formattedName,
+                                style = MaterialTheme.typography.titleLarge,
+                                color = MaterialTheme.colorScheme.onBackground,
+                                modifier =
+                                    Modifier.padding(horizontal = screenWidth / 15)
+                                        .testTag("MyEventsTitle"))
+                            myEvents.forEach { event ->
+                              ShowWidgets(
+                                  event = event,
+                                  query = query.value,
+                                  nav = nav,
+                                  userVM = userViewModel)
+                            }
+                          }
+                        }
+                      }
+                }
               }
             }
       }
