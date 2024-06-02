@@ -18,7 +18,6 @@ import com.github.se.gomeet.viewmodel.UserViewModel
 import io.github.kakaocup.kakao.common.utilities.getResourceString
 import java.time.LocalDate
 import java.time.LocalTime
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
 import org.junit.AfterClass
 import org.junit.BeforeClass
@@ -57,18 +56,14 @@ class EditEventTest {
           UserViewModel(""),
           "eventid")
 
-      while (eventVM.getAllEvents()!!.isEmpty()) {
-        TimeUnit.SECONDS.sleep(1)
-      }
-
-      eventUid = eventVM.getAllEvents()!![0].eventID
+      eventVM.getAllEvents { if (it != null) eventUid = it[0].eventID }
     }
 
     @AfterClass
     @JvmStatic
     fun tearDown() = runBlocking {
-      // Clean up the event
-      eventVM.getAllEvents()?.forEach { eventVM.removeEvent(it.eventID) }
+      // Clean up the events
+      eventVM.getAllEvents { events -> events?.forEach { eventVM.removeEvent(it.eventID) } }
 
       return@runBlocking
     }

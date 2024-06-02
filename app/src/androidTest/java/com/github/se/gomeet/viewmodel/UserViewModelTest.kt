@@ -78,7 +78,8 @@ class UserViewModelTest {
     fun tearDown() = runBlocking {
       // Clean up the user
       userVM.deleteUser(uid)
-      eventVM.getAllEvents()!!.forEach { eventVM.removeEvent(it.eventID) }
+      // Clean up the events
+      eventVM.getAllEvents { events -> events?.forEach { eventVM.removeEvent(it.eventID) } }
     }
   }
 
@@ -216,7 +217,7 @@ class UserViewModelTest {
     runBlocking { userVM.editUser(user.copy(myFavorites = listOf(eventId))) }
 
     // Remove it from the user's favorites
-    runBlocking { userVM.removeFavoriteEvent(eventId, uid) }
+    runBlocking { userVM.removeFavouriteEvent(eventId, uid) }
 
     // Make sure that the user's favorites list is empty
     runBlocking { assert(userVM.getUser(uid)!!.myFavorites.isEmpty()) }

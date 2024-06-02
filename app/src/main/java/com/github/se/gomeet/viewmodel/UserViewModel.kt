@@ -234,6 +234,17 @@ class UserViewModel(val currentUID: String? = null) : ViewModel() {
   }
 
   /**
+   * Function to leave an event.
+   *
+   * @param eventId The id of the event to leave.
+   * @param userId The id of the user leaving the event (optional, by default it is the current user
+   *   id).
+   */
+  fun leaveEvent(eventId: String, userId: String = currentUID!!) {
+    viewModelScope.launch { EventRepository.leaveEvent(eventId, userId) }
+  }
+
+  /**
    * Removes the given event from the user's list of favorites.
    *
    * @param userId The id of the user for which we remove the event from favorites.

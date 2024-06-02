@@ -87,8 +87,8 @@ class EventsTest {
     @AfterClass
     @JvmStatic
     fun tearDown() = runBlocking {
-      // Clean up the event
-      eventVM.getAllEvents()?.forEach { eventVM.removeEvent(it.eventID) }
+      // Clean up the events
+      eventVM.getAllEvents { events -> events?.forEach { eventVM.removeEvent(it.eventID) } }
 
       // Clean up the user
       Firebase.auth.currentUser?.delete()?.await()

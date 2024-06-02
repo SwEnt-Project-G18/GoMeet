@@ -2,6 +2,7 @@ package com.github.se.gomeet.viewmodel
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.model.Tag
+import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.location.Location
 import com.github.se.gomeet.model.user.GoMeetUser
 import java.time.LocalDate
@@ -77,7 +78,7 @@ class EventViewModelTest {
     @JvmStatic
     fun tearDown() {
       // Clean up the events
-      runBlocking { eventVM.getAllEvents()!!.forEach { eventVM.removeEvent(it.eventID) } }
+      eventVM.getAllEvents { events -> events?.forEach { eventVM.removeEvent(it.eventID) } }
     }
   }
 
@@ -180,7 +181,8 @@ class EventViewModelTest {
 
     TimeUnit.SECONDS.sleep(1)
 
-    val events = eventViewModel.getAllEvents()!!.toMutableList()
+    val events = mutableListOf<Event>()
+    eventViewModel.getAllEvents { if (it != null) events.addAll(it) }
     EventViewModel.sortEvents(currentUser.tags, events)
     assert(events[0].eventID == eid3)
     assert(events[1].eventID == eventId)
@@ -197,7 +199,11 @@ class EventViewModelTest {
 
   @Test
   fun getAllEventsTest() {
-    runBlocking { assert(eventVM.getAllEvents()!!.any { it.eventID == eventId }) }
+    runBlocking {
+      val events = mutableListOf<Event>()
+      eventVM.getAllEvents { if (it != null) events.addAll(it) }
+      assert(events.any { it.eventID == eventId })
+    }
   }
 
   @Test
@@ -298,7 +304,7 @@ class EventViewModelTest {
     runBlocking { eventVM.joinEvent(eventVM.getEvent(eventId)!!, userId) }
 
     // Make the user leave the event
-    runBlocking { eventVM.leaveEvent(eventVM.getEvent(eventId)!!, userId) }
+    runBlocking { eventVM.leaveEvent(eventId, userId) }
 
     // Make sure that the event participants list is empty
     runBlocking { assert(!eventVM.getEvent(eventId)!!.participants.any { it == userId }) }

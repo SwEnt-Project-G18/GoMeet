@@ -94,13 +94,12 @@ class ProfileEventListTest {
     @JvmStatic
     fun tearDown() = runBlocking {
       // Clean up the event
-      eventVM.getAllEvents()?.forEach {
-        eventVM.removeEvent(it.eventID)
+      eventVM.getAllEvents { it?.forEach { eventVM.removeEvent(it.eventID) } }
 
-        // Clean up the user
-        Firebase.auth.currentUser?.delete()
-        userVM.deleteUser(uid)
-      }
+      // Clean up the user
+      Firebase.auth.currentUser?.delete()
+      userVM.deleteUser(uid)
+
       return@runBlocking
     }
   }

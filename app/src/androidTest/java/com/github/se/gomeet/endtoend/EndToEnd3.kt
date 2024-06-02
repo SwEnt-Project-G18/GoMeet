@@ -155,8 +155,8 @@ class EndToEndTest3 : TestCase() {
     @JvmStatic
     fun tearDown() = runBlocking {
 
-      // clean up the event
-      eventVM.getAllEvents()?.forEach { eventVM.removeEvent(it.eventID) }
+      // clean up the events
+      eventVM.getAllEvents { events -> events?.forEach { eventVM.removeEvent(it.eventID) } }
 
       // clean up the users
       Firebase.auth.currentUser?.delete()?.await()

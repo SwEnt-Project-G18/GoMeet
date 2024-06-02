@@ -37,14 +37,12 @@ class CreateEventTest {
     fun tearDown() = runBlocking {
 
       // Clean up the events
-      eventVM.getAllEvents()?.forEach { eventVM.removeEvent(it.eventID) }
-
-      return@runBlocking
+      eventVM.getAllEvents { events -> events?.forEach { eventVM.removeEvent(it.eventID) } }
     }
   }
 
   @Test
-  fun testCratePrivateEvent() {
+  fun testCreatePrivateEvent() {
     val eventVM = EventViewModel(uid)
 
     composeTestRule.setContent {
