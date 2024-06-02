@@ -11,10 +11,12 @@ import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.se.gomeet.R
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import io.github.kakaocup.kakao.common.utilities.getResourceString
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
@@ -74,36 +76,45 @@ class EditProfileTest {
 
     // Test that the ui is correctly displayed. fill in the fields and click on Done
     composeTestRule.onNodeWithTag("Profile Picture").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Edit Tags").performScrollTo().assertIsDisplayed()
+    composeTestRule
+        .onNodeWithText(getResourceString(R.string.edit_tags))
+        .performScrollTo()
+        .assertIsDisplayed()
     composeTestRule.onNodeWithTag("EditTagsButton").assertIsDisplayed().performClick()
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("TagList").assertIsDisplayed().performClick()
-    composeTestRule.onNodeWithText("Save").assertIsDisplayed().performClick()
+    composeTestRule
+        .onNodeWithText(getResourceString(R.string.save))
+        .assertIsDisplayed()
+        .performClick()
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("Country").performScrollTo().assertIsDisplayed().performClick()
 
     composeTestRule.onAllNodesWithTag("CountryItem")[1].assertIsDisplayed().performClick()
 
     composeTestRule
-        .onNodeWithText("Phone Number")
+        .onNodeWithText(getResourceString(R.string.phone_number_text_field))
         .performScrollTo()
         .assertIsDisplayed()
         .performTextInput("+1234567890")
     composeTestRule
-        .onNodeWithText("Username")
+        .onNodeWithText(getResourceString(R.string.username_text_field))
         .performScrollTo()
         .assertIsDisplayed()
         .performTextInput("usesrname")
     composeTestRule
-        .onNodeWithText("Last Name")
+        .onNodeWithText(getResourceString(R.string.last_name_text_field))
         .performScrollTo()
         .assertIsDisplayed()
         .performTextInput("lastname")
     composeTestRule
-        .onNodeWithText("First Name")
+        .onNodeWithText(getResourceString(R.string.first_name_text_field))
         .performScrollTo()
         .assertIsDisplayed()
         .performTextInput("firstname")
-    composeTestRule.onNodeWithText("Done").assertIsDisplayed().performClick()
+    composeTestRule
+        .onNodeWithText(getResourceString(R.string.done))
+        .assertIsDisplayed()
+        .performClick()
   }
 }

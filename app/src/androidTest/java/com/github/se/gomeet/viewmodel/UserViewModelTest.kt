@@ -39,38 +39,7 @@ class UserViewModelTest {
             emptyList(),
             emptyList(),
             tags = emptyList())
-    private val event1 =
-        Event(
-            "event6",
-            uid,
-            "",
-            "",
-            Location(0.0, 0.0, ""),
-            LocalDate.now(),
-            LocalTime.now(),
-            0.0,
-            "",
-            emptyList(),
-            emptyList(),
-            emptyList(),
-            0,
-            true)
-    private val event2 =
-        Event(
-            "event7",
-            uid,
-            "",
-            "",
-            Location(0.0, 0.0, ""),
-            LocalDate.now(),
-            LocalTime.now(),
-            0.0,
-            "",
-            emptyList(),
-            emptyList(),
-            emptyList(),
-            0,
-            true)
+    private lateinit var event: Event
 
     private val userVM = UserViewModel(uid)
     private val eventVM = EventViewModel(uid)
@@ -79,9 +48,29 @@ class UserViewModelTest {
     @JvmStatic
     fun setup() = runBlocking {
       userVM.createUserIfNew(uid, username, firstname, lastname, email, phonenumber, country, "")
-      eventVM.editEvent(event1)
-      eventVM.editEvent(event2)
-      TimeUnit.SECONDS.sleep(1)
+      eventVM.createEvent(
+          "title",
+          "description",
+          Location(0.0, 0.0, ""),
+          LocalDate.now(),
+          LocalTime.now(),
+          0.0,
+          "",
+          emptyList(),
+          emptyList(),
+          emptyList(),
+          1,
+          true,
+          emptyList(),
+          emptyList(),
+          null,
+          userVM,
+          "testevent1")
+      while (eventVM.getEvent("testevent1") == null) {
+        TimeUnit.SECONDS.sleep(1)
+      }
+      event = eventVM.getEvent("testevent1")!!
+      TimeUnit.SECONDS.sleep(3)
     }
 
     @AfterClass
@@ -89,6 +78,7 @@ class UserViewModelTest {
     fun tearDown() = runBlocking {
       // Clean up the user
       userVM.deleteUser(uid)
+      eventVM.getAllEvents()!!.forEach { eventVM.removeEvent(it.eventID) }
     }
   }
 
@@ -190,34 +180,48 @@ class UserViewModelTest {
     runBlocking { assert(!userVM.getUser(uid)!!.pendingRequests.any { it.eventId == eventId }) }
   }
 
-  /**
-   * @Test fun userAcceptsInvitationTest() { val eventId = "event6"
-   *
-   * // Invite the user to the event runBlocking { userVM.gotInvitation(eventId, uid) }
-   *
-   * // Make the user accept the invitation runBlocking { userVM.userAcceptsInvitation(event1, user,
-   * eventVM) }
-   *
-   * // Verify that the event appears in the user's joinedEvents list runBlocking { while
-   * (!userVM.getUser(uid)!!.joinedEvents.contains(eventId)) { TimeUnit.SECONDS.sleep(1) }
-   * assert(userVM.getUser(uid)!!.joinedEvents.contains(eventId)) } }
-   *
-   * @Test fun userRefusesInvitationTest() { val eventId = "event7"
-   *
-   * // Invite the user to the event runBlocking { userVM.gotInvitation(eventId, uid) }
-   *
-   * // Make the user refuse the invitation runBlocking { userVM.userRefusesInvitation(event2, user,
-   * eventVM) }
-   *
-   * // Verify that the invitation is no longer in pendingRequests runBlocking { assert(
-   * userVM.getUser(uid)!!.pendingRequests.any { it.eventId == eventId && it.status ==
-   * InviteStatus.REFUSED }) }
-   *
-   * // Verify that the event doesn't appear in the user's joinedEvents list runBlocking {
-   * assert(!userVM.getUser(uid)!!.joinedEvents.contains(eventId)) assert(
-   * userVM.getUser(uid)!!.pendingRequests.any { it.eventId == eventId && it.status ==
-   * InviteStatus.REFUSED }) } }*
-   */
+  @Test
+  fun leaveEventTest() {
+    val eventId = "event4"
+
+    // Join an event
+    runBlocking { userVM.joinEvent(eventId, uid) }
+
+    // Leave the event
+    runBlocking { userVM.leaveEvent(eventId, uid) }
+
+    // Verify that the user's joinedEvents list was correctly updated
+    runBlocking { assert(!userVM.getUser(uid)!!.joinedEvents.any { it == eventId }) }
+  }
+
+  @Test
+  fun userDeletesEventTest() {
+    val eventId = "event5"
+
+    // Create an event
+    runBlocking { userVM.userCreatesEvent(eventId, uid) }
+
+    // Delete the event
+    runBlocking { userVM.userDeletesEvent(eventId, uid) }
+
+    // Make sure that the user's MyEvents list is empty
+    runBlocking { assert(userVM.getUser(uid)!!.myEvents.isEmpty()) }
+  }
+
+  @Test
+  fun removeFavoriteEventTest() {
+    val eventId = "event6"
+
+    // Add an event to the user's favorites
+    runBlocking { userVM.editUser(user.copy(myFavorites = listOf(eventId))) }
+
+    // Remove it from the user's favorites
+    runBlocking { userVM.removeFavoriteEvent(eventId, uid) }
+
+    // Make sure that the user's favorites list is empty
+    runBlocking { assert(userVM.getUser(uid)!!.myFavorites.isEmpty()) }
+  }
+
   @Test
   fun getUsernameTest() {
     var usrname: String?

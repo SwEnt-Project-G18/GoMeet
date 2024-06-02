@@ -7,15 +7,19 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.se.gomeet.R
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import io.github.kakaocup.kakao.common.utilities.getResourceString
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
@@ -112,8 +116,29 @@ class OthersProfileTest {
     composeTestRule.onNodeWithTag("Profile Picture").assertIsDisplayed()
     composeTestRule.onNodeWithTag("TopBar").assertIsDisplayed()
     composeTestRule.onNodeWithTag("UserInfo").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Follow").assertIsDisplayed().assertHasClickAction()
-    composeTestRule.onNodeWithText("Message").assertIsDisplayed().assertHasClickAction()
+    composeTestRule
+        .onNodeWithText(getResourceString(R.string.follow_button))
+        .assertIsDisplayed()
+        .assertHasClickAction()
+    composeTestRule
+        .onNodeWithText(getResourceString(R.string.message_button))
+        .assertIsDisplayed()
+        .assertHasClickAction()
     composeTestRule.onAllNodesWithTag("EventsListHeader").assertCountEquals(2)
+    composeTestRule.onNodeWithContentDescription("More").assertIsDisplayed().performClick()
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithText(getResourceString(R.string.options)).assertIsDisplayed()
+    composeTestRule
+        .onNodeWithText(getResourceString(R.string.share_profile))
+        .assertIsDisplayed()
+        .assertHasClickAction()
+    composeTestRule
+        .onNodeWithText(getResourceString(R.string.block))
+        .assertIsDisplayed()
+        .assertHasClickAction()
+    composeTestRule
+        .onNodeWithText(getResourceString(R.string.cancel))
+        .assertIsDisplayed()
+        .assertHasClickAction()
   }
 }

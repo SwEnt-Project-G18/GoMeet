@@ -13,6 +13,7 @@ import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
 import com.github.se.gomeet.MainActivity
+import com.github.se.gomeet.R
 import com.github.se.gomeet.screens.CreateEventScreen
 import com.github.se.gomeet.screens.CreateScreen
 import com.github.se.gomeet.screens.EventsScreen
@@ -27,6 +28,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import io.github.kakaocup.compose.node.element.ComposeScreen
+import io.github.kakaocup.kakao.common.utilities.getResourceString
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
@@ -99,16 +101,31 @@ class EndToEndTest : TestCase() {
   fun test() = run {
     ComposeScreen.onComposeScreen<WelcomeScreenScreen>(composeTestRule) {
       step("Click on the log in button") {
-        composeTestRule.onNodeWithText("Log In").assertIsDisplayed().performClick()
+        composeTestRule
+            .onNodeWithText(getResourceString(R.string.log_in_button))
+            .assertIsDisplayed()
+            .performClick()
       }
     }
 
     ComposeScreen.onComposeScreen<LoginScreenScreen>(composeTestRule) {
       step("Log in with email and password") {
-        composeTestRule.onNodeWithText("Log In").assertIsDisplayed().assertIsNotEnabled()
-        composeTestRule.onNodeWithText("Email").assertIsDisplayed().performTextInput(email)
-        composeTestRule.onNodeWithText("Password").assertIsDisplayed().performTextInput(pwd)
-        composeTestRule.onNodeWithText("Log In").assertIsEnabled().performClick()
+        composeTestRule
+            .onNodeWithText(getResourceString(R.string.log_in_button))
+            .assertIsDisplayed()
+            .assertIsNotEnabled()
+        composeTestRule
+            .onNodeWithText(getResourceString(R.string.email_text_field))
+            .assertIsDisplayed()
+            .performTextInput(email)
+        composeTestRule
+            .onNodeWithText(getResourceString(R.string.password_text_field))
+            .assertIsDisplayed()
+            .performTextInput(pwd)
+        composeTestRule
+            .onNodeWithText(getResourceString(R.string.log_in_button))
+            .assertIsEnabled()
+            .performClick()
         composeTestRule.waitForIdle()
         composeTestRule.waitUntil(timeoutMillis = 10000) {
           composeTestRule.onNodeWithTag("ExploreUI").isDisplayed()
@@ -132,7 +149,10 @@ class EndToEndTest : TestCase() {
 
     ComposeScreen.onComposeScreen<CreateScreen>(composeTestRule) {
       step("Select which type of event to create") {
-        composeTestRule.onNodeWithText("Public").assertIsDisplayed().performClick()
+        composeTestRule
+            .onNodeWithText(getResourceString(R.string.create_public_event_button))
+            .assertIsDisplayed()
+            .performClick()
       }
     }
 
@@ -151,7 +171,10 @@ class EndToEndTest : TestCase() {
             .onNodeWithText("Link")
             .assertIsDisplayed()
             .performTextInput("https://example.com")
-        composeTestRule.onNodeWithText("Post").assertIsEnabled().performClick()
+        composeTestRule
+            .onNodeWithText(getResourceString(R.string.post_event_button))
+            .assertIsEnabled()
+            .performClick()
         runBlocking {
           while (userVM.getUser(uid)!!.myEvents.isEmpty()) {
             TimeUnit.SECONDS.sleep(1)

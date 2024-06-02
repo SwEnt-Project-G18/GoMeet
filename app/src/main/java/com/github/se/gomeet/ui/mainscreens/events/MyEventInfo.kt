@@ -309,7 +309,8 @@ fun MyEventInfo(
                     Text(
                         text = "No updates about this event at the moment.",
                         color = MaterialTheme.colorScheme.tertiary,
-                        modifier = Modifier.align(Alignment.CenterHorizontally),
+                        modifier =
+                            Modifier.align(Alignment.CenterHorizontally).testTag("NoPostsText"),
                         style = MaterialTheme.typography.bodyLarge)
                     Spacer(Modifier.height(screenHeight / 50))
                   } else {
@@ -470,7 +471,11 @@ fun DeleteEventDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
             }
       },
       title = { Text("Delete Event") },
-      text = { Text("Are you sure you want to delete this event?") },
+      text = {
+        Text(
+            "Are you sure you want to delete this event?",
+            modifier = Modifier.testTag("DeleteEventConfirmationText"))
+      },
       containerColor = MaterialTheme.colorScheme.background,
   )
 }

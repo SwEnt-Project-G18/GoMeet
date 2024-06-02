@@ -12,12 +12,16 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
 import com.github.se.gomeet.MainActivity
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.location.Location
+import com.github.se.gomeet.screens.AddParticipantsScreen
+import com.github.se.gomeet.screens.CreateEventScreen
+import com.github.se.gomeet.screens.CreateScreen
 import com.github.se.gomeet.screens.EventInfoScreen
 import com.github.se.gomeet.screens.EventsScreen
 import com.github.se.gomeet.screens.ExploreScreen
@@ -43,7 +47,10 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-/** This end to end test tests that a user can add participants to an event they created. */
+/**
+ * This end to end test tests that a user can create/delete a post and add participants to an event
+ * they created as well as adding participants when they create a new private event.
+ */
 @RunWith(AndroidJUnit4::class)
 class EndToEndTest3 : TestCase() {
   @get:Rule val composeTestRule = createAndroidComposeRule<MainActivity>()
@@ -166,16 +173,31 @@ class EndToEndTest3 : TestCase() {
   fun test() = run {
     ComposeScreen.onComposeScreen<WelcomeScreenScreen>(composeTestRule) {
       step("Click on the log in button") {
-        composeTestRule.onNodeWithText("Log In").assertIsDisplayed().performClick()
+        composeTestRule
+            .onNodeWithText(getResourceString(R.string.log_in_button))
+            .assertIsDisplayed()
+            .performClick()
       }
     }
 
     ComposeScreen.onComposeScreen<LoginScreenScreen>(composeTestRule) {
       step("Log in with email and password") {
-        composeTestRule.onNodeWithText("Log In").assertIsDisplayed().assertIsNotEnabled()
-        composeTestRule.onNodeWithText("Email").assertIsDisplayed().performTextInput(email1)
-        composeTestRule.onNodeWithText("Password").assertIsDisplayed().performTextInput(pwd1)
-        composeTestRule.onNodeWithText("Log In").assertIsEnabled().performClick()
+        composeTestRule
+            .onNodeWithText(getResourceString(R.string.log_in_button))
+            .assertIsDisplayed()
+            .assertIsNotEnabled()
+        composeTestRule
+            .onNodeWithText(getResourceString(R.string.email_text_field))
+            .assertIsDisplayed()
+            .performTextInput(email1)
+        composeTestRule
+            .onNodeWithText(getResourceString(R.string.password_text_field))
+            .assertIsDisplayed()
+            .performTextInput(pwd1)
+        composeTestRule
+            .onNodeWithText(getResourceString(R.string.log_in_button))
+            .assertIsEnabled()
+            .performClick()
         composeTestRule.waitForIdle()
         composeTestRule.waitUntil(timeoutMillis = 10000) {
           composeTestRule.onNodeWithTag("ExploreUI").isDisplayed()
@@ -191,7 +213,7 @@ class EndToEndTest3 : TestCase() {
     ComposeScreen.onComposeScreen<EventsScreen>(composeTestRule) {
       step("View the info page of the event") {
         composeTestRule.waitForIdle()
-        composeTestRule.onAllNodesWithText("Events")[0].performClick()
+        composeTestRule.onAllNodesWithText(getResourceString(R.string.events))[0].performClick()
         composeTestRule.waitUntil(timeoutMillis = 10000) {
           composeTestRule.onAllNodesWithTag("Card")[0].isDisplayed()
         }
@@ -200,11 +222,79 @@ class EndToEndTest3 : TestCase() {
     }
 
     ComposeScreen.onComposeScreen<EventInfoScreen>(composeTestRule) {
-      step("Go to ManageInvites by clicking on the Add Participants button") {
-        composeTestRule.waitUntil(timeoutMillis = 10000) {
-          composeTestRule.onNodeWithTag("EventHeader").isDisplayed()
-        }
-        composeTestRule.onNodeWithText("Edit My Event").assertIsDisplayed().assertHasClickAction()
+      composeTestRule.waitUntil(timeoutMillis = 10000) {
+        composeTestRule.onNodeWithTag("EventHeader").isDisplayed()
+      }
+
+      step("Test that the dialog that appears when deleting an event is displayed properly") {
+        composeTestRule.onNodeWithContentDescription("Delete").assertIsDisplayed().performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText(getResourceString(R.string.delete_event)).assertIsDisplayed()
+        composeTestRule.onNodeWithTag("DeleteEventConfirmationText").assertIsDisplayed()
+        composeTestRule
+            .onNodeWithText(getResourceString(R.string.confirm))
+            .assertIsDisplayed()
+            .assertHasClickAction()
+        composeTestRule
+            .onNodeWithText(getResourceString(R.string.cancel))
+            .assertIsDisplayed()
+            .performClick()
+        composeTestRule.waitForIdle()
+      }
+      step("Create a post and then delete it") {
+        composeTestRule.onNodeWithText(getResourceString(R.string.posts)).assertIsDisplayed()
+        composeTestRule.onNodeWithTag("NoPostsText").assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescription("Add Post").assertIsDisplayed().performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule
+            .onNodeWithContentDescription("Cancel")
+            .assertIsDisplayed()
+            .assertHasClickAction()
+        composeTestRule.onNodeWithText(getResourceString(R.string.add_post)).assertIsDisplayed()
+        composeTestRule.onNodeWithTag("AddPostUserInfo").assertIsDisplayed()
+        composeTestRule
+            .onNodeWithContentDescription("Add Image")
+            .performScrollTo()
+            .assertIsDisplayed()
+            .assertHasClickAction()
+        composeTestRule
+            .onNodeWithText(getResourceString(R.string.new_post_placeholder_text))
+            .assertIsDisplayed()
+            .performTextInput("test")
+        composeTestRule
+            .onNodeWithText(getResourceString(R.string.post_button))
+            .performScrollTo()
+            .assertIsDisplayed()
+            .performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithTag("EventPostUserInfo").assertIsDisplayed()
+        composeTestRule.onNodeWithText("test").assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescription("Like").assertIsDisplayed().performClick()
+        composeTestRule.onNodeWithTag("PostDate").assertIsDisplayed()
+        composeTestRule
+            .onNodeWithContentDescription("Delete Post")
+            .assertIsDisplayed()
+            .performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText(getResourceString(R.string.delete_post)).assertIsDisplayed()
+        composeTestRule.onNodeWithTag("DeletePostConfirmationText").assertIsDisplayed()
+        composeTestRule
+            .onNodeWithText(getResourceString(R.string.cancel))
+            .assertIsDisplayed()
+            .assertHasClickAction()
+        composeTestRule
+            .onNodeWithText(getResourceString(R.string.confirm))
+            .assertIsDisplayed()
+            .performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithTag("NoPostsText").assertIsDisplayed()
+      }
+
+      step("Go to ManageInvites by clicking on Handle Participants") {
+        composeTestRule
+            .onNodeWithText(getResourceString(R.string.edit_event_button))
+            .assertIsDisplayed()
+            .assertHasClickAction()
         composeTestRule
             .onNodeWithText(getResourceString(R.string.participants_button))
             .assertIsDisplayed()
@@ -219,15 +309,31 @@ class EndToEndTest3 : TestCase() {
       }
 
       step("Test the ui of ManageInvites and invite a user to the event") {
-        composeTestRule.onNodeWithText("Manage Invites").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Pending").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Accepted").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Refused").assertIsDisplayed()
-        composeTestRule.onNodeWithText("To Invite").assertIsDisplayed()
+        composeTestRule
+            .onNodeWithText(getResourceString(R.string.manage_invites))
+            .assertIsDisplayed()
+        composeTestRule
+            .onNodeWithText(getResourceString(R.string.manage_invites_pending))
+            .assertIsDisplayed()
+        composeTestRule
+            .onNodeWithText(getResourceString(R.string.manage_invites_accepted))
+            .assertIsDisplayed()
+        composeTestRule
+            .onNodeWithText(getResourceString(R.string.manage_invites_refused))
+            .assertIsDisplayed()
+        composeTestRule
+            .onNodeWithText(getResourceString(R.string.manage_invites_to_invite))
+            .assertIsDisplayed()
         composeTestRule.onNodeWithText("@$username2").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Invite").assertIsDisplayed().performClick()
+        composeTestRule
+            .onNodeWithText(getResourceString(R.string.invite_button))
+            .assertIsDisplayed()
+            .performClick()
         composeTestRule.waitForIdle()
-        composeTestRule.onNodeWithText("Cancel").assertIsDisplayed().assertHasClickAction()
+        composeTestRule
+            .onNodeWithText(getResourceString(R.string.cancel))
+            .assertIsDisplayed()
+            .assertHasClickAction()
         composeTestRule.onNodeWithContentDescription("Go back").assertIsDisplayed().performClick()
         composeTestRule.waitForIdle()
       }
@@ -235,9 +341,14 @@ class EndToEndTest3 : TestCase() {
       ComposeScreen.onComposeScreen<EventInfoScreen>(composeTestRule) {
         step("Refresh ManageInvites") {
           composeTestRule.waitUntil(timeoutMillis = 10000) {
-            composeTestRule.onNodeWithTag("EventHeader").isDisplayed()
+            composeTestRule
+                .onNodeWithText(getResourceString(R.string.edit_event_button))
+                .isDisplayed()
           }
-          composeTestRule.onNodeWithText("Edit My Event").assertIsDisplayed().assertHasClickAction()
+          composeTestRule
+              .onNodeWithText(getResourceString(R.string.edit_event_button))
+              .assertIsDisplayed()
+              .assertHasClickAction()
           composeTestRule
               .onNodeWithText(getResourceString(R.string.participants_button))
               .assertIsDisplayed()
@@ -247,11 +358,72 @@ class EndToEndTest3 : TestCase() {
       }
 
       step("Verify that the invitation appears in Pending") {
-        composeTestRule.onNodeWithText("Pending").performClick()
+        composeTestRule
+            .onNodeWithText(getResourceString(R.string.manage_invites_pending))
+            .performClick()
         composeTestRule.waitForIdle()
         composeTestRule.waitUntil {
           composeTestRule.onNodeWithTag("UserInviteWidget").isDisplayed()
         }
+        composeTestRule.onNodeWithTag("UserInviteWidget").assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescription("Go back").performClick()
+        composeTestRule.waitForIdle()
+      }
+    }
+
+    ComposeScreen.onComposeScreen<EventInfoScreen>(composeTestRule) {
+      step("Go back to Events") {
+        composeTestRule.waitUntil(timeoutMillis = 10000) {
+          composeTestRule.onNodeWithTag("EventHeader").isDisplayed()
+        }
+        composeTestRule.onNodeWithContentDescription("Back").performClick()
+        composeTestRule.waitForIdle()
+      }
+    }
+
+    ComposeScreen.onComposeScreen<EventsScreen>(composeTestRule) {
+      step("Create a new Event") {
+        composeTestRule.onNodeWithTag("CreateEventButton").performClick()
+        composeTestRule.waitForIdle()
+      }
+    }
+
+    ComposeScreen.onComposeScreen<CreateScreen>(composeTestRule) {
+      step("Create a private event") {
+        composeTestRule
+            .onNodeWithText(getResourceString(R.string.create_private_event_button))
+            .performClick()
+        composeTestRule.waitForIdle()
+      }
+    }
+
+    ComposeScreen.onComposeScreen<CreateEventScreen>(composeTestRule) {
+      step("Add Participants") {
+        composeTestRule.onNodeWithContentDescription("Add Participants").performClick()
+        composeTestRule.waitForIdle()
+      }
+    }
+
+    ComposeScreen.onComposeScreen<AddParticipantsScreen>(composeTestRule) {
+      step("Check that the ui of AddParticipants is correctly displayed and invite a user") {
+        composeTestRule.waitUntil(timeoutMillis = 10000) {
+          composeTestRule
+              .onNodeWithText(getResourceString(R.string.search_bar_placeholder))
+              .isDisplayed()
+        }
+
+        composeTestRule.onNodeWithContentDescription("Back").assertIsDisplayed()
+        composeTestRule
+            .onNodeWithText(getResourceString(R.string.add_participants))
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText("Search").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("InviteUserWidget").assertIsDisplayed()
+        composeTestRule.onNodeWithText("testfirstname2", substring = true).assertIsDisplayed()
+        composeTestRule.onNodeWithText(username2, substring = true).assertIsDisplayed()
+        composeTestRule
+            .onNodeWithText(getResourceString(R.string.invite_button))
+            .assertIsDisplayed()
+            .performClick()
       }
     }
   }

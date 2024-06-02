@@ -20,7 +20,6 @@ import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldColors
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -34,9 +33,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.github.se.gomeet.ui.theme.DarkCyan
 
 /**
  * This composable function allows the user to input and confirm their password. It checks that the
@@ -127,20 +124,4 @@ fun RegisterPassword(callback: (String) -> Unit, textFieldColors: TextFieldColor
                   }
             }
       }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewRegisterPassword() {
-  RegisterPassword(
-      callback = { password -> println("Preview Password: $password") },
-      textFieldColors =
-          TextFieldDefaults.colors(
-              focusedTextColor = DarkCyan,
-              unfocusedTextColor = DarkCyan,
-              unfocusedContainerColor = Color.Transparent,
-              focusedContainerColor = Color.Transparent,
-              cursorColor = DarkCyan,
-              focusedLabelColor = MaterialTheme.colorScheme.tertiary,
-              focusedIndicatorColor = MaterialTheme.colorScheme.tertiary))
 }

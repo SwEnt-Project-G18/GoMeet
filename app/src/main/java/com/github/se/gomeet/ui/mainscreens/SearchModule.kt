@@ -45,11 +45,9 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.github.se.gomeet.R
@@ -90,7 +88,7 @@ fun SearchModule(
                     modifier = Modifier.size(20.dp))
               }
         },
-        onValueChange = viewModel::onSearchTextChange,
+        onValueChange = viewModel::performSearch,
         modifier =
             Modifier.fillMaxWidth()
                 .height(45.dp)
@@ -251,14 +249,4 @@ fun SearchModuleSnippet(
           }
     }
   }
-}
-
-@Preview
-@Composable
-fun PreviewSearchModule() {
-  SearchModule(
-      nav = NavigationActions(rememberNavController()),
-      backgroundColor = MaterialTheme.colorScheme.background,
-      contentColor = MaterialTheme.colorScheme.tertiary,
-      currentUID = "1234")
 }

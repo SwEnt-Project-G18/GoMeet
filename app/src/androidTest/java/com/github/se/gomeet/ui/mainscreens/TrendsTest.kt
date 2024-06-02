@@ -34,18 +34,27 @@ class TrendsTest {
 
     // Wait for the page to load
     composeTestRule.waitUntil(timeoutMillis = 10000) {
-      composeTestRule.onNodeWithText("Sort").isDisplayed()
+      composeTestRule.onNodeWithText(getResourceString(R.string.sort)).isDisplayed()
     }
 
     // Verify that the ui is correctly displayed
-    composeTestRule.onNodeWithText("Sort").assertIsDisplayed().performClick()
+    composeTestRule
+        .onNodeWithText(getResourceString(R.string.sort))
+        .assertIsDisplayed()
+        .performClick()
     composeTestRule
         .onNodeWithText(getResourceString(R.string.tag_sort))
         .assertIsDisplayed()
         .performClick()
-    composeTestRule.onNodeWithText("Sort").performClick()
-    composeTestRule.onNodeWithText("Name").assertIsDisplayed().performClick()
-    composeTestRule.onNodeWithText("Sort").performClick()
-    composeTestRule.onNodeWithText("Date").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithText(getResourceString(R.string.sort)).performClick()
+    composeTestRule
+        .onNodeWithText(getResourceString(R.string.name))
+        .assertIsDisplayed()
+        .performClick()
+    composeTestRule.onNodeWithText(getResourceString(R.string.sort)).performClick()
+    composeTestRule
+        .onNodeWithText(getResourceString(R.string.date))
+        .assertIsDisplayed()
+        .performClick()
   }
 }

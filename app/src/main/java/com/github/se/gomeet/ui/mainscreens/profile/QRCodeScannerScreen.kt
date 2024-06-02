@@ -103,7 +103,7 @@ fun QRCodeScannerScreen(nav: NavigationActions, eventViewModel: EventViewModel) 
         }
       }) { padding ->
         if (hasCameraPermission) {
-          Box(modifier = Modifier.fillMaxSize().padding(padding)) {
+          Box(modifier = Modifier.fillMaxSize().padding(padding).testTag("CameraView")) {
             var scanCompleted by remember { mutableStateOf(false) }
 
             CameraPreviewView(

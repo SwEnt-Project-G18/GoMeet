@@ -4,12 +4,14 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.location.Location
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import io.github.kakaocup.kakao.common.utilities.getResourceString
 import java.time.LocalDate
 import java.time.LocalTime
 import kotlinx.coroutines.runBlocking
@@ -30,6 +32,7 @@ class EventsTest {
     private lateinit var uid: String
     private const val username = "eventstest"
 
+    private const val eventTitle = "title"
     private const val eventId = "EventsTestEvent"
 
     private lateinit var userVM: UserViewModel
@@ -62,7 +65,7 @@ class EventsTest {
       // Create an event
       eventVM = EventViewModel(uid)
       eventVM.createEvent(
-          "title",
+          eventTitle,
           "description",
           Location(0.0, 0.0, "location"),
           LocalDate.of(2024, 8, 8),
@@ -105,11 +108,13 @@ class EventsTest {
 
     // Wait until the events are loaded
     composeTestRule.waitUntil(timeoutMillis = 10000) {
-      composeTestRule.onAllNodesWithText("title")[0].isDisplayed()
+      composeTestRule.onAllNodesWithText(eventTitle)[0].isDisplayed()
     }
 
     // Verify that the ui is correctly displayed
-    composeTestRule.onNodeWithText("Search").assertIsDisplayed()
+    composeTestRule
+        .onNodeWithText(getResourceString(R.string.search_bar_placeholder))
+        .assertIsDisplayed()
     composeTestRule.onNodeWithTag("JoinedButton").assertIsDisplayed().performClick().performClick()
     composeTestRule
         .onNodeWithTag("FavouritesButton")
@@ -124,9 +129,9 @@ class EventsTest {
     composeTestRule.onNodeWithTag("JoinedTitle").assertIsDisplayed()
     composeTestRule.onNodeWithTag("FavouritesTitle").assertIsDisplayed()
     composeTestRule.onNodeWithTag("MyEventsTitle").assertIsDisplayed()
-    composeTestRule.onAllNodesWithText("title").assertCountEquals(3)
+    composeTestRule.onAllNodesWithText(eventTitle).assertCountEquals(3)
     for (i in 0..2) {
-      composeTestRule.onAllNodesWithText("title")[i].assertIsDisplayed()
+      composeTestRule.onAllNodesWithText(eventTitle)[i].assertIsDisplayed()
     }
   }
 }
