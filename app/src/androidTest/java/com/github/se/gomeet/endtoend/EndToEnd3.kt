@@ -341,7 +341,9 @@ class EndToEndTest3 : TestCase() {
       ComposeScreen.onComposeScreen<EventInfoScreen>(composeTestRule) {
         step("Refresh ManageInvites") {
           composeTestRule.waitUntil(timeoutMillis = 10000) {
-            composeTestRule.onNodeWithText(getResourceString(R.string.edit_event_button)).isDisplayed()
+            composeTestRule
+                .onNodeWithText(getResourceString(R.string.edit_event_button))
+                .isDisplayed()
           }
           composeTestRule
               .onNodeWithText(getResourceString(R.string.edit_event_button))
