@@ -58,6 +58,14 @@ import com.google.android.gms.maps.model.LatLng
 import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.launch
 
+/**
+ * Composable function for the search module
+ *
+ * @param nav navigation actions
+ * @param backgroundColor background color of the search bar
+ * @param contentColor color of the content of the search bar
+ * @param currentUID current user's uid
+ */
 @Composable
 fun SearchModule(
     nav: NavigationActions,
@@ -133,6 +141,14 @@ fun SearchModule(
   }
 }
 
+/**
+ * Composable for a search result
+ *
+ * @param item item being displayed
+ * @param nav navigation actions
+ * @param backgroundColor background color of the composable
+ * @param currentUID current user's uid
+ */
 @Composable
 fun SearchModuleSnippet(
     item: SearchViewModel.SearchableItem,

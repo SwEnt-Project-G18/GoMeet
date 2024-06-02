@@ -38,6 +38,8 @@ class UserViewModel(val currentUID: String? = null) : ViewModel() {
    * @param email the email
    * @param phoneNumber the phone number
    * @param country the country
+   * @param pfp the profile pictures
+   * @param favorites the list of favorites
    */
   fun createUserIfNew(
       uid: String,

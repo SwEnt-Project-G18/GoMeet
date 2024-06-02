@@ -46,13 +46,12 @@ import com.github.se.gomeet.ui.theme.GoMeetTheme
  * Composable function for the profile Settings screen.
  *
  * @param nav The navigation actions for the screen.
- * @param authViewModel The view model for the authentication (for signing out)
  * @param logOut The navigation action to go back to the start screen after signing out.
  */
 @Composable
 fun SettingsScreen(nav: NavigationActions, /*userViewModel: UserViewModel*/ logOut: () -> Unit) {
   val screenHeight = LocalConfiguration.current.screenHeightDp.dp
-  val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+
   GoMeetTheme {
     Scaffold(
         modifier = Modifier.testTag("SettingsScreen"),
@@ -177,6 +176,8 @@ fun SettingsScreen(nav: NavigationActions, /*userViewModel: UserViewModel*/ logO
  *
  * @param icon The icon for the item.
  * @param text The text for the item.
+ * @param clickable Whether the settings items are clickable or not
+ * @param onClick The function to call when the item is clicked
  */
 @Composable
 fun SettingsComposable(

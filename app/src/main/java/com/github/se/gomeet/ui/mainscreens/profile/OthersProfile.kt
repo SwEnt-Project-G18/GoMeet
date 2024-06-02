@@ -317,7 +317,11 @@ fun OthersProfile(
       }
 }
 
-/** Composable function for the MoreActionsButton. */
+/**
+ * Composable function for the MoreActionsButton.
+ *
+ * @param uid The uid of the user whose profile is currently being viewed
+ */
 @Composable
 fun MoreActionsButton(uid: String, isProfile: Boolean) {
   var showOptionsDialog by remember { mutableStateOf(false) }
@@ -363,6 +367,12 @@ fun MoreActionsButton(uid: String, isProfile: Boolean) {
   }
 }
 
+/**
+ * Composable function for a styled text button
+ *
+ * @param text The text of the button
+ * @param onClick The function to be called when the button is clicked
+ */
 @Composable
 fun StyledTextButton(text: String, onClick: () -> Unit) {
   TextButton(

@@ -140,7 +140,6 @@ fun Trends(
             modifier = Modifier.padding(innerPadding).verticalScroll(rememberScrollState())) {
               Spacer(modifier = Modifier.height(5.dp))
               GoMeetSearchBar(
-                  nav,
                   query,
                   MaterialTheme.colorScheme.secondaryContainer,
                   MaterialTheme.colorScheme.tertiary)

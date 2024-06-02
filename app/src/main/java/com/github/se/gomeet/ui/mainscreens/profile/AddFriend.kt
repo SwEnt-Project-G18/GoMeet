@@ -109,7 +109,6 @@ fun AddFriend(nav: NavigationActions, userViewModel: UserViewModel) {
           } else {
             Column {
               GoMeetSearchBar(
-                  nav,
                   query,
                   MaterialTheme.colorScheme.primaryContainer,
                   MaterialTheme.colorScheme.tertiary)

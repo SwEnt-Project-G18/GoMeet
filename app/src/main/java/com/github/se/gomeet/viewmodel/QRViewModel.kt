@@ -29,6 +29,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+/**
+ * Process an image from the gallery
+ *
+ * @param context context
+ * @param uri uri
+ * @param onQRCodeScanned function to call after the qr code is scanned
+ */
 fun processGalleryImage(context: Context, uri: Uri, onQRCodeScanned: (String) -> Unit) {
   val scanner = BarcodeScanning.getClient()
   try {
@@ -49,6 +56,7 @@ fun processGalleryImage(context: Context, uri: Uri, onQRCodeScanned: (String) ->
   }
 }
 
+/** QR code analyzer */
 class QRCodeAnalyzer(private val onQRCodeScanned: (String) -> Unit) : ImageAnalysis.Analyzer {
   @SuppressLint("UnsafeOptInUsageError")
   override fun analyze(imageProxy: ImageProxy) {
@@ -70,6 +78,11 @@ class QRCodeAnalyzer(private val onQRCodeScanned: (String) -> Unit) : ImageAnaly
   }
 }
 
+/**
+ * Parses the given QR code content
+ *
+ * @param content content to parse
+ */
 fun parseQRCodeContent(content: String): Pair<String, String> {
   val parts = content.split("/")
   if (parts.size == 2) {
@@ -80,6 +93,13 @@ fun parseQRCodeContent(content: String): Pair<String, String> {
   throw IllegalArgumentException("Invalid QR code content")
 }
 
+/**
+ * Fetch an event and navigate to its info page
+ *
+ * @param eventId uid of the event
+ * @param nav navigation actions
+ * @param eventVM event view model
+ */
 fun fetchEventAndNavigate(eventId: String, nav: NavigationActions, eventVM: EventViewModel) {
   CoroutineScope(Dispatchers.Main).launch {
     val navigationPerformed = mutableStateOf(false)
@@ -107,6 +127,12 @@ fun fetchEventAndNavigate(eventId: String, nav: NavigationActions, eventVM: Even
   }
 }
 
+/**
+ * Generate a QR code
+ *
+ * @param type type
+ * @param id id
+ */
 fun generateQRCode(type: String, id: String): Bitmap {
   val content = "$type/$id"
   val writer = MultiFormatWriter()
@@ -115,6 +141,12 @@ fun generateQRCode(type: String, id: String): Bitmap {
   return encoder.createBitmap(bitMatrix)
 }
 
+/**
+ * Save an image to the gallery
+ *
+ * @param context context
+ * @param bitmap image to save
+ */
 fun saveImageToGallery(context: Context, bitmap: Bitmap) {
   val values =
       ContentValues().apply {
@@ -138,6 +170,12 @@ fun saveImageToGallery(context: Context, bitmap: Bitmap) {
   }
 }
 
+/**
+ * Share an image
+ *
+ * @param context context
+ * @param bitmap image to share
+ */
 fun shareImage(context: Context, bitmap: Bitmap) {
   val cachePath = File(context.cacheDir, "images")
   cachePath.mkdirs() // Create the directory if it doesn't exist

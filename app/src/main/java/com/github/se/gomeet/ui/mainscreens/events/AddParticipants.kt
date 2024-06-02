@@ -163,7 +163,6 @@ fun AddParticipants(
           } else {
             Column {
               GoMeetSearchBar(
-                  nav,
                   query,
                   MaterialTheme.colorScheme.primaryContainer,
                   MaterialTheme.colorScheme.tertiary)

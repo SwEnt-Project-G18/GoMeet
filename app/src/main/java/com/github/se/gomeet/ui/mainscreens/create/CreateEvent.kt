@@ -580,8 +580,6 @@ fun LocationField(
  * @param title The title of the event.
  * @param desc The description of the event.
  * @param loc The location of the event.
- * @param price The price of the event.
- * @param url The url of the event.
  * @return true if all fields are filled, false otherwise.
  */
 private fun fieldsAreFull(
@@ -592,6 +590,12 @@ private fun fieldsAreFull(
   return title.isNotEmpty() && desc.isNotEmpty() && loc.isNotEmpty()
 }
 
+/**
+ * Checks if a price is valid or not
+ *
+ * @param price The price to check
+ * @return True if the price is valid, false otherwise
+ */
 fun isValidPrice(price: String): Boolean {
   val regex = """^(\d{1,6})(\.\d{0,2})?$""".toRegex()
   if (!regex.matches(price)) return false

@@ -73,6 +73,14 @@ import com.github.se.gomeet.viewmodel.EventViewModel
 import java.io.InputStream
 import kotlinx.coroutines.launch
 
+/**
+ * Edit Event screen
+ *
+ * @param nav The navigation actions
+ * @param eventViewModel The event view model
+ * @param eventId The id of the event that is being edited
+ * @param refreshEvent The function to call when the event is refreshed
+ */
 @Composable
 fun EditEvent(
     nav: NavigationActions,
