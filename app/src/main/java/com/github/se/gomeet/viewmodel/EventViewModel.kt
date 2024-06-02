@@ -229,8 +229,10 @@ class EventViewModel(val currentUID: String? = null) : ViewModel() {
    * @param description the description of the event
    * @param location the location of the event
    * @param date the date of the event
+   * @param time the time at which the event takes place
    * @param price the price of the event
    * @param url the URL of the event
+   * @param pendingParticipants the list of users with a pending invitation to the event
    * @param participants the participants of the event
    * @param visibleToIfPrivate the users that the event is visible to if it is private
    * @param maxParticipants the maximum number of participants of the event
@@ -238,6 +240,7 @@ class EventViewModel(val currentUID: String? = null) : ViewModel() {
    * @param tags the tags of the event
    * @param images the images of the event
    * @param imageUri the URI of the image of the event
+   * @param userViewModel the user view model
    * @param eventId the UID of the event
    */
   fun createEvent(

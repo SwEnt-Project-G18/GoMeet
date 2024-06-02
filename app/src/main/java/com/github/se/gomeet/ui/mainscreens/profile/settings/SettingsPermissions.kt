@@ -62,6 +62,7 @@ import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.White
 
+/** Permissions screen of the settings */
 @SuppressLint("UnrememberedMutableState")
 @Composable
 fun SettingsPermissions(
@@ -69,7 +70,6 @@ fun SettingsPermissions(
 ) {
   Log.d("MyComposable", "Recomposed")
   val screenHeight = LocalConfiguration.current.screenHeightDp.dp
-  val screenWidth = LocalConfiguration.current.screenWidthDp.dp
 
   Scaffold(
       modifier = Modifier.testTag("SettingsPermissions"),

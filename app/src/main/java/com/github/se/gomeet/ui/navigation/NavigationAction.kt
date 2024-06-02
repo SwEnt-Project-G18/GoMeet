@@ -175,9 +175,11 @@ class NavigationActions(val navController: NavHostController) {
   /**
    * Navigates to the event info screen.
    *
+   * @param eventId The id of the event
    * @param title The title of the event.
    * @param date The date of the event.
    * @param time The time of the event.
+   * @param url The url of the event
    * @param organizer The organizer of the event.
    * @param rating The rating of the event by the current user (0 if unrated, 1-5 otherwise).
    * @param description The description of the event.

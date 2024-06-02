@@ -45,9 +45,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.rememberNavController
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.github.se.gomeet.ui.mainscreens.LoadingText
@@ -319,7 +317,11 @@ fun OthersProfile(
       }
 }
 
-/** Composable function for the MoreActionsButton. */
+/**
+ * Composable function for the MoreActionsButton.
+ *
+ * @param uid The uid of the user whose profile is currently being viewed
+ */
 @Composable
 fun MoreActionsButton(uid: String, isProfile: Boolean) {
   var showOptionsDialog by remember { mutableStateOf(false) }
@@ -365,6 +367,12 @@ fun MoreActionsButton(uid: String, isProfile: Boolean) {
   }
 }
 
+/**
+ * Composable function for a styled text button
+ *
+ * @param text The text of the button
+ * @param onClick The function to be called when the button is clicked
+ */
 @Composable
 fun StyledTextButton(text: String, onClick: () -> Unit) {
   TextButton(
@@ -381,11 +389,4 @@ fun StyledTextButton(text: String, onClick: () -> Unit) {
             color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
       }
-}
-
-@Preview
-@Composable
-fun OthersProfilePreview() {
-  OthersProfile(
-      nav = NavigationActions(rememberNavController()), "", UserViewModel(""), EventViewModel(null))
 }

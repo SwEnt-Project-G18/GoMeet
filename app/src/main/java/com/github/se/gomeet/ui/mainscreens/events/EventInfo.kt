@@ -65,7 +65,15 @@ import kotlinx.coroutines.launch
 
 private const val TAG = "EventInfo"
 
-/** EventHeader is a composable that displays the header of an event. */
+/**
+ * EventHeader is a composable that displays the header of an event.
+ *
+ * @param eventViewModel The event view model
+ * @param event The event that is being displayed
+ * @param nav The navigation actions
+ * @param rating The rating of the event
+ * @param organiser The organiser of the event
+ */
 @Composable
 fun EventHeader(
     eventViewModel: EventViewModel,
@@ -416,10 +424,14 @@ private fun FavouriteButton(isFavourite: Boolean) {
 /**
  * Helper function to perform the appropriate action when clicking the event button.
  *
- * @param currentUser Current user
- * @param event Event
- * @param userViewModel UserViewModel
+ * @param nav The navigation actions
+ * @param currentUser The current user
+ * @param event The event currently being displayed
+ * @param userViewModel The user view model
+ * @param eventViewModel The event view model
  * @param currentEvent The current event
+ * @param buttons The number corresponding to the button that was clicked
+ * @param callback The callback function to be called when the button is pressed
  */
 private fun eventAction(
     nav: NavigationActions,

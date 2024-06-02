@@ -36,12 +36,16 @@ import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 
+/**
+ * About screen of the settings
+ *
+ * @param nav The navigation actions
+ */
 @Composable
 fun SettingsAbout(
     nav: NavigationActions,
 ) {
   val screenHeight = LocalConfiguration.current.screenHeightDp.dp
-  val screenWidth = LocalConfiguration.current.screenWidthDp.dp
 
   Scaffold(
       modifier = Modifier.testTag("SettingsAbout"),

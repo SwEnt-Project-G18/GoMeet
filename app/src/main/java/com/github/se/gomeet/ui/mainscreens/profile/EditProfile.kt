@@ -75,6 +75,12 @@ import kotlinx.coroutines.tasks.await
 
 private const val TAG = "EditProfile"
 
+/**
+ * Edit Profile screen
+ *
+ * @param nav The navigation actions
+ * @param userViewModel The user view model
+ */
 @Composable
 fun EditProfile(nav: NavigationActions, userViewModel: UserViewModel) {
 

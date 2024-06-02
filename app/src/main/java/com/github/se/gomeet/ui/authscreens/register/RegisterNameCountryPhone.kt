@@ -266,6 +266,15 @@ fun RegisterNameCountryPhone(
       }
 }
 
+/**
+ * Composable function that displays a text field that, when clicked on, allows the user to select a
+ * country from a dropdown menu
+ *
+ * @param total The list of countries
+ * @param textFieldColors The TextFieldColors to use
+ * @param value The value of the text field
+ * @param callback The function to call when the user chooses a country
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CountrySuggestionTextField(

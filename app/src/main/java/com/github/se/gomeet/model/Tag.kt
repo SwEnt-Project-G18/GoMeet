@@ -91,7 +91,7 @@ enum class Tag(val tagName: String) {
     /**
      * Returns the list of strings corresponding to the given list of tags.
      *
-     * @param tagName: The name of the tag to find.
+     * @param tagList: The list of tags to find.
      * @return The Tag object that corresponds to the given tag name, or null if no such tag exists.
      */
     fun tagListToString(tagList: List<Tag>): List<String> {

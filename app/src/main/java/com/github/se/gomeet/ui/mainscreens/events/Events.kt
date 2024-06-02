@@ -70,7 +70,6 @@ private const val TAG = "Events"
 /**
  * Composable function to display the Events screen.
  *
- * @param currentUser String object representing CurrentUserId
  * @param nav NavigationActions object to handle navigation
  * @param userViewModel UserViewModel object to handle users
  * @param eventViewModel EventViewModel object to handle events
@@ -155,7 +154,6 @@ fun Events(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel:
             modifier = Modifier.padding(innerPadding)) {
               Spacer(modifier = Modifier.height(5.dp))
               GoMeetSearchBar(
-                  nav,
                   query,
                   MaterialTheme.colorScheme.secondaryContainer,
                   MaterialTheme.colorScheme.tertiary)
@@ -276,12 +274,7 @@ fun Events(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel:
  */
 @ExperimentalMaterial3Api
 @Composable
-fun GoMeetSearchBar(
-    nav: NavigationActions,
-    query: MutableState<String>,
-    backgroundColor: Color,
-    contentColor: Color
-) {
+fun GoMeetSearchBar(query: MutableState<String>, backgroundColor: Color, contentColor: Color) {
   val customTextSelectionColors =
       TextSelectionColors(handleColor = DarkCyan, backgroundColor = DarkCyan.copy(alpha = 0.4f))
   CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {

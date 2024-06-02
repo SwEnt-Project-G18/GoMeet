@@ -41,6 +41,7 @@ private const val TAG = "UserInviteWidget"
  * @param status the status of the invitation
  * @param initialClicked the initial state of the button
  * @param callback the callback function to update the list of users to invite
+ * @param nav the navigation actions
  */
 @Composable
 fun UserInviteWidget(

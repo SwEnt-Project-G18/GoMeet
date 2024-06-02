@@ -45,11 +45,9 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.github.se.gomeet.R
@@ -60,6 +58,14 @@ import com.google.android.gms.maps.model.LatLng
 import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.launch
 
+/**
+ * Composable function for the search module
+ *
+ * @param nav navigation actions
+ * @param backgroundColor background color of the search bar
+ * @param contentColor color of the content of the search bar
+ * @param currentUID current user's uid
+ */
 @Composable
 fun SearchModule(
     nav: NavigationActions,
@@ -135,6 +141,14 @@ fun SearchModule(
   }
 }
 
+/**
+ * Composable for a search result
+ *
+ * @param item item being displayed
+ * @param nav navigation actions
+ * @param backgroundColor background color of the composable
+ * @param currentUID current user's uid
+ */
 @Composable
 fun SearchModuleSnippet(
     item: SearchViewModel.SearchableItem,
@@ -251,14 +265,4 @@ fun SearchModuleSnippet(
           }
     }
   }
-}
-
-@Preview
-@Composable
-fun PreviewSearchModule() {
-  SearchModule(
-      nav = NavigationActions(rememberNavController()),
-      backgroundColor = MaterialTheme.colorScheme.background,
-      contentColor = MaterialTheme.colorScheme.tertiary,
-      currentUID = "1234")
 }

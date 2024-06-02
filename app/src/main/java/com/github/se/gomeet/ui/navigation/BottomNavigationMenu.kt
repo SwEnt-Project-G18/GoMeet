@@ -13,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.se.gomeet.ui.theme.TranslucentCyan
 
@@ -23,6 +22,8 @@ import com.github.se.gomeet.ui.theme.TranslucentCyan
  * @param onTabSelect callback for when a tab is selected
  * @param tabList list of top level destinations
  * @param selectedItem the currently selected item
+ * @param containerColor container color to use
+ * @param selectedColor color to use for the selected menu item
  */
 @Composable
 fun BottomNavigationMenu(
@@ -62,14 +63,4 @@ fun BottomNavigationMenu(
                   indicatorColor = TranslucentCyan))
     }
   }
-}
-
-@Preview
-@Composable
-fun PreviewBottomNavigationMenu() {
-  BottomNavigationMenu(
-      onTabSelect = {},
-      tabList = TOP_LEVEL_DESTINATIONS,
-      selectedItem = Route.NOTIFICATIONS,
-  )
 }
