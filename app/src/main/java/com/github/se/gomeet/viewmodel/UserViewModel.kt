@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.Invitation
 import com.github.se.gomeet.model.event.InviteStatus
+import com.github.se.gomeet.model.repository.EventRepository
 import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.model.user.GoMeetUser
 import java.util.UUID
@@ -155,12 +156,23 @@ class UserViewModel(val currentUID: String? = null) : ViewModel() {
   }
 
   /**
-   * Delete the user.
+   * Delete the user. It removes all the events the user creates. leaves the events the user joined,
+   * clears following/following lists and cancels pending invitations.
    *
-   * @param uid the user id
+   * @param uid the user id (optional, by default it is the current user id)
    */
-  fun deleteUser(uid: String) {
-    UserRepository.removeUser(uid)
+  fun deleteUser(uid: String = currentUID!!) {
+    viewModelScope.launch {
+      val user = getUser(uid)
+      if (user == null) {
+        Log.e(TAG, "Unable to delete user $uid: not found")
+        return@launch
+      }
+      user.myEvents.forEach { eventId -> EventRepository.removeEvent(eventId) }
+      UserRepository.removeFollowersFollowing(uid)
+      user.joinedEvents.forEach { eventID -> EventRepository.leaveEvent(eventID, uid) }
+      UserRepository.removeUser(uid)
+    }
   }
 
   /**
@@ -184,21 +196,6 @@ class UserViewModel(val currentUID: String? = null) : ViewModel() {
       } else {
         editUser(goMeetUser.copy(joinedEvents = goMeetUser.joinedEvents.plus(eventId)))
       }
-    } catch (e: Exception) {
-      Log.w(TAG, "Couldn't join the event", e)
-    }
-  }
-
-  /**
-   * Leave an event.
-   *
-   * @param eventId The id of the event to leave.
-   * @param userId The id of the user leaving the event.
-   */
-  suspend fun leaveEvent(eventId: String, userId: String = currentUID!!) {
-    try {
-      val goMeetUser = getUser(userId)!!
-      editUser(goMeetUser.copy(joinedEvents = goMeetUser.joinedEvents.minus(eventId)))
     } catch (e: Exception) {
       Log.w(TAG, "Couldn't join the event", e)
     }
@@ -239,16 +236,16 @@ class UserViewModel(val currentUID: String? = null) : ViewModel() {
   /**
    * Removes the given event from the user's list of favorites.
    *
-   * @param eventId The id of the event to remove from favorites.
    * @param userId The id of the user for which we remove the event from favorites.
+   * @param eventId The id of the event to remove from favorites.
+   * @param eventIds The list of event IDs to remove from favorites.
    */
-  suspend fun removeFavoriteEvent(eventId: String, userId: String = currentUID!!) {
-    try {
-      val goMeetUser = getUser(userId)!!
-      editUser(goMeetUser.copy(myFavorites = goMeetUser.myFavorites.minus(eventId)))
-    } catch (e: Exception) {
-      Log.w(TAG, "Couldn't remove the event from favorites", e)
-    }
+  fun removeFavouriteEvent(
+      userId: String = currentUID!!,
+      eventId: String = "",
+      eventIds: List<String> = emptyList()
+  ) {
+    viewModelScope.launch { UserRepository.removeFavouriteEvents(userId, eventId, eventIds) }
   }
 
   /**

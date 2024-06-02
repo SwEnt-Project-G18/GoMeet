@@ -95,10 +95,20 @@ fun OthersProfile(
       isFollowing = viewedUser.value?.followers?.contains(currentUID) ?: false
       followerCount = viewedUser.value?.followers?.size ?: 0
 
-      val allEvents =
-          (eventViewModel.getAllEvents() ?: emptyList()).filter { e ->
-            viewedUser.value!!.joinedEvents.contains(e.eventID) && e.public
+      val allEvents = mutableListOf<Event>()
+      eventViewModel.getAllEvents { events ->
+        events?.forEach { e ->
+          if (viewedUser.value!!.joinedEvents.contains(e.eventID) && e.public) {
+            allEvents.add(e)
+            if (e.isPastEvent()) {
+              myHistoryList.add(e)
+            } else {
+              joinedEventsList.add(e)
+            }
           }
+        }
+      }
+
       allEvents.forEach {
         if (!it.isPastEvent()) {
           joinedEventsList.add(it)

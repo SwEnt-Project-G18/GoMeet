@@ -98,6 +98,30 @@ class UserRepository private constructor() {
     }
 
     /**
+     * Function that removes user uid from all other users' following and followers lists.
+     *
+     * @param uid the user id
+     */
+    fun removeFollowersFollowing(uid: String) {
+      getAllUsers { users ->
+        users.forEach { user ->
+          if (user.uid != uid) {
+            val newFollowing = user.following.filter { f -> f != uid }
+            val newFollowers = user.followers.filter { f -> f != uid }
+            Firebase.firestore
+                .collection(USERS_COLLECTION)
+                .document(user.uid)
+                .update(FOLLOWING, newFollowing)
+            Firebase.firestore
+                .collection(USERS_COLLECTION)
+                .document(user.uid)
+                .update(FOLLOWERS, newFollowers)
+          }
+        }
+      }
+    }
+
+    /**
      * Upload a user profile image to Firebase Storage and return the download URL.
      *
      * @param userId the user ID
@@ -122,7 +146,8 @@ class UserRepository private constructor() {
     }
 
     /**
-     * Remove a user from the database.
+     * Remove a user from the database. Caution: This function doesn't update ant lists that need to
+     * be updated as a consequence of the deletion.
      *
      * @param uid the user id
      */
@@ -135,6 +160,13 @@ class UserRepository private constructor() {
           .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }
     }
 
+    /**
+     * Function to update a user's rating
+     *
+     * @param userID the user id
+     * @param newRating the new rating
+     * @param oldRating the old rating
+     */
     suspend fun updateUserRating(userID: String, newRating: Long, oldRating: Long) {
 
       if (oldRating == newRating ||
@@ -164,6 +196,51 @@ class UserRepository private constructor() {
       Log.d(
           TAG,
           "Updating rating of user($oldRating to $newRating) ${userID} from ${oldUserRating} to ${newUserRating}")
+    }
+
+    /**
+     * Remove the mentioned favourite events from the user's favourite events list.
+     *
+     * @param userID the user id
+     * @param eventID the event id (defaults to "")
+     * @param eventIDs the list of event ids (defaults to emptyList())
+     */
+    suspend fun removeFavouriteEvents(
+        userID: String,
+        eventID: String = "",
+        eventIDs: List<String> = emptyList()
+    ) {
+      val eventsToRemove =
+          (if (eventID == "" || eventIDs.contains(eventID)) eventIDs else eventIDs.plus(eventID))
+              .toSet()
+      if (eventsToRemove.isEmpty()) {
+        Log.w(TAG, "Can't remove favourites for user $userID: called with no events to remove")
+        return
+      }
+      val user = Firebase.firestore.collection(USERS_COLLECTION).document(userID).get().await()
+      val myFavorites = user.get(MY_FAVORITES) as List<String>
+      val newMyFavorites = myFavorites.toSet().minus(eventsToRemove).toList()
+      Firebase.firestore
+          .collection(USERS_COLLECTION)
+          .document(userID)
+          .update(MY_FAVORITES, newMyFavorites)
+    }
+
+    /**
+     * Removes eventID from user userID's joined events list. Caution: no checks are performed
+     * (don't call this function if the user created the event)
+     *
+     * @param userID the user id
+     * @param eventID the event id
+     */
+    suspend fun leaveEvent(userID: String, eventID: String) {
+      val user = Firebase.firestore.collection(USERS_COLLECTION).document(userID).get().await()
+      val joinedEvents = user.get(JOINED_EVENTS) as List<String>
+      val newJoinedEvents = joinedEvents.toSet().minus(eventID).toList()
+      Firebase.firestore
+          .collection(USERS_COLLECTION)
+          .document(userID)
+          .update(JOINED_EVENTS, newJoinedEvents)
     }
 
     /**

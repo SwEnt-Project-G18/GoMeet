@@ -88,9 +88,63 @@ class EventRepository private constructor() {
             callback(eventList)
           }
           .addOnFailureListener { exception ->
-            Log.w(TAG, "Error getting documents.", exception)
+            Log.w(TAG, "Error getting all events", exception)
             callback(null)
           }
+    }
+
+    /**
+     * This function enables a user (or a list of users) to leave an event
+     *
+     * @param eventID The event ID for the user(s) to leave
+     * @param userID The user ID if there is only one (default is "")
+     * @param userIDs The list of user IDs (default is emptyList())
+     */
+    suspend fun leaveEvent(
+        eventID: String,
+        userID: String = "",
+        userIDs: List<String> = emptyList()
+    ) {
+
+      val usersToRemove =
+          if (userIDs.contains(userID) || userID == "") userIDs else userIDs.plus(userID)
+      if (usersToRemove.isEmpty()) {
+        Log.w(TAG, "Returning from leave event $eventID: called with no user to remove")
+        return
+      }
+
+      val event: Event? =
+          Firebase.firestore
+              .collection(EVENT_COLLECTION)
+              .document(eventID)
+              .get()
+              .await()
+              .data
+              ?.toEvent()
+      if (event == null) {
+        Log.e(TAG, "Error leaving event $eventID: unfindable event")
+        return
+      }
+
+      // Can't leave the event if you're the creator
+      val newParticipants = event.participants.minus(usersToRemove.toSet().minus(event.creator))
+      val newPendingParticipants = event.pendingParticipants.minus(usersToRemove.toSet())
+
+      Firebase.firestore
+          .collection(EVENT_COLLECTION)
+          .document(eventID)
+          .update(PARTICIPANTS, newParticipants.toList())
+
+      Firebase.firestore
+          .collection(EVENT_COLLECTION)
+          .document(eventID)
+          .update(PENDING_PARTICIPANTS, newPendingParticipants.toList())
+
+      // Update user's joinedEvents field (again, check that the user is not the creator before
+      // removing them)
+      usersToRemove.forEach { uid ->
+        if (event.creator != uid) UserRepository.leaveEvent(uid, eventID)
+      }
     }
 
     /**
@@ -168,14 +222,15 @@ class EventRepository private constructor() {
     }
 
     /**
-     * This function removes an event from the database
+     * This function removes an event from the database caution: function doesn't update any other
+     * fields, like for instance user's joinedEvents field
      *
-     * @param uid The event ID
+     * @param eid The event ID
      */
-    fun removeEvent(uid: String) {
+    fun removeEvent(eid: String) {
       Firebase.firestore
           .collection(EVENT_COLLECTION)
-          .document(uid)
+          .document(eid)
           .delete()
           .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully deleted!") }
           .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }
