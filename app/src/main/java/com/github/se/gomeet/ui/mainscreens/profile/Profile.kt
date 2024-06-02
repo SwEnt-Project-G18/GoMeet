@@ -103,18 +103,20 @@ fun Profile(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel
   LaunchedEffect(Unit) {
     coroutineScope.launch {
       currentUser = userViewModel.getUser(userId)
-      val allEvents =
-          (eventViewModel.getAllEvents() ?: emptyList()).filter { e ->
-            currentUser!!.joinedEvents.contains(e.eventID)
+      val allEvents = mutableListOf<Event>()
+      eventViewModel.getAllEvents { events ->
+        events?.forEach { e ->
+          if (currentUser!!.joinedEvents.contains(e.eventID)) {
+            allEvents.add(e)
+            if (!e.isPastEvent()) {
+              joinedEventsList.add(e)
+            } else {
+              myHistoryList.add(e)
+            }
           }
-      allEvents.forEach {
-        if (!it.isPastEvent()) {
-          joinedEventsList.add(it)
-        } else {
-          myHistoryList.add(it)
         }
+        isProfileLoaded = true
       }
-      isProfileLoaded = true
     }
   }
   Scaffold(

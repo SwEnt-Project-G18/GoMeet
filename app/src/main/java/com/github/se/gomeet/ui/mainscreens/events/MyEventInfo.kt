@@ -3,7 +3,6 @@ package com.github.se.gomeet.ui.mainscreens.events
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
-import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -350,7 +349,7 @@ fun MyEventInfo(
     }
 
     if (showDeleteEventDialog) {
-      DeleteEventDialog(
+      ConfirmDialog(
           onConfirm = {
             coroutineScope.launch {
               myEvent.value!!.participants.forEach { participant ->
@@ -369,7 +368,7 @@ fun MyEventInfo(
 
               allUsers!!.forEach { user ->
                 if (user.myFavorites.contains(eventId)) {
-                  userViewModel.removeFavoriteEvent(eventId, user.uid)
+                  userViewModel.removeFavouriteEvent(eventId)
                 }
               }
 
@@ -377,7 +376,9 @@ fun MyEventInfo(
               nav.goBack()
             }
           },
-          onDismiss = { showDeleteEventDialog = false })
+          onDismiss = { showDeleteEventDialog = false },
+          confirmationMessage = "Are you sure you want to delete this event?",
+          title = "Delete Event")
     }
   }
 }
@@ -448,35 +449,49 @@ private fun MapViewComposable(
  *
  * @param onConfirm Callback function to be called when the user confirms the deletion
  * @param onDismiss Callback function to be called when the user dismisses the dialog
+ * @param confirmationMessage Message to be displayed in the dialog
+ * @param title Title of the dialog
  */
 @Composable
-fun DeleteEventDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
-  AlertDialog(
-      onDismissRequest = onDismiss,
-      confirmButton = {
-        Button(
-            onClick = onConfirm,
-            colors =
-                ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.outlineVariant)) {
-              Text("Confirm", color = Color.White)
-            }
-      },
-      dismissButton = {
-        Button(
-            onClick = onDismiss,
-            colors =
-                ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer)) {
-              Text("Cancel", color = MaterialTheme.colorScheme.onBackground)
-            }
-      },
-      title = { Text("Delete Event") },
-      text = {
-        Text(
-            "Are you sure you want to delete this event?",
-            modifier = Modifier.testTag("DeleteEventConfirmationText"))
-      },
-      containerColor = MaterialTheme.colorScheme.background,
-  )
+fun ConfirmDialog(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+    confirmationMessage: String,
+    title: String
+) {
+
+  var confirmed by remember { mutableStateOf(false) }
+  if (confirmed) {
+    LoadingText()
+  } else {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+          Button(
+              onClick = {
+                confirmed = true
+                onConfirm()
+              },
+              colors =
+                  ButtonDefaults.buttonColors(
+                      containerColor = MaterialTheme.colorScheme.outlineVariant)) {
+                Text("Confirm", color = Color.White)
+              }
+        },
+        dismissButton = {
+          Button(
+              onClick = onDismiss,
+              colors =
+                  ButtonDefaults.buttonColors(
+                      containerColor = MaterialTheme.colorScheme.primaryContainer)) {
+                Text("Cancel", color = MaterialTheme.colorScheme.onBackground)
+              }
+        },
+        title = { Text(title) },
+        text = {
+          Text(confirmationMessage, modifier = Modifier.testTag("DeleteEventConfirmationText"))
+        },
+        containerColor = MaterialTheme.colorScheme.background,
+    )
+  }
 }

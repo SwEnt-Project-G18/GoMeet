@@ -19,6 +19,7 @@ import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.Post
 import com.github.se.gomeet.model.event.location.Location
 import com.github.se.gomeet.model.repository.EventRepository
+import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.model.user.GoMeetUser
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
@@ -146,13 +147,13 @@ class EventViewModel(val currentUID: String? = null) : ViewModel() {
   /**
    * Get an event by its UID.
    *
-   * @param uid the UID of the event to get
+   * @param eid the UID of the event to get
    * @return the event with the given UID, or null if it does not exist
    */
-  suspend fun getEvent(uid: String): Event? {
+  suspend fun getEvent(eid: String): Event? {
     return try {
       val event = CompletableDeferred<Event?>()
-      EventRepository.getEvent(uid) { t -> event.complete(t) }
+      EventRepository.getEvent(eid) { t -> event.complete(t) }
       event.await()
     } catch (e: Exception) {
       null
@@ -211,14 +212,29 @@ class EventViewModel(val currentUID: String? = null) : ViewModel() {
         ?: throw Exception("Failed to upload image and retrieve URL")
   }
 
-  /** Get all events that exist in the database. */
-  suspend fun getAllEvents(): List<Event>? {
-    return try {
+  /**
+   * Get all events that exist in the database. Also removes phantom favourite events from the
+   * current user's favourites list. Caution: will throw null pointer exception if currentUID is
+   * null (this function shouldn't get called as long as no user has signed in).
+   *
+   * @param callback the function to call with the list of events.
+   */
+  fun getAllEvents(callback: (List<Event>?) -> Unit) {
+    viewModelScope.launch {
       val event = CompletableDeferred<List<Event>?>()
       EventRepository.getAllEvents { t -> event.complete(t) }
-      event.await()
-    } catch (e: Exception) {
-      null
+      val events = event.await()
+      callback(events)
+
+      // Prevent favourite events from being displayed if they are not in the database
+      if (events != null) {
+        val illegalEvents = mutableSetOf<String>()
+        UserRepository.getUser(currentUID!!) { user ->
+          if (user == null) return@getUser
+          illegalEvents.addAll(user.myFavorites.toSet().minus(events.map { it.eventID }.toSet()))
+        }
+        UserRepository.removeFavouriteEvents(currentUID, eventIDs = illegalEvents.toList())
+      }
     }
   }
 
@@ -346,10 +362,23 @@ class EventViewModel(val currentUID: String? = null) : ViewModel() {
    * Remove an event by its UID.
    *
    * @param eventID the ID of the event to remove
+   * @param callback the function to call after the event has been removed (optional)
    */
-  fun removeEvent(eventID: String) {
+  fun removeEvent(eventID: String, callback: () -> Unit = {}) {
     lastLoadedEvents = lastLoadedEvents.filter { it.eventID != eventID }
-    EventRepository.removeEvent(eventID)
+    viewModelScope.launch {
+      val event = getEvent(eventID)
+      if (event == null) {
+        Log.e(TAG, "Event with ID $eventID couldn't be found to delete")
+        return@launch
+      }
+      event.participants.forEach { participant -> EventRepository.leaveEvent(eventID, participant) }
+      event.pendingParticipants.forEach { pendingParticipant ->
+        cancelInvitation(event, pendingParticipant)
+      }
+      EventRepository.removeEvent(eventID)
+      callback()
+    }
   }
 
   /**
@@ -371,15 +400,15 @@ class EventViewModel(val currentUID: String? = null) : ViewModel() {
    * Update the event participants field by removing the given user to the list. Note that this
    * function should be called at the same time as the equivalent function in the UserViewModel.
    *
-   * @param event the event to update
+   * @param eventID the ID of the event to update
    * @param userId the ID of the user to remove from the event
+   * @param callback the function to call after the user has left the event (optional)
    */
-  fun leaveEvent(event: Event, userId: String) {
-    if (!event.participants.contains(userId)) {
-      Log.w(TAG, "User $userId is has never joined event ${event.eventID}")
-      return
+  fun leaveEvent(eventID: String, userId: String, callback: () -> Unit = {}) {
+    viewModelScope.launch {
+      EventRepository.leaveEvent(eventID, userId)
+      callback()
     }
-    editEvent(event.copy(participants = event.participants.minus(userId)))
   }
 
   /**

@@ -11,11 +11,15 @@ import androidx.compose.ui.test.performTextInput
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.R
+import com.github.se.gomeet.model.event.Event
+import com.github.se.gomeet.model.repository.EventRepository
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventCreationViewModel
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import io.github.kakaocup.kakao.common.utilities.getResourceString
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
 import org.junit.AfterClass
 import org.junit.Rule
@@ -37,14 +41,21 @@ class CreateEventTest {
     fun tearDown() = runBlocking {
 
       // Clean up the events
-      eventVM.getAllEvents()?.forEach { eventVM.removeEvent(it.eventID) }
-
-      return@runBlocking
+      val events = mutableListOf<Event>()
+      val latch = CountDownLatch(1)
+      eventVM.getAllEvents {
+        if (it != null) {
+          events.addAll(it)
+          latch.countDown()
+        }
+      }
+      assert(latch.await(3, TimeUnit.SECONDS))
+      events.forEach { event -> EventRepository.removeEvent(event.eventID) }
     }
   }
 
   @Test
-  fun testCratePrivateEvent() {
+  fun testCreatePrivateEvent() {
     val eventVM = EventViewModel(uid)
 
     composeTestRule.setContent {

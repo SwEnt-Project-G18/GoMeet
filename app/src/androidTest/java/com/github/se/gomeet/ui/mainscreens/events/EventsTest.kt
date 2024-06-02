@@ -5,7 +5,10 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.R
+import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.location.Location
+import com.github.se.gomeet.model.repository.EventRepository
+import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
@@ -14,6 +17,8 @@ import com.google.firebase.ktx.Firebase
 import io.github.kakaocup.kakao.common.utilities.getResourceString
 import java.time.LocalDate
 import java.time.LocalTime
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
 import org.junit.AfterClass
@@ -87,12 +92,20 @@ class EventsTest {
     @AfterClass
     @JvmStatic
     fun tearDown() = runBlocking {
-      // Clean up the event
-      eventVM.getAllEvents()?.forEach { eventVM.removeEvent(it.eventID) }
-
+      // Clean up the events
+      val events = mutableListOf<Event>()
+      val latch = CountDownLatch(1)
+      eventVM.getAllEvents {
+        if (it != null) {
+          events.addAll(it)
+          latch.countDown()
+        }
+      }
+      assert(latch.await(3, TimeUnit.SECONDS))
+      events.forEach { event -> EventRepository.removeEvent(event.eventID) }
       // Clean up the user
+      UserRepository.removeUser(uid)
       Firebase.auth.currentUser?.delete()?.await()
-      userVM.deleteUser(uid)
 
       return@runBlocking
     }

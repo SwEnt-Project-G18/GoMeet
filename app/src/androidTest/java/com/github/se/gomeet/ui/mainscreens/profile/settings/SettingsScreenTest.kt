@@ -12,6 +12,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.R
 import com.github.se.gomeet.ui.navigation.NavigationActions
+import com.github.se.gomeet.viewmodel.UserViewModel
 import io.github.kakaocup.kakao.common.utilities.getResourceString
 import org.junit.Rule
 import org.junit.Test
@@ -23,7 +24,9 @@ class SettingsScreenTest {
 
   @Test
   fun testSettingsScreen() {
-    composeTestRule.setContent { SettingsScreen(NavigationActions(rememberNavController())) {} }
+    composeTestRule.setContent {
+      SettingsScreen(NavigationActions(rememberNavController()), UserViewModel()) {}
+    }
 
     composeTestRule.waitForIdle()
 

@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.ui.mainscreens.Trends
 import com.github.se.gomeet.ui.mainscreens.create.Create
 import com.github.se.gomeet.ui.mainscreens.events.Events
@@ -129,10 +130,10 @@ class NavigationTest {
 
     @AfterClass
     @JvmStatic
-    fun tearDown() = runBlocking {
+    fun tearDown(): Unit = runBlocking {
       // Clean up the user view model
+      UserRepository.removeUser(currentUserId)
       Firebase.auth.currentUser!!.delete().await()
-      userVM.deleteUser(currentUserId)
     }
   }
 }

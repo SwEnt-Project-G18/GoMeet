@@ -18,7 +18,10 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
 import com.github.se.gomeet.MainActivity
 import com.github.se.gomeet.R
+import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.location.Location
+import com.github.se.gomeet.model.repository.EventRepository
+import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.screens.AddParticipantsScreen
 import com.github.se.gomeet.screens.CreateEventScreen
 import com.github.se.gomeet.screens.CreateScreen
@@ -38,6 +41,7 @@ import io.github.kakaocup.compose.node.element.ComposeScreen
 import io.github.kakaocup.kakao.common.utilities.getResourceString
 import java.time.LocalDate
 import java.time.LocalTime
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
@@ -155,13 +159,21 @@ class EndToEndTest3 : TestCase() {
     @JvmStatic
     fun tearDown() = runBlocking {
 
-      // clean up the event
-      eventVM.getAllEvents()?.forEach { eventVM.removeEvent(it.eventID) }
-
+      // clean up the events
+      val events = mutableListOf<Event>()
+      val latch = CountDownLatch(1)
+      eventVM.getAllEvents {
+        if (it != null) {
+          events.addAll(it)
+          latch.countDown()
+        }
+      }
+      assert(latch.await(3, TimeUnit.SECONDS))
+      events.forEach { event -> EventRepository.removeEvent(event.eventID) }
       // clean up the users
+      UserRepository.removeUser(uid1)
+      UserRepository.removeUser(uid2)
       Firebase.auth.currentUser?.delete()?.await()
-      userVM.deleteUser(uid1)
-      userVM.deleteUser(uid2)
       Firebase.auth.signInWithEmailAndPassword(email2, pwd2).await()
       Firebase.auth.currentUser?.delete()?.await()
 

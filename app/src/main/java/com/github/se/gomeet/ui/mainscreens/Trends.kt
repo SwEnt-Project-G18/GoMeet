@@ -106,7 +106,11 @@ fun Trends(
       } else {
         Log.e(TAG, "Current user is null")
       }
-      eventList.addAll(eventViewModel.getAllEvents()!!.filter { it.display(currentUserId) })
+      eventViewModel.getAllEvents { events ->
+        if (events != null) {
+          eventList.addAll(events.filter { it.display(currentUserId) })
+        }
+      }
 
       eventsLoaded.value = true
     }

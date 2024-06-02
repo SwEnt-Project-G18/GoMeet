@@ -89,10 +89,15 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
       locationPermissionLauncher.launch(locationPermissions)
     }
     val currentUser = eventViewModel.currentUID!!
-    val allEvents = eventViewModel.getAllEvents()
-    if (allEvents != null) {
-      eventList.value = allEvents.filter { e -> e.display(currentUser) }
-      nonFilteredEvents.value = allEvents.filter { e -> e.display(currentUser) }
+    val allEvents = mutableListOf<Event>()
+    eventViewModel.getAllEvents { events ->
+      events?.forEach { e ->
+        allEvents.add(e)
+        if (e.display(currentUser)) {
+          eventList.value = eventList.value.plus(e)
+          nonFilteredEvents.value = nonFilteredEvents.value.plus(e)
+        }
+      }
     }
 
     // wait for user input

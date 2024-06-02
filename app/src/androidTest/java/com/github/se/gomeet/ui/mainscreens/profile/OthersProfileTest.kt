@@ -14,6 +14,7 @@ import androidx.compose.ui.test.performClick
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.R
+import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
@@ -95,8 +96,8 @@ class OthersProfileTest {
     fun tearDown() = runBlocking {
       // clean up the users
       Firebase.auth.currentUser?.delete()?.await()
-      userVM.deleteUser(uid1)
-      userVM.deleteUser(uid2)
+      UserRepository.removeUser(uid1)
+      UserRepository.removeUser(uid2)
       Firebase.auth.signInWithEmailAndPassword(email2, pwd2).await()
       Firebase.auth.currentUser?.delete()?.await()
       return@runBlocking

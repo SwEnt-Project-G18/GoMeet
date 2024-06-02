@@ -8,8 +8,11 @@ import androidx.lifecycle.viewModelScope
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.Invitation
 import com.github.se.gomeet.model.event.InviteStatus
+import com.github.se.gomeet.model.repository.EventRepository
 import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.model.user.GoMeetUser
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import java.util.UUID
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
@@ -157,12 +160,26 @@ class UserViewModel(val currentUID: String? = null) : ViewModel() {
   }
 
   /**
-   * Delete the user.
+   * Delete the user. It removes all the events the user creates. leaves the events the user joined,
+   * clears following/following lists and cancels pending invitations.
    *
-   * @param uid the user id
+   * @param uid the user id (optional, by default it is the current user id)
+   * @param callback the callback to be executed after the user is deleted (optional)
    */
-  fun deleteUser(uid: String) {
-    UserRepository.removeUser(uid)
+  fun deleteUser(uid: String = currentUID!!, callback: () -> Unit = {}) {
+    viewModelScope.launch {
+      val user = getUser(uid)
+      if (user == null) {
+        Log.e(TAG, "Unable to delete user $uid: not found")
+        return@launch
+      }
+      user.myEvents.forEach { eventId -> EventRepository.removeEvent(eventId) }
+      UserRepository.removeFollowersFollowing(uid)
+      user.joinedEvents.forEach { eventID -> EventRepository.leaveEvent(eventID, uid) }
+      UserRepository.removeUser(uid)
+      Firebase.auth.currentUser!!.delete()
+      callback()
+    }
   }
 
   /**
@@ -186,21 +203,6 @@ class UserViewModel(val currentUID: String? = null) : ViewModel() {
       } else {
         editUser(goMeetUser.copy(joinedEvents = goMeetUser.joinedEvents.plus(eventId)))
       }
-    } catch (e: Exception) {
-      Log.w(TAG, "Couldn't join the event", e)
-    }
-  }
-
-  /**
-   * Leave an event.
-   *
-   * @param eventId The id of the event to leave.
-   * @param userId The id of the user leaving the event.
-   */
-  suspend fun leaveEvent(eventId: String, userId: String = currentUID!!) {
-    try {
-      val goMeetUser = getUser(userId)!!
-      editUser(goMeetUser.copy(joinedEvents = goMeetUser.joinedEvents.minus(eventId)))
     } catch (e: Exception) {
       Log.w(TAG, "Couldn't join the event", e)
     }
@@ -239,17 +241,37 @@ class UserViewModel(val currentUID: String? = null) : ViewModel() {
   }
 
   /**
+   * Function to leave an event.
+   *
+   * @param eventId The id of the event to leave.
+   * @param userId The id of the user leaving the event (optional, by default it is the current user
+   *   id).
+   */
+  fun leaveEvent(eventId: String, userId: String = currentUID!!, callback: () -> Unit = {}) {
+    viewModelScope.launch {
+      EventRepository.leaveEvent(eventId, userId)
+      callback()
+    }
+  }
+
+  /**
    * Removes the given event from the user's list of favorites.
    *
-   * @param eventId The id of the event to remove from favorites.
    * @param userId The id of the user for which we remove the event from favorites.
+   * @param eventId The id of the event to remove from favorites.
+   * @param eventIds The list of event IDs to remove from favorites.
+   * @param callback The callback to be executed after the event is removed from favorites
+   *   (optional).
    */
-  suspend fun removeFavoriteEvent(eventId: String, userId: String = currentUID!!) {
-    try {
-      val goMeetUser = getUser(userId)!!
-      editUser(goMeetUser.copy(myFavorites = goMeetUser.myFavorites.minus(eventId)))
-    } catch (e: Exception) {
-      Log.w(TAG, "Couldn't remove the event from favorites", e)
+  fun removeFavouriteEvent(
+      userId: String = currentUID!!,
+      eventId: String = "",
+      eventIds: List<String> = emptyList(),
+      callback: () -> Unit = {}
+  ) {
+    viewModelScope.launch {
+      UserRepository.removeFavouriteEvents(userId, eventId, eventIds)
+      callback()
     }
   }
 

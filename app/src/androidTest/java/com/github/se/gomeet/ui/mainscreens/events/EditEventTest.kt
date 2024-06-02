@@ -11,13 +11,17 @@ import androidx.compose.ui.test.performScrollTo
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.R
+import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.location.Location
+import com.github.se.gomeet.model.repository.EventRepository
+import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
 import com.github.se.gomeet.viewmodel.UserViewModel
 import io.github.kakaocup.kakao.common.utilities.getResourceString
 import java.time.LocalDate
 import java.time.LocalTime
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
 import org.junit.AfterClass
@@ -32,11 +36,16 @@ class EditEventTest {
 
   companion object {
     private lateinit var eventUid: String
-    private val eventVM = EventViewModel("")
+    private val uid = "EditEventTestUserUid"
+    private val eventVM = EventViewModel(uid)
+    private val userVM = UserViewModel(uid)
 
     @JvmStatic
     @BeforeClass
     fun setup() = runBlocking {
+      // Create a user
+      userVM.createUserIfNew(uid, "uname", "fn", "ln", "email", "phone", "country")
+
       // Create an event
       eventVM.createEvent(
           "title",
@@ -57,18 +66,25 @@ class EditEventTest {
           UserViewModel(""),
           "eventid")
 
-      while (eventVM.getAllEvents()!!.isEmpty()) {
-        TimeUnit.SECONDS.sleep(1)
-      }
-
-      eventUid = eventVM.getAllEvents()!![0].eventID
+      eventVM.getAllEvents { if (it != null) eventUid = it[0].eventID }
     }
 
     @AfterClass
     @JvmStatic
     fun tearDown() = runBlocking {
-      // Clean up the event
-      eventVM.getAllEvents()?.forEach { eventVM.removeEvent(it.eventID) }
+      // Clean up the user
+      UserRepository.removeUser(uid)
+      // Clean up the events
+      val events = mutableListOf<Event>()
+      val latch = CountDownLatch(1)
+      eventVM.getAllEvents {
+        if (it != null) {
+          events.addAll(it)
+          latch.countDown()
+        }
+      }
+      assert(latch.await(3, TimeUnit.SECONDS))
+      events.forEach { event -> EventRepository.removeEvent(event.eventID) }
 
       return@runBlocking
     }
