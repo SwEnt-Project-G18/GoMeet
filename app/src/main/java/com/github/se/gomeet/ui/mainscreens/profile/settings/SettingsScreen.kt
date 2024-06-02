@@ -51,11 +51,9 @@ import com.github.se.gomeet.viewmodel.UserViewModel
 /**
  * Composable function for the profile Settings screen.
  *
- * @param nav The navigation actions for the screen.
-<<<<<<< HEAD
- * @param userViewModel The view model for the user (to delete the account).
-=======
->>>>>>> f672fdec067d471ff33e98d50ae036e48c8a88bf
+ * @param nav The navigation actions for the screen. <<<<<<< HEAD
+ * @param userViewModel The view model for the user (to delete the account). ======= >>>>>>>
+ *   f672fdec067d471ff33e98d50ae036e48c8a88bf
  * @param logOut The navigation action to go back to the start screen after signing out.
  */
 @Composable
