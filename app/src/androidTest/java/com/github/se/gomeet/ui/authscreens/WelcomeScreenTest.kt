@@ -44,7 +44,7 @@ class WelcomeScreenTest {
     composeTestRule.onNodeWithText("Sign Up").assertExists().assertIsDisplayed()
     composeTestRule.onNodeWithContentDescription("Google logo").assertIsDisplayed().performClick()
 
-    // Assert that an Intent to Google Mobile Services has been sent
+    // Assert that an Intent to Google Mobile Services has been sent.
     intended(toPackage("com.google.android.gms"))
   }
 
