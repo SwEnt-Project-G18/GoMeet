@@ -3,9 +3,12 @@ package com.github.se.gomeet.viewmodel
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.location.Location
+import com.github.se.gomeet.model.repository.EventRepository
+import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.model.user.GoMeetUser
 import java.time.LocalDate
 import java.time.LocalTime
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
 import org.junit.AfterClass
@@ -42,7 +45,7 @@ class UserViewModelTest {
     private lateinit var event: Event
 
     private val userVM = UserViewModel(uid)
-    private val eventVM = EventViewModel(uid)
+    private var eventVM = EventViewModel(uid)
 
     @BeforeClass
     @JvmStatic
@@ -70,16 +73,25 @@ class UserViewModelTest {
         TimeUnit.SECONDS.sleep(1)
       }
       event = eventVM.getEvent("testevent1")!!
-      TimeUnit.SECONDS.sleep(3)
+      TimeUnit.SECONDS.sleep(1)
     }
 
     @AfterClass
     @JvmStatic
     fun tearDown() = runBlocking {
+      val latch = CountDownLatch(1)
       // Clean up the user
-      userVM.deleteUser(uid)
+      UserRepository.removeUser(uid)
       // Clean up the events
-      eventVM.getAllEvents { events -> events?.forEach { eventVM.removeEvent(it.eventID) } }
+      val events = mutableListOf<Event>()
+      eventVM.getAllEvents {
+        if (it != null) {
+          events.addAll(it)
+          latch.countDown()
+        }
+      }
+      assert(latch.await(3, TimeUnit.SECONDS))
+      events.forEach { event -> EventRepository.removeEvent(event.eventID) }
     }
   }
 
@@ -185,14 +197,38 @@ class UserViewModelTest {
   fun leaveEventTest() {
     val eventId = "event4"
 
+    eventVM = EventViewModel("UserViewModelTestUser2")
+    eventVM.createEvent(
+        "title",
+        "description",
+        Location(0.0, 0.0, ""),
+        LocalDate.now(),
+        LocalTime.now(),
+        0.0,
+        "",
+        emptyList(),
+        emptyList(),
+        emptyList(),
+        1,
+        true,
+        emptyList(),
+        emptyList(),
+        null,
+        userVM,
+        eventId)
     // Join an event
     runBlocking { userVM.joinEvent(eventId, uid) }
 
     // Leave the event
-    runBlocking { userVM.leaveEvent(eventId, uid) }
-
+    val latch = CountDownLatch(1)
+    userVM.leaveEvent(eventId, uid) { latch.countDown() }
+    assert(latch.await(3, TimeUnit.SECONDS))
     // Verify that the user's joinedEvents list was correctly updated
     runBlocking { assert(!userVM.getUser(uid)!!.joinedEvents.any { it == eventId }) }
+
+    eventVM.removeEvent(eventId)
+    TimeUnit.SECONDS.sleep(1)
+    eventVM = EventViewModel(uid)
   }
 
   @Test
@@ -216,9 +252,10 @@ class UserViewModelTest {
     // Add an event to the user's favorites
     runBlocking { userVM.editUser(user.copy(myFavorites = listOf(eventId))) }
 
+    val latch = CountDownLatch(1)
     // Remove it from the user's favorites
-    runBlocking { userVM.removeFavouriteEvent(eventId, uid) }
-
+    userVM.removeFavouriteEvent(uid, eventId) { latch.countDown() }
+    assert(latch.await(3, TimeUnit.SECONDS))
     // Make sure that the user's favorites list is empty
     runBlocking { assert(userVM.getUser(uid)!!.myFavorites.isEmpty()) }
   }

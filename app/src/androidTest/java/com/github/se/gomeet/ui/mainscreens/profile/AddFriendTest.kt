@@ -13,6 +13,7 @@ import androidx.compose.ui.test.performClick
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.R
+import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
@@ -75,9 +76,9 @@ class AddFriendTest {
     fun tearDown() = runBlocking {
 
       // Clean up the users
-      Firebase.auth.currentUser?.delete()
-      userVM.deleteUser(uid1)
-      userVM.deleteUser(uid2)
+      UserRepository.removeUser(uid1)
+      UserRepository.removeUser(uid2)
+      Firebase.auth.currentUser?.delete()?.await()
 
       return@runBlocking
     }

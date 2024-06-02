@@ -11,6 +11,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.R
 import com.github.se.gomeet.model.event.location.Location
+import com.github.se.gomeet.model.repository.EventRepository
+import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.ui.mainscreens.notifications.Notifications
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.EventViewModel
@@ -92,8 +94,8 @@ class NotificationsTest {
     @JvmStatic
     fun tearDown() = runBlocking {
       // Clean up the user and the event
-      userVM.deleteUser(uid1)
-      eventVM.removeEvent(eventId)
+      UserRepository.removeUser(uid1)
+      EventRepository.removeEvent(eventId)
 
       return@runBlocking
     }

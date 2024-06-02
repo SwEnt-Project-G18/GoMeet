@@ -359,8 +359,9 @@ class EventViewModel(val currentUID: String? = null) : ViewModel() {
    * Remove an event by its UID.
    *
    * @param eventID the ID of the event to remove
+   * @param callback the function to call after the event has been removed (optional)
    */
-  fun removeEvent(eventID: String) {
+  fun removeEvent(eventID: String, callback: () -> Unit = {}) {
     lastLoadedEvents = lastLoadedEvents.filter { it.eventID != eventID }
     viewModelScope.launch {
       val event = getEvent(eventID)
@@ -373,6 +374,7 @@ class EventViewModel(val currentUID: String? = null) : ViewModel() {
         cancelInvitation(event, pendingParticipant)
       }
       EventRepository.removeEvent(eventID)
+      callback()
     }
   }
 
@@ -397,9 +399,13 @@ class EventViewModel(val currentUID: String? = null) : ViewModel() {
    *
    * @param eventID the ID of the event to update
    * @param userId the ID of the user to remove from the event
+   * @param callback the function to call after the user has left the event (optional)
    */
-  fun leaveEvent(eventID: String, userId: String) {
-    viewModelScope.launch { EventRepository.leaveEvent(eventID, userId) }
+  fun leaveEvent(eventID: String, userId: String, callback: () -> Unit = {}) {
+    viewModelScope.launch {
+      EventRepository.leaveEvent(eventID, userId)
+      callback()
+    }
   }
 
   /**

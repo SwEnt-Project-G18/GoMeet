@@ -12,6 +12,7 @@ import androidx.compose.ui.test.performTextInput
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.R
+import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
@@ -58,8 +59,8 @@ class EditProfileTest {
     @JvmStatic
     fun tearDown() = runBlocking {
       // Clean up the user
+      UserRepository.removeUser(uid)
       Firebase.auth.currentUser!!.delete().await()
-      userVM.deleteUser(uid)
 
       return@runBlocking
     }

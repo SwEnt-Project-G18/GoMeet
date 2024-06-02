@@ -4,9 +4,12 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.se.gomeet.model.Tag
 import com.github.se.gomeet.model.event.Event
 import com.github.se.gomeet.model.event.location.Location
+import com.github.se.gomeet.model.repository.EventRepository
+import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.model.user.GoMeetUser
 import java.time.LocalDate
 import java.time.LocalTime
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -77,8 +80,16 @@ class EventViewModelTest {
     @AfterClass
     @JvmStatic
     fun tearDown() {
-      // Clean up the events
-      eventVM.getAllEvents { events -> events?.forEach { eventVM.removeEvent(it.eventID) } }
+      val events = mutableListOf<Event>()
+      val latch = CountDownLatch(1)
+      eventVM.getAllEvents {
+        if (it != null) {
+          events.addAll(it)
+          latch.countDown()
+        }
+      }
+      assert(latch.await(3, TimeUnit.SECONDS))
+      events.forEach { event -> EventRepository.removeEvent(event.eventID) }
     }
   }
 
@@ -182,14 +193,21 @@ class EventViewModelTest {
     TimeUnit.SECONDS.sleep(1)
 
     val events = mutableListOf<Event>()
-    eventViewModel.getAllEvents { if (it != null) events.addAll(it) }
+    val latch = CountDownLatch(1)
+    eventViewModel.getAllEvents {
+      if (it != null) {
+        events.addAll(it)
+        latch.countDown()
+      }
+    }
+    assert(latch.await(3, TimeUnit.SECONDS))
     EventViewModel.sortEvents(currentUser.tags, events)
     assert(events[0].eventID == eid3)
     assert(events[1].eventID == eventId)
     assert(events[2].eventID == eid1)
     assert(events[3].eventID == eid2)
 
-    userViewModel.deleteUser(userID)
+    UserRepository.removeUser(userID)
   }
 
   @Test
@@ -199,11 +217,17 @@ class EventViewModelTest {
 
   @Test
   fun getAllEventsTest() {
-    runBlocking {
-      val events = mutableListOf<Event>()
-      eventVM.getAllEvents { if (it != null) events.addAll(it) }
-      assert(events.any { it.eventID == eventId })
+    val events = mutableListOf<Event>()
+    val latch = CountDownLatch(1)
+    eventVM.getAllEvents {
+      if (it != null) {
+        events.addAll(it)
+        latch.countDown()
+        // If it is null then there has been an error
+      }
     }
+    assert(latch.await(3, TimeUnit.SECONDS))
+    assert(events.any { it.eventID == eventId })
   }
 
   @Test
@@ -300,14 +324,20 @@ class EventViewModelTest {
   fun leaveEventTest() {
     val userId = "uid6"
 
+    userVM.createUserIfNew(
+        userId, "EventViewModelTest", "firstName", "lastName", "email", "phoneNumber", "country")
+
     // Make a user join the event
     runBlocking { eventVM.joinEvent(eventVM.getEvent(eventId)!!, userId) }
 
     // Make the user leave the event
-    runBlocking { eventVM.leaveEvent(eventId, userId) }
-
+    val latch = CountDownLatch(1)
+    eventVM.leaveEvent(eventId, userId) { latch.countDown() }
+    assert(latch.await(3, TimeUnit.SECONDS))
     // Make sure that the event participants list is empty
     runBlocking { assert(!eventVM.getEvent(eventId)!!.participants.any { it == userId }) }
+
+    UserRepository.removeUser(userId)
   }
 
   @Test

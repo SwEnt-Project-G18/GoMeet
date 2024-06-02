@@ -160,8 +160,9 @@ class UserViewModel(val currentUID: String? = null) : ViewModel() {
    * clears following/following lists and cancels pending invitations.
    *
    * @param uid the user id (optional, by default it is the current user id)
+   * @param callback the callback to be executed after the user is deleted (optional)
    */
-  fun deleteUser(uid: String = currentUID!!) {
+  fun deleteUser(uid: String = currentUID!!, callback: () -> Unit = {}) {
     viewModelScope.launch {
       val user = getUser(uid)
       if (user == null) {
@@ -172,6 +173,7 @@ class UserViewModel(val currentUID: String? = null) : ViewModel() {
       UserRepository.removeFollowersFollowing(uid)
       user.joinedEvents.forEach { eventID -> EventRepository.leaveEvent(eventID, uid) }
       UserRepository.removeUser(uid)
+      callback()
     }
   }
 
@@ -240,8 +242,11 @@ class UserViewModel(val currentUID: String? = null) : ViewModel() {
    * @param userId The id of the user leaving the event (optional, by default it is the current user
    *   id).
    */
-  fun leaveEvent(eventId: String, userId: String = currentUID!!) {
-    viewModelScope.launch { EventRepository.leaveEvent(eventId, userId) }
+  fun leaveEvent(eventId: String, userId: String = currentUID!!, callback: () -> Unit = {}) {
+    viewModelScope.launch {
+      EventRepository.leaveEvent(eventId, userId)
+      callback()
+    }
   }
 
   /**
@@ -250,13 +255,19 @@ class UserViewModel(val currentUID: String? = null) : ViewModel() {
    * @param userId The id of the user for which we remove the event from favorites.
    * @param eventId The id of the event to remove from favorites.
    * @param eventIds The list of event IDs to remove from favorites.
+   * @param callback The callback to be executed after the event is removed from favorites
+   *   (optional).
    */
   fun removeFavouriteEvent(
       userId: String = currentUID!!,
       eventId: String = "",
-      eventIds: List<String> = emptyList()
+      eventIds: List<String> = emptyList(),
+      callback: () -> Unit = {}
   ) {
-    viewModelScope.launch { UserRepository.removeFavouriteEvents(userId, eventId, eventIds) }
+    viewModelScope.launch {
+      UserRepository.removeFavouriteEvents(userId, eventId, eventIds)
+      callback()
+    }
   }
 
   /**
