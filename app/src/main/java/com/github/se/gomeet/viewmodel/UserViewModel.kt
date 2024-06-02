@@ -11,6 +11,8 @@ import com.github.se.gomeet.model.event.InviteStatus
 import com.github.se.gomeet.model.repository.EventRepository
 import com.github.se.gomeet.model.repository.UserRepository
 import com.github.se.gomeet.model.user.GoMeetUser
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import java.util.UUID
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
@@ -173,6 +175,7 @@ class UserViewModel(val currentUID: String? = null) : ViewModel() {
       UserRepository.removeFollowersFollowing(uid)
       user.joinedEvents.forEach { eventID -> EventRepository.leaveEvent(eventID, uid) }
       UserRepository.removeUser(uid)
+      Firebase.auth.currentUser!!.delete()
       callback()
     }
   }

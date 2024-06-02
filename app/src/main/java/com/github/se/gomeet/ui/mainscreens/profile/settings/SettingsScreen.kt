@@ -24,6 +24,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,23 +40,27 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.github.se.gomeet.R
+import com.github.se.gomeet.ui.mainscreens.events.ConfirmDialog
 import com.github.se.gomeet.ui.navigation.BottomNavigationMenu
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.GoMeetTheme
+import com.github.se.gomeet.viewmodel.UserViewModel
 
 /**
  * Composable function for the profile Settings screen.
  *
  * @param nav The navigation actions for the screen.
- * @param authViewModel The view model for the authentication (for signing out)
+ * @param userViewModel The view model for the user (to delete the account).
  * @param logOut The navigation action to go back to the start screen after signing out.
  */
 @Composable
-fun SettingsScreen(nav: NavigationActions, /*userViewModel: UserViewModel*/ logOut: () -> Unit) {
+fun SettingsScreen(nav: NavigationActions, userViewModel: UserViewModel, logOut: () -> Unit) {
   val screenHeight = LocalConfiguration.current.screenHeightDp.dp
   val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+  var deleting by remember { mutableStateOf(false) }
+  var signingOut by remember { mutableStateOf(false) }
   GoMeetTheme {
     Scaffold(
         modifier = Modifier.testTag("SettingsScreen"),
@@ -94,80 +102,97 @@ fun SettingsScreen(nav: NavigationActions, /*userViewModel: UserViewModel*/ logO
               tabList = TOP_LEVEL_DESTINATIONS,
               selectedItem = Route.PROFILE)
         }) { innerPadding ->
-          Column(
-              modifier =
-                  Modifier.padding(innerPadding)
-                      .verticalScroll(rememberScrollState())
-                      .testTag("Settings"),
-              horizontalAlignment = Alignment.CenterHorizontally,
-              verticalArrangement = Arrangement.Center) {
-                SettingsSubtitle(
-                    "Who can see your content", Modifier.padding(15.dp).align(Alignment.Start))
+          if (deleting) {
+            ConfirmDialog(
+                onConfirm = { userViewModel.deleteUser { logOut() } },
+                onDismiss = { deleting = false },
+                title = "Delete account",
+                confirmationMessage =
+                    "Are you sure you want to delete your account? This action cannot be undone.",
+            )
+          } else if (signingOut) {
+            ConfirmDialog(
+                onConfirm = { logOut() },
+                onDismiss = { signingOut = false },
+                confirmationMessage = "Are you sure you want to log out?",
+                title = "Log out")
+          } else {
 
-                SettingsComposable(R.drawable.privacy_icon, "Account privacy")
-                SettingsComposable(R.drawable.star, "Close friends")
-                SettingsComposable(R.drawable.blocked_icon, "Blocked")
-                SettingsComposable(R.drawable.mail, "Messages")
+            Column(
+                modifier =
+                    Modifier.padding(innerPadding)
+                        .verticalScroll(rememberScrollState())
+                        .testTag("Settings"),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center) {
+                  SettingsSubtitle(
+                      "Who can see your content", Modifier.padding(15.dp).align(Alignment.Start))
 
-                SettingsSubtitle(
-                    "Your app and media", Modifier.padding(15.dp).align(Alignment.Start))
+                  SettingsComposable(R.drawable.privacy_icon, "Account privacy")
+                  SettingsComposable(R.drawable.star, "Close friends")
+                  SettingsComposable(R.drawable.blocked_icon, "Blocked")
+                  SettingsComposable(R.drawable.mail, "Messages")
 
-                SettingsComposable(R.drawable.folder, "Suggested content")
-                SettingsComposable(
-                    R.drawable.mobile_friendly,
-                    "Device permissions",
-                    true,
-                    { nav.navigateToScreen(Route.PERMISSIONS) })
-                SettingsComposable(R.drawable.accessibility_icon, "Accessibility")
-                SettingsComposable(R.drawable.language, "Language")
+                  SettingsSubtitle(
+                      "Your app and media", Modifier.padding(15.dp).align(Alignment.Start))
 
-                SettingsSubtitle(
-                    "More info and support", Modifier.padding(15.dp).align(Alignment.Start))
+                  SettingsComposable(R.drawable.folder, "Suggested content")
+                  SettingsComposable(
+                      R.drawable.mobile_friendly,
+                      "Device permissions",
+                      true,
+                      { nav.navigateToScreen(Route.PERMISSIONS) })
+                  SettingsComposable(R.drawable.accessibility_icon, "Accessibility")
+                  SettingsComposable(R.drawable.language, "Language")
 
-                SettingsComposable(
-                    R.drawable.baseline_chat_bubble_outline_24,
-                    "Help",
-                    true,
-                    { nav.navigateToScreen(Route.HELP) })
-                SettingsComposable(
-                    R.drawable.gomeet_icon, "About", true, { nav.navigateToScreen(Route.ABOUT) })
+                  SettingsSubtitle(
+                      "More info and support", Modifier.padding(15.dp).align(Alignment.Start))
 
-                Button(
-                    onClick = { logOut() },
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.fillMaxWidth(0.5f),
-                    colors =
-                        ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                            contentColor = MaterialTheme.colorScheme.tertiary)) {
-                      Text(
-                          text = "Log out",
-                          color = Color.Red,
-                          fontStyle = FontStyle.Normal,
-                          fontWeight = FontWeight.SemiBold,
-                          fontFamily = FontFamily.Default,
-                          textAlign = TextAlign.Start,
-                          style = MaterialTheme.typography.bodySmall)
-                    }
+                  SettingsComposable(
+                      R.drawable.baseline_chat_bubble_outline_24,
+                      "Help",
+                      true,
+                      { nav.navigateToScreen(Route.HELP) })
+                  SettingsComposable(
+                      R.drawable.gomeet_icon, "About", true, { nav.navigateToScreen(Route.ABOUT) })
 
-                Button(
-                    onClick = { /* TODO */},
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.fillMaxWidth(0.5f),
-                    colors =
-                        ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                            contentColor = MaterialTheme.colorScheme.tertiary)) {
-                      Text(
-                          text = "Delete account",
-                          color = Color.Red,
-                          fontStyle = FontStyle.Normal,
-                          fontWeight = FontWeight.SemiBold,
-                          fontFamily = FontFamily.Default,
-                          textAlign = TextAlign.Start,
-                          style = MaterialTheme.typography.bodySmall)
-                    }
-              }
+                  Button(
+                      onClick = { signingOut = true },
+                      shape = RoundedCornerShape(10.dp),
+                      modifier = Modifier.fillMaxWidth(0.5f),
+                      colors =
+                          ButtonDefaults.buttonColors(
+                              containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                              contentColor = MaterialTheme.colorScheme.tertiary)) {
+                        Text(
+                            text = "Log out",
+                            color = Color.Red,
+                            fontStyle = FontStyle.Normal,
+                            fontWeight = FontWeight.SemiBold,
+                            fontFamily = FontFamily.Default,
+                            textAlign = TextAlign.Start,
+                            style = MaterialTheme.typography.bodySmall)
+                      }
+
+                  Button(
+                      onClick = { deleting = true },
+                      shape = RoundedCornerShape(10.dp),
+                      modifier = Modifier.fillMaxWidth(0.5f),
+                      colors =
+                          ButtonDefaults.buttonColors(
+                              containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                              contentColor = MaterialTheme.colorScheme.tertiary)) {
+                        Text(
+                            text = "Delete account",
+                            color = Color.Red,
+                            fontStyle = FontStyle.Normal,
+                            fontWeight = FontWeight.SemiBold,
+                            fontFamily = FontFamily.Default,
+                            textAlign = TextAlign.Start,
+                            style = MaterialTheme.typography.bodySmall)
+                      }
+                }
+          }
         }
   }
 }

@@ -352,7 +352,7 @@ fun InitNavigation(nav: NavHostController, client: ChatClient, applicationContex
         }
 
     composable(Route.SETTINGS) {
-      SettingsScreen(navAction) {
+      SettingsScreen(navAction, userViewModel.value) {
         logOut(
             navAction,
             LOGIN_ITEMS.first { it.route == startScreen },
