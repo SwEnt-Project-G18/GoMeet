@@ -7,6 +7,8 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.se.gomeet.R.*
+import io.github.kakaocup.kakao.common.utilities.getResourceString
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -22,9 +24,12 @@ class TagTest {
   fun testTagSelector() {
     composeTestRule.setContent { TagsSelector("Edit Tags", tagList) { success.value = true } }
 
-    composeTestRule.onNodeWithText("Edit Tags").assertIsDisplayed()
+    composeTestRule.onNodeWithText(getResourceString(string.edit_tags)).assertIsDisplayed()
     composeTestRule.onNodeWithTag("TagList").assertIsDisplayed().performClick()
-    composeTestRule.onNodeWithText("Save").assertIsDisplayed().performClick()
+    composeTestRule
+        .onNodeWithText(getResourceString(string.save))
+        .assertIsDisplayed()
+        .performClick()
     assert(success.value)
     assert(tagList.value.isNotEmpty())
   }

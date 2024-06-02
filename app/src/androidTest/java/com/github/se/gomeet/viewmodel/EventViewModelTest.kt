@@ -291,6 +291,20 @@ class EventViewModelTest {
   }
 
   @Test
+  fun leaveEventTest() {
+    val userId = "uid6"
+
+    // Make a user join the event
+    runBlocking { eventVM.joinEvent(eventVM.getEvent(eventId)!!, userId) }
+
+    // Make the user leave the event
+    runBlocking { eventVM.leaveEvent(eventVM.getEvent(eventId)!!, userId) }
+
+    // Make sure that the event participants list is empty
+    runBlocking { assert(!eventVM.getEvent(eventId)!!.participants.any { it == userId }) }
+  }
+
+  @Test
   fun locationTest() {
     val query = "q"
     var locationList: List<Location> = emptyList()

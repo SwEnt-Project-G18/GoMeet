@@ -7,6 +7,7 @@ import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -187,16 +188,31 @@ class EndToEndTest2 : TestCase() {
   fun test() = run {
     ComposeScreen.onComposeScreen<WelcomeScreenScreen>(composeTestRule) {
       step("Click on the log in button") {
-        composeTestRule.onNodeWithText("Log In").assertIsDisplayed().performClick()
+        composeTestRule
+            .onNodeWithText(getResourceString(R.string.log_in_button))
+            .assertIsDisplayed()
+            .performClick()
       }
     }
 
     ComposeScreen.onComposeScreen<LoginScreenScreen>(composeTestRule) {
       step("Log in with email and password") {
-        composeTestRule.onNodeWithText("Log In").assertIsDisplayed().assertIsNotEnabled()
-        composeTestRule.onNodeWithText("Email").assertIsDisplayed().performTextInput(email2)
-        composeTestRule.onNodeWithText("Password").assertIsDisplayed().performTextInput(pwd2)
-        composeTestRule.onNodeWithText("Log In").assertIsEnabled().performClick()
+        composeTestRule
+            .onNodeWithText(getResourceString(R.string.log_in_button))
+            .assertIsDisplayed()
+            .assertIsNotEnabled()
+        composeTestRule
+            .onNodeWithText(getResourceString(R.string.email_text_field))
+            .assertIsDisplayed()
+            .performTextInput(email2)
+        composeTestRule
+            .onNodeWithText(getResourceString(R.string.password_text_field))
+            .assertIsDisplayed()
+            .performTextInput(pwd2)
+        composeTestRule
+            .onNodeWithText(getResourceString(R.string.log_in_button))
+            .assertIsEnabled()
+            .performClick()
         composeTestRule.waitForIdle()
         composeTestRule.waitUntil(timeoutMillis = 10000) {
           composeTestRule.onNodeWithTag("ExploreUI").isDisplayed()
@@ -234,6 +250,26 @@ class EndToEndTest2 : TestCase() {
 
         composeTestRule.onNodeWithTag("EventButton").assertIsDisplayed()
         composeTestRule.onNodeWithTag("MapView").assertIsDisplayed()
+        composeTestRule
+            .onNodeWithContentDescription("Add to Favorites")
+            .assertIsDisplayed()
+            .performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule
+            .onNodeWithContentDescription("Remove from favorites")
+            .assertIsDisplayed()
+            .performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule
+            .onNodeWithText(getResourceString(R.string.join_event_button))
+            .assertIsDisplayed()
+            .performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule
+            .onNodeWithText(getResourceString(R.string.leave_event_button))
+            .assertIsDisplayed()
+            .performClick()
+        composeTestRule.waitForIdle()
         eventHeader { composeTestRule.onNodeWithTag("Username").assertIsDisplayed().performClick() }
       }
     }
@@ -242,15 +278,21 @@ class EndToEndTest2 : TestCase() {
       step("Follow the event creator") {
         composeTestRule.waitForIdle()
         composeTestRule.waitUntil(timeoutMillis = 10000) {
-          composeTestRule.onNodeWithText("Follow").isDisplayed()
+          composeTestRule.onNodeWithText(getResourceString(R.string.follow_button)).isDisplayed()
         }
-        composeTestRule.onNodeWithText("Follow").performClick()
+        composeTestRule.onNodeWithText(getResourceString(R.string.follow_button)).performClick()
         TimeUnit.SECONDS.sleep(2)
-        composeTestRule.onNodeWithText("Unfollow").assertIsDisplayed().performClick()
+        composeTestRule
+            .onNodeWithText(getResourceString(R.string.unfollow_button))
+            .assertIsDisplayed()
+            .performClick()
         TimeUnit.SECONDS.sleep(2)
-        composeTestRule.onNodeWithText("Follow").assertIsDisplayed().performClick()
+        composeTestRule
+            .onNodeWithText(getResourceString(R.string.follow_button))
+            .assertIsDisplayed()
+            .performClick()
         TimeUnit.SECONDS.sleep(2)
-        composeTestRule.onNodeWithText("Followers").performClick()
+        composeTestRule.onNodeWithText(getResourceString(R.string.profile_followers)).performClick()
       }
     }
 
@@ -268,8 +310,12 @@ class EndToEndTest2 : TestCase() {
     ComposeScreen.onComposeScreen<ProfileScreen>(composeTestRule) {
       step("Check that the current user's following list has been updated") {
         composeTestRule.waitForIdle()
-        composeTestRule.waitUntil { composeTestRule.onNodeWithText("Following").isDisplayed() }
-        composeTestRule.onNodeWithText("Following").performClick()
+        composeTestRule.waitUntil {
+          composeTestRule
+              .onNodeWithText(getResourceString(R.string.profile_following))
+              .isDisplayed()
+        }
+        composeTestRule.onNodeWithText(getResourceString(R.string.profile_following)).performClick()
       }
     }
 

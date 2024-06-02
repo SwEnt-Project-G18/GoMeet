@@ -118,6 +118,7 @@ fun AddParticipants(
       }
 
   Scaffold(
+      modifier = Modifier.testTag("AddParticipants"),
       topBar = {
         Column {
           TopAppBar(

@@ -186,7 +186,7 @@ fun EventPost(
           IconButton(onClick = { showDeletePostDialog = true }) {
             Icon(
                 imageVector = Icons.Default.Delete,
-                contentDescription = "Delete",
+                contentDescription = "Delete Post",
                 tint = MaterialTheme.colorScheme.onBackground)
           }
         }
@@ -195,7 +195,8 @@ fun EventPost(
         Text(
             text = "${event.getDateString()}, ${event.getTimeString()}",
             style = MaterialTheme.typography.bodyMedium,
-            color = Grey)
+            color = Grey,
+            modifier = Modifier.testTag("PostDate"))
       }
     }
   }
@@ -237,12 +238,16 @@ private fun DeletePostDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
             onClick = onDismiss,
             colors =
                 ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.onErrorContainer)) {
+                    containerColor = MaterialTheme.colorScheme.primaryContainer)) {
               Text("Cancel")
             }
       },
       title = { Text("Delete Post") },
-      text = { Text("Are you sure you want to delete this post?") },
+      text = {
+        Text(
+            "Are you sure you want to delete this post?",
+            modifier = Modifier.testTag("DeletePostConfirmationText"))
+      },
       containerColor = MaterialTheme.colorScheme.background,
   )
 }

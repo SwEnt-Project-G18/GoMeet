@@ -54,26 +54,35 @@ class LoginScreenTest {
 
     // Test the UI elements
     composeTestRule.onNodeWithContentDescription("GoMeet").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Login").assertIsDisplayed()
+    composeTestRule.onNodeWithText(getResourceString(R.string.login)).assertIsDisplayed()
 
-    composeTestRule.onNodeWithText("Email").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Password").assertIsDisplayed()
+    composeTestRule.onNodeWithText(getResourceString(R.string.email_text_field)).assertIsDisplayed()
     composeTestRule
-        .onNodeWithText("Log In")
+        .onNodeWithText(getResourceString(R.string.password_text_field))
+        .assertIsDisplayed()
+    composeTestRule
+        .onNodeWithText(getResourceString(R.string.log_in_button))
         .assertIsNotEnabled()
         .assertHasClickAction()
         .assertIsDisplayed()
 
     // Enter email and password
-    composeTestRule.onNodeWithText("Email").performTextInput(email)
-    composeTestRule.onNodeWithText("Password").performTextInput(pwd)
+    composeTestRule
+        .onNodeWithText(getResourceString(R.string.email_text_field))
+        .performTextInput(email)
+    composeTestRule
+        .onNodeWithText(getResourceString(R.string.password_text_field))
+        .performTextInput(pwd)
 
     // Wait for the Compose framework to recompose the UI
     composeTestRule.waitForIdle()
 
     // Click on the "Log in" button
-    composeTestRule.onNodeWithText("Log In").assertIsEnabled().assertHasClickAction()
-    composeTestRule.onNodeWithText("Log In").performClick()
+    composeTestRule
+        .onNodeWithText(getResourceString(R.string.log_in_button))
+        .assertIsEnabled()
+        .assertHasClickAction()
+    composeTestRule.onNodeWithText(getResourceString(R.string.log_in_button)).performClick()
 
     composeTestRule.waitForIdle()
 

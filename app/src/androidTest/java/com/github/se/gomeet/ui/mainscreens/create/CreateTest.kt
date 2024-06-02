@@ -6,7 +6,9 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.se.gomeet.R
 import com.github.se.gomeet.ui.navigation.NavigationActions
+import io.github.kakaocup.kakao.common.utilities.getResourceString
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -22,10 +24,14 @@ class CreateTest {
     composeTestRule.waitForIdle()
 
     // Check that the text "Choose your audience" is displayed
-    composeTestRule.onNodeWithText("Choose your audience").assertIsDisplayed()
+    composeTestRule.onNodeWithText(getResourceString(R.string.create_text)).assertIsDisplayed()
 
     // Check that the "Public" and "Private" buttons are displayed
-    composeTestRule.onNodeWithText("Public").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Private").assertIsDisplayed()
+    composeTestRule
+        .onNodeWithText(getResourceString(R.string.create_public_event_button))
+        .assertIsDisplayed()
+    composeTestRule
+        .onNodeWithText(getResourceString(R.string.create_private_event_button))
+        .assertIsDisplayed()
   }
 }

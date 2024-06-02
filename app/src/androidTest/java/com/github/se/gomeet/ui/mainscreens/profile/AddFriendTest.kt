@@ -12,10 +12,12 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.github.se.gomeet.R
 import com.github.se.gomeet.ui.navigation.NavigationActions
 import com.github.se.gomeet.viewmodel.UserViewModel
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import io.github.kakaocup.kakao.common.utilities.getResourceString
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
@@ -91,12 +93,17 @@ class AddFriendTest {
       composeTestRule.onAllNodesWithTag("UserItem")[0].isDisplayed()
     }
 
-    composeTestRule.onNodeWithText("Find User").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Search").assertIsDisplayed()
+    composeTestRule.onNodeWithText(getResourceString(R.string.add_friend)).assertIsDisplayed()
+    composeTestRule
+        .onNodeWithText(getResourceString(R.string.search_bar_placeholder))
+        .assertIsDisplayed()
     composeTestRule.onAllNodesWithTag("UserItem")[0].assertIsDisplayed().assertHasClickAction()
     composeTestRule.onAllNodesWithContentDescription("Profile picture")[0].assertIsDisplayed()
     composeTestRule.onNodeWithText(firstName2, substring = true).assertIsDisplayed()
     composeTestRule.onNodeWithText(username2).assertIsDisplayed()
-    composeTestRule.onAllNodesWithText("Follow")[0].assertIsDisplayed().performClick()
+    composeTestRule
+        .onAllNodesWithText(getResourceString(R.string.follow_button))[0]
+        .assertIsDisplayed()
+        .performClick()
   }
 }
