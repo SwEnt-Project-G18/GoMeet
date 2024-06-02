@@ -36,13 +36,14 @@ const val POSTS = "posts"
  * @param time Time of the event
  * @param price Price of the Event
  * @param url Website of the event (can be ticketLink)
+ * @param pendingParticipants People with a pending invitation to the event
  * @param participants People participating to the event
  * @param visibleToIfPrivate People that can enter the event if it's private
  * @param maxParticipants Maximum number of Participants of the event
  * @param public True if the event is public, false if it's private
  * @param tags Tags of the event
- * @param ratings Ratings of the event by each user (i.e. userID -> rating)
  * @param images Images of the event
+ * @param ratings Ratings of the event by each user (i.e. userID -> rating)
  * @param posts Posts of the event
  */
 data class Event(
@@ -134,6 +135,12 @@ data class Event(
     return "${this.getDateString()} at ${this.getTimeString()}"
   }
 
+  /**
+   * Returns whether this event should be displayed in screens showing events or not
+   *
+   * @param userId The current user's id
+   * @return true if this event should be displayed, false otherwise
+   */
   fun display(userId: String): Boolean {
     return !this.isPastEvent() &&
         (this.creator == userId ||
@@ -142,6 +149,12 @@ data class Event(
             this.participants.contains(userId))
   }
 
+  /**
+   * Returns whether an event should be displayed in the history or not
+   *
+   * @param userId The current user's id
+   * @return true if this event should be displayed in the history, false otherwise
+   */
   fun historyDisplay(userId: String): Boolean {
     return this.isPastEvent() &&
         (this.creator == userId ||

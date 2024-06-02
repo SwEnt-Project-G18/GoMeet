@@ -352,6 +352,14 @@ fun Profile(nav: NavigationActions, userViewModel: UserViewModel, eventViewModel
   }
 }
 
+/**
+ * Composable function for a user's profile image
+ *
+ * @param userId uid of the user whose profile image is being viewed
+ * @param modifier modifier to use
+ * @param defaultImageResId res id of the default image to use
+ * @param size size of the image
+ */
 @Composable
 fun ProfileImage(
     userId: String,
@@ -388,6 +396,11 @@ fun ProfileImage(
       contentScale = ContentScale.Crop)
 }
 
+/**
+ * Composable function that displays a rating star with the rating as text next to it
+ *
+ * @param rating to display
+ */
 @Composable
 fun RatingStarWithText(rating: Pair<Long, Long>) {
   val doubleRating =
@@ -408,6 +421,13 @@ fun RatingStarWithText(rating: Pair<Long, Long>) {
   }
 }
 
+/**
+ * Composable for the dialog that is shown when sharing content
+ *
+ * @param type type of content that is being shared
+ * @param uid uid of the current user
+ * @param onDismiss function to call when dismissed
+ */
 @Composable
 fun ShareDialog(type: String, uid: String, onDismiss: () -> Unit) {
   val context = LocalContext.current

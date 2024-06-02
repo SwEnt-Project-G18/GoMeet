@@ -44,6 +44,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+/**
+ * QR Code scanner screen
+ *
+ * @param nav navigation actions
+ * @param eventViewModel event view model
+ */
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun QRCodeScannerScreen(nav: NavigationActions, eventViewModel: EventViewModel) {
@@ -148,6 +154,13 @@ fun QRCodeScannerScreen(nav: NavigationActions, eventViewModel: EventViewModel) 
       }
 }
 
+/**
+ * Composable that displays a camera preview
+ *
+ * @param cameraProviderFuture camera provider feature
+ * @param lifecycleOwner life cycle owner
+ * @param onQRCodeScanned function to call after the qr code is scanned
+ */
 @Composable
 fun CameraPreviewView(
     cameraProviderFuture: ListenableFuture<ProcessCameraProvider>,

@@ -173,6 +173,7 @@ fun WelcomeScreen(
       }
 }
 
+/** Toast that is displayed when the login failed */
 private fun cantLogInToast(context: Context) {
   Toast.makeText(context, "Please wait for log out to complete", Toast.LENGTH_SHORT).show()
 }

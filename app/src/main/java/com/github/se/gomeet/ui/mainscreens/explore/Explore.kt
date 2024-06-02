@@ -168,6 +168,7 @@ fun Explore(nav: NavigationActions, eventViewModel: EventViewModel) {
   }
 }
 
+/** Composable that displays the bottom navigation menu */
 @Composable
 private fun BottomNavigationFun(nav: NavigationActions) {
 

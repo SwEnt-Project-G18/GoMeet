@@ -52,15 +52,18 @@ import com.github.se.gomeet.viewmodel.UserViewModel
  * Composable function for the profile Settings screen.
  *
  * @param nav The navigation actions for the screen.
+<<<<<<< HEAD
  * @param userViewModel The view model for the user (to delete the account).
+=======
+>>>>>>> f672fdec067d471ff33e98d50ae036e48c8a88bf
  * @param logOut The navigation action to go back to the start screen after signing out.
  */
 @Composable
 fun SettingsScreen(nav: NavigationActions, userViewModel: UserViewModel, logOut: () -> Unit) {
   val screenHeight = LocalConfiguration.current.screenHeightDp.dp
-  val screenWidth = LocalConfiguration.current.screenWidthDp.dp
   var deleting by remember { mutableStateOf(false) }
   var signingOut by remember { mutableStateOf(false) }
+
   GoMeetTheme {
     Scaffold(
         modifier = Modifier.testTag("SettingsScreen"),
@@ -202,6 +205,8 @@ fun SettingsScreen(nav: NavigationActions, userViewModel: UserViewModel, logOut:
  *
  * @param icon The icon for the item.
  * @param text The text for the item.
+ * @param clickable Whether the settings items are clickable or not
+ * @param onClick The function to call when the item is clicked
  */
 @Composable
 fun SettingsComposable(

@@ -135,6 +135,7 @@ fun Notifications(nav: NavigationActions, userViewModel: UserViewModel) {
  * @param pagerState the pager state
  * @param coroutineScope the coroutine scope
  * @param screenHeight the screen height
+ * @param screenWidth the screen width
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

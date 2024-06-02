@@ -57,6 +57,7 @@ private const val TAG = "LoginScreen"
  * Composable function for the Login Screen.
  *
  * @param authViewModel The ViewModel for the authentication.
+ * @param nav The navigation actions
  * @param onNavToExplore The navigation function to navigate to the Explore Screen.
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -193,6 +194,11 @@ fun LoginScreen(
   }
 }
 
+/**
+ * Composable that displays an error message
+ *
+ * @param errorText The error text to display
+ */
 @Composable
 fun ErrorMessage(errorText: String) {
   Text(
@@ -202,6 +208,7 @@ fun ErrorMessage(errorText: String) {
       textAlign = TextAlign.Center)
 }
 
+/** Returns whether the login action is enabled or not */
 fun isLoginEnabled(signInState: State<SignInState>): Boolean {
   return signInState.value.email.isNotEmpty() && signInState.value.password.isNotEmpty()
 }

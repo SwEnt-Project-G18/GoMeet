@@ -19,6 +19,7 @@ import com.github.se.gomeet.ui.navigation.NavigationActions
  * @param status the status of the invitation
  * @param callback the callback function to update the list of users to invite
  * @param initialClicked the initial state of the button
+ * @param nav the navigation actions
  */
 @Composable
 fun PageUserInvites(
