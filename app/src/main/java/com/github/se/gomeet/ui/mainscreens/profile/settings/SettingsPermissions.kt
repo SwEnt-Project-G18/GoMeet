@@ -62,7 +62,11 @@ import com.github.se.gomeet.ui.navigation.Route
 import com.github.se.gomeet.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.github.se.gomeet.ui.theme.White
 
-/** Permissions screen of the settings */
+/**
+ * Permissions screen of the settings
+ *
+ * @param nav navigation actions
+ */
 @SuppressLint("UnrememberedMutableState")
 @Composable
 fun SettingsPermissions(
