@@ -6,6 +6,8 @@ We want to provide an app which is able to create durable social connections amo
 
 Our app’s main focus will be facilitating event organisation and the promotion of events. The idea is to improve users’ social lives, whether they have lived where they are forever, have just moved to a new place or even if they are just visiting. Events can range from small get-togethers at the beach among friends with a football and a six-pack of beer, to university-organised lectures, to live DJ sets, or to anything private or public that someone comes up with and organises.
 
+## PRD
+[PRD.pdf](https://github.com/user-attachments/files/16442939/PRD.pdf)
 
 ## Figma
 
@@ -19,4 +21,3 @@ Here is our [architecture diagram](https://excalidraw.com/#room=fc79d4082a6d6539
 ## SonarCloud
 
 We are using SonarCloud to analyze our code and to ensure that it is of high quality. Here is our [SonarCloud project](https://sonarcloud.io/summary/overall?id=SwEnt-Project-G18_SwEntApp).
-
